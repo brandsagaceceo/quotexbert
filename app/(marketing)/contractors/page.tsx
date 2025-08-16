@@ -1,8 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+// import { useAuth } from "@clerk/nextjs";
+import Link from "next/link";
+import ProBadge from "@/app/_components/pro-badge";
 
 export default function ContractorsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-ink-50 flex items-center justify-center">Loading...</div>}>
+      <ContractorsPageContent />
+    </Suspense>
+  )
+}
+
+function ContractorsPageContent() {
+  // const { isSignedIn } = useAuth();
+  const isSignedIn = false; // Mock for demo
+  const searchParams = useSearchParams();
+  const showUpgrade = searchParams.get('upgrade') === 'true';
+  
   const [formData, setFormData] = useState({
     companyName: "",
     email: "",
@@ -26,9 +43,33 @@ export default function ContractorsPage() {
     "Other",
   ];
 
+  const benefits = [
+    "Lead alerts delivered instantly to your phone",
+    "Professional contractor dashboard with analytics",
+    "Customer review management system",
+    "Dedicated customer support team",
+    "Marketing materials and resources",
+  ];
+
+  const proBenefits = [
+    "Priority placement in search results",
+    "Verified contractor badge with quotexbert Pro logo",
+    "Advanced lead analytics and reporting",
+    "Premium customer support with dedicated rep",
+    "Custom marketing materials with your branding",
+    "Early access to new features and tools"
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Track Clarity event
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'contractor_signup', {
+        tradeType: formData.tradeType
+      });
+    }
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -42,28 +83,38 @@ export default function ContractorsPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleUpgradeToPro = async () => {
+    // Track Clarity event
+    if (typeof window !== 'undefined' && (window as any).clarity) {
+      (window as any).clarity('event', 'pro_upgrade_click');
+    }
+
+    // TODO: Implement Stripe Checkout
+    alert('Stripe integration coming soon! This will redirect to Stripe Checkout.');
+  };
+
   if (isSubmitted) {
     return (
-      <div className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="rounded-md bg-green-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L7.53 10.53a.75.75 0 00-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">
-                    Application Submitted!
-                  </h3>
-                  <div className="mt-2 text-sm text-green-700">
-                    <p>Thank you for your interest in joining quotexbert. We'll review your application and get back to you within 2-3 business days.</p>
-                  </div>
-                </div>
-              </div>
+      <div className="min-h-screen bg-ink-100 py-16 sm:py-24">
+        <div className="max-w-2xl mx-auto px-4">
+          <div className="bg-white border border-green-200 rounded-xl p-8 text-center shadow-sm">
+            <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-6">
+              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
+            <h2 className="text-2xl font-bold text-green-800 mb-4">
+              Application Submitted Successfully!
+            </h2>
+            <p className="text-green-700 mb-6">
+              Thank you for your interest in joining quotexbert. We&apos;ll review your application and get back to you within 2-3 business days.
+            </p>
+            <button 
+              onClick={() => setIsSubmitted(false)}
+              className="bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors duration-200"
+            >
+              Submit Another Application
+            </button>
           </div>
         </div>
       </div>
@@ -71,55 +122,141 @@ export default function ContractorsPage() {
   }
 
   return (
-    <div className="bg-white py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Join Our Contractor Network
+    <div className="min-h-screen bg-ink-100 py-16 sm:py-24">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl font-bold text-ink-900 mb-4">
+            Join quotexbert Contractors
           </h1>
-          <p className="mt-2 text-lg leading-8 text-gray-600">
-            Connect with homeowners in your area and grow your business with quotexbert.
+          <p className="text-xl text-ink-600 leading-relaxed max-w-3xl mx-auto mb-8">
+            Connect with homeowners in your area and grow your business with qualified leads delivered directly to you.
           </p>
+          
+          {isSignedIn && (
+            <Link
+              href="/contractor/portal"
+              className="inline-flex items-center bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors duration-200"
+            >
+              Go to Contractor Portal
+              <svg className="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+              </svg>
+            </Link>
+          )}
         </div>
 
-        <div className="mx-auto mt-16 max-w-xl">
-          <div className="mb-8 rounded-lg bg-blue-50 p-6">
-            <h3 className="text-lg font-medium text-blue-900 mb-4">Why Join quotexbert?</h3>
-            <ul className="space-y-2 text-sm text-blue-800">
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                Access to qualified leads in your area
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                No upfront costs or monthly fees
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                Fast payment processing
-              </li>
-              <li className="flex items-center">
-                <svg className="h-4 w-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                Marketing and business tools
-              </li>
+        {/* Pro Upgrade Section */}
+        {showUpgrade && (
+          <div className="mb-16 bg-gradient-to-r from-brand/5 to-brand/10 border border-brand/20 rounded-xl p-8">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <ProBadge size="lg" />
+                <h2 className="text-3xl font-bold text-ink-900 ml-4">Upgrade to Pro</h2>
+              </div>
+              <p className="text-xl text-ink-600 max-w-2xl mx-auto">
+                Get priority placement, verified badge, and advanced features to grow your business faster.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <h3 className="text-lg font-bold text-ink-900 mb-4">Standard (Free)</h3>
+                <ul className="space-y-2 text-ink-600 mb-6">
+                  {benefits.map((benefit, index) => (
+                    <li key={index} className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+                <div className="text-2xl font-bold text-ink-900">Free</div>
+              </div>
+              
+              <div className="bg-white rounded-xl p-6 shadow-sm border-2 border-brand">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-ink-900">Pro</h3>
+                  <ProBadge size="md" />
+                </div>
+                <ul className="space-y-2 text-ink-600 mb-6">
+                  {proBenefits.map((benefit, index) => (
+                    <li key={index} className="flex items-center">
+                      <svg className="w-4 h-4 text-brand mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+                <div className="text-2xl font-bold text-brand mb-4">$99/month</div>
+                <button
+                  onClick={handleUpgradeToPro}
+                  className="w-full bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-xl font-bold transition-colors duration-200"
+                >
+                  Start Free Trial
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Benefits Card */}
+          <div className="bg-white border border-ink-200 rounded-xl p-8 shadow-sm">
+            <h3 className="text-2xl font-bold text-ink-900 mb-6">What you get:</h3>
+            <ul className="space-y-4 mb-8">
+              {benefits.map((benefit, index) => (
+                <li key={index} className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center w-6 h-6 bg-brand rounded-full">
+                      <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+                  <span className="ml-3 text-ink-700 font-medium">{benefit}</span>
+                </li>
+              ))}
             </ul>
+
+            <div className="border-t border-ink-200 pt-6">
+              <h4 className="text-lg font-bold text-ink-900 mb-4">Additional Benefits:</h4>
+              <ul className="space-y-2 text-sm text-ink-600">
+                <li className="flex items-center">
+                  <svg className="h-4 w-4 text-brand mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  No upfront costs or monthly fees
+                </li>
+                <li className="flex items-center">
+                  <svg className="h-4 w-4 text-brand mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Fast payment processing
+                </li>
+                <li className="flex items-center">
+                  <svg className="h-4 w-4 text-brand mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Marketing and business tools
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Company Name */}
-            <div>
-              <label htmlFor="companyName" className="block text-sm font-medium leading-6 text-gray-900">
-                Company Name
-              </label>
-              <div className="mt-2">
+          {/* Application Form Card */}
+          <div className="bg-white border border-ink-200 rounded-[var(--radius-card)] p-8 shadow-sm">
+            <h3 className="text-2xl font-bold text-ink-900 mb-2">Apply Now</h3>
+            <p className="text-ink-600 mb-6">Fill out the form below to get started.</p>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Company Name */}
+              <div>
+                <label htmlFor="companyName" className="block text-sm font-semibold text-ink-900 mb-2">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   name="companyName"
@@ -127,17 +264,16 @@ export default function ContractorsPage() {
                   required
                   value={formData.companyName}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[color:var(--brand)] sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg border-0 py-3 px-4 text-ink-900 shadow-sm ring-1 ring-inset ring-ink-300 placeholder:text-ink-500 focus:ring-2 focus:ring-inset focus:ring-[var(--brand)] sm:text-sm transition-colors duration-200"
+                  placeholder="Your company name"
                 />
               </div>
-            </div>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                Email Address
-              </label>
-              <div className="mt-2">
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-ink-900 mb-2">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="email"
                   name="email"
@@ -145,17 +281,16 @@ export default function ContractorsPage() {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[color:var(--brand)] sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg border-0 py-3 px-4 text-ink-900 shadow-sm ring-1 ring-inset ring-ink-300 placeholder:text-ink-500 focus:ring-2 focus:ring-inset focus:ring-[var(--brand)] sm:text-sm transition-colors duration-200"
+                  placeholder="your@email.com"
                 />
               </div>
-            </div>
 
-            {/* Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
-                Phone Number
-              </label>
-              <div className="mt-2">
+              {/* Phone */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-semibold text-ink-900 mb-2">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="tel"
                   name="phone"
@@ -163,26 +298,25 @@ export default function ContractorsPage() {
                   required
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[color:var(--brand)] sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg border-0 py-3 px-4 text-ink-900 shadow-sm ring-1 ring-inset ring-ink-300 placeholder:text-ink-500 focus:ring-2 focus:ring-inset focus:ring-[var(--brand)] sm:text-sm transition-colors duration-200"
+                  placeholder="(555) 123-4567"
                 />
               </div>
-            </div>
 
-            {/* Trade Type */}
-            <div>
-              <label htmlFor="tradeType" className="block text-sm font-medium leading-6 text-gray-900">
-                Trade Type
-              </label>
-              <div className="mt-2">
+              {/* Trade Type */}
+              <div>
+                <label htmlFor="tradeType" className="block text-sm font-semibold text-ink-900 mb-2">
+                  Primary Trade <span className="text-red-500">*</span>
+                </label>
                 <select
                   name="tradeType"
                   id="tradeType"
                   required
                   value={formData.tradeType}
                   onChange={handleInputChange}
-                  className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[color:var(--brand)] sm:text-sm sm:leading-6"
+                  className="block w-full rounded-lg border-0 py-3 px-4 text-ink-900 shadow-sm ring-1 ring-inset ring-ink-300 focus:ring-2 focus:ring-inset focus:ring-[var(--brand)] sm:text-sm transition-colors duration-200"
                 >
-                  <option value="">Select your trade</option>
+                  <option value="">Select your primary trade</option>
                   {tradeTypes.map((type) => (
                     <option key={type} value={type}>
                       {type}
@@ -190,19 +324,29 @@ export default function ContractorsPage() {
                   ))}
                 </select>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex w-full justify-center rounded-md bg-[color:var(--brand)] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[color:var(--brand)]/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--brand)] disabled:opacity-50 transition-colors duration-200"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Application"}
-              </button>
-            </div>
-          </form>
+              {/* Submit Button */}
+              <div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-4 rounded-[var(--radius-button)] text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Submitting...
+                    </span>
+                  ) : (
+                    "Submit Application"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

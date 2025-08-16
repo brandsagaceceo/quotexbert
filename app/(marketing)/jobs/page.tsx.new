@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { submitLead } from "@/app/actions/submitLead";
 
 declare global {
@@ -11,20 +10,10 @@ declare global {
 }
 
 export default function JobsPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-ink-50 flex items-center justify-center">Loading...</div>}>
-      <JobsPageContent />
-    </Suspense>
-  )
-}
-
-function JobsPageContent() {
   const [estimate, setEstimate] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [leadData, setLeadData] = useState<any>(null);
-  const searchParams = useSearchParams();
-  const affiliateCode = searchParams.get('ref');
 
   const projectTypes = [
     "Kitchen Renovation",
@@ -45,11 +34,6 @@ function JobsPageContent() {
     setErrors({});
 
     const formData = new FormData(e.currentTarget);
-    
-    // Add affiliate code if present
-    if (affiliateCode) {
-      formData.set('affiliateCode', affiliateCode);
-    }
 
     try {
       const result = await submitLead(formData);
@@ -74,7 +58,7 @@ function JobsPageContent() {
         const projectType = formData.get('projectType') as string;
         window.clarity('event', 'lead_submitted', { 
           projectType,
-          hasAffiliate: !!affiliateCode
+          hasAffiliate: false // TODO: implement affiliate tracking
         });
       }
 

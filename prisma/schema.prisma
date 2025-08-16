@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  postalCode   String
+  projectType  String
+  description  String
+  estimate     String
+  source       String?   // "web" or ref code
+  ip           String?
+  userAgent    String?
+  affiliateId  String?   // link to Affiliate if tracked
+  
+  // Job board extensions
+  status       String   @default("NEW") // NEW | PUBLISHED | CLAIMED | CLOSED | ARCHIVED
+  city         String?
+  province     String?
+  budgetMin    Int?     // CAD
+  budgetMax    Int?
+  claimedById  String?  // Clerk user id (contractor)
+  notesAdmin   String?  // admin-facing notes
+  tags         String?  // JSON string: e.g., '["plumbing","urgent"]'
+  
+  @@index([status, createdAt(sort: Desc)])
+  @@map("leads")
+}
+
+model Affiliate {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  name          String?
+  email         String?  @unique
+  referralCode  String   @unique
+  payoutPercent Int      @default(50) // 50% commission
+  notes         String?
+  
+  @@map("affiliates")
+}
+
+model Referral {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  affiliateId  String
+  leadId       String?
+  visitorIp    String?
+  userAgent    String?
+  
+  @@map("referrals")
+}
+
+model ProMembership {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  stripeId  String?  // customer id
+  status    String   // "active" | "canceled" | etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("pro_memberships")
+}
+
+model ContractorInterest {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  contractorId String   // Clerk user id
+  leadId       String
+  type         String   // "SAVED" | "APPLIED"
+  message      String?
+  
+  @@unique([contractorId, leadId, type])
+  @@map("contractor_interests")
+}
