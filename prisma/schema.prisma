@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// quotexbert - AI-powered home repair estimate platform + job board
+// Full-stack platform with Clerk auth, roles, messaging, and notifications
 
 generator client {
   provider = "prisma-client-js"
@@ -13,39 +10,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      String   // "admin" | "contractor" | "homeowner"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  contractorProfile    ContractorProfile?
+  homeownerProfile     HomeownerProfile?
+  billing             ContractorBilling?
+  leads               Lead[]            @relation("HomeownerLeads")
+  claimedLeads        Lead[]            @relation("ContractorLeads")
+  acceptedLeads       Lead[]            @relation("AcceptedLeads")
+  savedJobs           SavedJob[]
+  messagesSent        Message[]         @relation("MessageSender")
+  messagesReceived    Message[]         @relation("MessageReceiver")
+  notifications       Notification[]
+  homeownerContracts  Contract[]        @relation("HomeownerContracts")
+  contractorContracts Contract[]        @relation("ContractorContracts")
+  reviewsGiven        Review[]          @relation("HomeownerReviews")
+  reviewsReceived     Review[]          @relation("ContractorReviews")
+  
+  @@map("users")
+}
+
+model ContractorProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  companyName     String
+  trade           String   // "plumbing", "electrical", "general", etc.
+  bio             String?
+  city            String?
+  serviceRadiusKm Int      @default(25)
+  website         String?
+  phone           String?
+  verified        Boolean  @default(false)
+  avgRating       Float    @default(0)
+  reviewCount     Int      @default(0)
+  isActive        Boolean  @default(true)
+  
+  portfolio       PortfolioItem[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("contractor_profiles")
+}
+
 model Lead {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  postalCode   String
-  projectType  String
-  description  String
-  estimate     String
-  source       String?   // "web" or ref code
-  ip           String?
-  userAgent    String?
-  affiliateId  String?   // link to Affiliate if tracked
+  id               String           @id @default(cuid())
+  title            String
+  description      String
+  budget           Float
+  zipCode          String
+  category         String
+  status           String           @default("open") // "open" | "claimed" | "assigned" | "closed"
+  claimed          Boolean          @default(false)
+  published        Boolean          @default(true)
   
-  // Job board extensions
-  status       String   @default("NEW") // NEW | PUBLISHED | CLAIMED | CLOSED | ARCHIVED
-  city         String?
-  province     String?
-  budgetMin    Int?     // CAD
-  budgetMax    Int?
-  claimedById  String?  // Clerk user id (contractor)
-  notesAdmin   String?  // admin-facing notes
-  tags         String?  // JSON string: e.g., '["plumbing","urgent"]'
+  homeownerId      String
+  homeowner        User             @relation("HomeownerLeads", fields: [homeownerId], references: [id])
   
-  @@index([status, createdAt(sort: Desc)])
+  contractorId     String?
+  contractor       User?            @relation("ContractorLeads", fields: [contractorId], references: [id])
+  
+  acceptedById     String?
+  acceptedBy       User?            @relation("AcceptedLeads", fields: [acceptedById], references: [id])
+  
+  Thread           Thread?
+  savedBy          SavedJob[]
+  charges          Charge[]
+  contract         Contract?
+  reviews          Review[]
+  
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  @@index([category])
+  @@index([zipCode])
   @@map("leads")
 }
 
+model SavedJob {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId  String
+  job    Lead   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, jobId])
+  @@map("saved_jobs")
+}
+
+model Thread {
+  id        String    @id @default(cuid())
+  leadId    String    @unique
+  lead      Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  messages  Message[]
+  
+  createdAt DateTime  @default(now())
+  
+  @@map("threads")
+}
+
+model Message {
+  id       String @id @default(cuid())
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  body     String
+  
+  fromUserId String
+  fromUser   User   @relation("MessageSender", fields: [fromUserId], references: [id])
+  
+  toUserId   String
+  toUser     User   @relation("MessageReceiver", fields: [toUserId], references: [id])
+  
+  createdAt  DateTime @default(now())
+  
+  @@index([threadId, createdAt])
+  @@map("messages")
+}
+
+model Notification {
+  id      String  @id @default(cuid())
+  userId  String
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type    String  // "JOB_CLAIMED" | "NEW_MESSAGE" | "LEAD_MATCHED" | "JOB_COMPLETED"
+  payload Json    // Flexible data: { leadId, title, message, etc. }
+  read    Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// Legacy models for existing affiliate system
 model Affiliate {
   id            String   @id @default(cuid())
   createdAt     DateTime @default(now())
   name          String?
   email         String?  @unique
   referralCode  String   @unique
-  payoutPercent Int      @default(50) // 50% commission
+  payoutPercent Int      @default(50)
   notes         String?
   
   @@map("affiliates")
@@ -65,22 +180,152 @@ model Referral {
 model ProMembership {
   id        String   @id @default(cuid())
   email     String   @unique
-  stripeId  String?  // customer id
-  status    String   // "active" | "canceled" | etc.
+  stripeId  String?
+  status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   @@map("pro_memberships")
 }
 
-model ContractorInterest {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  contractorId String   // Clerk user id
-  leadId       String
-  type         String   // "SAVED" | "APPLIED"
-  message      String?
+model ContractorBilling {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String?  @unique
+  monthlyCapCents      Int      @default(5000) // $50.00 default cap
+  isPaused             Boolean  @default(false)
+  spendThisMonthCents  Int      @default(0)
+  resetOn              DateTime @default(now())
   
-  @@unique([contractorId, leadId, type])
-  @@map("contractor_interests")
+  charges              Charge[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@map("contractor_billing")
+}
+
+model Charge {
+  id            String           @id @default(cuid())
+  contractorId  String
+  contractor    ContractorBilling @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  leadId        String
+  lead          Lead             @relation(fields: [leadId], references: [id])
+  amountCents   Int
+  stripePaymentIntentId String? @unique
+  status        String           @default("pending") // "pending" | "succeeded" | "failed"
+  
+  createdAt     DateTime         @default(now())
+  
+  @@map("charges")
+}
+
+model LeadPricing {
+  id          String @id @default(cuid())
+  trade       String @unique
+  city        String @default("default") // "default" for general pricing
+  priceCents  Int    @default(900) // $9.00 default
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([trade, city])
+  @@map("lead_pricing")
+}
+
+model Contract {
+  id                String   @id @default(cuid())
+  leadId            String   @unique
+  lead              Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  homeownerId       String
+  homeowner         User     @relation("HomeownerContracts", fields: [homeownerId], references: [id])
+  
+  contractorId      String
+  contractor        User     @relation("ContractorContracts", fields: [contractorId], references: [id])
+  
+  title             String
+  description       String
+  scope             String   @default("") // Detailed scope of work
+  totalAmountCents  Int      // Total contract amount in cents
+  
+  status            String   @default("draft") // "draft" | "sent" | "accepted" | "completed" | "cancelled"
+  homeownerAccepted Boolean  @default(false)
+  contractorAccepted Boolean @default(false)
+  
+  pdfUrl            String?  // URL to generated PDF
+  
+  items             ContractItem[]
+  
+  sentAt            DateTime?
+  acceptedAt        DateTime? // When both parties accepted
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("contracts")
+}
+
+model ContractItem {
+  id          String   @id @default(cuid())
+  contractId  String
+  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Int      // Price per unit in cents
+  totalPrice  Int      // quantity * unitPrice
+  
+  createdAt   DateTime @default(now())
+  
+  @@map("contract_items")
+}
+
+model HomeownerProfile {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name     String?
+  city     String?
+  phone    String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("homeowner_profiles")
+}
+
+model PortfolioItem {
+  id           String   @id @default(cuid())
+  contractorId String
+  contractor   ContractorProfile @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  
+  title        String
+  caption      String?
+  imageUrl     String
+  
+  createdAt    DateTime @default(now())
+  
+  @@map("portfolio_items")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  leadId       String
+  contractorId String
+  homeownerId  String
+  
+  lead         Lead     @relation(fields: [leadId], references: [id])
+  contractor   User     @relation("ContractorReviews", fields: [contractorId], references: [id])
+  homeowner    User     @relation("HomeownerReviews", fields: [homeownerId], references: [id])
+  
+  rating       Int
+  text         String?
+  
+  createdAt    DateTime @default(now())
+  
+  @@unique([leadId, homeownerId]) // One review per homeowner per lead
+  @@map("reviews")
 }

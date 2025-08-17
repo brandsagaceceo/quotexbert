@@ -13,11 +13,13 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/jobs", label: "Jobs" },
-    { href: "/contractors", label: "Contractors" },
     { href: "/contractor/jobs", label: "Job Board" },
+    { href: "/contractors", label: "Contractors" },
+    { href: "/contractor/billing", label: "Billing" },
     { href: "/affiliates", label: "Affiliates" },
-    { href: "/admin/leads", label: "Admin" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+    { href: "/messages", label: "Messages" },
   ];
 
   return (
@@ -26,8 +28,8 @@ export default function SiteHeader() {
         <div className="flex justify-between items-center h-16">
           {/* Brand */}
           <div className="flex-shrink-0">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center space-x-3 hover:opacity-90 transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-md"
             >
               <Image
@@ -37,9 +39,7 @@ export default function SiteHeader() {
                 height={32}
                 className="w-8 h-8"
               />
-              <span className="text-xl font-bold text-brand">
-                quotexbert
-              </span>
+              <span className="text-xl font-bold text-brand">quotexbert</span>
             </Link>
           </div>
 
@@ -54,7 +54,7 @@ export default function SiteHeader() {
                 {link.label}
               </Link>
             ))}
-            
+
             {/* Authentication */}
             {isSignedIn ? (
               <div className="flex items-center space-x-4">
@@ -145,7 +145,7 @@ export default function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
-              
+
               {/* Mobile Auth */}
               {isSignedIn ? (
                 <div className="space-y-3 pt-4 border-t border-ink-200">

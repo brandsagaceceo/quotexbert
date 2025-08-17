@@ -1,59 +1,66 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { CANADIAN_PROVINCES, TRADE_TYPES } from '@/lib/canada'
+import { useState } from "react";
+import { CANADIAN_PROVINCES, TRADE_TYPES } from "@/lib/canada";
 
 interface FiltersBarProps {
   onFiltersChange: (filters: {
-    q?: string
-    trade?: string
-    minBudget?: number
-    maxBudget?: number
-    province?: string
-    city?: string
-  }) => void
+    q?: string;
+    trade?: string;
+    minBudget?: number;
+    maxBudget?: number;
+    province?: string;
+    city?: string;
+  }) => void;
 }
 
 export default function FiltersBar({ onFiltersChange }: FiltersBarProps) {
-  const [q, setQ] = useState('')
-  const [trade, setTrade] = useState('')
-  const [minBudget, setMinBudget] = useState('')
-  const [maxBudget, setMaxBudget] = useState('')
-  const [province, setProvince] = useState('')
-  const [city, setCity] = useState('')
+  const [q, setQ] = useState("");
+  const [trade, setTrade] = useState("");
+  const [minBudget, setMinBudget] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
+  const [province, setProvince] = useState("");
+  const [city, setCity] = useState("");
 
   const handleFiltersChange = () => {
-    const filters = {
-      q: q || undefined,
-      trade: trade || undefined,
-      minBudget: minBudget ? parseInt(minBudget) : undefined,
-      maxBudget: maxBudget ? parseInt(maxBudget) : undefined,
-      province: province || undefined,
-      city: city || undefined
-    }
+    const filters: {
+      q?: string;
+      trade?: string;
+      minBudget?: number;
+      maxBudget?: number;
+      province?: string;
+      city?: string;
+    } = {};
 
-    onFiltersChange(filters)
+    if (q) filters.q = q;
+    if (trade) filters.trade = trade;
+    if (minBudget) filters.minBudget = parseInt(minBudget);
+    if (maxBudget) filters.maxBudget = parseInt(maxBudget);
+    if (province) filters.province = province;
+    if (city) filters.city = city;
+
+    onFiltersChange(filters);
 
     // Emit Clarity event
-    if (typeof window !== 'undefined' && window.clarity) {
-      window.clarity('event', 'job_filter', {
+    if (typeof window !== "undefined" && window.clarity) {
+      window.clarity("event", "job_filter", {
         trade: filters.trade,
         province: filters.province,
         budgetMin: filters.minBudget,
-        budgetMax: filters.maxBudget
-      })
+        budgetMax: filters.maxBudget,
+      });
     }
-  }
+  };
 
   const clearFilters = () => {
-    setQ('')
-    setTrade('')
-    setMinBudget('')
-    setMaxBudget('')
-    setProvince('')
-    setCity('')
-    onFiltersChange({})
-  }
+    setQ("");
+    setTrade("");
+    setMinBudget("");
+    setMaxBudget("");
+    setProvince("");
+    setCity("");
+    onFiltersChange({});
+  };
 
   return (
     <div className="bg-white border-b border-ink-200 sticky top-0 z-10">
@@ -171,5 +178,5 @@ export default function FiltersBar({ onFiltersChange }: FiltersBarProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

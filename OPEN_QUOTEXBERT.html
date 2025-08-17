@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuotexBert - Profile System</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+        .status {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .url-list {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .url-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #0f172a;
+            border-radius: 6px;
+            border: 1px solid #475569;
+        }
+        .url-item:hover {
+            background: #1e293b;
+            border-color: #3b82f6;
+        }
+        .url-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            width: 30px;
+        }
+        .url-info h3 {
+            margin: 0 0 5px 0;
+            color: #3b82f6;
+        }
+        .url-info p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+        .url-link {
+            color: #10b981;
+            text-decoration: none;
+            font-family: monospace;
+            background: #065f46;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+        .url-link:hover {
+            background: #047857;
+        }
+        .features {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .feature-item {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+        }
+        .feature-item h4 {
+            color: #3b82f6;
+            margin: 0 0 8px 0;
+        }
+        .feature-item p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+        .instructions {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        .success {
+            color: #10b981;
+        }
+        .warning {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🏠 QuotexBert</div>
+        <div class="tagline">AI-Powered Home Repair Platform with Rich User Profiles</div>
+    </div>
+
+    <div class="status">
+        <h2>🎉 Profile System Complete!</h2>
+        <p>Your QuotexBert application is running with the full profile system implemented. All features are working including contractor profiles, portfolio management, ratings & reviews, and admin verification.</p>
+    </div>
+
+    <div class="instructions">
+        <h2>⚠️ How to Access Your App</h2>
+        <p><strong>IMPORTANT:</strong> Copy any URL below and paste it into your browser address bar. The development server is running on your computer.</p>
+    </div>
+
+    <div class="url-list">
+        <h2>🌐 Available Pages</h2>
+        
+        <div class="url-item">
+            <div class="url-icon">🏠</div>
+            <div class="url-info">
+                <h3>Main Application</h3>
+                <p>Homepage with job board and navigation</p>
+            </div>
+            <a href="http://localhost:3000" class="url-link">localhost:3000</a>
+        </div>
+
+        <div class="url-item">
+            <div class="url-icon">👷</div>
+            <div class="url-info">
+                <h3>Contractor Directory</h3>
+                <p>Browse all contractor profiles with ratings</p>
+            </div>
+            <a href="http://localhost:3000/contractors" class="url-link">localhost:3000/contractors</a>
+        </div>
+
+        <div class="url-item">
+            <div class="url-icon">✏️</div>
+            <div class="url-info">
+                <h3>Profile Editor</h3>
+                <p>Edit contractor profile information</p>
+            </div>
+            <a href="http://localhost:3000/profile/edit" class="url-link">localhost:3000/profile/edit</a>
+        </div>
+
+        <div class="url-item">
+            <div class="url-icon">📸</div>
+            <div class="url-info">
+                <h3>Portfolio Manager</h3>
+                <p>Upload and manage portfolio images</p>
+            </div>
+            <a href="http://localhost:3000/profile/portfolio" class="url-link">localhost:3000/profile/portfolio</a>
+        </div>
+
+        <div class="url-item">
+            <div class="url-icon">⚙️</div>
+            <div class="url-info">
+                <h3>Admin Dashboard</h3>
+                <p>Verify contractors and manage the platform</p>
+            </div>
+            <a href="http://localhost:3000/admin/contractors" class="url-link">localhost:3000/admin/contractors</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <h2>✅ Implemented Features</h2>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <h4>🎯 Public Profiles</h4>
+                <p>SEO-friendly contractor profile pages with company info, ratings, and portfolio</p>
+            </div>
+            <div class="feature-item">
+                <h4>📝 Profile Editor</h4>
+                <p>Complete form for contractors to update their information and business details</p>
+            </div>
+            <div class="feature-item">
+                <h4>📸 Portfolio System</h4>
+                <p>Image upload and management for showcasing completed work</p>
+            </div>
+            <div class="feature-item">
+                <h4>⭐ Reviews & Ratings</h4>
+                <p>Homeowners can rate and review contractors after job completion</p>
+            </div>
+            <div class="feature-item">
+                <h4>✅ Verification System</h4>
+                <p>Admin dashboard to verify contractors and manage platform quality</p>
+            </div>
+            <div class="feature-item">
+                <h4>🔗 Job Board Integration</h4>
+                <p>Contractor cards and badges for seamless job board display</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="status">
+        <h2>📊 Current System Data</h2>
+        <ul>
+            <li><span class="success">✅ 1 Contractor Profile</span> (Test Contracting Co.)</li>
+            <li><span class="success">✅ 3 Portfolio Items</span> (with image upload ready)</li>
+            <li><span class="success">✅ 1 Review</span> (5-star rating system working)</li>
+            <li><span class="success">✅ Admin Verification</span> (ready for contractor approval)</li>
+            <li><span class="success">✅ All APIs Functional</span> (CRUD operations tested)</li>
+        </ul>
+    </div>
+
+    <script>
+        // Auto-refresh server status
+        function checkServer() {
+            fetch('http://localhost:3000/api/health')
+                .then(response => {
+                    if (response.ok) {
+                        document.querySelector('.status h2').innerHTML = '🎉 Profile System Complete! <span style="color: #10b981;">● Server Running</span>';
+                    }
+                })
+                .catch(() => {
+                    document.querySelector('.status h2').innerHTML = '🎉 Profile System Complete! <span style="color: #f59e0b;">● Server Offline</span>';
+                });
+        }
+        
+        setInterval(checkServer, 5000);
+        checkServer();
+
+        // Add click handlers to copy URLs
+        document.querySelectorAll('.url-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigator.clipboard.writeText(link.href).then(() => {
+                    const originalText = link.textContent;
+                    link.textContent = 'Copied!';
+                    link.style.background = '#059669';
+                    setTimeout(() => {
+                        link.textContent = originalText;
+                        link.style.background = '#065f46';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

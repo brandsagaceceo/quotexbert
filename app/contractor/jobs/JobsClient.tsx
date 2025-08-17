@@ -1,117 +1,121 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { saveInterestAction } from './actions'
-import FiltersBar from '@/app/_components/jobs/FiltersBar'
-import JobCard from '@/app/_components/jobs/JobCard'
+import { useState, useEffect } from "react";
+import { saveInterestAction } from "./actions";
+import FiltersBar from "@/app/_components/jobs/FiltersBar";
+import JobCard from "@/app/_components/jobs/JobCard";
 
 interface Lead {
-  id: string
-  createdAt: Date
-  projectType: string
-  description: string
-  estimate: string
-  city?: string | null
-  province?: string | null
-  tags?: string | null
-  affiliateId?: string | null
-  status: string
-  budgetMin?: number | null
-  budgetMax?: number | null
+  id: string;
+  createdAt: Date;
+  projectType: string;
+  description: string;
+  estimate: string;
+  city?: string | null;
+  province?: string | null;
+  tags?: string | null;
+  affiliateId?: string | null;
+  status: string;
+  budgetMin?: number | null;
+  budgetMax?: number | null;
 }
 
 interface Filters {
-  q?: string
-  trade?: string
-  minBudget?: number
-  maxBudget?: number
-  province?: string
-  city?: string
+  q?: string;
+  trade?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  province?: string;
+  city?: string;
 }
 
 interface JobsClientProps {
-  initialLeads: Lead[]
+  initialLeads: Lead[];
 }
 
 export default function JobsClient({ initialLeads }: JobsClientProps) {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads)
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>(initialLeads)
-  const [filters, setFilters] = useState<Filters>({})
+  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [filteredLeads, setFilteredLeads] = useState<Lead[]>(initialLeads);
+  const [filters, setFilters] = useState<Filters>({});
 
   const handleSaveJob = async (leadId: string) => {
     try {
-      await saveInterestAction(leadId, 'SAVED')
+      await saveInterestAction(leadId, "SAVED");
       // Could show success message
     } catch (error) {
-      console.error('Error saving job:', error)
+      console.error("Error saving job:", error);
     }
-  }
+  };
 
   const handleApplyJob = async (leadId: string) => {
     try {
-      await saveInterestAction(leadId, 'APPLIED')
-      // Could show success message  
+      await saveInterestAction(leadId, "APPLIED");
+      // Could show success message
     } catch (error) {
-      console.error('Error applying to job:', error)
+      console.error("Error applying to job:", error);
     }
-  }
+  };
 
   const applyFilters = () => {
-    let filtered = leads
+    let filtered = leads;
 
     // Search filter
     if (filters.q) {
-      const searchLower = filters.q.toLowerCase()
-      filtered = filtered.filter(lead => 
-        lead.projectType.toLowerCase().includes(searchLower) ||
-        lead.description.toLowerCase().includes(searchLower) ||
-        lead.tags?.toLowerCase().includes(searchLower) ||
-        lead.city?.toLowerCase().includes(searchLower)
-      )
+      const searchLower = filters.q.toLowerCase();
+      filtered = filtered.filter(
+        (lead) =>
+          lead.projectType.toLowerCase().includes(searchLower) ||
+          lead.description.toLowerCase().includes(searchLower) ||
+          lead.tags?.toLowerCase().includes(searchLower) ||
+          lead.city?.toLowerCase().includes(searchLower),
+      );
     }
 
     // Location filters
     if (filters.city) {
-      filtered = filtered.filter(lead => 
-        lead.city?.toLowerCase().includes(filters.city!.toLowerCase())
-      )
+      filtered = filtered.filter((lead) =>
+        lead.city?.toLowerCase().includes(filters.city!.toLowerCase()),
+      );
     }
 
     if (filters.province) {
-      filtered = filtered.filter(lead => lead.province === filters.province)
+      filtered = filtered.filter((lead) => lead.province === filters.province);
     }
 
     // Trade type filter
     if (filters.trade) {
-      filtered = filtered.filter(lead => 
-        lead.projectType.toLowerCase().includes(filters.trade!.toLowerCase()) ||
-        lead.tags?.toLowerCase().includes(filters.trade!.toLowerCase())
-      )
+      filtered = filtered.filter(
+        (lead) =>
+          lead.projectType
+            .toLowerCase()
+            .includes(filters.trade!.toLowerCase()) ||
+          lead.tags?.toLowerCase().includes(filters.trade!.toLowerCase()),
+      );
     }
 
     // Budget filters
     if (filters.minBudget) {
-      filtered = filtered.filter(lead => 
-        lead.budgetMin && lead.budgetMin >= filters.minBudget!
-      )
+      filtered = filtered.filter(
+        (lead) => lead.budgetMin && lead.budgetMin >= filters.minBudget!,
+      );
     }
 
     if (filters.maxBudget) {
-      filtered = filtered.filter(lead => 
-        lead.budgetMax && lead.budgetMax <= filters.maxBudget!
-      )
+      filtered = filtered.filter(
+        (lead) => lead.budgetMax && lead.budgetMax <= filters.maxBudget!,
+      );
     }
 
-    setFilteredLeads(filtered)
-  }
+    setFilteredLeads(filtered);
+  };
 
   useEffect(() => {
-    applyFilters()
-  }, [filters, leads])
+    applyFilters();
+  }, [filters, leads]);
 
   const handleFilterChange = (newFilters: Filters) => {
-    setFilters(newFilters)
-  }
+    setFilters(newFilters);
+  };
 
   return (
     <div className="min-h-screen bg-ink-50">
@@ -141,8 +145,18 @@ export default function JobsClient({ initialLeads }: JobsClientProps) {
           {filteredLeads.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-ink-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-ink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-8 h-8 text-ink-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-ink-900 mb-2">
@@ -180,5 +194,5 @@ export default function JobsClient({ initialLeads }: JobsClientProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

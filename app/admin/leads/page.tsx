@@ -1,14 +1,14 @@
-import { prisma } from '@/lib/prisma'
-import AdminLeadsTable from './AdminLeadsTable'
+import { prisma } from "@/lib/prisma";
+import AdminLeadsTable from "./AdminLeadsTable";
 
 export default async function AdminLeadsPage() {
   // For now, we'll skip role checking and implement a simple admin page
   // In production, you'd add requireRole("admin") here
-  
+
   const leads = await prisma.lead.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 100
-  })
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
 
   return (
     <div className="py-16 sm:py-24">
@@ -25,5 +25,5 @@ export default async function AdminLeadsPage() {
         <AdminLeadsTable leads={leads} />
       </div>
     </div>
-  )
+  );
 }

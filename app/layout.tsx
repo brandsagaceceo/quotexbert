@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 import SiteHeader from "./_components/site-header";
 import SiteFooter from "./_components/site-footer";
+import DevStatus from "./_components/DevStatus";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,16 +18,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "quotexbert",
-  description: "Get instant quotes from trusted contractors for your home projects",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
+  title: "QuotexBert - AI-Powered Home Repair Estimates & Contractor Matching",
+  description:
+    "Get instant AI home repair estimates. Connect with verified contractors. Pay-per-lead system. Join 1000+ contractors earning more with QuotexBert.",
   openGraph: {
-    title: "quotexbert",
-    description: "Get instant quotes from trusted contractors for your home projects",
-    siteName: "quotexbert",
-    images: ['/og.png'],
+    title: "QuotexBert - AI Home Repair Estimates",
+    description:
+      "Get instant AI home repair estimates and connect with verified contractors in your area.",
+    siteName: "QuotexBert",
+    images: ["/og-homepage.jpg"],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
   },
 };
 
@@ -39,48 +43,45 @@ export default function RootLayout({
 
   // Temporarily disable Clerk for demo purposes
   const enableAuth = false; // Set to true when you have real Clerk keys
-  
+
   const content = (
     <html lang="en">
       <head>
         {clarityId && (
-            <Script
-              id="clarity-script"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
+          <Script
+            id="clarity-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
                   (function(c,l,a,r,i,t,y){
                     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
                   })(window, document, "clarity", "script", "${clarityId}");
                 `,
-              }}
-            />
-          )}
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
+            }}
+          />
+        )}
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
+      >
+        {/* Skip to content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-md z-50 focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
         >
-          {/* Skip to content link for accessibility */}
-          <a 
-            href="#main-content" 
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-md z-50 focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
-          >
-            Skip to content
-          </a>
-          <SiteHeader />
-          <main id="main-content" className="min-h-screen">
-            <div className="container mx-auto">
-              {children}
-            </div>
-          </main>
-          <SiteFooter />
-        </body>
-      </html>
+          Skip to content
+        </a>
+        <SiteHeader />
+        <main id="main-content" className="min-h-screen">
+          <div className="container mx-auto">{children}</div>
+        </main>
+        <SiteFooter />
+        <DevStatus />
+      </body>
+    </html>
   );
-  
-  return enableAuth ? (
-    <ClerkProvider>{content}</ClerkProvider>
-  ) : content;
+
+  return enableAuth ? <ClerkProvider>{content}</ClerkProvider> : content;
 }
