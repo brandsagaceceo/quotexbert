@@ -42,8 +42,8 @@ export default function FiltersBar({ onFiltersChange }: FiltersBarProps) {
     onFiltersChange(filters);
 
     // Emit Clarity event
-    if (typeof window !== "undefined" && window.clarity) {
-      window.clarity("event", "job_filter", {
+    if (typeof window !== "undefined" && (window as any).clarity) {
+      (window as any).clarity("event", "job_filter", {
         trade: filters.trade,
         province: filters.province,
         budgetMin: filters.minBudget,

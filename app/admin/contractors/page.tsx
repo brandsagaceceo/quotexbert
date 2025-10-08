@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 interface ContractorProfile {
@@ -24,7 +24,7 @@ interface ContractorProfile {
 }
 
 export default function AdminVerificationPage() {
-  const { user, isLoaded } = useUser();
+  const { authUser: user, authLoading } = useAuth();
   const router = useRouter();
   
   const [contractors, setContractors] = useState<ContractorProfile[]>([]);
@@ -34,17 +34,17 @@ export default function AdminVerificationPage() {
   const [filter, setFilter] = useState<"all" | "verified" | "unverified">("all");
 
   useEffect(() => {
-    if (isLoaded && user) {
-      // Check if user is an admin
-      const role = user.publicMetadata?.role;
-      if (role !== "admin") {
+    if (!authLoading && user) {
+      // Check if user is a contractor (or admin role in future)
+      const role = user.role;
+      if (role !== "contractor") {
         router.push("/");
         return;
       }
 
       fetchContractors();
     }
-  }, [isLoaded, user, router]);
+  }, [authLoading, user, router]);
 
   const fetchContractors = async () => {
     try {
@@ -123,7 +123,7 @@ export default function AdminVerificationPage() {
     ));
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-900 py-8">
         <div className="max-w-7xl mx-auto px-4">

@@ -46,8 +46,8 @@ export default function JobCard({
       await onSave(lead.id);
 
       // Emit Clarity event
-      if (typeof window !== "undefined" && window.clarity) {
-        window.clarity("event", "job_saved", { leadId: lead.id });
+      if (typeof window !== "undefined" && (window as any).clarity) {
+        (window as any).clarity("event", "job_saved", { leadId: lead.id });
       }
     } finally {
       setSaving(false);
@@ -62,8 +62,8 @@ export default function JobCard({
       await onApply(lead.id);
 
       // Emit Clarity event
-      if (typeof window !== "undefined" && window.clarity) {
-        window.clarity("event", "job_applied", { leadId: lead.id });
+      if (typeof window !== "undefined" && (window as any).clarity) {
+        (window as any).clarity("event", "job_applied", { leadId: lead.id });
       }
     } finally {
       setApplying(false);

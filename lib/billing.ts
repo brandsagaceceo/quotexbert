@@ -23,6 +23,38 @@ export async function getOrCreateContractorBilling(userId: string) {
 }
 
 /**
+ * Create a charge record for a lead claim
+ */
+export async function chargeLead(
+  contractorBillingId: string,
+  leadId: string,
+  amountCents: number,
+  stripePaymentIntentId?: string
+) {
+  const charge = await prisma.charge.create({
+    data: {
+      contractorId: contractorBillingId,
+      leadId,
+      amountCents,
+      stripePaymentIntentId: stripePaymentIntentId || null,
+      status: 'succeeded',
+    },
+  });
+
+  // Update contractor's monthly spend
+  await prisma.contractorBilling.update({
+    where: { id: contractorBillingId },
+    data: {
+      spendThisMonthCents: {
+        increment: amountCents,
+      },
+    },
+  });
+
+  return charge;
+}
+
+/**
  * Check if contractor can claim a lead (not paused, under cap, has payment method)
  */
 export async function canClaimLead(userId: string): Promise<{

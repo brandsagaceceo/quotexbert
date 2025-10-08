@@ -14,6 +14,7 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   role      String   // "admin" | "contractor" | "homeowner"
+  lastSeen  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -27,6 +28,7 @@ model User {
   savedJobs           SavedJob[]
   messagesSent        Message[]         @relation("MessageSender")
   messagesReceived    Message[]         @relation("MessageReceiver")
+  typingIndicators    TypingIndicator[] @relation("TypingIndicators")
   notifications       Notification[]
   homeownerContracts  Contract[]        @relation("HomeownerContracts")
   contractorContracts Contract[]        @relation("ContractorContracts")
@@ -133,9 +135,24 @@ model Message {
   toUser     User   @relation("MessageReceiver", fields: [toUserId], references: [id])
   
   createdAt  DateTime @default(now())
+  readAt     DateTime?
+  deliveredAt DateTime?
   
   @@index([threadId, createdAt])
   @@map("messages")
+}
+
+model TypingIndicator {
+  id       String @id @default(cuid())
+  threadId String
+  userId   String
+  user     User   @relation("TypingIndicators", fields: [userId], references: [id], onDelete: Cascade)
+  
+  startedAt DateTime @default(now())
+  expiresAt DateTime
+  
+  @@unique([threadId, userId])
+  @@map("typing_indicators")
 }
 
 model Notification {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Chat from "@/components/Chat";
+import EnhancedChatSimple from "@/components/EnhancedChatSimple";
 
 interface Message {
   id: string;
@@ -98,10 +98,15 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-burgundy-50 via-slate-50 to-teal-50">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Messages</h1>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-burgundy-600 to-teal-600 bg-clip-text text-transparent">
+              Messages
+            </h1>
+            <p className="text-gray-600 mt-1">Communicate with contractors and homeowners</p>
+          </div>
 
           {/* User Switcher for Demo */}
           <div className="flex items-center space-x-4">
@@ -191,7 +196,7 @@ export default function MessagesPage() {
           {/* Chat Area */}
           <div className="lg:col-span-3">
             {selectedThread ? (
-              <Chat thread={selectedThread} currentUserId={currentUserId} />
+              <EnhancedChatSimple thread={selectedThread} currentUserId={currentUserId} />
             ) : (
               <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
                 <div className="text-center text-gray-500">

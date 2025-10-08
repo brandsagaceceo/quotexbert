@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
 
 export default function AffiliatePage() {
   const [email, setEmail] = useState("");
@@ -34,89 +33,89 @@ export default function AffiliatePage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="min-h-screen bg-neutral-900 text-white">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50">
         <div className="max-w-6xl mx-auto px-4 py-16">
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Earn <span className="text-teal-400">50% Commission</span> with QuotexBert's Affiliate Program
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
+              Earn <span className="bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent">50% Commission</span> with QuotexBert's Affiliate Program
             </h1>
-            <p className="text-xl text-neutral-400 max-w-3xl mx-auto">
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
               Turn your network into passive income by referring contractors to QuotexBert. Our generous 50% commission structure means you earn substantial recurring revenue for every successful referral.
             </p>
           </div>
 
           {/* How It Works */}
-          <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-8 mb-16">
-            <h2 className="text-3xl font-bold text-teal-400 mb-8 text-center">How It Works</h2>
+          <div className="bg-white/80 backdrop-blur-sm border border-teal-200 rounded-xl p-8 mb-16 shadow-lg">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-8 text-center">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="bg-teal-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
-                <h3 className="font-semibold mb-2">Share Your Link</h3>
-                <p className="text-neutral-400 text-sm">Share your unique referral link with contractors in your network</p>
+                <div className="bg-gradient-to-r from-red-800 to-red-900 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
+                <h3 className="font-semibold mb-2 text-slate-900">Share Your Link</h3>
+                <p className="text-slate-600 text-sm">Share your unique referral link with contractors in your network</p>
               </div>
               <div className="text-center">
-                <div className="bg-teal-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
-                <h3 className="font-semibold mb-2">They Sign Up</h3>
-                <p className="text-neutral-400 text-sm">Contractors register and start claiming leads through your referral</p>
+                <div className="bg-gradient-to-r from-red-800 to-red-900 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
+                <h3 className="font-semibold mb-2 text-slate-900">They Sign Up</h3>
+                <p className="text-slate-600 text-sm">Contractors register and start claiming leads through your referral</p>
               </div>
               <div className="text-center">
-                <div className="bg-teal-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
-                <h3 className="font-semibold mb-2">Earn 50%</h3>
-                <p className="text-neutral-400 text-sm">You earn 50% of their lead fees for 12 months automatically</p>
+                <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
+                <h3 className="font-semibold mb-2 text-slate-900">Earn 50%</h3>
+                <p className="text-slate-600 text-sm">You earn 50% of their lead fees for 12 months automatically</p>
               </div>
               <div className="text-center">
-                <div className="bg-teal-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">4</div>
-                <h3 className="font-semibold mb-2">Get Paid</h3>
-                <p className="text-neutral-400 text-sm">Monthly payments via direct deposit or PayPal</p>
+                <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4">4</div>
+                <h3 className="font-semibold mb-2 text-slate-900">Get Paid</h3>
+                <p className="text-slate-600 text-sm">Monthly payments via direct deposit or PayPal</p>
               </div>
             </div>
           </div>
 
           {/* Earning Potential Table */}
           <div className="mb-16">
-            <h2 className="text-3xl font-bold text-center mb-8">Your Earning Potential</h2>
-            <div className="bg-neutral-800 border border-neutral-700 rounded-xl overflow-hidden">
+            <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Your Earning Potential</h2>
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl overflow-hidden shadow-lg">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-neutral-700">
+                  <thead className="bg-slate-100">
                     <tr>
-                      <th className="px-6 py-4 text-left font-semibold text-teal-400">Active Contractors</th>
-                      <th className="px-6 py-4 text-left font-semibold text-teal-400">Avg. Monthly Leads</th>
-                      <th className="px-6 py-4 text-left font-semibold text-teal-400">Lead Value</th>
-                      <th className="px-6 py-4 text-left font-semibold text-teal-400">Your Monthly Income</th>
+                      <th className="px-6 py-4 text-left font-semibold text-red-800">Active Contractors</th>
+                      <th className="px-6 py-4 text-left font-semibold text-red-800">Avg. Monthly Leads</th>
+                      <th className="px-6 py-4 text-left font-semibold text-red-800">Lead Value</th>
+                      <th className="px-6 py-4 text-left font-semibold text-red-800">Your Monthly Income</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-700">
-                    <tr className="hover:bg-neutral-750">
-                      <td className="px-6 py-4 font-medium">5 contractors</td>
-                      <td className="px-6 py-4 text-neutral-300">40 leads</td>
-                      <td className="px-6 py-4 text-neutral-300">$1,200</td>
-                      <td className="px-6 py-4 font-semibold text-teal-400">$600</td>
+                  <tbody className="divide-y divide-slate-200">
+                    <tr className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">5 contractors</td>
+                      <td className="px-6 py-4 text-slate-600">40 leads</td>
+                      <td className="px-6 py-4 text-slate-600">$1,200</td>
+                      <td className="px-6 py-4 font-semibold text-teal-700">$600</td>
                     </tr>
-                    <tr className="hover:bg-neutral-750">
-                      <td className="px-6 py-4 font-medium">10 contractors</td>
-                      <td className="px-6 py-4 text-neutral-300">80 leads</td>
-                      <td className="px-6 py-4 text-neutral-300">$2,400</td>
-                      <td className="px-6 py-4 font-semibold text-teal-400">$1,200</td>
+                    <tr className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">10 contractors</td>
+                      <td className="px-6 py-4 text-slate-600">80 leads</td>
+                      <td className="px-6 py-4 text-slate-600">$2,400</td>
+                      <td className="px-6 py-4 font-semibold text-teal-700">$1,200</td>
                     </tr>
-                    <tr className="hover:bg-neutral-750 bg-teal-900/20">
-                      <td className="px-6 py-4 font-medium">25 contractors</td>
-                      <td className="px-6 py-4 text-neutral-300">200 leads</td>
-                      <td className="px-6 py-4 text-neutral-300">$6,000</td>
-                      <td className="px-6 py-4 font-semibold text-teal-400 text-lg">$3,000</td>
+                    <tr className="hover:bg-slate-50 bg-teal-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">25 contractors</td>
+                      <td className="px-6 py-4 text-slate-600">200 leads</td>
+                      <td className="px-6 py-4 text-slate-600">$6,000</td>
+                      <td className="px-6 py-4 font-semibold text-teal-700 text-lg">$3,000</td>
                     </tr>
-                    <tr className="hover:bg-neutral-750">
-                      <td className="px-6 py-4 font-medium">50 contractors</td>
-                      <td className="px-6 py-4 text-neutral-300">400 leads</td>
-                      <td className="px-6 py-4 text-neutral-300">$12,000</td>
-                      <td className="px-6 py-4 font-semibold text-teal-400 text-lg">$6,000</td>
+                    <tr className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">50 contractors</td>
+                      <td className="px-6 py-4 text-slate-600">400 leads</td>
+                      <td className="px-6 py-4 text-slate-600">$12,000</td>
+                      <td className="px-6 py-4 font-semibold text-teal-700 text-lg">$6,000</td>
                     </tr>
-                    <tr className="hover:bg-neutral-750 bg-gradient-to-r from-teal-900/30 to-emerald-900/30">
-                      <td className="px-6 py-4 font-medium">100 contractors</td>
-                      <td className="px-6 py-4 text-neutral-300">800 leads</td>
-                      <td className="px-6 py-4 text-neutral-300">$24,000</td>
-                      <td className="px-6 py-4 font-bold text-teal-400 text-xl">$12,000</td>
+                    <tr className="hover:bg-slate-50 bg-gradient-to-r from-red-50 to-teal-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">100 contractors</td>
+                      <td className="px-6 py-4 text-slate-600">800 leads</td>
+                      <td className="px-6 py-4 text-slate-600">$24,000</td>
+                      <td className="px-6 py-4 font-bold text-teal-700 text-xl">$12,000</td>
                     </tr>
                   </tbody>
                 </table>
@@ -129,37 +128,37 @@ export default function AffiliatePage() {
 
           {/* Benefits */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">💰</div>
-              <h3 className="text-xl font-semibold text-teal-400 mb-3">High Commission Rate</h3>
-              <p className="text-neutral-400">50% commission on all lead fees - one of the highest rates in the industry</p>
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">High Commission Rate</h3>
+              <p className="text-slate-600">50% commission on all lead fees - one of the highest rates in the industry</p>
             </div>
             
-            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📈</div>
-              <h3 className="text-xl font-semibold text-teal-400 mb-3">Recurring Revenue</h3>
-              <p className="text-neutral-400">Earn from each contractor for 12 months - true passive income potential</p>
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">Recurring Revenue</h3>
+              <p className="text-slate-600">Earn from each contractor for 12 months - true passive income potential</p>
             </div>
             
-            <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📊</div>
-              <h3 className="text-xl font-semibold text-teal-400 mb-3">Real-Time Tracking</h3>
-              <p className="text-neutral-400">Dashboard with live stats, earnings, and detailed analytics</p>
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">Real-Time Tracking</h3>
+              <p className="text-slate-600">Dashboard with live stats, earnings, and detailed analytics</p>
             </div>
           </div>
 
           {/* CTA Section */}
-          <div className="bg-gradient-to-r from-teal-900/50 to-emerald-900/50 border border-teal-500/30 rounded-xl p-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">Start Earning with QuotexBert Today</h2>
-            <p className="text-xl text-neutral-300 mb-8 max-w-2xl mx-auto">
+          <div className="bg-gradient-to-r from-red-50 to-teal-50 border border-teal-200 rounded-xl p-8 text-center shadow-lg">
+            <h2 className="text-3xl font-bold mb-4 text-slate-900">Start Earning with QuotexBert Today</h2>
+            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
               Turn your contractor network into consistent passive income. Join our affiliate program and start earning 50% commission on every referral.
             </p>
             
             {joined ? (
-              <div className="bg-green-900/50 border border-green-500/30 rounded-lg p-6 max-w-md mx-auto">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-md mx-auto">
                 <div className="text-3xl mb-4">🎉</div>
-                <h3 className="text-xl font-semibold text-green-400 mb-2">Welcome to the Program!</h3>
-                <p className="text-neutral-300">Check your email for your affiliate dashboard access and referral link.</p>
+                <h3 className="text-xl font-semibold text-green-700 mb-2">Welcome to the Program!</h3>
+                <p className="text-slate-600">Check your email for your affiliate dashboard access and referral link.</p>
               </div>
             ) : (
               <form onSubmit={handleJoinAffiliate} className="max-w-md mx-auto">
@@ -170,12 +169,12 @@ export default function AffiliatePage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email to join"
                     required
-                    className="flex-1 bg-neutral-800 border border-neutral-600 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-teal-500"
+                    className="flex-1 bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
                   />
                   <button
                     type="submit"
                     disabled={isJoining}
-                    className="bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap"
+                    className="bg-gradient-to-r from-red-800 to-teal-600 hover:from-red-900 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap text-white"
                   >
                     {isJoining ? "Joining..." : "Join Program"}
                   </button>
@@ -186,26 +185,26 @@ export default function AffiliatePage() {
 
           {/* FAQ */}
           <div className="mt-16">
-            <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-teal-400 mb-3">How much can I earn?</h3>
-                <p className="text-neutral-400">With 50% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $5,000+ monthly.</p>
+              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">How much can I earn?</h3>
+                <p className="text-slate-600">With 50% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $5,000+ monthly.</p>
               </div>
               
-              <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-teal-400 mb-3">When do I get paid?</h3>
-                <p className="text-neutral-400">Monthly payments on the 15th via direct deposit or PayPal. Minimum payout threshold is $50.</p>
+              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">When do I get paid?</h3>
+                <p className="text-slate-600">Monthly payments on the 15th via direct deposit or PayPal. Minimum payout threshold is $50.</p>
               </div>
               
-              <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-teal-400 mb-3">How long do I earn from referrals?</h3>
-                <p className="text-neutral-400">You earn 50% commission for 12 months from each contractor you refer.</p>
+              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">How long do I earn from referrals?</h3>
+                <p className="text-slate-600">You earn 50% commission for 12 months from each contractor you refer.</p>
               </div>
               
-              <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-teal-400 mb-3">Is there a cost to join?</h3>
-                <p className="text-neutral-400">No cost to join. No monthly fees. You just earn commission on successful referrals.</p>
+              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-3">Is there a cost to join?</h3>
+                <p className="text-slate-600">No cost to join. No monthly fees. You just earn commission on successful referrals.</p>
               </div>
             </div>
           </div>

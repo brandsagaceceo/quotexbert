@@ -10,21 +10,37 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const trade = searchParams.get("trade");
     const city = searchParams.get("city");
+    const homeownerId = searchParams.get("homeownerId");
+    const contractorId = searchParams.get("contractorId");
 
     const where: any = {
-      status: "open",
       published: true,
     };
 
+    // If fetching for a specific homeowner
+    if (homeownerId) {
+      where.homeownerId = homeownerId;
+    }
+    
+    // If fetching for a specific contractor
+    if (contractorId) {
+      where.acceptedById = contractorId;
+    }
+    
+    // If no specific user, show open jobs
+    if (!homeownerId && !contractorId) {
+      where.status = "open";
+    }
+
     if (trade) {
-      where.trade = {
+      where.category = {
         contains: trade,
         mode: "insensitive",
       };
     }
 
     if (city) {
-      where.city = {
+      where.zipCode = {
         contains: city,
         mode: "insensitive",
       };
@@ -32,10 +48,20 @@ export async function GET(request: NextRequest) {
 
     const jobs = await prisma.lead.findMany({
       where,
+      include: {
+        homeowner: {
+          select: {
+            email: true
+          }
+        }
+      },
       orderBy: {
         createdAt: "desc",
       },
     });
+
+    console.log(`Fetching jobs...`);
+    console.log(`Found jobs:`, jobs);
 
     return NextResponse.json(jobs);
   } catch (error) {

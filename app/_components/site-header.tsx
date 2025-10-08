@@ -14,8 +14,7 @@ export default function SiteHeader() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/contractor/jobs", label: "Job Board" },
-    { href: "/contractors", label: "Contractors" },
-    { href: "/contractor/billing", label: "Billing" },
+    { href: "/billing", label: "Billing" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },

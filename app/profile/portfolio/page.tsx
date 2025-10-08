@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -14,7 +14,7 @@ interface PortfolioItem {
 }
 
 export default function PortfolioManagementPage() {
-  const { user, isLoaded } = useUser();
+  const { authUser: user, authLoading } = useAuth();
   const router = useRouter();
   
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
@@ -30,9 +30,9 @@ export default function PortfolioManagementPage() {
   });
 
   useEffect(() => {
-    if (isLoaded && user) {
+    if (!authLoading && user) {
       // Check if user is a contractor
-      const role = user.publicMetadata?.role;
+      const role = user.role;
       if (role !== "contractor") {
         router.push("/");
         return;
@@ -40,7 +40,7 @@ export default function PortfolioManagementPage() {
 
       fetchPortfolio();
     }
-  }, [isLoaded, user, router]);
+  }, [authLoading, user, router]);
 
   const fetchPortfolio = async () => {
     try {
@@ -176,7 +176,7 @@ export default function PortfolioManagementPage() {
     return new Date(dateString).toLocaleDateString();
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-900 py-8">
         <div className="max-w-6xl mx-auto px-4">

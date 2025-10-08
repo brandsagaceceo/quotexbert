@@ -40,14 +40,6 @@ export default function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="/contractors"
-                  className="text-ink-600 hover:text-brand transition-colors duration-200"
-                >
-                  Join as Contractor
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/affiliates"
                   className="text-ink-600 hover:text-brand transition-colors duration-200"
                 >

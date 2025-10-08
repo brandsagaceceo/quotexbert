@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { createCommentSchema } from "@/lib/validation/schemas";
 import { logEventServer } from "@/lib/analytics";
 

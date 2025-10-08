@@ -1,13 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { PostHog } from "posthog-node";
 
-// Initialize PostHog server client
-const postHogClient = new PostHog(
-  process.env.POSTHOG_API_KEY!,
-  {
-    host: process.env.POSTHOG_HOST || "https://app.posthog.com",
-  }
-);
+// Initialize PostHog server client conditionally
+let postHogClient: PostHog | null = null;
+
+if (process.env.POSTHOG_API_KEY) {
+  postHogClient = new PostHog(
+    process.env.POSTHOG_API_KEY,
+    {
+      host: process.env.POSTHOG_HOST || "https://app.posthog.com",
+    }
+  );
+}
 
 interface PostHogEvent {
   event: string;

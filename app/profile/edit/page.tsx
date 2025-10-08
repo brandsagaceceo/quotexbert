@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 interface ContractorProfile {
@@ -37,7 +37,7 @@ const TRADES = [
 ];
 
 export default function ProfileEditorPage() {
-  const { user, isLoaded } = useUser();
+  const { authUser: user, authLoading } = useAuth();
   const router = useRouter();
   
   const [profile, setProfile] = useState<ContractorProfile | null>(null);
@@ -56,9 +56,9 @@ export default function ProfileEditorPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (isLoaded && user) {
+    if (!authLoading && user) {
       // Check if user is a contractor
-      const role = user.publicMetadata?.role;
+      const role = user.role;
       if (role !== "contractor") {
         router.push("/");
         return;
@@ -66,7 +66,7 @@ export default function ProfileEditorPage() {
 
       fetchProfile();
     }
-  }, [isLoaded, user, router]);
+  }, [authLoading, user, router]);
 
   const fetchProfile = async () => {
     try {
@@ -137,7 +137,7 @@ export default function ProfileEditorPage() {
     }
   };
 
-  if (!isLoaded || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-900 py-8">
         <div className="max-w-4xl mx-auto px-4">

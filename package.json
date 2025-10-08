@@ -15,17 +15,24 @@
     "db:push": "prisma db push",
     "studio": "prisma studio",
     "dev:all": "concurrently \"npm run db:push\" \"npm run dev\" \"npm run studio\"",
-    "seed:billing": "node seed-billing.js"
+    "seed:billing": "node seed-billing.js",
+    "firebase:check": "node scripts/validate-firebase.js",
+    "firebase:setup": "echo 'Please follow the guide in firebase-setup-guide.md' && npm run firebase:check"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.864.0",
     "@clerk/nextjs": "^6.31.1",
+    "@google-cloud/firestore": "^7.11.6",
     "@prisma/client": "^6.14.0",
-    "@stripe/react-stripe-js": "^3.9.0",
-    "@stripe/stripe-js": "^7.8.0",
+    "@stripe/react-stripe-js": "^3.10.0",
+    "@stripe/stripe-js": "^7.9.0",
+    "clsx": "^2.1.1",
     "crypto": "^1.0.1",
+    "firebase": "^12.3.0",
+    "lucide-react": "^0.545.0",
     "nanoid": "^5.1.5",
     "next": "15.4.6",
+    "openai": "^6.2.0",
     "posthog-js": "^1.260.1",
     "posthog-node": "^5.7.0",
     "prisma": "^6.14.0",
@@ -34,6 +41,7 @@
     "react-dom": "19.1.0",
     "resend": "^6.0.1",
     "stripe": "^18.4.0",
+    "tailwind-merge": "^3.3.1",
     "zod": "^4.0.17"
   },
   "devDependencies": {
