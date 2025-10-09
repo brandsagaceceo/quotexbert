@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { portfolioItemSchema } from "@/lib/validation/schemas";
 import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: NextRequest) {
@@ -20,7 +19,14 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ portfolioItems });
+    // Parse JSON fields for before/after images
+    const formattedItems = portfolioItems.map(item => ({
+      ...item,
+      beforeImages: (item as any).beforeImages ? JSON.parse((item as any).beforeImages) : [],
+      afterImages: (item as any).afterImages ? JSON.parse((item as any).afterImages) : []
+    }));
+
+    return NextResponse.json({ portfolioItems: formattedItems });
   } catch (error) {
     console.error("Error fetching portfolio:", error);
     return NextResponse.json(
@@ -43,7 +49,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const validatedData = portfolioItemSchema.parse(body);
+    
+    // Validate required fields
+    if (!body.title) {
+      return NextResponse.json(
+        { error: "Title is required" },
+        { status: 400 }
+      );
+    }
 
     // Get contractor profile
     const contractorProfile = await prisma.contractorProfile.findUnique({
@@ -61,13 +74,23 @@ export async function POST(request: NextRequest) {
     const portfolioItem = await prisma.portfolioItem.create({
       data: {
         contractorId: contractorProfile.id,
-        title: validatedData.title,
-        caption: validatedData.caption || null,
-        imageUrl: validatedData.imageUrl,
-      },
+        title: body.title,
+        caption: body.caption || null,
+        projectType: body.projectType || "general",
+        beforeImages: JSON.stringify(body.beforeImages || []),
+        afterImages: JSON.stringify(body.afterImages || []),
+        imageUrl: body.imageUrl || null, // Legacy support
+      } as any,
     });
 
-    return NextResponse.json({ portfolioItem });
+    // Format response with parsed JSON
+    const formattedItem = {
+      ...portfolioItem,
+      beforeImages: JSON.parse((portfolioItem as any).beforeImages),
+      afterImages: JSON.parse((portfolioItem as any).afterImages)
+    };
+
+    return NextResponse.json({ portfolioItem: formattedItem });
   } catch (error) {
     console.error("Error creating portfolio item:", error);
     return NextResponse.json(

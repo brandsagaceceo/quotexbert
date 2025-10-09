@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import { canClaimLead, chargeLead } from '@/lib/billing';
+import { notifications } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,25 +69,36 @@ export async function POST(request: NextRequest) {
         await chargeLead(billing.id, leadId, amountCents, paymentIntent.id);
 
         // Update lead status
-        await prisma.lead.update({
+        const updatedLead = await prisma.lead.update({
           where: { id: leadId },
           data: { 
             contractorId: userId,
             status: 'claimed'
+          },
+          include: {
+            homeowner: true,
+            contractor: {
+              include: {
+                contractorProfile: true
+              }
+            }
           }
         });
 
-        // Create notification for homeowner
-        await prisma.notification.create({
-          data: {
-            userId: lead.homeownerId,
-            type: 'LEAD_CLAIMED',
-            payload: {
-              leadId,
-              contractorId: userId,
-              title: lead.title
-            }
-          }
+        // Send notification to homeowner about job claim
+        if (updatedLead.homeowner) {
+          await notifications.jobClaimed(updatedLead.homeownerId, {
+            leadId,
+            title: updatedLead.title || 'Your Project',
+            contractorName: updatedLead.contractor?.contractorProfile?.companyName || 'A contractor'
+          });
+        }
+
+        // Send payment confirmation to contractor
+        await notifications.paymentReceived(userId, {
+          amount: amountCents / 100,
+          leadId,
+          title: updatedLead.title || 'Lead Claim'
         });
 
         return NextResponse.json({

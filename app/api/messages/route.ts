@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifications } from "@/lib/notifications";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -144,7 +145,17 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             email: true,
-            role: true
+            role: true,
+            contractorProfile: {
+              select: {
+                companyName: true
+              }
+            },
+            homeownerProfile: {
+              select: {
+                name: true
+              }
+            }
           }
         },
         toUser: {
@@ -167,18 +178,16 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Create notification for recipient
-    await prisma.notification.create({
-      data: {
-        userId: toUserId,
-        type: "NEW_MESSAGE",
-        payload: {
-          messageId: newMessage.id,
-          fromUserId,
-          leadTitle: newMessage.thread.lead.title,
-          preview: content.substring(0, 100)
-        }
-      }
+    // Send notification to recipient using our new service
+    const senderName = newMessage.fromUser.contractorProfile?.companyName || 
+                      newMessage.fromUser.homeownerProfile?.name || 
+                      'User';
+
+    await notifications.newMessage(toUserId, {
+      messageId: newMessage.id,
+      title: newMessage.thread.lead?.title || 'Message',
+      message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+      senderName
     });
 
     return NextResponse.json(newMessage, { status: 201 });

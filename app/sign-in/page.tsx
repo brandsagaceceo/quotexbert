@@ -19,11 +19,11 @@ export default function SignInPage() {
 
     try {
       const result = await signInWithGoogle();
-      if (result.success) {
+      if (result && result.success) {
         // Redirect to role selection if no role is set
         router.push("/select-role");
       } else {
-        setError(result.error || "Sign in failed");
+        setError(result?.error || "Sign in failed");
       }
     } catch (error) {
       setError("An error occurred during sign in");
@@ -36,7 +36,7 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">QuoteXpert</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">QuoteXbert</h1>
           <h2 className="text-2xl font-semibold text-gray-700">Welcome Back</h2>
           <p className="mt-2 text-gray-600">
             Connect homeowners with trusted contractors

@@ -1,0 +1,316 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import PhotoUpload from "@/components/PhotoUpload";
+import { submitLead } from "@/app/actions/submitLead";
+
+const PROJECT_CATEGORIES = [
+  "Kitchen Renovation",
+  "Bathroom Renovation", 
+  "Plumbing",
+  "Electrical",
+  "Flooring",
+  "Painting",
+  "Roofing",
+  "HVAC",
+  "Landscaping",
+  "General Contractor",
+  "Handyman Services",
+  "Other"
+];
+
+export default function CreateLeadPage() {
+  const { authUser: user } = useAuth();
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    budget: "",
+    zipCode: ""
+  });
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  // Function to determine category from description
+  const detectCategoryFromDescription = (description: string): string => {
+    const desc = description.toLowerCase();
+    
+    if (desc.includes('kitchen')) return 'Kitchen Renovation';
+    if (desc.includes('bathroom') || desc.includes('shower') || desc.includes('toilet')) return 'Bathroom Renovation';
+    if (desc.includes('plumb') || desc.includes('pipe') || desc.includes('water')) return 'Plumbing';
+    if (desc.includes('electric') || desc.includes('wiring') || desc.includes('outlet')) return 'Electrical';
+    if (desc.includes('floor') || desc.includes('carpet') || desc.includes('tile')) return 'Flooring';
+    if (desc.includes('paint') || desc.includes('wall')) return 'Painting';
+    if (desc.includes('roof') || desc.includes('gutter')) return 'Roofing';
+    if (desc.includes('hvac') || desc.includes('heating') || desc.includes('cooling') || desc.includes('air')) return 'HVAC';
+    if (desc.includes('landscape') || desc.includes('garden') || desc.includes('yard')) return 'Landscaping';
+    if (desc.includes('handyman') || desc.includes('repair')) return 'Handyman Services';
+    
+    return 'General Contractor';
+  };
+
+  // Load estimate data on component mount
+  useEffect(() => {
+    const estimateData = localStorage.getItem('estimate_data');
+    if (estimateData) {
+      try {
+        const estimate = JSON.parse(estimateData);
+        console.log('Loading estimate data:', estimate);
+        
+        // Pre-fill form with estimate data
+        if (estimate.projectDescription) {
+          const detectedCategory = detectCategoryFromDescription(estimate.projectDescription);
+          
+          setFormData(prev => ({
+            ...prev,
+            title: estimate.projectDescription.length > 50 
+              ? estimate.projectDescription.substring(0, 50) + '...'
+              : estimate.projectDescription,
+            description: estimate.projectDescription,
+            category: detectedCategory,
+            budget: estimate.min && estimate.max 
+              ? `$${estimate.min.toLocaleString()} - $${estimate.max.toLocaleString()}`
+              : ""
+          }));
+        }
+        
+        // Clear the estimate data from localStorage after loading
+        localStorage.removeItem('estimate_data');
+      } catch (error) {
+        console.error('Error loading estimate data:', error);
+      }
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      setError("You must be signed in to create a lead");
+      return;
+    }
+
+    if (user.role !== "homeowner") {
+      setError("Only homeowners can create leads");
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.category || !formData.description || !formData.zipCode) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const submitFormData = new FormData();
+      submitFormData.append("postalCode", formData.zipCode);
+      submitFormData.append("projectType", formData.category);
+      submitFormData.append("description", formData.description);
+      submitFormData.append("photos", JSON.stringify(photos));
+      submitFormData.append("website", ""); // Honeypot field
+
+      const result = await submitLead(submitFormData);
+      
+      if (result.success) {
+        router.push(`/messages?leadId=${result.leadId}`);
+      } else {
+        console.error("Lead submission failed:", result);
+        setError(result.error || "Failed to create lead");
+      }
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      setError(`An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50 flex items-center justify-center">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
+          <h1 className="text-2xl font-bold text-center mb-4">Sign In Required</h1>
+          <p className="text-center mb-6">You need to sign in to create a lead.</p>
+          <div className="text-center space-y-4">
+            <a href="/demo-login" className="block bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg font-semibold">
+              Demo Login
+            </a>
+            <a href="/sign-in" className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
+              Sign In
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (user.role !== "homeowner") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50 flex items-center justify-center">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
+          <h1 className="text-2xl font-bold text-center mb-4">Homeowner Access Only</h1>
+          <p className="text-center mb-6">Only homeowners can create project leads.</p>
+          <div className="text-center">
+            <Link href="/" className="bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
+              Go Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-burgundy-600 to-teal-600 bg-clip-text text-transparent mb-4">
+            Create Your Project
+          </h1>
+          <p className="text-xl text-gray-600">
+            Tell contractors about your project and get matched with qualified professionals
+          </p>
+        </div>
+
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Project Title */}
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                Project Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Kitchen Cabinet Installation"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                required
+              />
+            </div>
+
+            {/* Category */}
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Project Category
+              </label>
+              <select
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                required
+              >
+                <option value="">Select a category</option>
+                {PROJECT_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Project Description
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe your project in detail. Include specifics about what work needs to be done, materials, timeline, etc."
+                rows={6}
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                required
+              />
+            </div>
+
+            {/* Budget */}
+            <div>
+              <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                Estimated Budget (CAD)
+              </label>
+              <input
+                type="number"
+                id="budget"
+                value={formData.budget}
+                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                placeholder="5000"
+                min="100"
+                step="100"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                required
+              />
+            </div>
+
+            {/* Postal Code */}
+            <div>
+              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
+                Postal Code
+              </label>
+              <input
+                type="text"
+                id="zipCode"
+                value={formData.zipCode}
+                onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.toUpperCase() })}
+                placeholder="K1A 0A6"
+                pattern="[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                required
+              />
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Project Photos
+              </label>
+              <PhotoUpload
+                photos={photos}
+                onPhotosChange={setPhotos}
+                maxPhotos={8}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800">{error}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <div className="flex gap-4 pt-6">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 bg-gradient-to-r from-burgundy-600 to-teal-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-burgundy-700 hover:to-teal-700 transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? "Creating Lead..." : "Create Lead"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

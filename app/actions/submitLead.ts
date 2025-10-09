@@ -21,6 +21,7 @@ const leadSchema = z.object({
     .string()
     .min(1, "Description is required")
     .max(1000, "Description must be 1000 characters or less"),
+  photos: z.array(z.string()).optional().default([]), // Array of photo URLs
   website: z.string().optional(), // Honeypot field
 });
 
@@ -80,6 +81,7 @@ export async function submitLead(formData: FormData) {
       postalCode: formData.get("postalCode") as string,
       projectType: formData.get("projectType") as string,
       description: formData.get("description") as string,
+      photos: formData.get("photos") ? JSON.parse(formData.get("photos") as string) : [],
       website: formData.get("website") as string, // Honeypot
       affiliateCode: formData.get("affiliateCode") as string, // Affiliate tracking
     };
@@ -151,6 +153,21 @@ export async function submitLead(formData: FormData) {
       }
     }
 
+    // Ensure demo homeowner exists in database
+    let demoHomeowner = await prisma.user.findUnique({
+      where: { id: "demo-homeowner" }
+    });
+
+    if (!demoHomeowner) {
+      demoHomeowner = await prisma.user.create({
+        data: {
+          id: "demo-homeowner",
+          email: "demo-homeowner@quotexpert.com",
+          role: "homeowner"
+        }
+      });
+    }
+
     // Save lead to database
     const lead = await prisma.lead.create({
       data: {
@@ -158,8 +175,10 @@ export async function submitLead(formData: FormData) {
         zipCode: data.postalCode,
         category: data.projectType,
         description: data.description,
-        budget: parseFloat(estimate.replace(/[^0-9.]/g, "")),
-        homeownerId: "cmeelabtm0001jkisp3uamyg2", // Demo homeowner ID
+        budget: parseFloat(estimate.replace(/[^0-9.]/g, "")) || 5000,
+        photos: JSON.stringify(data.photos || []),
+        homeownerId: "demo-homeowner", // Demo homeowner ID for testing
+        status: "Open", // Set initial status
       },
     });
 

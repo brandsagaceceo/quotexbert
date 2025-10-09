@@ -1,4 +1,4 @@
-// QuoteXpert Design System
+// QuoteXbert Design System
 export const colors = {
   // Primary brand colors
   primary: {

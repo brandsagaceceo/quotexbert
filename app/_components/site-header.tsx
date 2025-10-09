@@ -1,24 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
-// import { useAuth, UserButton } from '@clerk/nextjs';
+import { useAuth } from "@/lib/hooks/useAuth";
+import Logo from "@/components/Logo";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // const { isSignedIn, userId } = useAuth();
-  const isSignedIn = false; // Mock for demo
-  const userId = null; // Mock for demo
+  const { isSignedIn, authUser: user } = useAuth();
 
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/contractor/jobs", label: "Job Board" },
-    { href: "/billing", label: "Billing" },
-    { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
-    { href: "/messages", label: "Messages" },
   ];
 
   return (
@@ -27,19 +22,7 @@ export default function SiteHeader() {
         <div className="flex justify-between items-center h-16">
           {/* Brand */}
           <div className="flex-shrink-0">
-            <Link
-              href="/"
-              className="flex items-center space-x-3 hover:opacity-90 transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-md"
-            >
-              <Image
-                src="/logo.svg"
-                alt="quotexbert logo"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span className="text-xl font-bold text-brand">quotexbert</span>
-            </Link>
+            <Logo size="md" showText={true} />
           </div>
 
           {/* Desktop Navigation */}
@@ -55,31 +38,47 @@ export default function SiteHeader() {
             ))}
 
             {/* Authentication */}
-            {isSignedIn ? (
+            {isSignedIn && user ? (
               <div className="flex items-center space-x-4">
+                {user.role === 'homeowner' && (
+                  <Link
+                    href="/create-lead"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    Post Project
+                  </Link>
+                )}
+                {user.role === 'contractor' && (
+                  <Link
+                    href="/contractor/jobs"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    View Jobs
+                  </Link>
+                )}
                 <Link
-                  href="/dashboard"
+                  href="/profile"
                   className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  Dashboard
+                  Profile
                 </Link>
                 <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  U
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
-                  href="/sign-in"
+                  href="/demo-login"
                   className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  Sign in
+                  Demo Login
                 </Link>
                 <Link
-                  href="/jobs"
+                  href="/demo-login"
                   className="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
-                  Get a quote
+                  Get Started
                 </Link>
               </div>
             )}
@@ -146,36 +145,54 @@ export default function SiteHeader() {
               ))}
 
               {/* Mobile Auth */}
-              {isSignedIn ? (
+              {isSignedIn && user ? (
                 <div className="space-y-3 pt-4 border-t border-ink-200">
+                  {user.role === 'homeowner' && (
+                    <Link
+                      href="/create-lead"
+                      className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Post Project
+                    </Link>
+                  )}
+                  {user.role === 'contractor' && (
+                    <Link
+                      href="/contractor/jobs"
+                      className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      View Jobs
+                    </Link>
+                  )}
                   <Link
-                    href="/dashboard"
+                    href="/profile"
                     className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Dashboard
+                    Profile
                   </Link>
                   <div className="flex items-center justify-center">
                     <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
-                      U
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3 pt-4 border-t border-ink-200">
                   <Link
-                    href="/sign-in"
+                    href="/demo-login"
                     className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Sign in
+                    Demo Login
                   </Link>
                   <Link
-                    href="/jobs"
+                    href="/demo-login"
                     className="block w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] text-white text-center px-4 py-3 rounded-[var(--radius-button)] text-base font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Get a quote
+                    Get Started
                   </Link>
                 </div>
               )}

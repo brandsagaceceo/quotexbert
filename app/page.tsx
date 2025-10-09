@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
+import { useAuth } from "@/lib/hooks/useAuth";
+import Logo from "@/components/Logo";
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
+  const { authUser: user, isSignedIn } = useAuth();
 
   const testimonials = [
     {
@@ -40,6 +44,45 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50">
+      {/* Top Navigation */}
+      <nav className="p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Logo size="md" showText={true} />
+          <div className="space-x-4">
+            {isSignedIn && user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-slate-600">Welcome, {user.name}</span>
+                {user.role === 'homeowner' && (
+                  <Link href="/create-lead" className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-colors">
+                    Post Project
+                  </Link>
+                )}
+                {user.role === 'contractor' && (
+                  <Link href="/contractor/jobs" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-colors">
+                    View Jobs
+                  </Link>
+                )}
+                <Link href="/profile" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-colors">
+                  Profile
+                </Link>
+                <Link href="/demo-login" className="text-slate-600 hover:text-slate-700 font-medium">
+                  Switch User
+                </Link>
+              </div>
+            ) : (
+              <>
+                <Link href="/demo-login" className="bg-gradient-to-r from-teal-600 to-teal-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-teal-700 hover:to-teal-800 transition-colors">
+                  🚀 Try Demo
+                </Link>
+                <Link href="/sign-in" className="text-teal-600 hover:text-teal-700 font-medium">
+                  Sign In
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section with Prominent Estimator */}
       <section className="py-8 sm:py-12">
         <div className="max-w-4xl mx-auto px-4">
@@ -51,6 +94,21 @@ export default function Home() {
             <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
               Use voice or photos to describe your project and get accurate estimates instantly
             </p>
+            
+            {/* Quick Action for Homeowners */}
+            {isSignedIn && user?.role === 'homeowner' && (
+              <div className="mt-6">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 max-w-md mx-auto">
+                  <p className="text-green-800 font-medium mb-3">Welcome back, {user.name}!</p>
+                  <Link 
+                    href="/create-lead" 
+                    className="inline-block bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                  >
+                    🚀 Post Project on Job Board
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Estimator Form - Center of Attention */}
@@ -125,8 +183,16 @@ export default function Home() {
                 >
                   Get New Estimate
                 </button>
-                <button className="px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-white rounded-lg hover:from-red-900 hover:to-red-950 transition-colors flex-1">
-                  Connect with Contractors
+                <button
+                  onClick={() => {
+                    // Store estimate data for the create-lead form
+                    localStorage.setItem('estimate_data', JSON.stringify(estimateResult));
+                    // Navigate to create-lead page
+                    window.location.href = '/create-lead';
+                  }}
+                  className="px-6 py-3 bg-gradient-to-r from-red-800 to-red-900 text-white rounded-lg hover:from-red-900 hover:to-red-950 transition-colors flex-1"
+                >
+                  Post on Job Board
                 </button>
               </div>
             </div>

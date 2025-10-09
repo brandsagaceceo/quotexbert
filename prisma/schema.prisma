@@ -73,6 +73,7 @@ model Lead {
   status           String           @default("open") // "open" | "claimed" | "assigned" | "closed"
   claimed          Boolean          @default(false)
   published        Boolean          @default(true)
+  photos           String           @default("[]") // JSON string of photo URLs/paths
   
   homeownerId      String
   homeowner        User             @relation("HomeownerLeads", fields: [homeownerId], references: [id])
@@ -321,7 +322,10 @@ model PortfolioItem {
   
   title        String
   caption      String?
-  imageUrl     String
+  projectType  String   @default("general") // "kitchen", "bathroom", "electrical", "plumbing", etc.
+  beforeImages String   @default("[]") // JSON array of before photo URLs
+  afterImages  String   @default("[]")  // JSON array of after photo URLs
+  imageUrl     String?  // Legacy single image support
   
   createdAt    DateTime @default(now())
   
@@ -338,10 +342,33 @@ model Review {
   contractor   User     @relation("ContractorReviews", fields: [contractorId], references: [id])
   homeowner    User     @relation("HomeownerReviews", fields: [homeownerId], references: [id])
   
-  rating       Int
-  text         String?
+  rating       Int      // 1-5 star rating
+  title        String?  // Review title/summary
+  text         String?  // Detailed review text
+  
+  // Detailed rating categories
+  qualityRating      Int? // Quality of work (1-5)
+  timelinessRating   Int? // On-time completion (1-5)
+  communicationRating Int? // Communication skills (1-5)
+  cleanlinessRating  Int? // Cleanup after work (1-5)
+  valueRating        Int? // Value for money (1-5)
+  
+  // Project details
+  projectType  String?  // Type of work done
+  projectCost  Float?   // Actual cost of project
+  projectDuration String? // How long project took
+  
+  // Review status and moderation
+  status       String   @default("published") // "published", "pending", "hidden"
+  isVerified   Boolean  @default(false) // Verified by platform
+  
+  // Helpful/response metrics
+  helpfulCount Int      @default(0)
+  responseText String?  // Contractor's response to review
+  responseDate DateTime?
   
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   
   @@unique([leadId, homeownerId]) // One review per homeowner per lead
   @@map("reviews")

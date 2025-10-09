@@ -19,11 +19,11 @@ export default function SignUpPage() {
 
     try {
       const result = await signInWithGoogle();
-      if (result.success) {
+      if (result && result.success) {
         // Redirect to role selection for new users
         router.push("/select-role");
       } else {
-        setError(result.error || "Sign up failed");
+        setError(result?.error || "Sign up failed");
       }
     } catch (error) {
       setError("An error occurred during sign up");
@@ -36,7 +36,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">QuoteXpert</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">QuoteXbert</h1>
           <h2 className="text-2xl font-semibold text-gray-700">Join Our Platform</h2>
           <p className="mt-2 text-gray-600">
             Connect with trusted professionals or find your next project
@@ -87,7 +87,7 @@ export default function SignUpPage() {
                   <li>1. Sign up with Google</li>
                   <li>2. Choose your role (Homeowner or Contractor)</li>
                   <li>3. Complete your profile</li>
-                  <li>4. Start using QuoteXpert!</li>
+                  <li>4. Start using QuoteXbert!</li>
                 </ol>
               </div>
 

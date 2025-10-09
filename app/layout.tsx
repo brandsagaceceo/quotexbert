@@ -19,18 +19,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-  title: "QuotexBert - AI-Powered Home Repair Estimates & Contractor Matching",
+  title: "QuoteXbert - AI-Powered Home Repair Estimates & Contractor Matching",
   description:
-    "Get instant AI home repair estimates. Connect with verified contractors. Pay-per-lead system. Join 1000+ contractors earning more with QuotexBert.",
+    "Get instant AI home repair estimates. Connect with verified contractors. Pay-per-lead system. Join 1000+ contractors earning more with QuoteXbert.",
   openGraph: {
-    title: "QuotexBert - AI Home Repair Estimates",
+    title: "QuoteXbert - AI Home Repair Estimates", 
     description:
       "Get instant AI home repair estimates and connect with verified contractors in your area.",
-    siteName: "QuotexBert",
+    siteName: "QuoteXbert",
     images: ["/og-homepage.jpg"],
   },
   twitter: {
     card: "summary_large_image",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
 };
 

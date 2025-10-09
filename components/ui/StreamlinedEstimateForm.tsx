@@ -58,6 +58,9 @@ interface EstimateResult {
   confidence: number;
   factors: string[];
   aiPowered?: boolean;
+  // Add original project data for form pre-filling
+  projectDescription?: string;
+  projectImages?: File[];
 }
 
 interface StreamlinedEstimateFormProps {
@@ -239,6 +242,9 @@ export function StreamlinedEstimateForm({ onEstimateComplete }: StreamlinedEstim
       }
 
       const result = await response.json();
+      // Add original project data to the result
+      result.projectDescription = description;
+      result.projectImages = images;
       onEstimateComplete(result);
 
     } catch (error) {
@@ -257,7 +263,9 @@ export function StreamlinedEstimateForm({ onEstimateComplete }: StreamlinedEstim
           "Material cost estimation",
           "Labor complexity assessment"
         ],
-        aiPowered: false
+        aiPowered: false,
+        projectDescription: description,
+        projectImages: images
       };
       
       setTimeout(() => onEstimateComplete(mockResult), 1500);

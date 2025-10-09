@@ -1,6 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { notifications } from "@/lib/notifications";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +22,11 @@ export async function POST(req: NextRequest) {
       publicMetadata: {
         role: role,
       },
+    });
+
+    // Send welcome notification for new users
+    await notifications.welcome(userId, {
+      firstName: role === 'contractor' ? 'Contractor' : 'Homeowner'
     });
 
     return NextResponse.json({ success: true, role });
