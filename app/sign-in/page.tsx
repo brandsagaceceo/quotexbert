@@ -22,8 +22,11 @@ export default function SignInPage() {
       if (result && result.success) {
         // Redirect to role selection if no role is set
         router.push("/select-role");
+      } else if (result && 'redirect' in result) {
+        // Redirect to demo login for demo purposes
+        router.push(result.redirect);
       } else {
-        setError(result?.error || "Sign in failed");
+        setError("Sign in failed");
       }
     } catch (error) {
       setError("An error occurred during sign in");

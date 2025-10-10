@@ -13,6 +13,7 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  name      String?  // Added name field
   role      String   // "admin" | "contractor" | "homeowner"
   lastSeen  DateTime @default(now())
   createdAt DateTime @default(now())
@@ -34,6 +35,13 @@ model User {
   contractorContracts Contract[]        @relation("ContractorContracts")
   reviewsGiven        Review[]          @relation("HomeownerReviews")
   reviewsReceived     Review[]          @relation("ContractorReviews")
+  
+  // New conversation relations
+  homeownerConversations Conversation[] @relation("HomeownerConversations")
+  contractorConversations Conversation[] @relation("ContractorConversations")
+  sentMessages        ConversationMessage[] @relation("SentMessages")
+  receivedMessages    ConversationMessage[] @relation("ReceivedMessages")
+  quotes              Quote[]
   
   @@map("users")
 }
@@ -74,6 +82,7 @@ model Lead {
   claimed          Boolean          @default(false)
   published        Boolean          @default(true)
   photos           String           @default("[]") // JSON string of photo URLs/paths
+  userId           String?          // Added userId field for homeowner
   
   homeownerId      String
   homeowner        User             @relation("HomeownerLeads", fields: [homeownerId], references: [id])
@@ -89,6 +98,8 @@ model Lead {
   charges          Charge[]
   contract         Contract?
   reviews          Review[]
+  conversations    Conversation[]
+  quotes           Quote[]
   
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -157,15 +168,20 @@ model TypingIndicator {
 }
 
 model Notification {
-  id      String  @id @default(cuid())
-  userId  String
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String  @id @default(cuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  type    String  // "JOB_CLAIMED" | "NEW_MESSAGE" | "LEAD_MATCHED" | "JOB_COMPLETED"
-  payload Json    // Flexible data: { leadId, title, message, etc. }
-  read    Boolean @default(false)
+  type        String  // "job_accepted" | "new_message" | "quote_received" | "quote_accepted"
+  title       String  // Notification title
+  message     String  // Notification message
+  payload     Json?   // Additional flexible data
+  read        Boolean @default(false)
   
-  createdAt DateTime @default(now())
+  relatedId   String? // ID of related job, conversation, quote, etc.
+  relatedType String? // "job" | "conversation" | "quote"
+  
+  createdAt   DateTime @default(now())
   
   @@index([userId, read, createdAt(sort: Desc)])
   @@map("notifications")
@@ -372,4 +388,121 @@ model Review {
   
   @@unique([leadId, homeownerId]) // One review per homeowner per lead
   @@map("reviews")
+}
+
+// New Conversation System for Job Communication
+model Conversation {
+  id           String   @id @default(cuid())
+  jobId        String
+  job          Lead     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  homeownerId  String
+  homeowner    User     @relation("HomeownerConversations", fields: [homeownerId], references: [id])
+  
+  contractorId String
+  contractor   User     @relation("ContractorConversations", fields: [contractorId], references: [id])
+  
+  status       String   @default("active") // "active" | "closed" | "archived"
+  lastMessageAt DateTime @default(now())
+  
+  messages     ConversationMessage[]
+  quotes       Quote[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@unique([jobId, homeownerId, contractorId])
+  @@map("conversations")
+}
+
+model ConversationMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  senderId       String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  
+  senderRole     String       // "homeowner" | "contractor" | "system"
+  
+  receiverId     String
+  receiver       User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  
+  receiverRole   String       // "homeowner" | "contractor" | "system"
+  
+  content        String
+  type           String       @default("text") // "text" | "notification" | "quote" | "image"
+  
+  attachments    String       @default("[]") // JSON array of attachment URLs
+  
+  readAt         DateTime?
+  deliveredAt    DateTime?    @default(now())
+  
+  createdAt      DateTime     @default(now())
+  
+  @@index([conversationId, createdAt])
+  @@map("conversation_messages")
+}
+
+// AI-Generated Quote System
+model Quote {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  jobId          String
+  job            Lead         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  contractorId   String
+  contractor     User         @relation(fields: [contractorId], references: [id])
+  
+  // Quote content generated by AI
+  title          String
+  description    String
+  scope          String       // Detailed scope of work extracted from conversation
+  
+  // Pricing breakdown
+  laborCost      Float        @default(0)
+  materialCost   Float        @default(0)
+  totalCost      Float
+  
+  items          QuoteItem[]
+  
+  // AI analysis metadata
+  aiAnalysis     String?      // AI's analysis of the conversation
+  extractedRequirements String? // Requirements extracted from chat
+  confidenceScore Float       @default(0) // AI confidence in the quote (0-1)
+  
+  // Quote status and workflow
+  status         String       @default("draft") // "draft" | "sent" | "accepted" | "rejected" | "expired"
+  isEdited       Boolean      @default(false) // True if contractor edited AI-generated quote
+  
+  // Timeline
+  sentAt         DateTime?
+  acceptedAt     DateTime?
+  rejectedAt     DateTime?
+  expiresAt      DateTime?    // Optional expiration date
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  @@map("quotes")
+}
+
+model QuoteItem {
+  id          String  @id @default(cuid())
+  quoteId     String
+  quote       Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  category    String  // "labor" | "materials" | "permits" | "other"
+  description String
+  quantity    Float   @default(1)
+  unitPrice   Float
+  totalPrice  Float
+  
+  notes       String? // Additional notes for this item
+  
+  createdAt   DateTime @default(now())
+  
+  @@map("quote_items")
 }

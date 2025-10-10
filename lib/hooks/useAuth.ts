@@ -39,12 +39,13 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     console.log('Demo sign in with Google');
-    return null;
+    // For demo purposes, we'll redirect to demo login
+    return { success: false, redirect: '/demo-login' };
   };
 
   const setUserRole = async (role: 'homeowner' | 'contractor') => {
     console.log('Demo set user role:', role);
-    return null;
+    return { success: true };
   };
 
   const signOut = async () => {

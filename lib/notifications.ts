@@ -88,6 +88,8 @@ export class NotificationService {
         data: {
           userId,
           type,
+          title: `New ${type.replace('_', ' ')}`,
+          message: `You have a new ${type.replace('_', ' ').toLowerCase()}`,
           payload: payload as any,
           read: false
         }

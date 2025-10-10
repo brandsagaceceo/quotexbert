@@ -63,13 +63,15 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: toUserId,
-        type: "NEW_MESSAGE",
-        payload: JSON.stringify({
+        type: "new_message",
+        title: "New Message",
+        message: `You have a new message from ${newMessage.fromUser.email}`,
+        payload: {
           messageId: newMessage.id,
           fromUserName: newMessage.fromUser.email,
           preview: message.substring(0, 100),
-        }),
-      },
+        }
+      }
     });
 
     // Track analytics

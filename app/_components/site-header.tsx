@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useUnreadMessageCount } from "@/lib/hooks/useUnreadMessageCount";
+import { UnreadBadge } from "./UnreadBadge";
 import Logo from "@/components/Logo";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isSignedIn, authUser: user } = useAuth();
+  const { unreadCount } = useUnreadMessageCount();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -41,20 +44,50 @@ export default function SiteHeader() {
             {isSignedIn && user ? (
               <div className="flex items-center space-x-4">
                 {user.role === 'homeowner' && (
-                  <Link
-                    href="/create-lead"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-                  >
-                    Post Project
-                  </Link>
+                  <>
+                    <Link
+                      href="/create-lead"
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    >
+                      Post Project
+                    </Link>
+                    <Link
+                      href="/conversations"
+                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
+                    >
+                      Messages
+                      <UnreadBadge count={unreadCount} className="ml-2" />
+                    </Link>
+                    <Link
+                      href="/homeowner/quotes"
+                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    >
+                      My Quotes
+                    </Link>
+                  </>
                 )}
                 {user.role === 'contractor' && (
-                  <Link
-                    href="/contractor/jobs"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-                  >
-                    View Jobs
-                  </Link>
+                  <>
+                    <Link
+                      href="/contractor/jobs"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    >
+                      View Jobs
+                    </Link>
+                    <Link
+                      href="/conversations"
+                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
+                    >
+                      Messages
+                      <UnreadBadge count={unreadCount} className="ml-2" />
+                    </Link>
+                    <Link
+                      href="/contractor/quotes"
+                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    >
+                      Quotes
+                    </Link>
+                  </>
                 )}
                 <Link
                   href="/profile"
@@ -148,22 +181,56 @@ export default function SiteHeader() {
               {isSignedIn && user ? (
                 <div className="space-y-3 pt-4 border-t border-ink-200">
                   {user.role === 'homeowner' && (
-                    <Link
-                      href="/create-lead"
-                      className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Post Project
-                    </Link>
+                    <>
+                      <Link
+                        href="/create-lead"
+                        className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Post Project
+                      </Link>
+                      <Link
+                        href="/conversations"
+                        className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span>Messages</span>
+                        <UnreadBadge count={unreadCount} />
+                      </Link>
+                      <Link
+                        href="/homeowner/quotes"
+                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        My Quotes
+                      </Link>
+                    </>
                   )}
                   {user.role === 'contractor' && (
-                    <Link
-                      href="/contractor/jobs"
-                      className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      View Jobs
-                    </Link>
+                    <>
+                      <Link
+                        href="/contractor/jobs"
+                        className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        View Jobs
+                      </Link>
+                      <Link
+                        href="/conversations"
+                        className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span>Messages</span>
+                        <UnreadBadge count={unreadCount} />
+                      </Link>
+                      <Link
+                        href="/contractor/quotes"
+                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Quotes
+                      </Link>
+                    </>
                   )}
                   <Link
                     href="/profile"

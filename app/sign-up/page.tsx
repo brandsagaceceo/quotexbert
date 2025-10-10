@@ -22,8 +22,11 @@ export default function SignUpPage() {
       if (result && result.success) {
         // Redirect to role selection for new users
         router.push("/select-role");
+      } else if (result && 'redirect' in result) {
+        // Redirect to demo login for demo purposes
+        router.push(result.redirect);
       } else {
-        setError(result?.error || "Sign up failed");
+        setError("Sign up failed");
       }
     } catch (error) {
       setError("An error occurred during sign up");
