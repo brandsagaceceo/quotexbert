@@ -153,7 +153,7 @@ export function VoiceRecorder({ onRecordingComplete, className = "" }: VoiceReco
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
-                className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-100"
+                className="bg-gradient-to-r from-green-400 to-orange-500 h-2 rounded-full transition-all duration-100"
                 style={{ width: `${Math.min(audioLevel, 100)}%` }}
               ></div>
             </div>
@@ -162,7 +162,7 @@ export function VoiceRecorder({ onRecordingComplete, className = "" }: VoiceReco
 
         {/* Transcript Display */}
         {transcript && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <p className="text-sm text-gray-700">
               <strong>Transcript:</strong> {transcript}
             </p>
@@ -196,7 +196,7 @@ export function VoiceRecorder({ onRecordingComplete, className = "" }: VoiceReco
           
           {isProcessing && (
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600"></div>
               <span>Processing...</span>
             </div>
           )}

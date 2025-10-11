@@ -59,6 +59,8 @@ export async function GET(request: NextRequest) {
         website: user.contractorProfile.website,
         phone: user.contractorProfile.phone,
         verified: user.contractorProfile.verified,
+        profilePhoto: user.contractorProfile.profilePhoto,
+        coverPhoto: user.contractorProfile.coverPhoto,
         avgRating: avgRating,
         reviewCount: user.reviewsReceived.length,
         completedJobs: user._count.acceptedLeads,
@@ -70,6 +72,8 @@ export async function GET(request: NextRequest) {
         name: user.homeownerProfile.name,
         city: user.homeownerProfile.city,
         phone: user.homeownerProfile.phone,
+        profilePhoto: user.homeownerProfile.profilePhoto,
+        coverPhoto: user.homeownerProfile.coverPhoto,
         totalJobs: user._count.leads
       })
     };
@@ -109,7 +113,9 @@ export async function PUT(request: NextRequest) {
         city: updateData.city || user.contractorProfile?.city,
         serviceRadiusKm: updateData.serviceRadiusKm || user.contractorProfile?.serviceRadiusKm || 25,
         website: updateData.website || user.contractorProfile?.website,
-        phone: updateData.phone || user.contractorProfile?.phone
+        phone: updateData.phone || user.contractorProfile?.phone,
+        profilePhoto: updateData.profilePhoto !== undefined ? updateData.profilePhoto : user.contractorProfile?.profilePhoto,
+        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : user.contractorProfile?.coverPhoto
       };
 
       await prisma.contractorProfile.upsert({
@@ -124,7 +130,9 @@ export async function PUT(request: NextRequest) {
       const homeownerData = {
         name: updateData.name || user.homeownerProfile?.name,
         city: updateData.city || user.homeownerProfile?.city,
-        phone: updateData.phone || user.homeownerProfile?.phone
+        phone: updateData.phone || user.homeownerProfile?.phone,
+        profilePhoto: updateData.profilePhoto !== undefined ? updateData.profilePhoto : user.homeownerProfile?.profilePhoto,
+        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : user.homeownerProfile?.coverPhoto
       };
 
       await prisma.homeownerProfile.upsert({

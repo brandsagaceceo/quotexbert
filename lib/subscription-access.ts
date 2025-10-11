@@ -88,6 +88,34 @@ export async function getAccessibleLeads(contractorId: string) {
 }
 
 /**
+ * Get all open leads regardless of subscription status
+ * Contractors can view all leads but only apply to subscribed categories
+ */
+export async function getAllOpenLeads() {
+  try {
+    const leads = await prisma.lead.findMany({
+      where: {
+        status: 'open' // Only show open leads
+      },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        homeowner: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    return leads;
+  } catch (error) {
+    console.error('Error fetching all open leads:', error);
+    return [];
+  }
+}
+
+/**
  * Get subscription summary for a contractor
  */
 export async function getSubscriptionSummary(contractorId: string) {

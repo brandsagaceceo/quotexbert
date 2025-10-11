@@ -3,18 +3,102 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
+import { ALL_CATEGORIES } from "@/lib/categories";
+
+interface JobFilters {
+  category?: string;
+  minBudget?: number | undefined;
+  maxBudget?: number | undefined;
+  location?: string;
+  search?: string;
+}
 
 export default function ContractorJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string>('');
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [acceptanceModal, setAcceptanceModal] = useState<{jobId: string; title: string} | null>(null);
+  const [filters, setFilters] = useState<JobFilters>({});
+  const [showFilters, setShowFilters] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
+
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
   useEffect(() => {
     fetchJobs();
+    fetchSubscriptions();
   }, [user]);
+
+  const fetchSubscriptions = async () => {
+    if (!user) return;
+    try {
+      const response = await fetch(`/api/subscriptions?contractorId=${user.id}`);
+      const data = await response.json();
+      if (data.success) {
+        setSubscriptions(data.subscriptions || []);
+      }
+    } catch (error) {
+      console.error("Error fetching subscriptions:", error);
+    }
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [jobs, filters]);
+
+  const applyFilters = () => {
+    let filtered = [...jobs];
+
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(job => 
+        job.title?.toLowerCase().includes(searchLower) ||
+        job.description?.toLowerCase().includes(searchLower) ||
+        job.category?.toLowerCase().includes(searchLower) ||
+        job.location?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (filters.category) {
+      filtered = filtered.filter(job => job.category === filters.category);
+    }
+
+    if (filters.minBudget) {
+      filtered = filtered.filter(job => {
+        const budgetStr = job.budget?.replace(/[^0-9]/g, '');
+        const budget = parseInt(budgetStr) || 0;
+        return budget >= filters.minBudget!;
+      });
+    }
+
+    if (filters.maxBudget) {
+      filtered = filtered.filter(job => {
+        const budgetStr = job.budget?.replace(/[^0-9]/g, '');
+        const budget = parseInt(budgetStr) || 0;
+        return budget <= filters.maxBudget!;
+      });
+    }
+
+    if (filters.location) {
+      const locationLower = filters.location.toLowerCase();
+      filtered = filtered.filter(job => 
+        job.location?.toLowerCase().includes(locationLower)
+      );
+    }
+
+    setFilteredJobs(filtered);
+  };
+
+  const handleFilterChange = (newFilters: Partial<JobFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
+  const clearFilters = () => {
+    setFilters({});
+  };
 
   const fetchJobs = async () => {
     try {
@@ -35,8 +119,30 @@ export default function ContractorJobsPage() {
     }
   };
 
-  const acceptJob = async (jobId: string) => {
+  const acceptJob = async (jobId: string, acceptanceData?: {message?: string}) => {
     setAccepting(jobId);
+    
+    // Find the job to check its category
+    const job = jobs.find(j => j.id === jobId);
+    if (!job) {
+      alert('Job not found');
+      setAccepting(null);
+      return;
+    }
+
+    // Check if contractor is subscribed to this job's category
+    const isSubscribed = subscriptions.some(sub => 
+      sub.category === job.category && 
+      sub.status === 'active' && 
+      sub.canClaimLeads
+    );
+
+    if (!isSubscribed) {
+      alert(`You must be subscribed to the "${job.category}" category to accept jobs. Please visit your subscriptions page to subscribe.`);
+      setAccepting(null);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/jobs/${jobId}/accept`, {
         method: 'POST',
@@ -44,16 +150,20 @@ export default function ContractorJobsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contractorId: user?.id || 'demo-contractor'
+          contractorId: user?.id || 'demo-contractor',
+          message: acceptanceData?.message || `I'm interested in this project and would like to provide you with a quote. Let's discuss the details!`
         })
       });
+
+      const result = await response.json();
 
       if (response.ok) {
         // Refresh jobs list
         fetchJobs();
-        alert('Job accepted successfully!');
+        alert(result.message || 'Job accepted successfully! You can now send quotes through messages.');
+        setAcceptanceModal(null);
       } else {
-        alert('Failed to accept job');
+        alert(result.error || 'Failed to accept job');
       }
     } catch (error) {
       console.error('Error accepting job:', error);
@@ -61,6 +171,10 @@ export default function ContractorJobsPage() {
     } finally {
       setAccepting(null);
     }
+  };
+
+  const openAcceptanceModal = (jobId: string, title: string) => {
+    setAcceptanceModal({ jobId, title });
   };
 
   const toggleJobDetails = (jobId: string) => {
@@ -115,22 +229,141 @@ export default function ContractorJobsPage() {
           )}
         </div>
 
+        {/* Filter Section */}
+        <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/50">
+          <div className="p-4 border-b border-gray-200">
+            <button 
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+              <span className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>
+                ⌄
+              </span>
+            </button>
+          </div>
+          
+          {showFilters && (
+            <div className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Search
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Search jobs..."
+                    value={filters.search || ''}
+                    onChange={(e) => handleFilterChange({ search: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={filters.category || ''}
+                    onChange={(e) => handleFilterChange({ category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <option value="">All categories</option>
+                    {ALL_CATEGORIES.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Min Budget */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Min Budget
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="$0"
+                    value={filters.minBudget || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFilterChange({ 
+                        minBudget: value ? parseInt(value) : undefined 
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                {/* Max Budget */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Max Budget
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="$50,000"
+                    value={filters.maxBudget || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFilterChange({ 
+                        maxBudget: value ? parseInt(value) : undefined 
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                >
+                  Clear Filters
+                </button>
+                <div className="text-sm text-gray-600 flex items-center">
+                  Showing {filteredJobs.length} of {jobs.length} jobs
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading jobs...</p>
           </div>
-        ) : jobs.length === 0 ? (
+        ) : filteredJobs.length === 0 ? (
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Available</h3>
-            <p className="text-gray-500 mb-4">No leads have been created yet. Try logging in as a homeowner to create a lead!</p>
-            <Link href="/demo-login" className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg font-semibold">
-              Switch to Homeowner Demo
-            </Link>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Match Your Filters</h3>
+            <p className="text-gray-500 mb-4">
+              {jobs.length === 0 
+                ? "No leads have been created yet. Try logging in as a homeowner to create a lead!"
+                : "Try adjusting your filters to see more jobs."
+              }
+            </p>
+            <div className="space-x-2">
+              {jobs.length > 0 && (
+                <button 
+                  onClick={clearFilters}
+                  className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg font-semibold"
+                >
+                  Clear Filters
+                </button>
+              )}
+              <Link href="/demo-login" className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg font-semibold">
+                Switch to Homeowner Demo
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6">
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <div key={job.id} className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -204,15 +437,38 @@ export default function ContractorJobsPage() {
                     >
                       {expandedJob === job.id ? 'Hide Details' : 'View Details'}
                     </button>
-                    {job.status === 'Open' && (
-                      <button 
-                        onClick={() => acceptJob(job.id)}
-                        disabled={accepting === job.id}
-                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-colors"
-                      >
-                        {accepting === job.id ? 'Accepting...' : 'Accept Job'}
-                      </button>
-                    )}
+                    {job.status === 'open' && (() => {
+                      const isSubscribed = subscriptions.some(sub => 
+                        sub.category === job.category && 
+                        sub.status === 'active' && 
+                        sub.canClaimLeads
+                      );
+                      
+                      return isSubscribed ? (
+                        <button 
+                          onClick={() => openAcceptanceModal(job.id, job.title)}
+                          disabled={accepting === job.id}
+                          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                        >
+                          {accepting === job.id ? 'Accepting...' : 'Accept Job'}
+                        </button>
+                      ) : (
+                        <div className="flex flex-col items-end gap-1">
+                          <button 
+                            disabled
+                            className="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold opacity-50 cursor-not-allowed"
+                          >
+                            Subscription Required
+                          </button>
+                          <Link 
+                            href="/contractor/subscriptions"
+                            className="text-xs text-blue-600 hover:text-blue-800 underline"
+                          >
+                            Subscribe to {job.category}
+                          </Link>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -220,6 +476,66 @@ export default function ContractorJobsPage() {
           </div>
         )}
       </div>
+
+      {/* Acceptance Modal */}
+      {acceptanceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Accept Job: {acceptanceModal.title}
+            </h3>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              await acceptJob(acceptanceModal.jobId, {
+                message: formData.get('message') as string
+              });
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Message to Homeowner (Optional)
+                  </label>
+                  <textarea
+                    name="message"
+                    rows={3}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    defaultValue="I'm interested in this project and would like to provide you with a quote. Let's discuss the details!"
+                  />
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">What happens next?</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• You'll be added to this job (max 3 contractors)</li>
+                    <li>• A conversation will start with the homeowner</li>
+                    <li>• You can send quotes and discuss details through messages</li>
+                    <li>• The homeowner will choose their preferred contractor</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setAcceptanceModal(null)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={accepting === acceptanceModal.jobId}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-4 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                >
+                  {accepting === acceptanceModal.jobId ? 'Accepting...' : 'Accept Job'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -28,7 +28,7 @@ export default function SelectRolePage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome to QuoteXbert!</h1>

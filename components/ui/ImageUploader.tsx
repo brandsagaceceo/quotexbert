@@ -123,7 +123,7 @@ export function ImageUploader({ onImagesSelected, maxImages = 5, className = "" 
       buttonContainer.className = 'flex space-x-3 justify-center';
       
       const captureBtn = document.createElement('button');
-      captureBtn.className = 'bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700';
+      captureBtn.className = 'bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700';
       captureBtn.textContent = 'Capture';
       
       const cancelBtn = document.createElement('button');
@@ -186,7 +186,7 @@ export function ImageUploader({ onImagesSelected, maxImages = 5, className = "" 
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             isDragging 
-              ? 'border-blue-500 bg-blue-50' 
+              ? 'border-orange-500 bg-orange-50' 
               : 'border-gray-300 hover:border-gray-400'
           }`}
           onDragOver={handleDragOver}

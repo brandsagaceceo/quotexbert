@@ -43,7 +43,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-slate-50 to-red-50">
       {/* Top Navigation */}
       <nav className="p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -58,12 +58,15 @@ export default function Home() {
                   </Link>
                 )}
                 {user.role === 'contractor' && (
-                  <Link href="/contractor/jobs" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-colors">
+                  <Link href="/contractor/jobs" className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-700 hover:to-orange-800 transition-colors">
                     View Jobs
                   </Link>
                 )}
                 <Link href="/profile" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-colors">
                   Profile
+                </Link>
+                <Link href="/messages" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-colors">
+                  Messages
                 </Link>
                 <Link href="/demo-login" className="text-slate-600 hover:text-slate-700 font-medium">
                   Switch User
@@ -71,10 +74,10 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <Link href="/demo-login" className="bg-gradient-to-r from-teal-600 to-teal-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-teal-700 hover:to-teal-800 transition-colors">
+                <Link href="/demo-login" className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors">
                   🚀 Try Demo
                 </Link>
-                <Link href="/sign-in" className="text-teal-600 hover:text-teal-700 font-medium">
+                <Link href="/sign-in" className="text-red-900 hover:text-red-950 font-medium">
                   Sign In
                 </Link>
               </>
@@ -88,7 +91,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-900 to-teal-700 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-4">
               Get Instant Home Improvement Estimates
             </h1>
             <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
@@ -98,11 +101,11 @@ export default function Home() {
             {/* Quick Action for Homeowners */}
             {isSignedIn && user?.role === 'homeowner' && (
               <div className="mt-6">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 max-w-md mx-auto">
+                <div className="bg-gradient-to-r from-green-50 to-orange-50 border border-green-200 rounded-xl p-4 max-w-md mx-auto">
                   <p className="text-green-800 font-medium mb-3">Welcome back, {user.name}!</p>
                   <Link 
                     href="/create-lead" 
-                    className="inline-block bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                    className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                   >
                     🚀 Post Project on Job Board
                   </Link>
@@ -112,20 +115,20 @@ export default function Home() {
           </div>
 
           {/* Main Estimator Form - Center of Attention */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-teal-100">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100">
             <StreamlinedEstimateForm onEstimateComplete={handleEstimateComplete} />
           </div>
 
           {/* Estimate Results */}
           {estimateResult && (
-            <div id="estimate-results" className="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-teal-100">
+            <div id="estimate-results" className="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100">
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">
                     Your {estimateResult.aiPowered ? 'AI-Powered' : 'Smart'} Estimate
                   </h2>
                   {estimateResult.aiPowered && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                       🤖 AI
                     </span>
                   )}
@@ -154,12 +157,12 @@ export default function Home() {
                 </div>
 
                 {/* Analysis Factors */}
-                <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 border border-teal-200">
-                  <h3 className="text-xl font-semibold text-teal-900 mb-4">🔍 Analysis Factors</h3>
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+                  <h3 className="text-xl font-semibold text-red-900 mb-4">🔍 Analysis Factors</h3>
                   <ul className="space-y-2">
                     {estimateResult.factors?.map((factor: string, index: number) => (
-                      <li key={index} className="flex items-center text-teal-800">
-                        <span className="text-teal-600 mr-2">✓</span>
+                      <li key={index} className="flex items-center text-red-800">
+                        <span className="text-red-900 mr-2">✓</span>
                         {factor}
                       </li>
                     ))}
@@ -209,7 +212,7 @@ export default function Home() {
                   confidence: 85,
                   factors: ["Project description analyzed", "Market rate analysis", "Material cost estimation", "Labor complexity assessment"]
                 })}
-                className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700 transition-colors"
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
               >
                 🧪 Test Estimate Display
               </button>
@@ -222,7 +225,7 @@ export default function Home() {
       <section className="py-16 bg-white/60 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-4">
               How It Works
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -232,7 +235,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-white"
                   fill="none"
@@ -256,7 +259,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-white"
                   fill="none"
@@ -280,7 +283,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-red-800 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-white"
                   fill="none"
@@ -307,10 +310,10 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gradient-to-r from-teal-50 to-red-50">
+      <section className="py-16 bg-gradient-to-r from-orange-50 to-red-50">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-800 to-teal-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-4">
               What Our Users Say
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">

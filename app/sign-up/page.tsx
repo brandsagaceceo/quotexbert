@@ -36,7 +36,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">QuoteXbert</h1>
@@ -53,7 +53,7 @@ export default function SignUpPage() {
               Already have an account?{" "}
               <Link
                 href="/sign-in"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-red-900 hover:text-red-950"
               >
                 Sign in here
               </Link>
@@ -84,9 +84,9 @@ export default function SignUpPage() {
                 </div>
               )}
 
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-900 mb-2">What's next?</h4>
-                <ol className="text-sm text-blue-800 space-y-1">
+              <div className="bg-orange-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-orange-900 mb-2">What's next?</h4>
+                <ol className="text-sm text-orange-800 space-y-1">
                   <li>1. Sign up with Google</li>
                   <li>2. Choose your role (Homeowner or Contractor)</li>
                   <li>3. Complete your profile</li>

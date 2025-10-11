@@ -4,8 +4,10 @@ import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import SiteHeader from "./_components/site-header";
 import SiteFooter from "./_components/site-footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import DevStatus from "./_components/DevStatus";
 import "./globals.css";
+import "../styles/mobile.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,10 +83,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main-content" className="min-h-screen">
+        <main id="main-content" className="min-h-screen pb-20 md:pb-0">
           <div className="container mx-auto">{children}</div>
         </main>
         <SiteFooter />
+        <MobileBottomNav />
         <DevStatus />
       </body>
     </html>

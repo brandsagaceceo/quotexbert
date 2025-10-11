@@ -199,7 +199,7 @@ export function StreamlinedEstimateForm({ onEstimateComplete }: StreamlinedEstim
 
   const handleVoiceTranscript = (transcript: string) => {
     // Append voice transcript to existing description
-    const newDescription = description + (description ? '\n\n' : '') + `Voice input: ${transcript}`;
+    const newDescription = description + (description ? '\n\n' : '') + transcript;
     setDescription(newDescription);
   };
 

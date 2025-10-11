@@ -29,6 +29,8 @@ model User {
   leads               Lead[]            @relation("HomeownerLeads")
   claimedLeads        Lead[]            @relation("ContractorLeads")
   acceptedLeads       Lead[]            @relation("AcceptedLeads")
+  jobApplications     JobApplication[]  @relation("ContractorApplications")
+  jobAcceptances      JobAcceptance[]   @relation("ContractorAcceptances")
   savedJobs           SavedJob[]
   messagesSent        Message[]         @relation("MessageSender")
   messagesReceived    Message[]         @relation("MessageReceiver")
@@ -70,6 +72,8 @@ model ContractorProfile {
   avgRating       Float    @default(0)
   reviewCount     Int      @default(0)
   isActive        Boolean  @default(true)
+  profilePhoto    String?  // Added for profile photo storage
+  coverPhoto      String?  // Added for cover photo storage
   
   portfolio       PortfolioItem[]
   
@@ -86,11 +90,13 @@ model Lead {
   budget           String           // Changed from Float to String to store budget ranges
   zipCode          String
   category         String
-  status           String           @default("open") // "open" | "claimed" | "assigned" | "closed"
+  status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "completed" | "closed"
   claimed          Boolean          @default(false)
-  published        Boolean          @default(true)
+  published        Boolean          @default(false) // Changed default to false - homeowner controls when to publish
   photos           String           @default("[]") // JSON string of photo URLs/paths
   userId           String?          // Added userId field for homeowner
+  maxContractors   Int              @default(3) // Maximum contractors that can apply
+  acceptedContractors String        @default("[]") // JSON array of contractor IDs who accepted the job (max 3)
   
   homeownerId      String
   homeowner        User             @relation("HomeownerLeads", fields: [homeownerId], references: [id])
@@ -98,9 +104,11 @@ model Lead {
   contractorId     String?
   contractor       User?            @relation("ContractorLeads", fields: [contractorId], references: [id])
   
-  acceptedById     String?
+  acceptedById     String?          // Final selected contractor
   acceptedBy       User?            @relation("AcceptedLeads", fields: [acceptedById], references: [id])
   
+  applications     JobApplication[] // Multiple contractor applications
+  acceptances      JobAcceptance[]  // Multiple contractor acceptances (max 3)
   Thread           Thread?
   savedBy          SavedJob[]
   charges          Charge[]
@@ -114,7 +122,57 @@ model Lead {
   
   @@index([category])
   @@index([zipCode])
+  @@index([status])
+  @@index([published])
   @@map("leads")
+}
+
+model JobApplication {
+  id            String           @id @default(cuid())
+  
+  leadId        String
+  lead          Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  contractorId  String
+  contractor    User             @relation("ContractorApplications", fields: [contractorId], references: [id], onDelete: Cascade)
+  
+  status        String           @default("pending") // "pending" | "accepted" | "rejected" | "withdrawn"
+  message       String?          // Optional application message from contractor
+  proposedPrice String?          // Contractor's price quote
+  estimatedDays Int?             // Estimated completion time
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  @@unique([leadId, contractorId]) // One application per contractor per job
+  @@index([contractorId])
+  @@index([leadId])
+  @@index([status])
+  @@map("job_applications")
+}
+
+model JobAcceptance {
+  id            String           @id @default(cuid())
+  
+  leadId        String
+  lead          Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  contractorId  String
+  contractor    User             @relation("ContractorAcceptances", fields: [contractorId], references: [id], onDelete: Cascade)
+  
+  status        String           @default("accepted") // "accepted" | "quoted" | "selected" | "withdrawn"
+  message       String?          // Optional message from contractor
+  quoteAmount   String?          // Contractor's quote amount
+  estimatedDays Int?             // Estimated completion time
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  @@unique([leadId, contractorId]) // One acceptance per contractor per job
+  @@index([contractorId])
+  @@index([leadId])
+  @@index([status])
+  @@map("job_acceptances")
 }
 
 model SavedJob {
@@ -329,9 +387,11 @@ model HomeownerProfile {
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  name     String?
-  city     String?
-  phone    String?
+  name         String?
+  city         String?
+  phone        String?
+  profilePhoto String?  // Added for profile photo storage
+  coverPhoto   String?  // Added for cover photo storage
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -345,13 +405,27 @@ model PortfolioItem {
   contractor   ContractorProfile @relation(fields: [contractorId], references: [id], onDelete: Cascade)
   
   title        String
-  caption      String?
+  description  String?  // Detailed project description
+  caption      String?  // Short social media style caption
   projectType  String   @default("general") // "kitchen", "bathroom", "electrical", "plumbing", etc.
   beforeImages String   @default("[]") // JSON array of before photo URLs
   afterImages  String   @default("[]")  // JSON array of after photo URLs
   imageUrl     String?  // Legacy single image support
   
+  // Project details
+  projectCost  String?  // "1000-2000" format for budget ranges
+  duration     String?  // "2 weeks", "3 days", etc.
+  materials    String?  // Materials used
+  location     String?  // City or general area
+  clientStory  String?  // Client testimonial or story
+  
+  // Social features
+  isPublic     Boolean  @default(true)  // Whether visible to potential clients
+  isPinned     Boolean  @default(false) // Pin to top of contractor profile
+  tags         String   @default("[]")  // JSON array of tags like ["modern", "luxury", "eco-friendly"]
+  
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   
   @@map("portfolio_items")
 }

@@ -49,7 +49,7 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
       // Combine all input sources
       const combinedDescription = [
         textDescription,
-        voiceTranscript ? `Voice description: ${voiceTranscript}` : "",
+        voiceTranscript || "",
       ].filter(Boolean).join("\n\n");
 
       // Create FormData for multipart request
@@ -125,7 +125,7 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
             onClick={() => setActiveTab("text")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "text"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-orange-600 border-b-2 border-orange-600"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -135,7 +135,7 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
             onClick={() => setActiveTab("voice")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "voice"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-orange-600 border-b-2 border-orange-600"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -145,7 +145,7 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
             onClick={() => setActiveTab("photos")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeTab === "photos"
-                ? "text-blue-600 border-b-2 border-blue-600"
+                ? "text-orange-600 border-b-2 border-orange-600"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -167,7 +167,7 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
                   value={textDescription}
                   onChange={(e) => setTextDescription(e.target.value)}
                   placeholder="Describe your project in detail... (e.g., 'I need to replace my kitchen faucet. It's a standard single-handle faucet with a pull-out sprayer. The current one is leaking from the base.')"
-                  className="w-full bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-500 min-h-[120px] resize-y focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-500 min-h-[120px] resize-y focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
                 />
                 {textDescription && (
                   <div className="mt-2 text-sm text-green-600 flex items-center">
@@ -191,8 +191,8 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
 
         {/* Summary Section */}
         {hasContent && (
-          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-2">Input Summary:</h3>
+          <div className="mt-8 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+            <h3 className="font-semibold text-orange-900 mb-2">Input Summary:</h3>
             <div className="space-y-2 text-sm">
               {textDescription && (
                 <div className="flex items-start space-x-2">
@@ -202,8 +202,8 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
               )}
               {voiceTranscript && (
                 <div className="flex items-start space-x-2">
-                  <span className="text-blue-600">🎤</span>
-                  <span className="text-blue-800">Voice: {voiceTranscript.substring(0, 100)}{voiceTranscript.length > 100 ? "..." : ""}</span>
+                  <span className="text-red-900">🎤</span>
+                  <span className="text-red-900">{voiceTranscript.substring(0, 100)}{voiceTranscript.length > 100 ? "..." : ""}</span>
                 </div>
               )}
               {images.length > 0 && (

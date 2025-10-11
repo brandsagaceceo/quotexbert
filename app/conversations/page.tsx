@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useUnreadMessageCount } from '@/lib/hooks/useUnreadMessageCount';
 import { UnreadBadge } from '@/app/_components/UnreadBadge';
+import { Trash2, Star } from 'lucide-react';
+import { ReviewForm } from '@/components/ReviewForm';
 
 interface Conversation {
   id: string;
@@ -63,6 +65,8 @@ export default function ConversationsPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     if (authUser && isSignedIn) {
@@ -137,6 +141,68 @@ export default function ConversationsPage() {
     }
   };
 
+  const deleteConversation = async (conversationId: string) => {
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Remove conversation from local state
+        setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+        
+        // If this was the selected conversation, clear it
+        if (selectedConversation?.id === conversationId) {
+          setSelectedConversation(null);
+          setMessages([]);
+        }
+        
+        // Clear delete confirmation
+        setDeleteConfirm(null);
+        
+        // Refresh unread count
+        refreshUnreadCount();
+      } else {
+        console.error('Failed to delete conversation');
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+    }
+  };
+
+  const submitReview = async (reviewData: any) => {
+    if (!selectedConversation || !authUser) return;
+
+    try {
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contractorId: selectedConversation.contractor.id,
+          homeownerId: authUser.id,
+          leadId: selectedConversation.jobId,
+          ...reviewData
+        }),
+      });
+
+      if (response.ok) {
+        setShowReviewForm(false);
+        alert('Review submitted successfully!');
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      throw error;
+    }
+  };
+
   if (!isSignedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -177,37 +243,53 @@ export default function ConversationsPage() {
                   {conversations.map((conversation) => (
                     <div
                       key={conversation.id}
-                      onClick={() => setSelectedConversation(conversation)}
-                      className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                        selectedConversation?.id === conversation.id ? 'bg-blue-50' : ''
+                      className={`p-4 hover:bg-gray-50 relative ${
+                        selectedConversation?.id === conversation.id ? 'bg-red-50' : ''
                       }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold text-gray-900 truncate">
-                              {conversation.job.title}
-                            </h3>
-                            <UnreadBadge count={conversation.unreadCount} />
+                      <div 
+                        onClick={() => setSelectedConversation(conversation)}
+                        className="cursor-pointer pr-8"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-semibold text-gray-900 truncate">
+                                {conversation.job.title}
+                              </h3>
+                              <UnreadBadge count={conversation.unreadCount} />
+                            </div>
+                            <p className="text-sm text-gray-600 truncate">
+                              with {conversation.otherParticipant.name}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Budget: ${conversation.job.budget.toLocaleString()}
+                            </p>
                           </div>
-                          <p className="text-sm text-gray-600 truncate">
-                            with {conversation.otherParticipant.name}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Budget: ${conversation.job.budget.toLocaleString()}
-                          </p>
+                          <span className="text-xs text-gray-400">
+                            {conversation.lastMessage && 
+                              new Date(conversation.lastMessage.createdAt).toLocaleDateString()
+                            }
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-400">
-                          {conversation.lastMessage && 
-                            new Date(conversation.lastMessage.createdAt).toLocaleDateString()
-                          }
-                        </span>
+                        {conversation.lastMessage && (
+                          <p className="text-sm text-gray-600 mt-2 truncate">
+                            {conversation.lastMessage.content}
+                          </p>
+                        )}
                       </div>
-                      {conversation.lastMessage && (
-                        <p className="text-sm text-gray-600 mt-2 truncate">
-                          {conversation.lastMessage.content}
-                        </p>
-                      )}
+                      
+                      {/* Delete Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirm(conversation.id);
+                        }}
+                        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-red-600 rounded"
+                        title="Delete conversation"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -219,12 +301,27 @@ export default function ConversationsPage() {
                   <>
                     {/* Header */}
                     <div className="p-4 border-b border-gray-200">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {selectedConversation.job.title}
-                      </h2>
-                      <p className="text-sm text-gray-600">
-                        Conversation with {selectedConversation.otherParticipant.name}
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            {selectedConversation.job.title}
+                          </h2>
+                          <p className="text-sm text-gray-600">
+                            Conversation with {selectedConversation.otherParticipant.name}
+                          </p>
+                        </div>
+                        
+                        {/* Review Button - Only show for homeowners */}
+                        {authUser?.role === 'homeowner' && (
+                          <button
+                            onClick={() => setShowReviewForm(true)}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                          >
+                            <Star className="h-4 w-4" />
+                            Leave Review
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Messages */}
@@ -239,13 +336,13 @@ export default function ConversationsPage() {
                           <div
                             className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                               message.senderId === authUser?.id
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-red-900 text-white'
                                 : 'bg-gray-200 text-gray-900'
                             }`}
                           >
                             <p className="text-sm">{message.content}</p>
                             <p className={`text-xs mt-1 ${
-                              message.senderId === authUser?.id ? 'text-blue-200' : 'text-gray-500'
+                              message.senderId === authUser?.id ? 'text-red-200' : 'text-gray-500'
                             }`}>
                               {new Date(message.createdAt).toLocaleString()}
                             </p>
@@ -269,7 +366,7 @@ export default function ConversationsPage() {
                         <button
                           onClick={sendMessage}
                           disabled={sending || !newMessage.trim()}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="bg-red-900 text-white px-4 py-2 rounded-md hover:bg-red-950 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {sending ? 'Sending...' : 'Send'}
                         </button>
@@ -286,6 +383,43 @@ export default function ConversationsPage() {
           </div>
         )}
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Delete Conversation</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this conversation? This action cannot be undone and all messages will be permanently removed.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteConversation(deleteConfirm)}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Review Form Modal */}
+      {showReviewForm && selectedConversation && (
+        <ReviewForm
+          contractorId={selectedConversation.contractor.id}
+          contractorName={selectedConversation.contractor.name}
+          leadId={selectedConversation.jobId}
+          onSubmit={submitReview}
+          onCancel={() => setShowReviewForm(false)}
+        />
+      )}
     </div>
   );
 }
