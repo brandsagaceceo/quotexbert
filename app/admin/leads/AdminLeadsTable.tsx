@@ -7,7 +7,7 @@ interface Lead {
   createdAt: Date;
   title: string;
   description: string;
-  budget: number;
+  budget: string; // Changed from number to string to match updated schema
   zipCode: string;
   category: string;
   status: string;

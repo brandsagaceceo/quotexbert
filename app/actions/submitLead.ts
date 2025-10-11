@@ -21,6 +21,7 @@ const leadSchema = z.object({
     .string()
     .min(1, "Description is required")
     .max(1000, "Description must be 1000 characters or less"),
+  budget: z.string().optional(), // Optional budget from form
   photos: z.array(z.string()).optional().default([]), // Array of photo URLs
   website: z.string().optional(), // Honeypot field
 });
@@ -81,6 +82,7 @@ export async function submitLead(formData: FormData) {
       postalCode: formData.get("postalCode") as string,
       projectType: formData.get("projectType") as string,
       description: formData.get("description") as string,
+      budget: formData.get("budget") as string,
       photos: formData.get("photos") ? JSON.parse(formData.get("photos") as string) : [],
       website: formData.get("website") as string, // Honeypot
       affiliateCode: formData.get("affiliateCode") as string, // Affiliate tracking
@@ -125,12 +127,9 @@ export async function submitLead(formData: FormData) {
       data.description,
       data.postalCode,
     );
-    const estimateParts = estimate
-      .split("$")[1]
-      ?.split(",")
-      .join("")
-      .split(" ");
-    const _estimateValue = parseInt(estimateParts?.[0] || "5000") || 5000;
+    
+    // Use provided budget if available and valid, otherwise use generated estimate
+    const finalBudget = data.budget && data.budget.trim() !== "" ? data.budget : estimate;
 
     // Handle affiliate tracking
     let affiliateId: string | null = null;
@@ -175,7 +174,7 @@ export async function submitLead(formData: FormData) {
         zipCode: data.postalCode,
         category: data.projectType,
         description: data.description,
-        budget: parseFloat(estimate.replace(/[^0-9.]/g, "")) || 5000,
+        budget: finalBudget, // Store the budget range or user input as string
         photos: JSON.stringify(data.photos || []),
         homeownerId: "demo-homeowner", // Demo homeowner ID for testing
         status: "Open", // Set initial status

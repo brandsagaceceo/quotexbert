@@ -7,25 +7,29 @@ import Link from "next/link";
 export default function ContractorJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<string>('');
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [accepting, setAccepting] = useState<string | null>(null);
   const { authUser: user, isSignedIn } = useAuth();
 
   useEffect(() => {
     fetchJobs();
-  }, []);
+  }, [user]);
 
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/jobs");
+      const contractorId = user?.id || 'demo-contractor';
+      const response = await fetch(`/api/jobs?contractorId=${contractorId}`);
       
       if (response.ok) {
         const data = await response.json();
-        setJobs(data);
+        setJobs(data.jobs || data); // Handle both old and new response formats
+        setMessage(data.message || '');
       }
     } catch (error) {
       console.error("Error fetching jobs:", error);
+      setMessage("Error loading jobs. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -89,6 +93,26 @@ export default function ContractorJobsPage() {
           <p className="text-xl text-gray-600">
             Welcome {user.name}! Browse home improvement projects in your area
           </p>
+          
+          {message && (
+            <div className={`mt-4 p-4 rounded-lg border ${
+              message.includes('Subscribe') || message.includes('No jobs')
+                ? 'bg-amber-50 border-amber-200 text-amber-800'
+                : 'bg-green-50 border-green-200 text-green-800'
+            }`}>
+              <p className="font-medium">{message}</p>
+              {message.includes('Subscribe') && (
+                <div className="mt-2">
+                  <Link 
+                    href="/contractor/subscriptions" 
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    View Subscriptions →
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {loading ? (

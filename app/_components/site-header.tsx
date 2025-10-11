@@ -75,6 +75,12 @@ export default function SiteHeader() {
                       View Jobs
                     </Link>
                     <Link
+                      href="/contractor/subscriptions"
+                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    >
+                      Subscriptions
+                    </Link>
+                    <Link
                       href="/conversations"
                       className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
                     >
@@ -214,6 +220,13 @@ export default function SiteHeader() {
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         View Jobs
+                      </Link>
+                      <Link
+                        href="/contractor/subscriptions"
+                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Subscriptions
                       </Link>
                       <Link
                         href="/conversations"

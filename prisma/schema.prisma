@@ -19,6 +19,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  // Stripe integration
+  stripeCustomerId     String?  @unique
+  
   // Relations
   contractorProfile    ContractorProfile?
   homeownerProfile     HomeownerProfile?
@@ -42,6 +45,11 @@ model User {
   sentMessages        ConversationMessage[] @relation("SentMessages")
   receivedMessages    ConversationMessage[] @relation("ReceivedMessages")
   quotes              Quote[]
+  
+  // Payment relations - UPDATED FOR SUBSCRIPTION MODEL
+  subscriptions       ContractorSubscription[] @relation("ContractorSubscriptions")
+  paymentMethods      PaymentMethod[]
+  transactions        Transaction[]
   
   @@map("users")
 }
@@ -75,7 +83,7 @@ model Lead {
   id               String           @id @default(cuid())
   title            String
   description      String
-  budget           Float
+  budget           String           // Changed from Float to String to store budget ranges
   zipCode          String
   category         String
   status           String           @default("open") // "open" | "claimed" | "assigned" | "closed"
@@ -505,4 +513,105 @@ model QuoteItem {
   createdAt   DateTime @default(now())
   
   @@map("quote_items")
+}
+
+model ContractorSubscription {
+  id                String   @id @default(cuid())
+  contractorId      String
+  contractor        User     @relation("ContractorSubscriptions", fields: [contractorId], references: [id], onDelete: Cascade)
+  
+  // Subscription details
+  category          String   // "plumbing", "electrical", "general", etc.
+  status            String   @default("active") // "active" | "canceled" | "past_due" | "paused"
+  
+  // Pricing
+  monthlyPrice      Float    @default(29.99)
+  currency          String   @default("usd")
+  
+  // Stripe integration
+  stripeSubscriptionId String? @unique
+  stripeCustomerId     String?
+  stripePriceId        String? // Stripe price ID for this category
+  
+  // Billing cycle
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  nextBillingDate      DateTime?
+  
+  // Trial and cancellation
+  trialStart          DateTime?
+  trialEnd            DateTime?
+  canceledAt          DateTime?
+  cancelAtPeriodEnd   Boolean  @default(false)
+  
+  // Access control
+  canClaimLeads       Boolean  @default(true)
+  canViewLeads        Boolean  @default(true)
+  leadsThisMonth      Int      @default(0)
+  monthlyLeadLimit    Int      @default(100) // Optional lead limit
+  
+  // Relations
+  transactions        Transaction[]
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  @@unique([contractorId, category])
+  @@map("contractor_subscriptions")
+}
+
+model PaymentMethod {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Stripe data
+  stripePaymentMethodId String @unique
+  type             String   // "card" | "bank_account"
+  
+  // Card/Bank details (from Stripe)
+  last4            String?
+  brand            String?  // "visa", "mastercard", etc.
+  expMonth         Int?
+  expYear          Int?
+  
+  // Status
+  isDefault        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@map("payment_methods")
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  subscriptionId String?
+  subscription  ContractorSubscription? @relation(fields: [subscriptionId], references: [id])
+  
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  type          String   // "subscription_payment" | "refund" | "credit"
+  amount        Float
+  description   String
+  category      String?  // Which category this payment is for
+  
+  // External references
+  stripeTransactionId String?
+  stripeInvoiceId     String?
+  
+  // Status
+  status        String   @default("pending") // "pending" | "completed" | "failed"
+  
+  // Billing period this transaction covers
+  periodStart   DateTime?
+  periodEnd     DateTime?
+  
+  metadata      String?  // JSON for additional data
+  
+  createdAt     DateTime @default(now())
+  
+  @@map("transactions")
 }

@@ -130,7 +130,10 @@ Respond in JSON format:
         console.warn('Failed to parse AI response, creating fallback quote:', parseError);
         
         // Create fallback quote based on project details
-        const estimatedTotal = Math.max(projectDetails.budget * 0.8, 1000);
+        const budgetValue = typeof projectDetails.budget === 'string' 
+          ? parseFloat((projectDetails.budget as string).replace(/[^0-9.]/g, '') || '0')
+          : (projectDetails.budget as number) || 0;
+        const estimatedTotal = Math.max(budgetValue * 0.8, 1000);
         const laborCost = estimatedTotal * 0.6;
         const materialCost = estimatedTotal * 0.4;
         
@@ -240,7 +243,10 @@ Respond in JSON format:
       console.error("AI quote generation failed:", aiError);
       
       // Create basic quote as fallback
-      const estimatedTotal = Math.max(projectDetails.budget * 0.8, 1000);
+      const budgetValue = typeof projectDetails.budget === 'string' 
+        ? parseFloat((projectDetails.budget as string).replace(/[^0-9.]/g, '') || '0')
+        : (projectDetails.budget as number) || 0;
+      const estimatedTotal = Math.max(budgetValue * 0.8, 1000);
       const quote = await prisma.quote.create({
         data: {
           conversationId,

@@ -5,9 +5,27 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
+  apiVersion: "2025-08-27.basil",
   typescript: true,
 });
+
+// Platform fee configuration
+export const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% platform fee
+export const STRIPE_FEE_PERCENTAGE = 0.029; // 2.9% + $0.30
+export const STRIPE_FEE_FIXED = 0.30;
+
+export function calculatePaymentFees(amount: number) {
+  const stripeFee = Math.round((amount * STRIPE_FEE_PERCENTAGE + STRIPE_FEE_FIXED) * 100) / 100;
+  const platformFee = Math.round(amount * PLATFORM_FEE_PERCENTAGE * 100) / 100;
+  const contractorAmount = Math.round((amount - stripeFee - platformFee) * 100) / 100;
+
+  return {
+    totalAmount: amount,
+    stripeFee,
+    platformFee,
+    contractorAmount
+  };
+}
 
 /**
  * Create or retrieve a Stripe customer for a user

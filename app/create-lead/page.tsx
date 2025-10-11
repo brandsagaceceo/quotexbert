@@ -6,21 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PhotoUpload from "@/components/PhotoUpload";
 import { submitLead } from "@/app/actions/submitLead";
-
-const PROJECT_CATEGORIES = [
-  "Kitchen Renovation",
-  "Bathroom Renovation", 
-  "Plumbing",
-  "Electrical",
-  "Flooring",
-  "Painting",
-  "Roofing",
-  "HVAC",
-  "Landscaping",
-  "General Contractor",
-  "Handyman Services",
-  "Other"
-];
+import { CATEGORY_GROUPS } from "@/lib/categories";
 
 export default function CreateLeadPage() {
   const { authUser: user } = useAuth();
@@ -40,18 +26,44 @@ export default function CreateLeadPage() {
   const detectCategoryFromDescription = (description: string): string => {
     const desc = description.toLowerCase();
     
-    if (desc.includes('kitchen')) return 'Kitchen Renovation';
-    if (desc.includes('bathroom') || desc.includes('shower') || desc.includes('toilet')) return 'Bathroom Renovation';
-    if (desc.includes('plumb') || desc.includes('pipe') || desc.includes('water')) return 'Plumbing';
-    if (desc.includes('electric') || desc.includes('wiring') || desc.includes('outlet')) return 'Electrical';
-    if (desc.includes('floor') || desc.includes('carpet') || desc.includes('tile')) return 'Flooring';
-    if (desc.includes('paint') || desc.includes('wall')) return 'Painting';
-    if (desc.includes('roof') || desc.includes('gutter')) return 'Roofing';
-    if (desc.includes('hvac') || desc.includes('heating') || desc.includes('cooling') || desc.includes('air')) return 'HVAC';
-    if (desc.includes('landscape') || desc.includes('garden') || desc.includes('yard')) return 'Landscaping';
-    if (desc.includes('handyman') || desc.includes('repair')) return 'Handyman Services';
+    // Kitchen categories
+    if (desc.includes('kitchen')) return 'kitchen-renovation';
+    if (desc.includes('cabinets') || desc.includes('millwork')) return 'cabinets-millwork';
+    if (desc.includes('countertop')) return 'countertops-installation';
     
-    return 'General Contractor';
+    // Bathroom categories
+    if (desc.includes('bathroom') || desc.includes('shower') || desc.includes('toilet')) return 'bathroom-renovation';
+    
+    // Plumbing and water
+    if (desc.includes('plumb') || desc.includes('pipe') || desc.includes('water') || desc.includes('drain')) return 'electrical-general';
+    
+    // Electrical
+    if (desc.includes('electric') || desc.includes('wiring') || desc.includes('outlet') || desc.includes('lighting')) return 'electrical-general';
+    if (desc.includes('smart home') || desc.includes('security')) return 'smart-home-installation';
+    
+    // Flooring
+    if (desc.includes('floor') || desc.includes('carpet') || desc.includes('tile') || desc.includes('hardwood')) return 'flooring-installation-repair';
+    
+    // Painting
+    if (desc.includes('paint') || desc.includes('wall') || desc.includes('interior') || desc.includes('exterior')) return 'painting-interior-exterior';
+    
+    // Roofing
+    if (desc.includes('roof') || desc.includes('gutter') || desc.includes('siding')) return 'roofing';
+    
+    // HVAC
+    if (desc.includes('hvac') || desc.includes('heating') || desc.includes('cooling') || desc.includes('air') || desc.includes('furnace')) return 'heating-cooling-hvac';
+    
+    // Landscaping
+    if (desc.includes('landscape') || desc.includes('garden') || desc.includes('yard') || desc.includes('lawn')) return 'landscaping-garden-design';
+    
+    // Handyman
+    if (desc.includes('handyman') || desc.includes('repair') || desc.includes('fix') || desc.includes('mount')) return 'handyman-services';
+    
+    // Cleaning
+    if (desc.includes('clean') || desc.includes('wash') || desc.includes('maintenance')) return 'deep-cleaning';
+    
+    // Default to handyman for general work
+    return 'handyman-services';
   };
 
   // Load estimate data on component mount
@@ -114,6 +126,7 @@ export default function CreateLeadPage() {
       submitFormData.append("postalCode", formData.zipCode);
       submitFormData.append("projectType", formData.category);
       submitFormData.append("description", formData.description);
+      submitFormData.append("budget", formData.budget);
       submitFormData.append("photos", JSON.stringify(photos));
       submitFormData.append("website", ""); // Honeypot field
 
@@ -211,10 +224,14 @@ export default function CreateLeadPage() {
                 required
               >
                 <option value="">Select a category</option>
-                {PROJECT_CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
+                {CATEGORY_GROUPS.map((group) => (
+                  <optgroup key={group.id} label={group.name}>
+                    {group.categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name} - ${category.monthlyPrice}/mo
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>

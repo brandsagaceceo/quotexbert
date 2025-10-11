@@ -44,7 +44,7 @@ async function main() {
     data: {
       title: "Kitchen Plumbing Repair",
       description: "Need to fix a leaky kitchen sink and install new faucet",
-      budget: 500,
+      budget: "500",
       zipCode: "90210",
       category: "plumbing",
       homeownerId: homeowner.id,
@@ -55,7 +55,7 @@ async function main() {
     data: {
       title: "Bathroom Electrical Work",
       description: "Install new light fixtures and outlets in bathroom",
-      budget: 800,
+      budget: "800",
       zipCode: "90211",
       category: "electrical",
       homeownerId: homeowner.id,
