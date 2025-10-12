@@ -14,9 +14,8 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/contractor/jobs", label: "Job Board" },
+    { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
   ];
 
   return (
@@ -29,7 +28,7 @@ export default function SiteHeader() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -39,85 +38,65 @@ export default function SiteHeader() {
                 {link.label}
               </Link>
             ))}
+          </nav>
 
+          {/* Right Side Actions */}
+          <div className="hidden md:flex items-center space-x-3">
             {/* Authentication */}
             {isSignedIn && user ? (
-              <div className="flex items-center space-x-4">
-                {user.role === 'homeowner' && (
-                  <>
-                    <Link
-                      href="/create-lead"
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-                    >
-                      Post Project
-                    </Link>
-                    <Link
-                      href="/contractors"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                    >
-                      Find Contractors
-                    </Link>
-                    <Link
-                      href="/conversations"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
-                    >
-                      Messages
-                      <UnreadBadge count={unreadCount} className="ml-2" />
-                    </Link>
-                    <Link
-                      href="/homeowner/quotes"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                    >
-                      My Quotes
-                    </Link>
-                  </>
+              <>
+                {/* Primary Action Button */}
+                {user.role === 'homeowner' ? (
+                  <Link
+                    href="/create-lead"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    Post Project
+                  </Link>
+                ) : (
+                  <Link
+                    href="/contractor/jobs"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    View Jobs
+                  </Link>
                 )}
-                {user.role === 'contractor' && (
-                  <>
-                    <Link
-                      href="/contractor/jobs"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-                    >
-                      View Jobs
-                    </Link>
-                    <Link
-                      href="/contractor/subscriptions"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                    >
-                      Subscriptions
-                    </Link>
-                    <Link
-                      href="/conversations"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
-                    >
-                      Messages
-                      <UnreadBadge count={unreadCount} className="ml-2" />
-                    </Link>
-                    <Link
-                      href="/contractor/quotes"
-                      className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                    >
-                      Quotes
-                    </Link>
-                  </>
-                )}
+
+                {/* Messages with badge */}
                 <Link
-                  href="/profile"
-                  className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  href="/conversations"
+                  className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
                 >
-                  Profile
+                  Messages
+                  <UnreadBadge count={unreadCount} className="ml-1" />
                 </Link>
-                <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+
+                {/* Profile Menu */}
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="/demo-login"
+                    className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  >
+                    Switch Demo
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  >
+                    Profile
+                  </Link>
+                  <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
                 </div>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center space-x-4">
+              <>
                 <Link
                   href="/demo-login"
                   className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  Demo Login
+                  Demo
                 </Link>
                 <Link
                   href="/demo-login"
@@ -125,9 +104,9 @@ export default function SiteHeader() {
                 >
                   Get Started
                 </Link>
-              </div>
+              </>
             )}
-          </nav>
+          </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
@@ -192,72 +171,36 @@ export default function SiteHeader() {
               {/* Mobile Auth */}
               {isSignedIn && user ? (
                 <div className="space-y-3 pt-4 border-t border-ink-200">
-                  {user.role === 'homeowner' && (
-                    <>
-                      <Link
-                        href="/create-lead"
-                        className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Post Project
-                      </Link>
-                      <Link
-                        href="/contractors"
-                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Find Contractors
-                      </Link>
-                      <Link
-                        href="/conversations"
-                        className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <span>Messages</span>
-                        <UnreadBadge count={unreadCount} />
-                      </Link>
-                      <Link
-                        href="/homeowner/quotes"
-                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        My Quotes
-                      </Link>
-                    </>
+                  {/* Primary Action */}
+                  {user.role === 'homeowner' ? (
+                    <Link
+                      href="/create-lead"
+                      className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Post Project
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/contractor/jobs"
+                      className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      View Jobs
+                    </Link>
                   )}
-                  {user.role === 'contractor' && (
-                    <>
-                      <Link
-                        href="/contractor/jobs"
-                        className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        View Jobs
-                      </Link>
-                      <Link
-                        href="/contractor/subscriptions"
-                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Subscriptions
-                      </Link>
-                      <Link
-                        href="/conversations"
-                        className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <span>Messages</span>
-                        <UnreadBadge count={unreadCount} />
-                      </Link>
-                      <Link
-                        href="/contractor/quotes"
-                        className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Quotes
-                      </Link>
-                    </>
-                  )}
+                  
+                  {/* Messages */}
+                  <Link
+                    href="/conversations"
+                    className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Messages</span>
+                    <UnreadBadge count={unreadCount} />
+                  </Link>
+                  
+                  {/* Profile */}
                   <Link
                     href="/profile"
                     className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
@@ -265,11 +208,15 @@ export default function SiteHeader() {
                   >
                     Profile
                   </Link>
-                  <div className="flex items-center justify-center">
-                    <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                  </div>
+                  
+                  {/* Switch Demo */}
+                  <Link
+                    href="/demo-login"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Switch Demo
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3 pt-4 border-t border-ink-200">

@@ -94,6 +94,22 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     ]
   },
   {
+    id: "plumbing",
+    name: "Plumbing",
+    description: "Plumbing installation, repair, and maintenance services",
+    categories: [
+      { id: "general-plumbing", name: "General Plumbing", group: "plumbing", monthlyPrice: 25 },
+      { id: "toilet-repair-installation", name: "Toilet Repair & Installation", group: "plumbing", monthlyPrice: 25 },
+      { id: "faucet-fixture-repair", name: "Faucet & Fixture Repair", group: "plumbing", monthlyPrice: 25 },
+      { id: "drain-cleaning", name: "Drain Cleaning", group: "plumbing", monthlyPrice: 25 },
+      { id: "pipe-repair-replacement", name: "Pipe Repair & Replacement", group: "plumbing", monthlyPrice: 25 },
+      { id: "water-heater-services", name: "Water Heater Services", group: "plumbing", monthlyPrice: 49 },
+      { id: "sump-pump-services", name: "Sump Pump Services", group: "plumbing", monthlyPrice: 25 },
+      { id: "backflow-prevention", name: "Backflow Prevention", group: "plumbing", monthlyPrice: 25 },
+      { id: "leak-detection-repair", name: "Leak Detection & Repair", group: "plumbing", monthlyPrice: 25 },
+    ]
+  },
+  {
     id: "exterior-landscaping",
     name: "Exterior & Landscaping",
     description: "Outdoor work, landscaping, and exterior improvements",

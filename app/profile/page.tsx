@@ -679,32 +679,13 @@ export default function UnifiedProfilePage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-                  View Available Jobs
-                </button>
-                <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
-                  Upload Portfolio Photo
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50">
-                  Download Profile
-                </button>
-              </div>
-            </div>
-
-            {/* Service Area */}
-            {isContractor && (
+            {/* Location */}
+            {profile.city && (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Service Area</h3>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{profile.serviceRadiusKm || 25} km</div>
-                  <div className="text-sm text-gray-600">Service Radius</div>
-                  {profile.city && (
-                    <div className="text-sm text-gray-600 mt-2">Around {profile.city}</div>
-                  )}
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Location</h3>
+                <div className="flex items-center text-gray-700">
+                  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                  <span>{profile.city}</span>
                 </div>
               </div>
             )}

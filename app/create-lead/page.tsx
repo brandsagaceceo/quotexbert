@@ -113,7 +113,7 @@ export default function CreateLeadPage() {
     }
 
     // Validate required fields
-    if (!formData.category || !formData.description || !formData.zipCode) {
+    if (!formData.title || !formData.category || !formData.description || !formData.zipCode) {
       setError("Please fill in all required fields");
       return;
     }
@@ -125,6 +125,7 @@ export default function CreateLeadPage() {
       const submitFormData = new FormData();
       submitFormData.append("postalCode", formData.zipCode);
       submitFormData.append("projectType", formData.category);
+      submitFormData.append("title", formData.title);
       submitFormData.append("description", formData.description);
       submitFormData.append("budget", formData.budget);
       submitFormData.append("photos", JSON.stringify(photos));

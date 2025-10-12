@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
 import { useAuth } from "@/lib/hooks/useAuth";
-import Logo from "@/components/Logo";
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
@@ -43,49 +42,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-slate-50 to-red-50">
-      {/* Top Navigation */}
-      <nav className="p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Logo size="md" showText={true} />
-          <div className="space-x-4">
-            {isSignedIn && user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-slate-600">Welcome, {user.name}</span>
-                {user.role === 'homeowner' && (
-                  <Link href="/create-lead" className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg font-medium hover:from-green-700 hover:to-green-800 transition-colors">
-                    Post Project
-                  </Link>
-                )}
-                {user.role === 'contractor' && (
-                  <Link href="/contractor/jobs" className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-700 hover:to-orange-800 transition-colors">
-                    View Jobs
-                  </Link>
-                )}
-                <Link href="/profile" className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-colors">
-                  Profile
-                </Link>
-                <Link href="/messages" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-colors">
-                  Messages
-                </Link>
-                <Link href="/demo-login" className="text-slate-600 hover:text-slate-700 font-medium">
-                  Switch User
-                </Link>
-              </div>
-            ) : (
-              <>
-                <Link href="/demo-login" className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-2 rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-colors">
-                  🚀 Try Demo
-                </Link>
-                <Link href="/sign-in" className="text-red-900 hover:text-red-950 font-medium">
-                  Sign In
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
       {/* Hero Section with Prominent Estimator */}
       <section className="py-8 sm:py-12">
         <div className="max-w-4xl mx-auto px-4">
@@ -115,13 +72,13 @@ export default function Home() {
           </div>
 
           {/* Main Estimator Form - Center of Attention */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100 relative z-10">
             <StreamlinedEstimateForm onEstimateComplete={handleEstimateComplete} />
           </div>
 
           {/* Estimate Results */}
           {estimateResult && (
-            <div id="estimate-results" className="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100">
+            <div id="estimate-results" className="mt-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100 relative z-10">
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">

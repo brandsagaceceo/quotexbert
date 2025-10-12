@@ -17,6 +17,10 @@ const leadSchema = z.object({
     .string()
     .min(1, "Project type is required")
     .max(80, "Project type must be 80 characters or less"),
+  title: z
+    .string()
+    .min(1, "Project title is required")
+    .max(100, "Project title must be 100 characters or less"),
   description: z
     .string()
     .min(1, "Description is required")
@@ -81,6 +85,7 @@ export async function submitLead(formData: FormData) {
     const rawData = {
       postalCode: formData.get("postalCode") as string,
       projectType: formData.get("projectType") as string,
+      title: formData.get("title") as string,
       description: formData.get("description") as string,
       budget: formData.get("budget") as string,
       photos: formData.get("photos") ? JSON.parse(formData.get("photos") as string) : [],
@@ -170,7 +175,7 @@ export async function submitLead(formData: FormData) {
     // Save lead to database
     const lead = await prisma.lead.create({
       data: {
-        title: data.projectType,
+        title: data.title, // Use the actual title from the form
         zipCode: data.postalCode,
         category: data.projectType,
         description: data.description,
