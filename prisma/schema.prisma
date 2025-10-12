@@ -689,3 +689,19 @@ model Transaction {
   
   @@map("transactions")
 }
+
+model Analytics {
+  id          String    @id @default(cuid())
+  eventName   String
+  eventData   Json?
+  timestamp   DateTime  @default(now())
+  userId      String?
+  sessionId   String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([eventName, timestamp])
+  @@index([userId, timestamp])
+  @@map("analytics")
+}
