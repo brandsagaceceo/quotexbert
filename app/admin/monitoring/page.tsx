@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Users, Briefcase, DollarSign, MessageSquare, RefreshCw } from 'lucide-react';
+import { Users, Briefcase, DollarSign, MessageSquare, RefreshCw, Shield } from 'lucide-react';
 
 interface UsageData {
   period: string;
@@ -39,13 +41,27 @@ interface UsageData {
 }
 
 export default function AdminMonitoringPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
   const [usageData, setUsageData] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('7d');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [error, setError] = useState<string | null>(null);
 
+  // Security check - only admins can access
+  useEffect(() => {
+    if (isLoaded && (!user || user.publicMetadata.role !== 'admin')) {
+      router.push('/unauthorized');
+      return;
+    }
+  }, [user, isLoaded, router]);
+
   const fetchData = async () => {
+    if (!user || user.publicMetadata.role !== 'admin') {
+      setError('Unauthorized access');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -78,12 +94,26 @@ export default function AdminMonitoringPage() {
     }).format(amount / 100);
   };
 
-  if (loading && !usageData) {
+  // Show loading while checking authentication
+  if (!isLoaded || loading && !usageData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p>Loading monitoring data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show unauthorized if not admin
+  if (isLoaded && (!user || user.publicMetadata.role !== 'admin')) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Shield className="h-16 w-16 mx-auto mb-4 text-red-500" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+          <p className="text-gray-600">You need admin privileges to access this page.</p>
         </div>
       </div>
     );
