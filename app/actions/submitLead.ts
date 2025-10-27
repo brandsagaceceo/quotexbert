@@ -182,7 +182,8 @@ export async function submitLead(formData: FormData) {
         budget: finalBudget, // Store the budget range or user input as string
         photos: JSON.stringify(data.photos || []),
         homeownerId: "demo-homeowner", // Demo homeowner ID for testing
-        status: "Open", // Set initial status
+        status: "open", // Set initial status to lowercase
+        published: true, // Make the lead available to contractors immediately
       },
     });
 

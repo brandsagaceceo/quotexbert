@@ -226,7 +226,7 @@ export default function QuoteManagementPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Quote Management</h1>
           <button
-            onClick={() => router.push('/conversations')}
+            onClick={() => router.push('/messages')}
             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           >
             Generate New Quote from Chat
@@ -240,10 +240,10 @@ export default function QuoteManagementPage() {
               Start a conversation with a homeowner and use AI to generate your first quote.
             </p>
             <button
-              onClick={() => router.push('/conversations')}
+              onClick={() => router.push('/messages')}
               className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
             >
-              Go to Conversations
+              Go to Messages
             </button>
           </div>
         ) : (

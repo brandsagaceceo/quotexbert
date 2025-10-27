@@ -127,26 +127,39 @@ export async function POST(
       }
     });
 
-    // Create conversation between homeowner and contractor
-    const conversation = await prisma.conversation.create({
+    // Check if thread already exists for this lead
+    let thread = await prisma.thread.findUnique({
+      where: { leadId: jobId }
+    });
+
+    // Create thread if it doesn't exist
+    if (!thread) {
+      thread = await prisma.thread.create({
+        data: {
+          leadId: jobId
+        }
+      });
+    }
+
+    // Create initial messages in the thread for both parties
+    
+    // Message from contractor to homeowner
+    await prisma.message.create({
       data: {
-        jobId: jobId,
-        homeownerId: currentLead.homeownerId,
-        contractorId: contractorId,
-        status: "active"
+        threadId: thread.id,
+        fromUserId: contractorId,
+        toUserId: currentLead.homeownerId,
+        body: `Hello! I've accepted your project "${currentLead.title}". I'm interested in providing you with a quote. Let's discuss the details so I can give you an accurate estimate.`
       }
     });
 
-    // Create initial message in the conversation
-    await prisma.conversationMessage.create({
+    // Welcome message from homeowner to contractor 
+    await prisma.message.create({
       data: {
-        conversationId: conversation.id,
-        senderId: contractorId,
-        senderRole: "contractor",
-        receiverId: currentLead.homeownerId,
-        receiverRole: "homeowner",
-        content: `Hello! I've accepted your project "${currentLead.title}". I'm interested in providing you with a quote. Let's discuss the details so I can give you an accurate estimate.`,
-        type: "text"
+        threadId: thread.id,
+        fromUserId: currentLead.homeownerId,
+        toUserId: contractorId,
+        body: `Thank you for accepting my project! I look forward to discussing the details and receiving your quote for "${currentLead.title}".`
       }
     });
 
@@ -183,11 +196,12 @@ export async function POST(
         message: acceptance.message,
         createdAt: acceptance.createdAt
       },
-      conversation: {
-        id: conversation.id
+      thread: {
+        id: thread.id
       },
       budget: currentLead.budget,
-      spotsRemaining: 3 - updatedAccepted.length
+      spotsRemaining: 3 - updatedAccepted.length,
+      redirectUrl: `/messages?threadId=${thread.id}`
     });
 
   } catch (error) {

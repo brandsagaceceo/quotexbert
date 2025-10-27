@@ -21,6 +21,12 @@ model User {
   
   // Stripe integration
   stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  subscriptionPlan     String?  // 'basic' | 'professional' | 'premium'
+  subscriptionStatus   String?  // 'active' | 'canceled' | 'past_due' | 'unpaid'
+  subscriptionInterval String?  // 'month' | 'year'
+  subscriptionCurrentPeriodStart DateTime?
+  subscriptionCurrentPeriodEnd   DateTime?
   
   // Relations
   contractorProfile    ContractorProfile?

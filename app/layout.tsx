@@ -84,7 +84,7 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         <main id="main-content" className="min-h-screen pb-20 md:pb-0">
-          <div className="container mx-auto">{children}</div>
+          {children}
         </main>
         <SiteFooter />
         <MobileBottomNav />

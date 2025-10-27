@@ -11,12 +11,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    // Get all threads where the user is involved (either as homeowner or contractor)
+    // Get all threads where the user is involved (either as homeowner, contractor, or message participant)
     const threads = await prisma.thread.findMany({
       where: {
-        lead: {
-          OR: [{ homeownerId: userId }, { contractorId: userId }],
-        },
+        OR: [
+          // User is the homeowner of the lead
+          { lead: { homeownerId: userId } },
+          // User is the contractor of the lead
+          { lead: { contractorId: userId } },
+          // User has sent or received messages in this thread
+          { 
+            messages: {
+              some: {
+                OR: [
+                  { fromUserId: userId },
+                  { toUserId: userId }
+                ]
+              }
+            }
+          }
+        ]
       },
       include: {
         lead: {

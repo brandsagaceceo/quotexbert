@@ -46,7 +46,7 @@ export default function AffiliatePage() {
           </div>
 
           {/* How It Works */}
-          <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-xl p-8 mb-16 shadow-lg">
+          <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-8 mb-16 shadow-lg">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-8 text-center">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
@@ -75,7 +75,7 @@ export default function AffiliatePage() {
           {/* Earning Potential Table */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Your Earning Potential</h2>
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl overflow-hidden shadow-lg">
+            <div className="bg-gradient-to-br from-slate-50/80 to-orange-50/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-slate-100">
@@ -128,19 +128,19 @@ export default function AffiliatePage() {
 
           {/* Benefits */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">💰</div>
               <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">High Commission Rate</h3>
               <p className="text-slate-600">50% commission on all lead fees - one of the highest rates in the industry</p>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📈</div>
               <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Recurring Revenue</h3>
               <p className="text-slate-600">Earn from each contractor for 12 months - true passive income potential</p>
             </div>
             
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📊</div>
               <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Real-Time Tracking</h3>
               <p className="text-slate-600">Dashboard with live stats, earnings, and detailed analytics</p>
@@ -148,14 +148,14 @@ export default function AffiliatePage() {
           </div>
 
           {/* CTA Section */}
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-orange-200 rounded-xl p-8 text-center shadow-lg">
+          <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 rounded-xl p-8 text-center shadow-lg">
             <h2 className="text-3xl font-bold mb-4 text-slate-900">Start Earning with QuotexBert Today</h2>
             <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
               Turn your contractor network into consistent passive income. Join our affiliate program and start earning 50% commission on every referral.
             </p>
             
             {joined ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-md mx-auto">
+              <div className="bg-gradient-to-br from-green-50/80 to-orange-50/80 rounded-lg p-6 max-w-md mx-auto">
                 <div className="text-3xl mb-4">🎉</div>
                 <h3 className="text-xl font-semibold text-green-700 mb-2">Welcome to the Program!</h3>
                 <p className="text-slate-600">Check your email for your affiliate dashboard access and referral link.</p>
@@ -169,7 +169,7 @@ export default function AffiliatePage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email to join"
                     required
-                    className="flex-1 bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                    className="flex-1 bg-white/90 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
                   />
                   <button
                     type="submit"
@@ -187,22 +187,22 @@ export default function AffiliatePage() {
           <div className="mt-16">
             <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+              <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How much can I earn?</h3>
                 <p className="text-slate-600">With 50% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $5,000+ monthly.</p>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+              <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">When do I get paid?</h3>
                 <p className="text-slate-600">Monthly payments on the 15th via direct deposit or PayPal. Minimum payout threshold is $50.</p>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+              <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How long do I earn from referrals?</h3>
                 <p className="text-slate-600">You earn 50% commission for 12 months from each contractor you refer.</p>
               </div>
               
-              <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
+              <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Is there a cost to join?</h3>
                 <p className="text-slate-600">No cost to join. No monthly fees. You just earn commission on successful referrals.</p>
               </div>

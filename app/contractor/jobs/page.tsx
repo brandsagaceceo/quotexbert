@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
 
@@ -24,6 +25,7 @@ export default function ContractorJobsPage() {
   const [filters, setFilters] = useState<JobFilters>({});
   const [showFilters, setShowFilters] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
+  const router = useRouter();
 
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
 
@@ -160,10 +162,18 @@ export default function ContractorJobsPage() {
       if (response.ok) {
         // Refresh jobs list
         fetchJobs();
-        alert(result.message || 'Job accepted successfully! You can now send quotes through messages.');
         setAcceptanceModal(null);
+        
+        // Redirect to messages page with specific thread
+        const redirectUrl = result.redirectUrl || '/messages';
+        setTimeout(() => {
+          router.push(redirectUrl);
+        }, 1000);
+        
+        alert(result.message || 'Job accepted successfully! Redirecting to conversation with homeowner...');
       } else {
-        alert(result.error || 'Failed to accept job');
+        console.error('Job acceptance failed:', result);
+        alert(`Failed to accept job: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error accepting job:', error);
@@ -408,21 +418,30 @@ export default function ContractorJobsPage() {
                         <span className="font-medium">Status:</span> {job.status}
                       </div>
                     </div>
-                    {job.photos && JSON.parse(job.photos).length > 0 && (
-                      <div className="mt-3">
-                        <span className="font-medium">Photos:</span>
-                        <div className="flex gap-2 mt-1">
-                          {JSON.parse(job.photos).map((photo: string, index: number) => (
-                            <img 
-                              key={index} 
-                              src={photo} 
-                              alt={`Project photo ${index + 1}`}
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {job.photos && (() => {
+                      try {
+                        const photos = JSON.parse(job.photos);
+                        return photos.length > 0 && (
+                          <div className="mt-3">
+                            <span className="font-medium">Photos:</span>
+                            <div className="flex gap-2 mt-1 flex-wrap">
+                              {photos.map((photo: string, index: number) => (
+                                <img 
+                                  key={index} 
+                                  src={photo} 
+                                  alt={`Project photo ${index + 1}`}
+                                  className="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                                  onClick={() => window.open(photo, '_blank')}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      } catch (error) {
+                        console.error('Error parsing photos:', error);
+                        return null;
+                      }
+                    })()}
                   </div>
                 )}
 

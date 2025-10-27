@@ -53,10 +53,10 @@ export default function MobileBottomNav() {
       isAction: true
     },
     {
-      href: "/conversations",
+      href: "/messages",
       label: "Messages",
       icon: MessageCircle,
-      active: pathname === "/conversations",
+      active: pathname === "/messages",
       badge: unreadCount
     },
     {
@@ -87,10 +87,10 @@ export default function MobileBottomNav() {
       active: pathname.startsWith("/contractor/quotes")
     },
     {
-      href: "/conversations",
+      href: "/messages",
       label: "Messages",
       icon: MessageCircle,
-      active: pathname === "/conversations",
+      active: pathname === "/messages",
       badge: unreadCount
     },
     {

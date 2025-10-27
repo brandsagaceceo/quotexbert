@@ -13,19 +13,19 @@ export default function Home() {
     {
       name: "Sarah M.",
       location: "Toronto, ON",
-      text: "Got quotes from contractors in under 5 minutes using voice input. Saved over $2,000 on my kitchen renovation!",
+      text: "Got quotes from GTA contractors in under 5 minutes using voice input. Saved over $2,000 on my downtown Toronto kitchen renovation!",
       rating: 5,
     },
     {
       name: "Mike R.",
-      location: "Vancouver, BC",
-      text: "Amazing service! Found a reliable roofer through the instant estimator. The voice feature made it so easy!",
+      location: "Mississauga, ON",
+      text: "Amazing service! Found a reliable Mississauga roofer through the instant estimator. The voice feature made it so easy to describe my project!",
       rating: 5,
     },
     {
       name: "Jennifer L.",
-      location: "Montreal, QC",
-      text: "The photo upload and voice description made getting estimates super simple. Highly recommend!",
+      location: "North York, ON",
+      text: "The photo upload and voice description made getting estimates for my North York condo renovation super simple. Highly recommend!",
       rating: 5,
     },
   ];
@@ -58,7 +58,7 @@ export default function Home() {
             {/* Quick Action for Homeowners */}
             {isSignedIn && user?.role === 'homeowner' && (
               <div className="mt-6">
-                <div className="bg-gradient-to-r from-green-50 to-orange-50 border border-green-200 rounded-xl p-4 max-w-md mx-auto">
+                <div className="bg-gradient-to-r from-green-50/80 to-orange-50/80 rounded-xl p-4 max-w-md mx-auto">
                   <p className="text-green-800 font-medium mb-3">Welcome back, {user.name}!</p>
                   <Link 
                     href="/create-lead" 
@@ -72,13 +72,13 @@ export default function Home() {
           </div>
 
           {/* Main Estimator Form - Center of Attention */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100 relative z-10">
+          <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
             <StreamlinedEstimateForm onEstimateComplete={handleEstimateComplete} />
           </div>
 
           {/* Estimate Results */}
           {estimateResult && (
-            <div id="estimate-results" className="mt-8 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-100 relative z-10">
+            <div id="estimate-results" className="mt-8 bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">
@@ -100,7 +100,7 @@ export default function Home() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Cost Estimate */}
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                <div className="bg-gradient-to-br from-green-50/80 to-green-100/80 rounded-xl p-6">
                   <h3 className="text-xl font-semibold text-green-900 mb-4">💰 Estimated Cost</h3>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-800 mb-2">
@@ -114,7 +114,7 @@ export default function Home() {
                 </div>
 
                 {/* Analysis Factors */}
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
+                <div className="bg-gradient-to-br from-orange-50/80 to-orange-100/80 rounded-xl p-6">
                   <h3 className="text-xl font-semibold text-red-900 mb-4">🔍 Analysis Factors</h3>
                   <ul className="space-y-2">
                     {estimateResult.factors?.map((factor: string, index: number) => (
@@ -129,7 +129,7 @@ export default function Home() {
 
               {/* Description */}
               {estimateResult.description && (
-                <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <div className="mt-6 p-4 bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-lg">
                   <h4 className="font-semibold text-slate-800 mb-2">📋 Estimate Details</h4>
                   <p className="text-slate-700">{estimateResult.description}</p>
                 </div>
@@ -179,7 +179,7 @@ export default function Home() {
       </section>
 
       {/* How It Works - Below the fold */}
-      <section className="py-16 bg-white/60 backdrop-blur-sm">
+      <section className="py-16 bg-gradient-to-br from-orange-100/40 to-red-100/40 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-4">
@@ -280,7 +280,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
+              <div key={index} className="bg-gradient-to-br from-orange-50/60 to-red-50/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <svg

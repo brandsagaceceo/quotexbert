@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       location: lead.zipCode || 'Location TBD',
       status: lead.status || 'open',
       homeowner: lead.homeowner?.name || 'Anonymous',
+      photos: lead.photos || '[]', // Include photos from lead
       createdAt: lead.createdAt
     }));
 

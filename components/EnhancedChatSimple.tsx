@@ -29,10 +29,20 @@ interface Thread {
 
 interface ChatProps {
   thread: Thread;
-  currentUserId: string;
+  currentUserId: string | undefined;
 }
 
 export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
+  // Early return if no currentUserId
+  if (!currentUserId) {
+    return (
+      <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <p>Loading chat...</p>
+        </div>
+      </div>
+    );
+  }
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -49,35 +59,46 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const otherUser =
-    thread.lead.homeowner.id === currentUserId
-      ? thread.lead.contractor
-      : thread.lead.homeowner;
+  // Get other user from lead participants or messages
+  const [otherUser, setOtherUser] = useState<{ id: string; email: string } | null>(null);
 
   const isHomeowner = currentUserId === thread.lead.homeowner.id;
 
-  // Enhanced polling with smart intervals
+  // Initialize otherUser immediately from thread data
+  useEffect(() => {
+    console.log('Initializing other user from thread...');
+    console.log('Current user ID:', currentUserId);
+    console.log('Thread lead:', thread.lead);
+    
+    const threadOtherUser = thread.lead.homeowner.id === currentUserId
+      ? thread.lead.contractor
+      : thread.lead.homeowner;
+    
+    console.log('Calculated other user:', threadOtherUser);
+    
+    if (threadOtherUser && !otherUser) {
+      console.log('Setting other user from thread:', threadOtherUser);
+      setOtherUser(threadOtherUser);
+    }
+  }, [currentUserId, thread.lead, otherUser]);
+
+  // Debug otherUser changes
+  useEffect(() => {
+    console.log('Other user changed:', otherUser);
+  }, [otherUser]);
+
+  // Simplified polling mechanism to prevent glitching
   useEffect(() => {
     fetchMessages();
     
-    // Start with frequent polling, then reduce frequency
-    let pollInterval = 1000; // Start with 1 second
+    // Simple consistent polling every 3 seconds
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+    }
     
-    const setupPolling = () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-      
-      pollingIntervalRef.current = setInterval(() => {
-        fetchMessages();
-        // Gradually increase interval up to 5 seconds when idle
-        if (pollInterval < 5000) {
-          pollInterval = Math.min(pollInterval + 500, 5000);
-        }
-      }, pollInterval);
-    };
-
-    setupPolling();
+    pollingIntervalRef.current = setInterval(() => {
+      fetchMessages();
+    }, 3000);
 
     return () => {
       if (pollingIntervalRef.current) {
@@ -86,26 +107,14 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
     };
   }, [thread.id]);
 
-  // Reset polling to fast when user types
+  // Simple polling speed reset when user is active
   const resetPollingSpeed = useCallback(() => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
+    // Just maintain normal polling, no speed changes to prevent glitching
+    if (!pollingIntervalRef.current) {
+      pollingIntervalRef.current = setInterval(() => {
+        fetchMessages();
+      }, 3000);
     }
-    
-    // Fast polling for 10 seconds when active
-    pollingIntervalRef.current = setInterval(() => {
-      fetchMessages();
-    }, 1000);
-    
-    // Then reset to normal polling
-    setTimeout(() => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = setInterval(() => {
-          fetchMessages();
-        }, 3000);
-      }
-    }, 10000);
   }, []);
 
   // Online/offline detection
@@ -132,6 +141,18 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
     };
   }, [resetPollingSpeed]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, []);
+
   // Auto-scroll and new message detection
   useEffect(() => {
     if (shouldScrollToBottom) {
@@ -154,22 +175,53 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
     setLastMessageCount(messages.length);
   }, [messages, shouldScrollToBottom, lastMessageCount, currentUserId]);
 
-  // Simulated typing indicator
+  // Simplified typing indicator to reduce glitching
   const simulateTypingIndicator = useCallback(() => {
-    if (Math.random() > 0.7) { // 30% chance to show typing
+    if (Math.random() > 0.9) { // Reduced to 10% chance to show typing
       setShowTypingIndicator(true);
       setTimeout(() => {
         setShowTypingIndicator(false);
-      }, 2000 + Math.random() * 2000); // 2-4 seconds
+      }, 3000); // Fixed 3 seconds duration
     }
   }, []);
 
   const fetchMessages = async () => {
+    console.log('Fetching messages for thread:', thread.id, 'currentUserId:', currentUserId);
     try {
       const response = await fetch(`/api/threads/${thread.id}/messages`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Received messages:', data.messages.length);
         setMessages(data.messages);
+        
+        // Only determine other user from messages if not already set
+        if (data.messages.length > 0 && !otherUser) {
+          console.log('Determining other user from messages...');
+          console.log('Current user ID:', currentUserId);
+          
+          // Find a message where the sender is not the current user
+          const otherMessage = data.messages.find((msg: Message) => 
+            msg.fromUser.id !== currentUserId
+          );
+          
+          if (otherMessage) {
+            console.log('Found other user from message sender:', otherMessage.fromUser);
+            setOtherUser({
+              id: otherMessage.fromUser.id,
+              email: otherMessage.fromUser.email
+            });
+          } else {
+            // If all messages are from current user, get the recipient
+            const firstMessage = data.messages[0];
+            if (firstMessage && firstMessage.toUser.id !== currentUserId) {
+              console.log('Found other user from message recipient:', firstMessage.toUser);
+              setOtherUser({
+                id: firstMessage.toUser.id,
+                email: firstMessage.toUser.email
+              });
+            }
+          }
+        }
         
         // Simulate typing indicator occasionally
         if (data.messages.length > lastMessageCount) {
@@ -209,7 +261,7 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          body: optimisticMessage.body,
+          message: optimisticMessage.body,
           fromUserId: currentUserId,
           toUserId: otherUser.id
         }),
@@ -298,21 +350,21 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-50 to-white">
       {/* Enhanced Chat Header */}
-      <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white p-4 shadow-lg">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-lg">
+            <h3 className="font-bold text-xl text-gray-900 mb-1">
               {thread.lead.title}
             </h3>
-            <div className="flex items-center space-x-2 text-teal-100">
-              <span className="text-sm">
+            <div className="flex items-center space-x-3 text-gray-600">
+              <span className="text-sm font-medium">
                 with {otherUser?.email || "Unknown User"}
               </span>
-              <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-xs">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-gray-100 rounded-full">
+                <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-red-500'}`}></div>
+                <span className="text-xs font-semibold">
                   {isOnline ? 'Online' : 'Offline'}
                 </span>
               </div>
@@ -322,12 +374,12 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
           {/* Status indicators */}
           <div className="flex items-center space-x-2">
             {isTyping && (
-              <span className="text-xs bg-teal-500 px-2 py-1 rounded-full">
+              <span className="text-xs bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1.5 rounded-full shadow-lg font-medium">
                 Typing...
               </span>
             )}
             {sending && (
-              <span className="text-xs bg-yellow-500 px-2 py-1 rounded-full">
+              <span className="text-xs bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1.5 rounded-full shadow-lg font-medium">
                 Sending...
               </span>
             )}
@@ -338,7 +390,7 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
       {/* Enhanced Messages Container */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-gray-50 to-white"
+        className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-slate-50/50 to-white/50"
         style={{ maxHeight: "calc(100vh - 200px)" }}
       >
         {messages.map((message, index) => {
@@ -355,26 +407,26 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
               <div className={`max-w-xs lg:max-w-md flex ${isOwn ? "flex-row-reverse" : "flex-row"} items-end space-x-2`}>
                 {/* Avatar */}
                 {showAvatar && !isOwn && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold shadow-lg">
                     {message.fromUser.email.charAt(0).toUpperCase()}
                   </div>
                 )}
                 
                 {/* Message bubble */}
                 <div
-                  className={`px-4 py-2 rounded-2xl shadow-sm ${
+                  className={`px-5 py-3 rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 ${
                     isOwn
-                      ? "bg-gradient-to-br from-teal-600 to-teal-700 text-white"
-                      : "bg-white border border-gray-200 text-gray-900"
-                  } ${showAvatar ? "" : isOwn ? "mr-10" : "ml-10"}`}
+                      ? "bg-gradient-to-br from-teal-500 via-teal-600 to-emerald-600 text-white"
+                      : "bg-white/90 backdrop-blur-sm border border-gray-200/50 text-gray-900"
+                  } ${showAvatar ? "" : isOwn ? "mr-12" : "ml-12"}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.body}</p>
-                  <div className={`text-xs mt-1 ${
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.body}</p>
+                  <div className={`text-xs mt-2 flex items-center justify-between ${
                     isOwn ? "text-teal-100" : "text-gray-500"
                   }`}>
-                    {formatMessageTime(message.createdAt)}
+                    <span>{formatMessageTime(message.createdAt)}</span>
                     {isOwn && (
-                      <span className="ml-2">
+                      <span className="ml-2 text-lg">
                         {message.id.startsWith('temp-') ? '○' : '✓'}
                       </span>
                     )}
@@ -386,11 +438,11 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
         })}
 
         {/* Enhanced Typing Indicator */}
-        {showTypingIndicator && (
+        {showTypingIndicator && otherUser && (
           <div className="flex justify-start">
             <div className="max-w-xs lg:max-w-md flex items-end space-x-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-sm font-semibold">
-                {otherUser?.email.charAt(0).toUpperCase() || '?'}
+                {otherUser.email.charAt(0).toUpperCase()}
               </div>
               <div className="bg-white border border-gray-200 px-4 py-2 rounded-2xl shadow-sm">
                 <div className="flex space-x-1 items-center">
@@ -441,6 +493,19 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
             <button
               type="submit"
               disabled={!newMessage.trim() || sending || !otherUser || !isOnline}
+              onClick={() => {
+                console.log('Send button clicked');
+                console.log('newMessage:', newMessage);
+                console.log('sending:', sending);
+                console.log('otherUser:', otherUser);
+                console.log('isOnline:', isOnline);
+                console.log('disabled conditions:', {
+                  noMessage: !newMessage.trim(),
+                  sending: sending,
+                  noOtherUser: !otherUser,
+                  offline: !isOnline
+                });
+              }}
               className="bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none"
             >
               {sending ? (

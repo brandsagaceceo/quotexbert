@@ -14,6 +14,7 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "Home" },
+    { href: "/blog", label: "Blog" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
   ];
@@ -64,7 +65,7 @@ export default function SiteHeader() {
 
                 {/* Messages with badge */}
                 <Link
-                  href="/conversations"
+                  href="/messages"
                   className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
                 >
                   Messages
@@ -192,7 +193,7 @@ export default function SiteHeader() {
                   
                   {/* Messages */}
                   <Link
-                    href="/conversations"
+                    href="/messages"
                     className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
