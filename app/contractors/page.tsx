@@ -11,11 +11,7 @@ import {
   Filter,
   User,
   Phone,
-  Mail,
   Globe,
-  Calendar,
-  DollarSign,
-  Briefcase,
   MessageCircle
 } from "lucide-react";
 
@@ -150,7 +146,8 @@ export default function ContractorSearchPage() {
   };
 
   const applyFilters = () => {
-    let filtered = contractors.filter(contractor => {
+    // Apply filters
+    const filtered = contractors.filter(contractor => {
       // Search term filter
       const matchesSearch = searchTerm === "" || 
         contractor.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||

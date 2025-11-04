@@ -18,7 +18,6 @@ import {
   Plus,
   Briefcase,
   DollarSign,
-  Clock,
   Edit,
   Trash
 } from "lucide-react";

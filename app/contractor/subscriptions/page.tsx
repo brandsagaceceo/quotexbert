@@ -40,6 +40,12 @@ export default function SubscriptionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'subscriptions' | 'billing'>('subscriptions');
+  
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priceFilter, setPriceFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [categoryGroupFilter, setCategoryGroupFilter] = useState<string>('all');
 
   // Fetch subscription data
   const fetchSubscriptions = async () => {
@@ -178,6 +184,39 @@ export default function SubscriptionsPage() {
   const totalMonthlyFees = activeSubscriptions.reduce((sum, sub) => sum + sub.monthlyPrice, 0);
   const subscribedCategories = new Set(subscriptions.map(sub => sub.category));
 
+  // Filter function for categories
+  const getFilteredCategoryGroups = () => {
+    return CATEGORY_GROUPS.map(group => ({
+      ...group,
+      categories: group.categories.filter(category => {
+        // Search term filter
+        if (searchTerm && !category.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+          return false;
+        }
+        
+        // Price filter
+        if (priceFilter !== 'all') {
+          if (priceFilter === 'low' && category.monthlyPrice > 25) return false;
+          if (priceFilter === 'medium' && (category.monthlyPrice <= 25 || category.monthlyPrice > 49)) return false;
+          if (priceFilter === 'high' && category.monthlyPrice <= 49) return false;
+        }
+        
+        // Status filter
+        const subscription = subscriptions.find(sub => sub.category === category.id);
+        if (statusFilter !== 'all') {
+          if (statusFilter === 'subscribed' && !subscription) return false;
+          if (statusFilter === 'unsubscribed' && subscription) return false;
+          if (statusFilter === 'active' && (!subscription || subscription.status !== 'active')) return false;
+          if (statusFilter === 'inactive' && subscription && subscription.status === 'active') return false;
+        }
+        
+        return true;
+      })
+    })).filter(group => 
+      categoryGroupFilter === 'all' || group.id === categoryGroupFilter
+    ).filter(group => group.categories.length > 0);
+  };
+
   return (
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
@@ -243,6 +282,87 @@ export default function SubscriptionsPage() {
             </div>
           </div>
 
+          {/* Filters Section */}
+          {activeTab === 'subscriptions' && (
+            <div className="bg-white rounded-lg shadow p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter Categories</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <input
+                    type="text"
+                    placeholder="Search categories..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="subscribed">Subscribed</option>
+                    <option value="unsubscribed">Not Subscribed</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+
+                {/* Price Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                  <select
+                    value={priceFilter}
+                    onChange={(e) => setPriceFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Prices</option>
+                    <option value="low">Low ($15-$25)</option>
+                    <option value="medium">Medium ($25-$49)</option>
+                    <option value="high">High ($49+)</option>
+                  </select>
+                </div>
+
+                {/* Category Group Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category Group</label>
+                  <select
+                    value={categoryGroupFilter}
+                    onChange={(e) => setCategoryGroupFilter(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Groups</option>
+                    {CATEGORY_GROUPS.map(group => (
+                      <option key={group.id} value={group.id}>{group.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Clear Filters */}
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setStatusFilter('all');
+                    setPriceFilter('all');
+                    setCategoryGroupFilter('all');
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-800 underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Tab Navigation */}
           <div className="mb-6">
             <div className="border-b border-gray-200">
@@ -306,26 +426,33 @@ export default function SubscriptionsPage() {
 
                   {/* Category Groups */}
                   <div className="space-y-8">
-                    {CATEGORY_GROUPS.map((group) => (
-                      <div key={group.id}>
-                        <div className="mb-4">
-                          <h3 className="text-md font-semibold text-gray-900">{group.name}</h3>
-                          <p className="text-sm text-gray-600">{group.description}</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {group.categories.map((category) => {
-                            const subscription = subscriptions.find(sub => sub.category === category.id);
-                            const isSubscribed = subscribedCategories.has(category.id);
-                            
-                            const getPriceColor = (price: number) => {
-                              switch(price) {
-                                case 15: return 'bg-green-100 text-green-800';
-                                case 25: return 'bg-blue-100 text-blue-800';
-                                case 49: return 'bg-purple-100 text-purple-800';
-                                case 79: return 'bg-yellow-100 text-yellow-800';
-                                default: return 'bg-gray-100 text-gray-800';
-                              }
-                            };
+                    {getFilteredCategoryGroups().length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="text-gray-400 text-lg mb-2">🔍</div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-1">No categories found</h3>
+                        <p className="text-gray-600">Try adjusting your filters to see more categories.</p>
+                      </div>
+                    ) : (
+                      getFilteredCategoryGroups().map((group) => (
+                        <div key={group.id}>
+                          <div className="mb-4">
+                            <h3 className="text-md font-semibold text-gray-900">{group.name}</h3>
+                            <p className="text-sm text-gray-600">{group.description}</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {group.categories.map((category) => {
+                              const subscription = subscriptions.find(sub => sub.category === category.id);
+                              const isSubscribed = subscribedCategories.has(category.id);
+                              
+                              const getPriceColor = (price: number) => {
+                                switch(price) {
+                                  case 15: return 'bg-green-100 text-green-800';
+                                  case 25: return 'bg-blue-100 text-blue-800';
+                                  case 49: return 'bg-purple-100 text-purple-800';
+                                  case 79: return 'bg-yellow-100 text-yellow-800';
+                                  default: return 'bg-gray-100 text-gray-800';
+                                }
+                              };
                             
                             return (
                               <div key={category.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -384,7 +511,8 @@ export default function SubscriptionsPage() {
                           })}
                         </div>
                       </div>
-                    ))}
+                    ))
+                    )}
                   </div>
                 </div>
               </div>

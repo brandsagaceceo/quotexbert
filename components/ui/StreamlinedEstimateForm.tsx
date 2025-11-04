@@ -65,6 +65,7 @@ interface EstimateResult {
 
 interface StreamlinedEstimateFormProps {
   onEstimateComplete: (result: EstimateResult) => void;
+  userId?: string | undefined; // Optional userId for auto-saving estimates
 }
 
 // Simple Voice Recording Component
@@ -191,7 +192,7 @@ function PhotoUploadButton({ onPhotosSelected }: { onPhotosSelected: (files: Fil
   );
 }
 
-export function StreamlinedEstimateForm({ onEstimateComplete }: StreamlinedEstimateFormProps) {
+export function StreamlinedEstimateForm({ onEstimateComplete, userId }: StreamlinedEstimateFormProps) {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -226,6 +227,11 @@ export function StreamlinedEstimateForm({ onEstimateComplete }: StreamlinedEstim
       const formData = new FormData();
       formData.append("description", description);
       formData.append("imageCount", images.length.toString());
+      
+      // Add homeownerId for auto-save if provided
+      if (userId) {
+        formData.append("homeownerId", userId);
+      }
 
       // Add images to form data
       images.forEach((image, index) => {

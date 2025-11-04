@@ -1,6 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 interface EstimateResult {
   min: number;
@@ -16,6 +19,51 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 }) : null;
 
+// Helper function to save estimate to database
+async function saveEstimateToDatabase(
+  homeownerId: string,
+  description: string,
+  estimate: EstimateResult,
+  hasVoice: boolean,
+  imageCount: number
+) {
+  try {
+    // Generate basic items from the estimate
+    const items = estimate.factors.map((factor, index) => ({
+      category: `Item ${index + 1}`,
+      description: factor,
+      minCost: Math.round(estimate.min / estimate.factors.length),
+      maxCost: Math.round(estimate.max / estimate.factors.length),
+      selected: true, // All items selected by default
+    }));
+
+    await prisma.aIEstimate.create({
+      data: {
+        homeownerId,
+        description,
+        minCost: estimate.min,
+        maxCost: estimate.max,
+        confidence: estimate.confidence / 100, // Convert to decimal
+        aiPowered: estimate.aiPowered,
+        enhancedDescription: estimate.description,
+        factors: JSON.stringify(estimate.factors),
+        reasoning: (estimate as any).reasoning || null,
+        hasVoice,
+        imageCount,
+        images: JSON.stringify([]),
+        status: 'saved',
+        isPublic: false,
+        items: {
+          create: items,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error saving estimate to database:', error);
+    throw error;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -23,6 +71,7 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string;
     const hasVoice = formData.get('hasVoice') === 'true';
     const imageCount = parseInt(formData.get('imageCount') as string) || 0;
+    const homeownerId = formData.get('homeownerId') as string | null;
     
     // Extract images
     const images: File[] = [];
@@ -37,24 +86,42 @@ export async function POST(request: NextRequest) {
       description: description?.substring(0, 100),
       hasVoice,
       imageCount: images.length,
+      homeownerId: homeownerId?.substring(0, 10),
       aiEnabled: !!openai
     });
+
+    let estimateResult: EstimateResult;
 
     // Try AI estimation first
     if (openai && description) {
       try {
         const aiResult = await getAIEstimate(description, hasVoice, images.length);
         if (aiResult) {
-          return NextResponse.json(aiResult);
+          estimateResult = aiResult;
+        } else {
+          estimateResult = getRuleBasedEstimate(description, hasVoice, images.length);
         }
       } catch (error) {
         console.error('AI estimation failed, falling back to rule-based:', error);
+        estimateResult = getRuleBasedEstimate(description, hasVoice, images.length);
+      }
+    } else {
+      // Fallback to rule-based estimation
+      estimateResult = getRuleBasedEstimate(description, hasVoice, images.length);
+    }
+
+    // Auto-save estimate to database if homeownerId provided
+    if (homeownerId && estimateResult) {
+      try {
+        await saveEstimateToDatabase(homeownerId, description, estimateResult, hasVoice, imageCount);
+        console.log('Estimate auto-saved to database');
+      } catch (error) {
+        console.error('Failed to auto-save estimate:', error);
+        // Don't fail the request if save fails
       }
     }
 
-    // Fallback to rule-based estimation
-    const fallbackResult = getRuleBasedEstimate(description, hasVoice, images.length);
-    return NextResponse.json(fallbackResult);
+    return NextResponse.json(estimateResult);
 
   } catch (error) {
     console.error('Error processing AI estimate:', error);

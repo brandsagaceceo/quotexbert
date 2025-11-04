@@ -9,8 +9,6 @@ import {
   MessageCircle,
   CreditCard,
   Briefcase,
-  Star,
-  Settings,
   ArrowLeft,
   Check
 } from "lucide-react";

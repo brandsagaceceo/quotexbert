@@ -60,11 +60,34 @@ export default function Home() {
               <div className="mt-6">
                 <div className="bg-gradient-to-r from-green-50/80 to-orange-50/80 rounded-xl p-4 max-w-md mx-auto">
                   <p className="text-green-800 font-medium mb-3">Welcome back, {user.name}!</p>
+                  <div className="flex gap-3 justify-center">
+                    <Link 
+                      href="/homeowner/estimates" 
+                      className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                    >
+                      📊 View My Estimates
+                    </Link>
+                    <Link 
+                      href="/create-lead" 
+                      className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                    >
+                      🚀 Post Project
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Action for Contractors */}
+            {isSignedIn && user?.role === 'contractor' && (
+              <div className="mt-6">
+                <div className="bg-gradient-to-r from-blue-50/80 to-teal-50/80 rounded-xl p-4 max-w-md mx-auto">
+                  <p className="text-blue-800 font-medium mb-3">Welcome back, {user.name}!</p>
                   <Link 
-                    href="/create-lead" 
-                    className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                    href="/contractors" 
+                    className="inline-block bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                   >
-                    🚀 Post Project on Job Board
+                    🔨 View Job Board
                   </Link>
                 </div>
               </div>
@@ -73,7 +96,10 @@ export default function Home() {
 
           {/* Main Estimator Form - Center of Attention */}
           <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
-            <StreamlinedEstimateForm onEstimateComplete={handleEstimateComplete} />
+            <StreamlinedEstimateForm 
+              onEstimateComplete={handleEstimateComplete} 
+              userId={user?.id}
+            />
           </div>
 
           {/* Estimate Results */}

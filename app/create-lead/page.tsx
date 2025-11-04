@@ -229,7 +229,7 @@ export default function CreateLeadPage() {
                   <optgroup key={group.id} label={group.name}>
                     {group.categories.map((category) => (
                       <option key={category.id} value={category.id}>
-                        {category.name} - ${category.monthlyPrice}/mo
+                        {category.name}
                       </option>
                     ))}
                   </optgroup>

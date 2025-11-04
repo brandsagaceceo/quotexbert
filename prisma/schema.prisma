@@ -59,6 +59,9 @@ model User {
   paymentMethods      PaymentMethod[]
   transactions        Transaction[]
   
+  // AI Estimates
+  aiEstimates         AIEstimate[]   @relation("HomeownerEstimates")
+  
   @@map("users")
 }
 
@@ -122,6 +125,7 @@ model Lead {
   reviews          Review[]
   conversations    Conversation[]
   quotes           Quote[]
+  aiEstimate       AIEstimate?      // Link back to the original AI estimate
   
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -710,4 +714,78 @@ model Analytics {
   @@index([eventName, timestamp])
   @@index([userId, timestamp])
   @@map("analytics")
+}
+
+// AI Estimate Model - Stores all AI-generated estimates for homeowners
+model AIEstimate {
+  id                String           @id @default(cuid())
+  
+  // User relationship
+  homeownerId       String?          // Optional - can be anonymous initially
+  homeowner         User?            @relation("HomeownerEstimates", fields: [homeownerId], references: [id], onDelete: Cascade)
+  
+  // Estimate details
+  description       String           // Original description from user
+  minCost           Float            // Minimum estimated cost
+  maxCost           Float            // Maximum estimated cost
+  confidence        Float            // AI confidence score (0-100)
+  
+  // AI analysis
+  aiPowered         Boolean          @default(true)
+  enhancedDescription String?        // AI-enhanced description
+  factors           String           @default("[]") // JSON array of cost factors
+  reasoning         String?          // AI reasoning for the estimate
+  
+  // Media attachments
+  hasVoice          Boolean          @default(false)
+  imageCount        Int              @default(0)
+  images            String           @default("[]") // JSON array of image URLs
+  
+  // Status and visibility
+  status            String           @default("draft") // "draft" | "saved" | "posted"
+  isPublic          Boolean          @default(false)  // Whether posted to job board
+  
+  // Breakdown items (renovation items)
+  items             EstimateItem[]
+  
+  // Lead relationship (if posted to job board)
+  leadId            String?          @unique
+  lead              Lead?            @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  @@index([homeownerId])
+  @@index([status])
+  @@index([isPublic])
+  @@index([createdAt])
+  @@map("ai_estimates")
+}
+
+// Individual items within an AI estimate
+model EstimateItem {
+  id            String       @id @default(cuid())
+  
+  estimateId    String
+  estimate      AIEstimate   @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  
+  // Item details
+  category      String       // "flooring", "painting", "plumbing", etc.
+  description   String       // Description of the item
+  minCost       Float        // Minimum cost for this item
+  maxCost       Float        // Maximum cost for this item
+  
+  // Item selection
+  selected      Boolean      @default(true) // Whether homeowner wants to include this in job posting
+  
+  // Additional details
+  quantity      Float?       // Optional quantity (sq ft, units, etc.)
+  unit          String?      // Optional unit of measurement
+  notes         String?      // Optional notes from homeowner or AI
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  @@index([estimateId])
+  @@map("estimate_items")
 }

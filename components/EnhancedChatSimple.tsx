@@ -47,11 +47,13 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [lastMessageCount, setLastMessageCount] = useState(0);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -155,12 +157,10 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
 
   // Auto-scroll and new message detection
   useEffect(() => {
-    if (shouldScrollToBottom) {
+    // Only auto-scroll when there are new messages (not on initial load)
+    if (messages.length > lastMessageCount && lastMessageCount > 0 && shouldScrollToBottom) {
       scrollToBottom();
-    }
-    
-    // Detect new messages
-    if (messages.length > lastMessageCount && lastMessageCount > 0) {
+      
       // New message arrived - show notification if not from current user
       const newestMessage = messages[messages.length - 1];
       if (newestMessage && newestMessage.fromUser.id !== currentUserId) {
@@ -317,6 +317,25 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
     }
   };
 
+  const handleScroll = useCallback(() => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const isNearBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 100;
+      setIsAtBottom(isNearBottom);
+      setShowScrollButton(!isNearBottom && messages.length > 5);
+      setShouldScrollToBottom(isNearBottom);
+    }
+  }, [messages.length]);
+
+  // Add scroll listener
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString([], { 
       hour: '2-digit', 
@@ -350,7 +369,7 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-50 to-white">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-50 to-white relative">
       {/* Enhanced Chat Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 p-6 shadow-sm">
         <div className="flex items-center justify-between">
@@ -460,6 +479,21 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Scroll to Bottom Button */}
+      {showScrollButton && (
+        <div className="absolute bottom-20 right-6 z-10">
+          <button
+            onClick={scrollToBottom}
+            className="bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            aria-label="Scroll to bottom"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {/* Enhanced Message Input */}
       <div className="bg-white border-t border-gray-200 p-4">

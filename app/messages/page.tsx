@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import SimpleChatComponent from "@/components/SimpleChatComponent";
+import EnhancedChatSimple from "@/components/EnhancedChatSimple";
 import { ChatBubbleLeftRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 interface Message {
@@ -84,6 +84,34 @@ export default function MessagesPage() {
     }
   };
 
+  const deleteThread = async (threadId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting the thread
+    
+    if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/threads/${threadId}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        // Remove thread from local state
+        setThreads(prev => prev.filter(thread => thread.id !== threadId));
+        // Clear selection if deleted thread was selected
+        if (selectedThread?.id === threadId) {
+          setSelectedThread(null);
+        }
+      } else {
+        alert('Failed to delete conversation. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting thread:', error);
+      alert('Failed to delete conversation. Please try again.');
+    }
+  };
+
   const getConversationPartner = (thread: Thread) => {
     if (!user) return null;
     return thread.lead.homeowner.id === user.id
@@ -123,7 +151,7 @@ export default function MessagesPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
             <div className="w-16 h-16 mx-auto mb-6">
@@ -139,10 +167,10 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex flex-col">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col">
         {/* Modern Header */}
-        <div className="mb-8">
+        <div className="mb-8 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent">
@@ -157,12 +185,12 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 h-[calc(100vh-200px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0">
           {/* Conversations List - Modern Sidebar */}
-          <div className="lg:col-span-4 xl:col-span-3">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 h-full flex flex-col overflow-hidden">
+          <div className="lg:col-span-4 xl:col-span-3 flex flex-col min-h-0">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full">
               {/* Header with Search */}
-              <div className="p-6 border-b border-slate-200/50">
+              <div className="p-6 border-b border-slate-200/50 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-slate-900">Conversations</h2>
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center">
@@ -187,8 +215,51 @@ export default function MessagesPage() {
                 </div>
               </div>
               
-              {/* Conversations List */}
-              <div className="flex-1 overflow-y-auto scrollbar-hide">
+              {/* Conversations List with Enhanced Scroll */}
+              <div className="flex-1 overflow-y-auto bg-white chat-scroll min-h-0">
+                <style jsx>{`
+                  .chat-scroll {
+                    scrollbar-width: thin;
+                    scrollbar-color: #f97316 #f8fafc;
+                  }
+                  .chat-scroll::-webkit-scrollbar {
+                    width: 10px;
+                  }
+                  .chat-scroll::-webkit-scrollbar-track {
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    margin: 8px 0;
+                  }
+                  .chat-scroll::-webkit-scrollbar-thumb {
+                    background: linear-gradient(to bottom, #f97316, #ea580c);
+                    border-radius: 12px;
+                    border: 2px solid #fed7aa;
+                    transition: all 0.3s ease;
+                  }
+                  .chat-scroll::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(to bottom, #ea580c, #dc2626);
+                    transform: scaleX(1.1);
+                    border-color: #fdba74;
+                  }
+                  .chat-scroll::-webkit-scrollbar-thumb:active {
+                    background: linear-gradient(to bottom, #dc2626, #b91c1c);
+                    border-color: #f97316;
+                  }
+                  .chat-scroll {
+                    position: relative;
+                  }
+                  .chat-scroll::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 2px;
+                    height: 100%;
+                    background: linear-gradient(to bottom, rgba(249, 115, 22, 0.1), transparent);
+                    pointer-events: none;
+                    z-index: 1;
+                  }
+                `}</style>
                 {filteredThreads.length === 0 ? (
                   <div className="flex items-center justify-center h-64 text-slate-500">
                     <div className="text-center">
@@ -200,7 +271,7 @@ export default function MessagesPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-1 p-2">
+                  <div className="p-2 space-y-1">
                     {filteredThreads.map((thread) => {
                       const lastMessage = thread.messages[thread.messages.length - 1];
                       const isSelected = selectedThread?.id === thread.id;
@@ -211,14 +282,27 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={thread.id}
-                          onClick={() => setSelectedThread(thread)}
-                          className={`p-4 cursor-pointer rounded-xl transition-all duration-200 hover:bg-slate-50 ${
+                          className={`group relative p-4 cursor-pointer rounded-xl transition-all duration-200 hover:bg-slate-50 ${
                             isSelected 
                               ? 'bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 shadow-sm' 
                               : 'hover:shadow-sm'
                           }`}
                         >
-                          <div className="flex items-start space-x-3">
+                          {/* Delete Button */}
+                          <button
+                            onClick={(e) => deleteThread(thread.id, e)}
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all duration-200 transform hover:scale-105 z-10"
+                            title="Delete conversation"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+
+                          <div 
+                            onClick={() => setSelectedThread(thread)}
+                            className="flex items-start space-x-3"
+                          >
                             {/* Avatar */}
                             <div className="flex-shrink-0">
                               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center shadow-md">
@@ -269,13 +353,13 @@ export default function MessagesPage() {
           </div>
 
           {/* Modern Chat Area */}
-          <div className="lg:col-span-8 xl:col-span-9">
+          <div className="lg:col-span-8 xl:col-span-9 flex flex-col min-h-0">
             {selectedThread ? (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 h-full overflow-hidden">
-                <SimpleChatComponent thread={selectedThread} currentUserId={user?.id} />
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
+                <EnhancedChatSimple thread={selectedThread} currentUserId={user?.id} />
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 h-full flex items-center justify-center">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center relative z-10 h-full">
                 <div className="text-center">
                   <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                     <ChatBubbleLeftRightIcon className="w-12 h-12 text-slate-400" />
