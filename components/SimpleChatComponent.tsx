@@ -32,6 +32,7 @@ interface ChatProps {
 }
 
 export default function SimpleChatComponent({ thread, currentUserId }: ChatProps) {
+  // All hooks must come before any returns
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -39,19 +40,9 @@ export default function SimpleChatComponent({ thread, currentUserId }: ChatProps
   const [otherUser, setOtherUser] = useState<{ id: string; email: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Early return if no currentUserId
-  if (!currentUserId) {
-    return (
-      <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <p>Loading chat...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fetch messages
+  // Fetch messages - defined before being used in useEffect
   const fetchMessages = async () => {
+    if (!currentUserId) return;
     try {
       const response = await fetch(`/api/threads/${thread.id}/messages`);
       if (response.ok) {
@@ -153,6 +144,17 @@ export default function SimpleChatComponent({ thread, currentUserId }: ChatProps
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Early returns for loading and no currentUserId
+  if (!currentUserId) {
+    return (
+      <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <p>Loading chat...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

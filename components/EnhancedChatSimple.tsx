@@ -33,16 +33,7 @@ interface ChatProps {
 }
 
 export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
-  // Early return if no currentUserId
-  if (!currentUserId) {
-    return (
-      <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <p>Loading chat...</p>
-        </div>
-      </div>
-    );
-  }
+  // All hooks must come before any returns
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -64,7 +55,18 @@ export default function EnhancedChat({ thread, currentUserId }: ChatProps) {
   // Get other user from lead participants or messages
   const [otherUser, setOtherUser] = useState<{ id: string; email: string } | null>(null);
 
-  const isHomeowner = currentUserId === thread.lead.homeowner.id;
+  const isHomeowner = currentUserId ? currentUserId === thread.lead.homeowner.id : false;
+
+  // Early return if no currentUserId - AFTER all hooks
+  if (!currentUserId) {
+    return (
+      <div className="bg-white rounded-lg border h-[600px] flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <p>Loading chat...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Initialize otherUser immediately from thread data
   useEffect(() => {
