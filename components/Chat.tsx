@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Message {
   id: string;
@@ -33,6 +33,7 @@ interface ChatProps {
 }
 
 export default function Chat({ thread, currentUserId }: ChatProps) {
+  // All hooks at the top
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  // Computed values (not hooks)
   const otherUser =
     thread.lead.homeowner.id === currentUserId
       ? thread.lead.contractor
@@ -54,42 +56,8 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     thread.lead.status !== "assigned" &&
     !contractorHired;
 
-  // Debug logging
-  console.log("Chat Debug:", {
-    currentUserId,
-    homeownerId: thread.lead.homeowner.id,
-    isHomeowner,
-    contractor: thread.lead.contractor,
-    status: thread.lead.status,
-    contractorHired,
-    canHireContractor,
-  });
-
-  const scrollToBottom = () => {
-    if (shouldScrollToBottom && messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      container.scrollTop = container.scrollHeight;
-    }
-  };
-
-  useEffect(() => {
-    fetchMessages();
-    setShouldScrollToBottom(true);
-  }, [thread.id]);
-
-  useEffect(() => {
-    if (shouldScrollToBottom) {
-      scrollToBottom();
-    }
-  }, [messages, shouldScrollToBottom]);
-
-  useEffect(() => {
-    // Poll for new messages every 3 seconds
-    const interval = setInterval(fetchMessages, 3000);
-    return () => clearInterval(interval);
-  }, [thread.id]);
-
-  const fetchMessages = async () => {
+  // Functions defined with useCallback to avoid dependency issues
+  const fetchMessages = useCallback(async () => {
     try {
       const response = await fetch(`/api/threads/${thread.id}/messages`);
       if (response.ok) {
@@ -101,7 +69,32 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [thread.id]);
+
+  const scrollToBottom = useCallback(() => {
+    if (shouldScrollToBottom && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [shouldScrollToBottom]);
+
+  // Effects after all functions are defined
+  useEffect(() => {
+    fetchMessages();
+    setShouldScrollToBottom(true);
+  }, [fetchMessages]);
+
+  useEffect(() => {
+    if (shouldScrollToBottom) {
+      scrollToBottom();
+    }
+  }, [messages, shouldScrollToBottom, scrollToBottom]);
+
+  useEffect(() => {
+    // Poll for new messages every 3 seconds
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, [fetchMessages]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
