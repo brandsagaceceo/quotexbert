@@ -83,12 +83,20 @@ export default function Home() {
               <div className="mt-6">
                 <div className="bg-gradient-to-r from-blue-50/80 to-teal-50/80 rounded-xl p-4 max-w-md mx-auto">
                   <p className="text-blue-800 font-medium mb-3">Welcome back, {user.name}!</p>
-                  <Link 
-                    href="/dashboard" 
-                    className="inline-block bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                  >
-                    🔨 View Dashboard
-                  </Link>
+                  <div className="flex gap-3">
+                    <Link 
+                      href="/contractors" 
+                      className="flex-1 text-center bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                    >
+                      � Browse Contractors
+                    </Link>
+                    <Link 
+                      href="/profile" 
+                      className="flex-1 text-center bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-all"
+                    >
+                      👤 My Profile
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
