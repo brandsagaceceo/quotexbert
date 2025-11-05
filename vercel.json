@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "next build",
+  "buildCommand": "SKIP_ENV_VALIDATION=1 next build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "functions": {
