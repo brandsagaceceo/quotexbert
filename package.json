@@ -14,6 +14,7 @@
     "format:check": "prettier --check .",
     "verify": "npm run typecheck && npm run lint && npm run build",
     "db:push": "prisma db push",
+    "db:seed": "npx tsx prisma/seed.ts",
     "studio": "prisma studio",
     "dev:all": "concurrently \"npm run db:push\" \"npm run dev\" \"npm run studio\"",
     "seed:billing": "node seed-billing.js",
@@ -60,6 +61,7 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
