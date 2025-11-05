@@ -77,7 +77,7 @@ export default function Home() {
                 </div>
               </div>
             )}
-
+          </div>
 
           {/* Main Estimator Form - Center of Attention */}
           <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
