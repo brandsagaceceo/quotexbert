@@ -13,7 +13,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Welcome to QuoteXpert</h1>
           <p className="text-gray-600 mb-6">Please sign in to access your dashboard</p>
           <Link 
-            href="/demo-login"
+            href="/sign-in"
             className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-all"
           >
             Sign In

@@ -146,7 +146,7 @@ export default function HomeownerQuotesPage() {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-4">This page is only accessible to homeowners.</p>
-          <Link href="/demo-login" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href="/sign-in" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             Sign In
           </Link>
         </div>

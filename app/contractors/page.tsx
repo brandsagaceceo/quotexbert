@@ -52,7 +52,7 @@ export default function ContractorSearchPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isSignedIn || !authUser) {
-      router.push("/demo-login");
+      router.push("/sign-in");
       return;
     }
     fetchContractors();

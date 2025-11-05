@@ -198,8 +198,8 @@ export default function ContractorJobsPage() {
           <h1 className="text-2xl font-bold text-center mb-4">Access Restricted</h1>
           <p className="text-center mb-6">You need to sign in as a contractor to view jobs.</p>
           <div className="text-center">
-            <Link href="/demo-login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
-              Demo Login
+            <Link href="/sign-in" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
+              Sign In
             </Link>
           </div>
         </div>
@@ -366,9 +366,6 @@ export default function ContractorJobsPage() {
                   Clear Filters
                 </button>
               )}
-              <Link href="/demo-login" className="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg font-semibold">
-                Switch to Homeowner Demo
-              </Link>
             </div>
           </div>
         ) : (

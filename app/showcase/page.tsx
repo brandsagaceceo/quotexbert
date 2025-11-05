@@ -115,10 +115,10 @@ export default function ShowcasePage() {
             </div>
             <div className="flex gap-3">
               <Link 
-                href="/demo-login"
+                href="/sign-in"
                 className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 transition-all"
               >
-                Try Demo
+                Sign In
               </Link>
               <Link 
                 href="/contractor/jobs"
@@ -476,10 +476,10 @@ export default function ShowcasePage() {
           <p className="text-orange-100 mb-6">Experience the complete job marketplace with all features working seamlessly</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/demo-login"
+              href="/sign-in"
               className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Try Demo Login
+              Sign In
             </Link>
             <Link 
               href="/contractor/jobs"

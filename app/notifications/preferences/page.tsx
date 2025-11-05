@@ -44,7 +44,7 @@ export default function NotificationPreferencesPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isSignedIn || !authUser) {
-      router.push("/demo-login");
+      router.push("/sign-in");
       return;
     }
     loadPreferences();

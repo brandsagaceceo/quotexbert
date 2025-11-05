@@ -153,10 +153,7 @@ export default function CreateLeadPage() {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold text-center mb-4">Sign In Required</h1>
           <p className="text-center mb-6">You need to sign in to create a lead.</p>
-          <div className="text-center space-y-4">
-            <a href="/demo-login" className="block bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg font-semibold">
-              Demo Login
-            </a>
+          <div className="text-center">
             <a href="/sign-in" className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
               Sign In
             </a>
