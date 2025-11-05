@@ -1,8 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { logEventServer } from "@/lib/analytics";
+import OpenAI from "openai";
 
-// AI estimate stub - returns realistic price ranges based on job description
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// AI estimate using real OpenAI API
 export async function POST(req: NextRequest) {
   try {
     const { description, userId } = await req.json();
@@ -14,8 +20,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Simple AI simulation based on keywords
-    const estimate = generateEstimate(description.toLowerCase());
+    // Check if OpenAI API key is configured
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo')) {
+      console.warn("OpenAI API key not configured, using fallback");
+      const estimate = generateFallbackEstimate(description.toLowerCase());
+      return NextResponse.json(estimate);
+    }
+
+    // Generate AI-powered estimate using OpenAI
+    const estimate = await generateAIEstimate(description);
 
     // Log analytics event
     await logEventServer(
@@ -26,20 +39,102 @@ export async function POST(req: NextRequest) {
         estimateMin: estimate.min,
         estimateMax: estimate.max,
         descriptionLength: description.length,
+        aiPowered: true,
       }
     );
 
     return NextResponse.json(estimate);
   } catch (error) {
     console.error("Error generating estimate:", error);
-    return NextResponse.json(
-      { error: "Failed to generate estimate" },
-      { status: 500 },
-    );
+    
+    // Fallback to keyword-based estimate if OpenAI fails
+    try {
+      const { description } = await req.json();
+      const fallbackEstimate = generateFallbackEstimate(description.toLowerCase());
+      return NextResponse.json({
+        ...fallbackEstimate,
+        warning: "AI service temporarily unavailable, using basic estimate"
+      });
+    } catch {
+      return NextResponse.json(
+        { error: "Failed to generate estimate" },
+        { status: 500 },
+      );
+    }
   }
 }
 
-function generateEstimate(description: string): {
+async function generateAIEstimate(description: string): Promise<{
+  min: number;
+  max: number;
+  description: string;
+}> {
+  const prompt = `You are an expert contractor providing cost estimates for home improvement projects. 
+Based on the following project description, provide a realistic cost estimate range in USD.
+
+Project Description: "${description}"
+
+Respond with ONLY a JSON object in this exact format:
+{
+  "min": <minimum cost as number>,
+  "max": <maximum cost as number>,
+  "description": "<brief explanation of what's included in the estimate, 1-2 sentences>"
+}
+
+Consider:
+- Labor costs for skilled contractors
+- Material costs at mid-range quality
+- Regional average pricing (US nationwide average)
+- Typical project complexity
+- Industry standard pricing
+
+Be realistic and conservative. Return ONLY the JSON, no other text.`;
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: "You are a professional contractor cost estimator. Always respond with valid JSON only."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 300,
+  });
+
+  const response = completion.choices[0]?.message?.content?.trim();
+  
+  if (!response) {
+    throw new Error("No response from OpenAI");
+  }
+
+  // Parse the JSON response
+  const estimate = JSON.parse(response);
+
+  // Validate the response structure
+  if (typeof estimate.min !== 'number' || typeof estimate.max !== 'number' || !estimate.description) {
+    throw new Error("Invalid estimate format from AI");
+  }
+
+  return {
+    min: Math.round(estimate.min),
+    max: Math.round(estimate.max),
+    description: estimate.description
+  };
+}
+
+// Fallback keyword-based estimate for when OpenAI is unavailable
+function generateFallbackEstimate(description: string): {
+  min: number;
+  max: number;
+  description: string;
+}
+
+function generateFallbackEstimate(description: string): {
   min: number;
   max: number;
   description: string;
