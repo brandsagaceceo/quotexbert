@@ -52,8 +52,8 @@ export default function RootLayout({
 }>) {
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
 
-  // Temporarily disable Clerk for demo purposes
-  const enableAuth = false; // Set to true when you have real Clerk keys
+  // Enable real Clerk authentication
+  const enableAuth = true;
 
   const content = (
     <html lang="en">

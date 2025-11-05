@@ -1,5 +1,6 @@
 "use client";
 
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 
 interface User {
@@ -11,54 +12,45 @@ interface User {
 }
 
 export function useAuth() {
+  const { user: clerkUser, isSignedIn: clerkIsSignedIn, isLoaded } = useUser();
+  const { signOut: clerkSignOut } = useClerk();
   const [authUser, setAuthUser] = useState<User | null>(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Auth hook initializing...');
-    
-    // Check for existing demo user
-    const demoUser = localStorage.getItem('demo_user');
-    console.log('Demo user from localStorage:', demoUser);
-    
-    if (demoUser) {
-      try {
-        const mockUser = JSON.parse(demoUser);
-        console.log('Parsed demo user:', mockUser);
-        setAuthUser(mockUser);
-        setIsSignedIn(true);
-      } catch (error) {
-        console.error('Error parsing demo user:', error);
-        localStorage.removeItem('demo_user');
-      }
+    if (isLoaded && clerkUser) {
+      // Map Clerk user to our User interface
+      setAuthUser({
+        id: clerkUser.id,
+        email: clerkUser.primaryEmailAddress?.emailAddress || '',
+        name: clerkUser.fullName || clerkUser.firstName || 'User',
+        role: (clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin') || 'homeowner',
+        profilePhoto: clerkUser.imageUrl
+      });
+    } else if (isLoaded) {
+      setAuthUser(null);
     }
-    
-    setAuthLoading(false);
-  }, []);
+  }, [clerkUser, isLoaded]);
 
   const signInWithGoogle = async () => {
-    console.log('Demo sign in with Google');
-    // For demo purposes, we'll redirect to demo login
-    return { success: false, redirect: '/demo-login' };
+    // Redirect to Clerk sign-in page
+    return { success: false, redirect: '/sign-in' };
   };
 
   const setUserRole = async (role: 'homeowner' | 'contractor') => {
-    console.log('Demo set user role:', role);
+    // Role should be set through Clerk's user metadata
     return { success: true };
   };
 
   const signOut = async () => {
-    localStorage.removeItem('demo_user');
+    await clerkSignOut();
     setAuthUser(null);
-    setIsSignedIn(false);
   };
 
   return {
     authUser,
     user: authUser, // Alias for backward compatibility
-    isSignedIn,
-    authLoading,
+    isSignedIn: clerkIsSignedIn || false,
+    authLoading: !isLoaded,
     signInWithGoogle,
     setUserRole,
     signOut
