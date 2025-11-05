@@ -183,24 +183,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
-          {/* Test Button - Remove this after testing */}
-          {!estimateResult && (
-            <div className="mt-4 text-center">
-              <button 
-                onClick={() => handleEstimateComplete({
-                  min: 800,
-                  max: 1200,
-                  description: "Test estimate for kitchen faucet replacement including labor and materials",
-                  confidence: 85,
-                  factors: ["Project description analyzed", "Market rate analysis", "Material cost estimation", "Labor complexity assessment"]
-                })}
-                className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
-              >
-                🧪 Test Estimate Display
-              </button>
-            </div>
-          )}
         </div>
       </section>
 
