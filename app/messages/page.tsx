@@ -1,9 +1,11 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import EnhancedChatSimple from "@/components/EnhancedChatSimple";
+import Chat from "@/components/Chat";
 import { ChatBubbleLeftRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 interface Message {
@@ -356,7 +358,7 @@ export default function MessagesPage() {
           <div className="lg:col-span-8 xl:col-span-9 flex flex-col min-h-0">
             {selectedThread ? (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
-                <EnhancedChatSimple thread={selectedThread} currentUserId={user?.id} />
+                <Chat thread={selectedThread} currentUserId={user?.id} />
               </div>
             ) : (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center relative z-10 h-full">

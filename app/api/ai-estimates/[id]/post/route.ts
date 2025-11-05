@@ -65,16 +65,12 @@ export async function POST(
       data: {
         title: `Home Renovation: ${estimate.description.substring(0, 50)}${estimate.description.length > 50 ? '...' : ''}`,
         description: fullDescription,
-        budget: Math.round((totalMin + totalMax) / 2), // Use average as budget
-        city: estimate.homeowner?.homeownerProfile?.city || 'Not specified',
-        state: estimate.homeowner?.homeownerProfile?.state || '',
-        zipCode: estimate.homeowner?.homeownerProfile?.zipCode || '',
-        trade: 'General Contractor', // Default, can be extracted from items
+        budget: Math.round((totalMin + totalMax) / 2).toString(), // Use average as budget
+        zipCode: '00000', // Default zipCode
+        category: 'General Contractor', // Default, can be extracted from items
         status: 'open',
         published: true,
         homeownerId: estimate.homeownerId,
-        propertyType: estimate.homeowner?.homeownerProfile?.propertyType || 'Residential',
-        urgency: 'normal',
       },
     });
 

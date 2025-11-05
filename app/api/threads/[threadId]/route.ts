@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { threadId: string } }
+  { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
-    const { threadId } = params;
+    const { threadId } = await params;
 
     if (!threadId) {
       return NextResponse.json(

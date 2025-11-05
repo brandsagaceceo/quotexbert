@@ -9,6 +9,8 @@ import DevStatus from "./_components/DevStatus";
 import "./globals.css";
 import "../styles/mobile.css";
 
+export const dynamic = 'force-dynamic';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
