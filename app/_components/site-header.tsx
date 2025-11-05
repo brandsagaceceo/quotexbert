@@ -75,32 +75,29 @@ export default function SiteHeader() {
                 {/* Profile Menu */}
                 <div className="flex items-center space-x-2">
                   <Link
-                    href="/demo-login"
-                    className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                  >
-                    Switch Demo
-                  </Link>
-                  <Link
                     href="/profile"
                     className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                   >
                     Profile
                   </Link>
-                  <div className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  <Link
+                    href="/profile"
+                    className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold hover:bg-brand-dark transition-colors"
+                  >
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
+                  </Link>
                 </div>
               </>
             ) : (
               <>
                 <Link
-                  href="/demo-login"
+                  href="/sign-in"
                   className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                 >
-                  Demo
+                  Sign In
                 </Link>
                 <Link
-                  href="/demo-login"
+                  href="/sign-up"
                   className="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 >
                   Get Started
@@ -209,27 +206,18 @@ export default function SiteHeader() {
                   >
                     Profile
                   </Link>
-                  
-                  {/* Switch Demo */}
-                  <Link
-                    href="/demo-login"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Switch Demo
-                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3 pt-4 border-t border-ink-200">
                   <Link
-                    href="/demo-login"
+                    href="/sign-in"
                     className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Demo Login
+                    Sign In
                   </Link>
                   <Link
-                    href="/demo-login"
+                    href="/sign-up"
                     className="block w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] text-white text-center px-4 py-3 rounded-[var(--radius-button)] text-base font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
