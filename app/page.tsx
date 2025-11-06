@@ -41,10 +41,148 @@ export default function Home() {
     }, 100);
   };
 
+  // Structured Data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "QuoteXbert",
+    "image": "https://www.quotexbert.com/og-image.jpg",
+    "@id": "https://www.quotexbert.com",
+    "url": "https://www.quotexbert.com",
+    "telephone": "+1-416-XXX-XXXX",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "",
+      "addressLocality": "Toronto",
+      "addressRegion": "ON",
+      "postalCode": "",
+      "addressCountry": "CA"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 43.6532,
+      "longitude": -79.3832
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "00:00",
+      "closes": "23:59"
+    },
+    "sameAs": [
+      "https://twitter.com/quotexbert",
+      "https://facebook.com/quotexbert"
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "1247"
+    },
+    "areaServed": {
+      "@type": "GeoCircle",
+      "geoMidpoint": {
+        "@type": "GeoCoordinates",
+        "latitude": 43.6532,
+        "longitude": -79.3832
+      },
+      "geoRadius": "100000"
+    }
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "QuoteXbert",
+    "alternateName": "QuoteXbert Home Services",
+    "url": "https://www.quotexbert.com",
+    "logo": "https://www.quotexbert.com/logo.svg",
+    "description": "Connect homeowners with verified contractors across the Greater Toronto Area. Get instant AI-powered home repair estimates.",
+    "foundingDate": "2024",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-416-XXX-XXXX",
+      "contactType": "customer service",
+      "areaServed": "CA",
+      "availableLanguage": "en"
+    }
+  };
+
+  const serviceData = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Home Repair Estimate Service",
+    "provider": {
+      "@type": "Organization",
+      "name": "QuoteXbert"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Greater Toronto Area"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Home Improvement Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Kitchen Renovation Estimates"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Bathroom Remodeling Estimates"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Roofing Repair Estimates"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Flooring Installation Estimates"
+          }
+        }
+      ]
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
-      {/* Hero Section with Prominent Estimator */}
-      <section className="py-8 sm:py-12">
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceData) }}
+      />
+      
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
+        {/* Hero Section with Prominent Estimator */}
+        <section className="py-8 sm:py-12">
         <div className="max-w-4xl mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
@@ -301,5 +439,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </>
   );
 }

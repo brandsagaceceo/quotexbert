@@ -22,19 +22,62 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
-  title: "QuoteXbert - AI-Powered Home Repair Estimates & Contractor Matching",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
+  title: {
+    default: "QuoteXbert - AI-Powered Home Repair Estimates & Contractor Matching",
+    template: "%s | QuoteXbert"
+  },
   description:
-    "Get instant AI home repair estimates. Connect with verified contractors. Pay-per-lead system. Join 1000+ contractors earning more with QuoteXbert.",
+    "Get instant AI home repair estimates in seconds. Connect with verified, background-checked contractors across the Greater Toronto Area. Stripe-secured payments. Pay-per-lead system for contractors.",
+  keywords: [
+    "home repair estimates",
+    "contractor quotes",
+    "GTA contractors",
+    "Toronto home repair",
+    "AI estimates",
+    "home improvement quotes",
+    "verified contractors",
+    "instant estimates",
+    "home renovation quotes",
+    "contractor marketplace"
+  ],
+  authors: [{ name: "QuoteXbert" }],
+  creator: "QuoteXbert",
+  publisher: "QuoteXbert",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: "QuoteXbert - AI Home Repair Estimates", 
+    type: "website",
+    locale: "en_CA",
+    url: "https://www.quotexbert.com",
+    title: "QuoteXbert - AI-Powered Home Repair Estimates", 
     description:
-      "Get instant AI home repair estimates and connect with verified contractors in your area.",
+      "Get instant AI home repair estimates and connect with verified contractors across the Greater Toronto Area. Stripe-secured payments, background-checked professionals.",
     siteName: "QuoteXbert",
-    images: ["/og-homepage.jpg"],
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "QuoteXbert - AI Home Repair Estimates"
+      }
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    title: "QuoteXbert - AI-Powered Home Repair Estimates",
+    description: "Get instant AI home repair estimates. Connect with verified GTA contractors. Stripe-secured payments.",
+    images: ["/og-image.jpg"],
+    creator: "@quotexbert",
   },
   icons: {
     icon: [
@@ -42,6 +85,12 @@ export const metadata: Metadata = {
       { url: "/logo.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-touch-icon.png",
+  },
+  alternates: {
+    canonical: "https://www.quotexbert.com"
+  },
+  verification: {
+    google: "your-google-verification-code-here",
   },
 };
 

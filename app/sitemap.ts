@@ -1,18 +1,19 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
   
   // Static pages
   const staticPages = [
     '',
     '/about',
-    '/affiliates',
-    '/blog',
+    '/contact',
     '/create-lead',
-    '/leads',
-    '/contractors',
-    '/messages'
+    '/contractor/jobs',
+    '/sign-in',
+    '/sign-up',
+    '/privacy',
+    '/terms'
   ]
 
   // Toronto-focused blog posts

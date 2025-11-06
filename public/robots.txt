@@ -1,0 +1,15 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow private pages
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /onboarding/
+Disallow: /billing/
+Disallow: /messages/
+
+# Sitemap
+Sitemap: https://www.quotexbert.com/sitemap.xml
