@@ -1,60 +1,60 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'// Temporary: Middleware disabled while building core features
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'// Temporary: Middleware disabled while building core features
 
 import { NextResponse } from 'next/server'
 
-import { NextResponse } from 'next/server'// Enable after setting up proper Clerk keys
+import { NextResponse } from 'next/server'
 
 // Define protected routes that require authentication
 
-const isProtectedRoute = createRouteMatcher([
+const isProtectedRoute = createRouteMatcher([import { NextResponse } from 'next/server'// Enable after setting up proper Clerk keys
 
   '/dashboard(.*)',
 
-  '/contractor(.*)',// Define protected routes that require authenticationexport default function middleware() {
+  '/contractor(.*)',// Define protected routes that require authentication
 
   '/homeowner(.*)',
 
-  '/admin(.*)',const isProtectedRoute = createRouteMatcher([  // No-op middleware for development
+  '/admin(.*)',const isProtectedRoute = createRouteMatcher([
 
   '/profile(.*)',
 
-  '/messages(.*)',  '/dashboard(.*)',}
+  '/messages(.*)',  '/dashboard(.*)',
 
   '/create-lead(.*)',
 
-  '/onboarding(.*)',  '/contractor(.*)',
+  '/onboarding(.*)',  '/contractor(.*)',// Define protected routes that require authenticationexport default function middleware() {
 
   '/billing(.*)',
 
-  '/notifications(.*)',  '/homeowner(.*)',export const config = {
+  '/notifications(.*)',  '/homeowner(.*)',
 
 ])
 
-  '/admin(.*)',  matcher: [
+  '/admin(.*)',const isProtectedRoute = createRouteMatcher([  // No-op middleware for development
 
 const isPublicRoute = createRouteMatcher([
 
-  '/',  '/profile(.*)',    // Skip Next.js internals and all static files, unless found in search params
+  '/',  '/profile(.*)',
 
   '/about',
 
-  '/contact',  '/messages(.*)',    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+  '/contact',  '/messages(.*)',  '/dashboard(.*)',}
 
   '/sign-in(.*)',
 
-  '/sign-up(.*)',  '/create-lead(.*)',    // Always run for API routes
+  '/sign-up(.*)',  '/create-lead(.*)',
 
   '/api/webhooks(.*)',
 
-  '/api/estimate',  '/onboarding(.*)',    "/(api|trpc)(.*)",
+  '/api/estimate',  '/onboarding(.*)',  '/contractor(.*)',
 
   '/api/health',
 
-])  '/billing(.*)',  ],
+])  '/billing(.*)',
 
 
 
-const isAdminRoute = createRouteMatcher(['/admin(.*)'])  '/notifications(.*)',};
+const isAdminRoute = createRouteMatcher(['/admin(.*)'])  '/notifications(.*)',  '/homeowner(.*)',export const config = {
 
 const isContractorRoute = createRouteMatcher(['/contractor(.*)'])
 
@@ -62,23 +62,105 @@ const isHomeownerRoute = createRouteMatcher(['/homeowner(.*)'])])
 
 
 
-export default clerkMiddleware(async (auth, req) => {/* 
+export default clerkMiddleware(async (auth, req) => {  '/admin(.*)',  matcher: [
 
   // Allow public routes without authentication
 
-  if (isPublicRoute(req)) {const isPublicRoute = createRouteMatcher([// Full Clerk middleware - enable when keys are configured
+  if (isPublicRoute(req)) {const isPublicRoute = createRouteMatcher([
 
     return NextResponse.next()
 
-  }  '/',import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+  }  '/',  '/profile(.*)',    // Skip Next.js internals and all static files, unless found in search params
 
 
 
-  // Protect all other routes  '/about',import { NextResponse } from 'next/server'
+  // Protect all other routes  '/about',
 
   if (isProtectedRoute(req)) {
 
-    const { userId, sessionClaims } = await auth.protect()  '/contact',
+    const { userId, sessionClaims } = await auth.protect()  '/contact',  '/messages(.*)',    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+
+    
+
+    if (!userId) {  '/sign-in(.*)',
+
+      // Redirect to sign-in if not authenticated
+
+      const signInUrl = new URL('/sign-in', req.url)  '/sign-up(.*)',  '/create-lead(.*)',    // Always run for API routes
+
+      signInUrl.searchParams.set('redirect_url', req.url)
+
+      return NextResponse.redirect(signInUrl)  '/api/webhooks(.*)',
+
+    }
+
+  '/api/estimate',  '/onboarding(.*)',    "/(api|trpc)(.*)",
+
+    // Get user role from session metadata
+
+    const role = (sessionClaims?.publicMetadata as any)?.role as string  '/api/health',
+
+    
+
+    // Role-based access control])  '/billing(.*)',  ],
+
+    if (isAdminRoute(req) && role !== 'admin') {
+
+      return NextResponse.redirect(new URL('/unauthorized', req.url))
+
+    }
+
+    const isAdminRoute = createRouteMatcher(['/admin(.*)'])  '/notifications(.*)',};
+
+    if (isContractorRoute(req) && role !== 'contractor' && role !== 'admin') {
+
+      return NextResponse.redirect(new URL('/unauthorized', req.url))const isContractorRoute = createRouteMatcher(['/contractor(.*)'])
+
+    }
+
+    const isHomeownerRoute = createRouteMatcher(['/homeowner(.*)'])])
+
+    if (isHomeownerRoute(req) && role !== 'homeowner' && role !== 'admin') {
+
+      return NextResponse.redirect(new URL('/unauthorized', req.url))
+
+    }
+
+    export default clerkMiddleware(async (auth, req) => {/* 
+
+    // Redirect to onboarding if no role is set
+
+    if (!role && !req.nextUrl.pathname.startsWith('/onboarding')) {  // Allow public routes without authentication
+
+      return NextResponse.redirect(new URL('/onboarding', req.url))
+
+    }  if (isPublicRoute(req)) {const isPublicRoute = createRouteMatcher([// Full Clerk middleware - enable when keys are configured
+
+  }
+
+      return NextResponse.next()
+
+  return NextResponse.next()
+
+})  }  '/',import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+
+
+
+export const config = {
+
+  matcher: [
+
+    // Skip Next.js internals and all static files  // Protect all other routes  '/about',import { NextResponse } from 'next/server'
+
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+
+    // Always run for API routes  if (isProtectedRoute(req)) {
+
+    '/(api|trpc)(.*)',
+
+  ],    const { userId, sessionClaims } = await auth.protect()  '/contact',
+
+}
 
     
 
