@@ -32,7 +32,7 @@ export default function SiteFooter() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/jobs"
+                  href="/create-lead"
                   className="text-ink-600 hover:text-brand transition-colors duration-200"
                 >
                   Get a Quote
@@ -40,10 +40,10 @@ export default function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="/affiliates"
+                  href="/contractor/jobs"
                   className="text-ink-600 hover:text-brand transition-colors duration-200"
                 >
-                  Affiliate Program
+                  Browse Jobs
                 </Link>
               </li>
             </ul>
