@@ -217,6 +217,31 @@ export default function Home() {
             )}
           </div>
 
+          {/* Trust Indicators Strip */}
+          <div className="mb-6 py-4 px-6 bg-white/60 backdrop-blur-sm rounded-xl border border-orange-200/50 shadow-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <span className="text-green-600 font-bold">✓</span>
+                <span className="font-medium">Serving the GTA</span>
+              </div>
+              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600 font-bold">🔒</span>
+                <span className="font-medium">Stripe-Secured Payments</span>
+              </div>
+              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-600 font-bold">✓</span>
+                <span className="font-medium">Background-Checked Contractors</span>
+              </div>
+              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="flex items-center gap-2">
+                <span className="text-orange-600 font-bold">⭐</span>
+                <span className="font-medium">Verified Reviews</span>
+              </div>
+            </div>
+          </div>
+
           {/* Main Estimator Form - Center of Attention */}
           <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
             <StreamlinedEstimateForm 
