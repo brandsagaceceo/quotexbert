@@ -1,78 +1,153 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'// Temporary: Middleware disabled while building core features
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'// Temporary: Middleware disabled while building core features
 
 import { NextResponse } from 'next/server'
 
 import { NextResponse } from 'next/server'
 
-// Define protected routes that require authentication
+const isProtectedRoute = createRouteMatcher([
 
-const isProtectedRoute = createRouteMatcher([import { NextResponse } from 'next/server'
+  '/dashboard(.*)',import { NextResponse } from 'next/server'
 
-  '/dashboard(.*)',
+  '/contractor(.*)',
 
-  '/contractor(.*)',// Define protected routes that require authentication
+  '/homeowner(.*)',// Define protected routes that require authentication
 
-  '/homeowner(.*)',
+  '/admin(.*)',
 
-  '/admin(.*)',const isProtectedRoute = createRouteMatcher([import { NextResponse } from 'next/server'// Enable after setting up proper Clerk keys
+  '/profile(.*)',const isProtectedRoute = createRouteMatcher([import { NextResponse } from 'next/server'
 
-  '/profile(.*)',
+  '/messages(.*)',
 
-  '/messages(.*)',  '/dashboard(.*)',
+  '/create-lead(.*)',  '/dashboard(.*)',
 
-  '/create-lead(.*)',
+  '/onboarding(.*)',
 
-  '/onboarding(.*)',  '/contractor(.*)',// Define protected routes that require authentication
+  '/billing(.*)',  '/contractor(.*)',// Define protected routes that require authentication
 
-  '/billing(.*)',
+  '/notifications(.*)',
 
-  '/notifications(.*)',  '/homeowner(.*)',
+])  '/homeowner(.*)',
+
+
+
+const isPublicRoute = createRouteMatcher([  '/admin(.*)',const isProtectedRoute = createRouteMatcher([import { NextResponse } from 'next/server'// Enable after setting up proper Clerk keys
+
+  '/',
+
+  '/about',  '/profile(.*)',
+
+  '/contact',
+
+  '/sign-in(.*)',  '/messages(.*)',  '/dashboard(.*)',
+
+  '/sign-up(.*)',
+
+  '/api/webhooks(.*)',  '/create-lead(.*)',
+
+  '/api/estimate',
+
+  '/api/health',  '/onboarding(.*)',  '/contractor(.*)',// Define protected routes that require authentication
+
+  '/privacy',
+
+  '/terms',  '/billing(.*)',
 
 ])
 
+  '/notifications(.*)',  '/homeowner(.*)',
+
+const isAdminRoute = createRouteMatcher(['/admin(.*)'])
+
+const isContractorRoute = createRouteMatcher(['/contractor(.*)'])])
+
+const isHomeownerRoute = createRouteMatcher(['/homeowner(.*)'])
+
   '/admin(.*)',const isProtectedRoute = createRouteMatcher([
 
-const isPublicRoute = createRouteMatcher([
+export default clerkMiddleware(async (auth, req) => {
 
-  '/',  '/profile(.*)',
+  if (isPublicRoute(req)) {const isPublicRoute = createRouteMatcher([
 
-  '/about',
+    return NextResponse.next()
 
-  '/contact',  '/messages(.*)',  '/dashboard(.*)',
+  }  '/',  '/profile(.*)',
 
-  '/sign-in(.*)',
 
-  '/sign-up(.*)',  '/create-lead(.*)',
+
+  if (isProtectedRoute(req)) {  '/about',
+
+    const { userId, sessionClaims } = await auth.protect()
+
+      '/contact',  '/messages(.*)',  '/dashboard(.*)',
+
+    if (!userId) {
+
+      const signInUrl = new URL('/sign-in', req.url)  '/sign-in(.*)',
+
+      signInUrl.searchParams.set('redirect_url', req.url)
+
+      return NextResponse.redirect(signInUrl)  '/sign-up(.*)',  '/create-lead(.*)',
+
+    }
 
   '/api/webhooks(.*)',
 
-  '/api/estimate',  '/onboarding(.*)',  '/contractor(.*)',// Define protected routes that require authenticationexport default function middleware() {
+    const role = (sessionClaims?.publicMetadata as any)?.role as string
 
-  '/api/health',
+      '/api/estimate',  '/onboarding(.*)',  '/contractor(.*)',// Define protected routes that require authenticationexport default function middleware() {
 
-  '/privacy',  '/billing(.*)',
+    if (isAdminRoute(req) && role !== 'admin') {
 
-  '/terms',
+      return NextResponse.redirect(new URL('/unauthorized', req.url))  '/api/health',
 
-])  '/notifications(.*)',  '/homeowner(.*)',
+    }
 
+      '/privacy',  '/billing(.*)',
 
+    if (isContractorRoute(req) && role !== 'contractor' && role !== 'admin') {
 
-const isAdminRoute = createRouteMatcher(['/admin(.*)'])])
+      return NextResponse.redirect(new URL('/unauthorized', req.url))  '/terms',
 
-const isContractorRoute = createRouteMatcher(['/contractor(.*)'])
+    }
 
-const isHomeownerRoute = createRouteMatcher(['/homeowner(.*)'])  '/admin(.*)',const isProtectedRoute = createRouteMatcher([  // No-op middleware for development
+    ])  '/notifications(.*)',  '/homeowner(.*)',
 
+    if (isHomeownerRoute(req) && role !== 'homeowner' && role !== 'admin') {
 
+      return NextResponse.redirect(new URL('/unauthorized', req.url))
+
+    }
+
+    const isAdminRoute = createRouteMatcher(['/admin(.*)'])])
+
+    if (!role && !req.nextUrl.pathname.startsWith('/onboarding')) {
+
+      return NextResponse.redirect(new URL('/onboarding', req.url))const isContractorRoute = createRouteMatcher(['/contractor(.*)'])
+
+    }
+
+  }const isHomeownerRoute = createRouteMatcher(['/homeowner(.*)'])  '/admin(.*)',const isProtectedRoute = createRouteMatcher([  // No-op middleware for development
+
+  
+
+  return NextResponse.next()
+
+})
 
 export default clerkMiddleware(async (auth, req) => {const isPublicRoute = createRouteMatcher([
 
-  // Allow public routes without authentication
+export const config = {
 
-  if (isPublicRoute(req)) {  '/',  '/profile(.*)',
+  matcher: [  // Allow public routes without authentication
 
-    return NextResponse.next()
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+
+    '/(api|trpc)(.*)',  if (isPublicRoute(req)) {  '/',  '/profile(.*)',
+
+  ],
+
+}    return NextResponse.next()
+
 
   }  '/about',
 
