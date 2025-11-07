@@ -1,5 +1,8 @@
 ﻿import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
@@ -45,7 +48,17 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(signInUrl)
     }
 
-    const role = (sessionClaims?.publicMetadata as any)?.role as string
+    // Check session role first, then fallback to database
+    let role = (sessionClaims?.publicMetadata as any)?.role as string
+    
+    // If no role in session, check database
+    if (!role) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true }
+      })
+      role = user?.role || ''
+    }
     
     if (isAdminRoute(req) && role !== 'admin') {
       return NextResponse.redirect(new URL('/unauthorized', req.url))
