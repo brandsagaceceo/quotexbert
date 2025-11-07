@@ -3,6 +3,26 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function GET() {
+  try {
+    // Test database connection
+    const userCount = await prisma.user.count();
+    return NextResponse.json({ 
+      status: 'ok',
+      databaseConnected: true,
+      userCount,
+      databaseUrl: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+    });
+  } catch (error) {
+    return NextResponse.json({ 
+      status: 'error',
+      databaseConnected: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      databaseUrl: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+    }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
