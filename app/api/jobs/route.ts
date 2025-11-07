@@ -5,7 +5,14 @@ export async function GET(request: NextRequest) {
   try {
     // Get contractor ID from query parameters or headers
     const { searchParams } = new URL(request.url);
-    const contractorId = searchParams.get('contractorId') || searchParams.get('userId') || 'demo-contractor';
+    const contractorId = searchParams.get('contractorId') || searchParams.get('userId');
+
+    if (!contractorId) {
+      return NextResponse.json(
+        { error: "Contractor ID required. Please sign in." },
+        { status: 401 }
+      );
+    }
 
     // Get all open leads - contractors can view all but only apply to subscribed categories
     const leads = await getAllOpenLeads();

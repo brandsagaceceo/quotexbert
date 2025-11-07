@@ -38,19 +38,6 @@ export default function MessagesPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Set up demo contractor user if not exists
-    if (!user && !localStorage.getItem('demo_user')) {
-      const demoContractor = {
-        id: 'demo-contractor',
-        email: 'demo-contractor@quotexpert.com',
-        name: 'Demo Contractor',
-        role: 'contractor' as const
-      };
-      localStorage.setItem('demo_user', JSON.stringify(demoContractor));
-      window.location.reload();
-      return;
-    }
-
     if (user) {
       fetchThreads();
     } else {

@@ -157,20 +157,10 @@ export async function submitLead(formData: FormData) {
       }
     }
 
-    // Ensure demo homeowner exists in database
-    let demoHomeowner = await prisma.user.findUnique({
-      where: { id: "demo-homeowner" }
-    });
-
-    if (!demoHomeowner) {
-      demoHomeowner = await prisma.user.create({
-        data: {
-          id: "demo-homeowner",
-          email: "demo-homeowner@quotexpert.com",
-          role: "homeowner"
-        }
-      });
-    }
+    // Get authenticated user ID from Clerk
+    // If no user is signed in, we'll need them to sign in first
+    // For now, this assumes users create leads after signing in
+    const homeownerId = "guest"; // Temporary guest ID - will be updated after sign-in
 
     // Save lead to database
     const lead = await prisma.lead.create({
@@ -181,7 +171,7 @@ export async function submitLead(formData: FormData) {
         description: data.description,
         budget: finalBudget, // Store the budget range or user input as string
         photos: JSON.stringify(data.photos || []),
-        homeownerId: "demo-homeowner", // Demo homeowner ID for testing
+        homeownerId: homeownerId,
         status: "open", // Set initial status to lowercase
         published: true, // Make the lead available to contractors immediately
       },

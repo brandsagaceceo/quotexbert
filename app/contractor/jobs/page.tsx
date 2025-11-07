@@ -105,7 +105,14 @@ export default function ContractorJobsPage() {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const contractorId = user?.id || 'demo-contractor';
+      
+      if (!user?.id) {
+        setMessage("Please sign in to view jobs.");
+        setLoading(false);
+        return;
+      }
+      
+      const contractorId = user.id;
       const response = await fetch(`/api/jobs?contractorId=${contractorId}`);
       
       if (response.ok) {
@@ -145,6 +152,12 @@ export default function ContractorJobsPage() {
       return;
     }
 
+    if (!user?.id) {
+      alert("Please sign in to accept jobs.");
+      setAccepting(null);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/jobs/${jobId}/accept`, {
         method: 'POST',
@@ -152,7 +165,7 @@ export default function ContractorJobsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contractorId: user?.id || 'demo-contractor',
+          contractorId: user.id,
           message: acceptanceData?.message || `I'm interested in this project and would like to provide you with a quote. Let's discuss the details!`
         })
       });

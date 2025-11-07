@@ -78,24 +78,13 @@ export async function POST(
     }
 
     // Ensure contractor exists
-    let contractor = await prisma.user.findUnique({
+    const contractor = await prisma.user.findUnique({
       where: { id: contractorId }
     });
 
-    if (!contractor && contractorId === "demo-contractor") {
-      contractor = await prisma.user.create({
-        data: {
-          id: "demo-contractor",
-          email: "demo-contractor@quotexpert.com",
-          role: "contractor",
-          name: "Demo Contractor"
-        }
-      });
-    }
-
     if (!contractor) {
       return NextResponse.json(
-        { error: "Contractor not found" },
+        { error: "Contractor not found. Please sign in." },
         { status: 404 }
       );
     }
