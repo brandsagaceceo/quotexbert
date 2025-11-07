@@ -50,8 +50,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, role });
   } catch (error) {
     console.error("Error updating user role:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      DATABASE_URL: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+    });
     return NextResponse.json(
-      { error: "Failed to update role" },
+      { 
+        error: "Failed to update role",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 },
     );
   }
