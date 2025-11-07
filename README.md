@@ -6,6 +6,8 @@
 
 **AI-Powered Home Repair Estimates & Contractor Matching Platform**
 
+**🔒 Now with Clerk Authentication & Enhanced Security**
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/quotexbert)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Next.js](https://img.shields.io/badge/Next.js-15.4.6-black)](https://nextjs.org/)
@@ -17,7 +19,7 @@
 
 ## 🌟 What is QuoteXbert?
 
-QuoteXbert is a comprehensive home improvement platform that connects homeowners with verified contractors. The platform features AI-powered estimate generation, real-time messaging, secure payments, and mobile-optimized experiences.
+QuoteXbert is a comprehensive home improvement platform that connects homeowners with verified contractors. The platform features AI-powered estimate generation, Clerk authentication with Google OAuth, real-time messaging, secure payments, and mobile-optimized experiences.
 
 ### 🎯 Key Features
 
