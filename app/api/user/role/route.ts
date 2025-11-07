@@ -5,13 +5,27 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // Test database connection
-    const userCount = await prisma.user.count();
+    const { userId } = await auth();
+    
+    if (!userId) {
+      // Health check mode if not authenticated
+      const userCount = await prisma.user.count();
+      return NextResponse.json({ 
+        status: 'ok',
+        databaseConnected: true,
+        userCount,
+        databaseUrl: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+      });
+    }
+    
+    // Return user's role from database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    });
+    
     return NextResponse.json({ 
-      status: 'ok',
-      databaseConnected: true,
-      userCount,
-      databaseUrl: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+      role: user?.role || null
     });
   } catch (error) {
     return NextResponse.json({ 

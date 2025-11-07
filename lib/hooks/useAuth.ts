@@ -15,20 +15,43 @@ export function useAuth() {
   const { user: clerkUser, isSignedIn: clerkIsSignedIn, isLoaded } = useUser();
   const { signOut: clerkSignOut } = useClerk();
   const [authUser, setAuthUser] = useState<User | null>(null);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoaded && clerkUser) {
-      // Map Clerk user to our User interface
-      setAuthUser({
-        id: clerkUser.id,
-        email: clerkUser.primaryEmailAddress?.emailAddress || '',
-        name: clerkUser.fullName || clerkUser.firstName || 'User',
-        role: (clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin') || 'homeowner',
-        profilePhoto: clerkUser.imageUrl
-      });
-    } else if (isLoaded) {
-      setAuthUser(null);
-    }
+    const fetchUserRole = async () => {
+      if (isLoaded && clerkUser) {
+        let role = clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin' | undefined;
+        
+        // If no role in session, fetch from database
+        if (!role) {
+          setRoleLoading(true);
+          try {
+            const response = await fetch('/api/user/role');
+            const data = await response.json();
+            if (data.role) {
+              role = data.role;
+            }
+          } catch (error) {
+            console.error('Error fetching user role:', error);
+          } finally {
+            setRoleLoading(false);
+          }
+        }
+        
+        // Map Clerk user to our User interface
+        setAuthUser({
+          id: clerkUser.id,
+          email: clerkUser.primaryEmailAddress?.emailAddress || '',
+          name: clerkUser.fullName || clerkUser.firstName || 'User',
+          role: role || 'contractor', // Default to contractor for now
+          profilePhoto: clerkUser.imageUrl
+        });
+      } else if (isLoaded) {
+        setAuthUser(null);
+      }
+    };
+    
+    fetchUserRole();
   }, [clerkUser, isLoaded]);
 
   const signInWithGoogle = async () => {
