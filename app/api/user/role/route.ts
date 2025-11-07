@@ -1,7 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { notifications } from "@/lib/notifications";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,17 +16,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    // Update user metadata in Clerk
+    // Get user info from Clerk
     const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+
+    // Update user metadata in Clerk
     await client.users.updateUserMetadata(userId, {
       publicMetadata: {
         role: role,
       },
     });
 
-    // Send welcome notification for new users
-    await notifications.welcome(userId, {
-      firstName: role === 'contractor' ? 'Contractor' : 'Homeowner'
+    // Create or update user in database
+    const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
+    const userName = clerkUser.firstName 
+      ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
+      : email.split('@')[0];
+
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {
+        role: role,
+        name: userName,
+      },
+      create: {
+        id: userId,
+        email: email,
+        name: userName,
+        role: role,
+      },
     });
 
     return NextResponse.json({ success: true, role });
