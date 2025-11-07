@@ -29,21 +29,21 @@ export async function POST(req: NextRequest) {
 
     // Create or update user in database
     const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
-    const userName = clerkUser.firstName 
+    const userName: string = clerkUser.firstName 
       ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
-      : email.split('@')[0];
+      : email.split('@')[0] || 'User';
 
     await prisma.user.upsert({
       where: { id: userId },
       update: {
-        role: role,
+        role: role as "homeowner" | "contractor" | "admin",
         name: userName,
       },
       create: {
         id: userId,
         email: email,
         name: userName,
-        role: role,
+        role: role as "homeowner" | "contractor" | "admin",
       },
     });
 
