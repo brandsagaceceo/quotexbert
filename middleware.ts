@@ -53,11 +53,17 @@ export default clerkMiddleware(async (auth, req) => {
     
     // If no role in session, check database
     if (!role) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { role: true }
-      })
-      role = user?.role || ''
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true }
+        })
+        role = user?.role || ''
+      } catch (error) {
+        console.error('Error fetching user role from database:', error)
+        // If database check fails, allow access (temporary workaround)
+        role = 'contractor'
+      }
     }
     
     if (isAdminRoute(req) && role !== 'admin') {
