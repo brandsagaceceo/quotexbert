@@ -52,13 +52,27 @@ export default function OnboardingPage() {
         throw new Error("Failed to update role");
       }
 
-      // Redirect based on role
-      if (roleId === "contractor") {
-        router.push("/contractor/jobs");
-      } else if (roleId === "homeowner") {
-        router.push("/dashboard");
+      const data = await response.json();
+
+      // If session needs refresh, reload the page to get new session
+      if (data.refreshSession) {
+        // Use window.location for a full page reload which refreshes the Clerk session
+        if (roleId === "contractor") {
+          window.location.href = "/contractor/jobs";
+        } else if (roleId === "homeowner") {
+          window.location.href = "/dashboard";
+        } else {
+          window.location.href = "/dashboard";
+        }
       } else {
-        router.push("/dashboard");
+        // Normal client-side navigation
+        if (roleId === "contractor") {
+          router.push("/contractor/jobs");
+        } else if (roleId === "homeowner") {
+          router.push("/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       console.error("Error updating user role:", error);

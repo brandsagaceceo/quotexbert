@@ -67,7 +67,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, role });
+    // Return success with a flag to reload the session
+    const response = NextResponse.json({ success: true, role, refreshSession: true });
+    return response;
   } catch (error) {
     console.error("Error updating user role:", error);
     console.error("Error details:", {
