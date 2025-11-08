@@ -67,19 +67,37 @@ export async function POST(req: NextRequest) {
       ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
       : email.split('@')[0] || 'User';
 
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        role: role as "homeowner" | "contractor" | "admin",
-        name: userName,
-      },
-      create: {
-        id: userId,
-        email: email,
-        name: userName,
-        role: role as "homeowner" | "contractor" | "admin",
-      },
+    // Check if user exists first to handle email conflicts
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId }
     });
+
+    if (existingUser) {
+      // Just update the existing user
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          role: role as "homeowner" | "contractor" | "admin",
+          name: userName,
+        },
+      });
+    } else {
+      // Create new user, or update by email if exists
+      await prisma.user.upsert({
+        where: { email: email },
+        update: {
+          id: userId,
+          role: role as "homeowner" | "contractor" | "admin",
+          name: userName,
+        },
+        create: {
+          id: userId,
+          email: email,
+          name: userName,
+          role: role as "homeowner" | "contractor" | "admin",
+        },
+      });
+    }
 
     // Return success with a flag to reload the session
     const response = NextResponse.json({ success: true, role, refreshSession: true });
