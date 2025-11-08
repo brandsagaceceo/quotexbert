@@ -151,7 +151,10 @@ export default function OnboardingPage() {
 
               {selectedRole === role.id && (
                 <button
-                  onClick={() => handleRoleSelection(role.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRoleSelection(role.id);
+                  }}
                   disabled={isLoading}
                   className="w-full bg-[#800020] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#600018] transition-colors disabled:opacity-50"
                 >
