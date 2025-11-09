@@ -12,7 +12,6 @@ const isProtectedRoute = createRouteMatcher([
   '/profile(.*)',
   '/messages(.*)',
   '/create-lead(.*)',
-  '/onboarding(.*)',
   '/billing(.*)',
   '/notifications(.*)',
 ])
