@@ -1,8 +1,5 @@
 ﻿import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
