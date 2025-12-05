@@ -24,7 +24,7 @@ export async function GET() {
       select: { role: true }
     });
     
-    // If user doesn't exist, auto-create them as a contractor
+    // If user doesn't exist, auto-create them WITHOUT a role (they must select during onboarding)
     if (!user) {
       try {
         const client = await clerkClient();
@@ -34,25 +34,25 @@ export async function GET() {
           ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
           : email.split('@')[0] || 'User';
 
-        // Create user with default role (contractor)
+        // Create user WITHOUT a role - they must select during onboarding
         user = await prisma.user.create({
           data: {
             id: userId,
             email: email,
             name: userName,
-            role: 'contractor'
+            role: null
           },
           select: { role: true }
         });
       } catch (error) {
         console.error('Error creating user:', error);
-        // Return contractor as default if creation fails
-        user = { role: 'contractor' };
+        // Return null if creation fails - user must select role
+        user = { role: null };
       }
     }
     
     return NextResponse.json({ 
-      role: user?.role || 'contractor'
+      role: user?.role || null
     });
   } catch (error) {
     return NextResponse.json({ 

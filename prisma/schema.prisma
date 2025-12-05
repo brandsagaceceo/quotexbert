@@ -14,7 +14,7 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?  // Added name field
-  role      String   // "admin" | "contractor" | "homeowner"
+  role      String?  // "admin" | "contractor" | "homeowner" (null until user selects role during onboarding)
   lastSeen  DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
