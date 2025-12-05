@@ -18,14 +18,41 @@ export async function GET() {
       });
     }
     
-    // Return user's role from database
-    const user = await prisma.user.findUnique({
+    // Check if user exists in database
+    let user = await prisma.user.findUnique({
       where: { id: userId },
       select: { role: true }
     });
     
+    // If user doesn't exist, auto-create them as a contractor
+    if (!user) {
+      try {
+        const client = await clerkClient();
+        const clerkUser = await client.users.getUser(userId);
+        const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
+        const userName: string = clerkUser.firstName 
+          ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
+          : email.split('@')[0] || 'User';
+
+        // Create user with default role (contractor)
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            email: email,
+            name: userName,
+            role: 'contractor'
+          },
+          select: { role: true }
+        });
+      } catch (error) {
+        console.error('Error creating user:', error);
+        // Return contractor as default if creation fails
+        user = { role: 'contractor' };
+      }
+    }
+    
     return NextResponse.json({ 
-      role: user?.role || null
+      role: user?.role || 'contractor'
     });
   } catch (error) {
     return NextResponse.json({ 
