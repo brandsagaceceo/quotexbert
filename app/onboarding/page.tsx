@@ -57,16 +57,11 @@ export default function OnboardingPage() {
         throw new Error(`Failed to update role: ${data.error || response.statusText}`);
       }
 
-      // If session needs refresh, reload the page to get new session
-      if (data.refreshSession) {
-        // Use window.location for a full page reload which refreshes the Clerk session
-        console.log('Redirecting to /profile');
+      // Use window.location for a full page reload which refreshes the Clerk session
+      console.log('Redirecting to /profile');
+      setTimeout(() => {
         window.location.href = "/profile";
-      } else {
-        // Normal client-side navigation
-        console.log('Pushing to /profile');
-        router.push("/profile");
-      }
+      }, 500);
     } catch (error) {
       console.error("Error updating user role:", error);
       alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
