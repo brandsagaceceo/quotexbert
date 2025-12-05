@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       await prisma.user.update({
         where: { id: userId },
         data: {
-          role: role as "homeowner" | "contractor" | "admin",
+          role: role,
           name: userName,
         },
       });
@@ -114,14 +114,14 @@ export async function POST(req: NextRequest) {
         where: { email: email },
         update: {
           id: userId,
-          role: role as "homeowner" | "contractor" | "admin",
+          role: role,
           name: userName,
         },
         create: {
           id: userId,
           email: email,
           name: userName,
-          role: role as "homeowner" | "contractor" | "admin",
+          role: role,
         },
       });
     }
