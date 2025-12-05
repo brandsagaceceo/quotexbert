@@ -37,8 +37,10 @@ export default function OnboardingPage() {
         body: JSON.stringify({ role: roleId }),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error("Failed to update role");
+        throw new Error(data.details || data.error || "Failed to update role");
       }
 
       // Redirect to profile

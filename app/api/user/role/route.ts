@@ -94,13 +94,18 @@ export async function POST(req: NextRequest) {
       ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
       : email.split('@')[0] || 'User';
 
+    console.log('Updating user:', { userId, email, role });
+
     // Check if user exists first to handle email conflicts
     const existingUser = await prisma.user.findUnique({
       where: { id: userId }
     });
 
+    console.log('Existing user:', existingUser);
+
     if (existingUser) {
       // Just update the existing user
+      console.log('Updating existing user');
       await prisma.user.update({
         where: { id: userId },
         data: {
@@ -109,15 +114,10 @@ export async function POST(req: NextRequest) {
         },
       });
     } else {
-      // Create new user, or update by email if exists
-      await prisma.user.upsert({
-        where: { email: email },
-        update: {
-          id: userId,
-          role: role,
-          name: userName,
-        },
-        create: {
+      // Create new user
+      console.log('Creating new user');
+      await prisma.user.create({
+        data: {
           id: userId,
           email: email,
           name: userName,
@@ -125,6 +125,8 @@ export async function POST(req: NextRequest) {
         },
       });
     }
+
+    console.log('User role updated successfully');
 
     // Return success with a flag to reload the session
     const response = NextResponse.json({ success: true, role, refreshSession: true });
@@ -134,7 +136,7 @@ export async function POST(req: NextRequest) {
     console.error("Error details:", {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      DATABASE_URL: process.env.DATABASE_URL ? 'Set (length: ' + process.env.DATABASE_URL.length + ')' : 'NOT SET'
+      DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'NOT SET'
     });
     return NextResponse.json(
       { 
