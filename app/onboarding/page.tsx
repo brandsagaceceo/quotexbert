@@ -40,6 +40,7 @@ export default function OnboardingPage() {
 
     try {
       // Update user metadata with selected role via API
+      console.log('Submitting role selection:', roleId);
       const response = await fetch("/api/user/role", {
         method: "POST",
         headers: {
@@ -48,22 +49,27 @@ export default function OnboardingPage() {
         body: JSON.stringify({ role: roleId }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update role");
-      }
-
+      console.log('API response status:', response.status);
       const data = await response.json();
+      console.log('API response data:', data);
+
+      if (!response.ok) {
+        throw new Error(`Failed to update role: ${data.error || response.statusText}`);
+      }
 
       // If session needs refresh, reload the page to get new session
       if (data.refreshSession) {
         // Use window.location for a full page reload which refreshes the Clerk session
+        console.log('Redirecting to /profile');
         window.location.href = "/profile";
       } else {
         // Normal client-side navigation
+        console.log('Pushing to /profile');
         router.push("/profile");
       }
     } catch (error) {
       console.error("Error updating user role:", error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsLoading(false);
     }
   };
