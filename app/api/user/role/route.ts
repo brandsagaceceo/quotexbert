@@ -96,20 +96,51 @@ export async function POST(req: NextRequest) {
 
     console.log('Updating user:', { userId, email, role });
 
-    // Use upsert to handle both create and update cases
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        role: role,
-        name: userName,
-      },
-      create: {
-        id: userId,
-        email: email,
-        name: userName,
-        role: role,
-      },
+    // First try to find user by email (in case of duplicate sign-ups)
+    let existingUserByEmail = await prisma.user.findUnique({
+      where: { email: email }
     });
+
+    if (existingUserByEmail) {
+      // User with this email exists, update it
+      console.log('Updating existing user by email');
+      await prisma.user.update({
+        where: { email: email },
+        data: {
+          id: userId, // Update to match current Clerk userId
+          role: role,
+          name: userName,
+        },
+      });
+    } else {
+      // Check if user exists by ID
+      const existingUserById = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (existingUserById) {
+        // User exists by ID, just update the role
+        console.log('Updating existing user by id');
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            role: role,
+            name: userName,
+          },
+        });
+      } else {
+        // No user exists, create new one
+        console.log('Creating new user');
+        await prisma.user.create({
+          data: {
+            id: userId,
+            email: email,
+            name: userName,
+            role: role,
+          },
+        });
+      }
+    }
 
     console.log('User role updated successfully');
 
