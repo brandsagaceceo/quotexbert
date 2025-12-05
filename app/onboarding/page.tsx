@@ -32,7 +32,7 @@ const roles = [
 export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const { user } = useUser() // Disabled for demo
+  // Force redeploy v2
   const router = useRouter();
 
   const handleRoleSelection = async (roleId: string) => {
