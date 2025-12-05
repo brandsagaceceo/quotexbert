@@ -5,6 +5,8 @@ import Link from "next/link";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
 import { useAuth } from "@/lib/hooks/useAuth";
 
+// Build: v2 - Testing Vercel webhook with public repo
+
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
   const { authUser: user, isSignedIn } = useAuth();
