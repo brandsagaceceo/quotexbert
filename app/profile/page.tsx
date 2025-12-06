@@ -101,25 +101,6 @@ export default function UnifiedProfilePage() {
       return;
     }
 
-    // If user doesn't have a role, send them back to onboarding
-    if (!authUser.role || authUser.role === 'contractor') {
-      // Check if they actually have a role set
-      const checkRole = async () => {
-        try {
-          const response = await fetch('/api/user/role');
-          const data = await response.json();
-          if (!data.role) {
-            router.push("/onboarding");
-            return;
-          }
-        } catch (error) {
-          console.error('Error checking role:', error);
-        }
-      };
-      
-      checkRole();
-    }
-
     const fetchProfileData = async () => {
       try {
         setIsLoading(true);

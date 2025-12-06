@@ -43,11 +43,11 @@ export default function OnboardingPage() {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      // Wait a moment for the database to sync, then redirect
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait longer for Clerk to sync the metadata
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Use router.push for client-side navigation (no full reload)
-      router.push("/profile");
+      // Do a hard page reload to refresh the session
+      window.location.href = "/profile";
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
