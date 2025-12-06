@@ -105,7 +105,15 @@ export default function UnifiedProfilePage() {
       try {
         setIsLoading(true);
         
-        // Fetch profile
+        // Create a basic profile from authUser
+        const basicProfile: ProfileData = {
+          id: authUser.id,
+          email: authUser.email,
+          name: authUser.name,
+          role: authUser.role,
+        };
+        
+        // Fetch extended profile data
         const profileResponse = await fetch(`/api/profile?userId=${authUser.id}`);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
@@ -121,6 +129,9 @@ export default function UnifiedProfilePage() {
             website: profileData.website || '',
             serviceRadiusKm: profileData.serviceRadiusKm || 25
           });
+        } else {
+          // If profile doesn't exist yet, use basic profile
+          setProfile(basicProfile);
         }
 
         // Fetch portfolio if contractor
