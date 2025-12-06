@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 
 export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { getToken } = useAuth();
 
   const roles = [
     {
@@ -50,14 +48,9 @@ export default function OnboardingPage() {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      console.log("Step 4: Success! Refreshing Clerk session...");
+      console.log("Step 4: Success! Redirecting to profile...");
       
-      // Force refresh the Clerk session to get updated metadata
-      await getToken({ template: "default" });
-      
-      console.log("Step 5: Session refreshed. Redirecting to profile...");
-      
-      // Use router instead of window.location for better Next.js integration
+      // Simple redirect - let profile page handle role checking
       router.push("/profile");
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
