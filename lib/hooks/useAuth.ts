@@ -20,22 +20,21 @@ export function useAuth() {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (isLoaded && clerkUser) {
+        // Start with whatever Clerk session has
         let role = clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin' | undefined;
-        
-        // If no role in session, fetch from database
-        if (!role) {
-          setRoleLoading(true);
-          try {
-            const response = await fetch('/api/user/role');
-            const data = await response.json();
-            if (data.role) {
-              role = data.role;
-            }
-          } catch (error) {
-            console.error('Error fetching user role:', error);
-          } finally {
-            setRoleLoading(false);
+
+        // Always fetch server-side role to pick up updates made during onboarding
+        setRoleLoading(true);
+        try {
+          const response = await fetch('/api/user/role');
+          const data = await response.json();
+          if (data.role) {
+            role = data.role;
           }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        } finally {
+          setRoleLoading(false);
         }
         
         // Map Clerk user to our User interface
@@ -43,7 +42,7 @@ export function useAuth() {
           id: clerkUser.id,
           email: clerkUser.primaryEmailAddress?.emailAddress || '',
           name: clerkUser.fullName || clerkUser.firstName || 'User',
-          role: role || 'homeowner', // Temporary default
+          role: role || 'homeowner', // fallback if none returned
           profilePhoto: clerkUser.imageUrl
         });
       } else if (isLoaded) {
