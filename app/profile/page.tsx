@@ -307,19 +307,33 @@ export default function UnifiedProfilePage() {
     }
   };
 
-  if (authLoading || isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your profile...</p>
+        </div>
       </div>
     );
   }
 
-  if (!isSignedIn || !authUser || !profile) {
+  if (!isSignedIn || !authUser) {
     return null;
   }
 
-  const displayName = profile.companyName || profile.name || authUser.email;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Setting up your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayName = profile?.companyName || profile?.name || authUser.email;
   const isContractor = authUser.role === 'contractor';
 
   return (
@@ -332,7 +346,7 @@ export default function UnifiedProfilePage() {
             {/* Profile Photo */}
             <div className="relative">
               <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                {profile.profilePhoto ? (
+                {profile?.profilePhoto ? (
                   <img 
                     src={profile.profilePhoto} 
                     alt="Profile" 
@@ -365,14 +379,14 @@ export default function UnifiedProfilePage() {
             {/* Basic Info */}
             <div className="text-white mb-4">
               <h1 className="text-3xl font-bold">{displayName}</h1>
-              <p className="text-blue-100 capitalize text-lg">{profile.trade || authUser.role}</p>
-              {profile.city && (
+              <p className="text-blue-100 capitalize text-lg">{profile?.trade || authUser.role}</p>
+              {profile?.city && (
                 <div className="flex items-center mt-2 text-blue-100">
                   <MapPin className="h-4 w-4 mr-1" />
                   {profile.city}
                 </div>
               )}
-              {isContractor && profile.verified && (
+              {isContractor && profile?.verified && (
                 <div className="flex items-center mt-2 text-green-300">
                   <Award className="h-4 w-4 mr-1" />
                   Verified Contractor
@@ -453,7 +467,7 @@ export default function UnifiedProfilePage() {
                     />
                   ) : (
                     <p className="text-gray-600">
-                      {profile.bio || "No bio added yet. Click Edit Profile to add information about your experience and services."}
+                      {profile?.bio || "No bio added yet. Click Edit Profile to add information about your experience and services."}
                     </p>
                   )}
                 </div>
@@ -463,17 +477,17 @@ export default function UnifiedProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-lg shadow-md p-6 text-center">
                       <Briefcase className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile.completedJobs || 0}</div>
+                      <div className="text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
                       <div className="text-sm text-gray-600">Completed Jobs</div>
                     </div>
                     <div className="bg-white rounded-lg shadow-md p-6 text-center">
                       <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile.avgRating || 0}</div>
+                      <div className="text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
                       <div className="text-sm text-gray-600">Average Rating</div>
                     </div>
                     <div className="bg-white rounded-lg shadow-md p-6 text-center">
                       <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile.reviewCount || 0}</div>
+                      <div className="text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
                       <div className="text-sm text-gray-600">Reviews</div>
                     </div>
                   </div>
@@ -649,13 +663,13 @@ export default function UnifiedProfilePage() {
                         <Mail className="h-5 w-5 mr-3" />
                         {authUser.email}
                       </div>
-                      {profile.phone && (
+                      {profile?.phone && (
                         <div className="flex items-center text-gray-600">
                           <Phone className="h-5 w-5 mr-3" />
                           {profile.phone}
                         </div>
                       )}
-                      {profile.website && (
+                      {profile?.website && (
                         <div className="flex items-center text-gray-600">
                           <Globe className="h-5 w-5 mr-3" />
                           <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
@@ -663,7 +677,7 @@ export default function UnifiedProfilePage() {
                           </a>
                         </div>
                       )}
-                      {profile.city && (
+                      {profile?.city && (
                         <div className="flex items-center text-gray-600">
                           <MapPin className="h-5 w-5 mr-3" />
                           {profile.city}
@@ -679,7 +693,7 @@ export default function UnifiedProfilePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Location */}
-            {profile.city && (
+            {profile?.city && (
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Location</h3>
                 <div className="flex items-center text-gray-700">
