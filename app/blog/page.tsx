@@ -117,6 +117,51 @@ export default function BlogPage() {
       imageUrl: "/blog/toronto-seasonal-maintenance.jpg",
       seoTitle: "Toronto Home Maintenance Checklist 2025 | GTA Seasonal Care",
       seoDescription: "Essential seasonal maintenance for Toronto homes. Prepare for Ontario winters, prevent costly repairs, and protect your GTA property year-round."
+    },
+    {
+      id: "7",
+      title: "Complete Guide to Basement Renovations in Toronto: Budget & Design Ideas",
+      slug: "toronto-basement-renovation-guide-budget-ideas",
+      excerpt: "Transform your Toronto basement into a functional living space. Expert budget breakdown, design ideas, and hiring GTA contractors for basement renovations.",
+      content: "Full content would go here...",
+      author: "Marc Thompson",
+      publishedAt: "2025-01-20",
+      readTime: 11,
+      category: "Basement",
+      tags: ["toronto basement", "GTA renovation", "basement ideas", "toronto contractors", "finished basement"],
+      imageUrl: "/blog/toronto-basement-renovation.jpg",
+      seoTitle: "Toronto Basement Renovation Guide 2025 | Budget, Design & Contractors",
+      seoDescription: "Complete guide to finishing your Toronto basement. Budget breakdown, design ideas, GTA contractor tips, and Ontario permit information for basement renovations."
+    },
+    {
+      id: "8",
+      title: "Finding the Right Basement Contractor in Whitby & GTA: 10 Questions to Ask",
+      slug: "whitby-basement-contractor-questions",
+      excerpt: "Choosing a basement contractor in Whitby or the GTA? Learn the 10 critical questions to ask, red flags to avoid, and how to verify credentials.",
+      content: "Full content would go here...",
+      author: "Amanda Wells",
+      publishedAt: "2025-01-18",
+      readTime: 8,
+      category: "Contractor Tips",
+      tags: ["whitby contractor", "basement contractor", "GTA", "contractor vetting", "ontario"],
+      imageUrl: "/blog/whitby-basement-contractor.jpg",
+      seoTitle: "Whitby Basement Contractors: 10 Questions to Ask | GTA Hiring Guide",
+      seoDescription: "Find reliable basement contractors in Whitby and GTA. Essential questions to ask, red flags, WSIB verification, and contractor hiring tips."
+    },
+    {
+      id: "9",
+      title: "Why Basement Waterproofing is Essential in Toronto's Wet Climate",
+      slug: "toronto-basement-waterproofing-why-important",
+      excerpt: "Toronto's rainy climate makes basement waterproofing essential. Learn about common GTA moisture problems, solutions, and the cost of waterproofing.",
+      content: "Full content would go here...",
+      author: "Robert Hayes",
+      publishedAt: "2025-01-16",
+      readTime: 9,
+      category: "Basement",
+      tags: ["toronto waterproofing", "basement moisture", "GTA", "foundation", "drainage"],
+      imageUrl: "/blog/toronto-waterproofing.jpg",
+      seoTitle: "Toronto Basement Waterproofing Guide 2025 | GTA Moisture Solutions",
+      seoDescription: "Why waterproofing matters in Toronto. Solutions for GTA basement moisture, drainage problems, and expert waterproofing contractors in Ontario."
     }
   ];
 
@@ -198,8 +243,16 @@ export default function BlogPage() {
                 <article key={post.id} className="group">
                   <Link href={`/blog/${post.slug}`} className="block">
                     <div className="bg-gradient-to-br from-white/90 to-orange-50/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      {/* Image placeholder */}
+                      {/* Image */}
                       <div className="h-48 bg-gradient-to-br from-orange-200 to-red-200 relative overflow-hidden">
+                        <img
+                          src={post.imageUrl || "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop";
+                          }}
+                        />
                         <div className="absolute inset-0 bg-black/20"></div>
                         <div className="absolute bottom-4 left-4">
                           <span className="px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-full">

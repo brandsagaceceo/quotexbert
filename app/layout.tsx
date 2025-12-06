@@ -25,22 +25,30 @@ const interMono = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
   title: {
-    default: "QuoteXbert - AI-Powered Home Repair Estimates & Contractor Matching",
-    template: "%s | QuoteXbert"
+    default: "QuoteXbert - AI Home Repair Estimates Toronto, Whitby & GTA | Free Contractor Quotes",
+    template: "%s | QuoteXbert - Toronto Home Repair Estimates"
   },
   description:
-    "Get instant AI home repair estimates in seconds. Connect with verified, background-checked contractors across the Greater Toronto Area. Stripe-secured payments. Pay-per-lead system for contractors.",
+    "Get instant AI home repair estimates in Toronto, Whitby, and Greater Toronto Area. Connect with verified, background-checked contractors. Free quotes, secure payments. Available for basements, kitchens, roofing, and more.",
   keywords: [
-    "home repair estimates",
-    "contractor quotes",
+    "home repair estimates Toronto",
+    "contractor quotes Whitby",
     "GTA contractors",
     "Toronto home repair",
-    "AI estimates",
-    "home improvement quotes",
-    "verified contractors",
-    "instant estimates",
-    "home renovation quotes",
-    "contractor marketplace"
+    "AI estimates Ontario",
+    "home improvement quotes Greater Toronto Area",
+    "verified contractors Toronto",
+    "basement renovation Toronto",
+    "kitchen renovation quotes Toronto",
+    "home renovation estimates Whitby",
+    "contractor marketplace GTA",
+    "background checked contractors Toronto",
+    "free home repair estimates",
+    "local contractors near me",
+    "home repair services Toronto",
+    "roof repair quotes Toronto",
+    "bathroom renovation Whitby",
+    "contractor bidding platform Ontario"
   ],
   authors: [{ name: "QuoteXbert" }],
   creator: "QuoteXbert",
@@ -60,16 +68,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_CA",
     url: "https://www.quotexbert.com",
-    title: "QuoteXbert - AI-Powered Home Repair Estimates", 
+    title: "QuoteXbert - AI Home Repair Estimates in Toronto & GTA", 
     description:
-      "Get instant AI home repair estimates and connect with verified contractors across the Greater Toronto Area. Stripe-secured payments, background-checked professionals.",
+      "Get instant AI home repair estimates and connect with verified contractors in Toronto, Whitby, and Greater Toronto Area. Free quotes, background-checked professionals, secure Stripe payments.",
     siteName: "QuoteXbert",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "QuoteXbert - AI Home Repair Estimates"
+        alt: "QuoteXbert - AI Home Repair Estimates Toronto"
       }
     ],
   },
