@@ -43,7 +43,7 @@ export function useAuth() {
           id: clerkUser.id,
           email: clerkUser.primaryEmailAddress?.emailAddress || '',
           name: clerkUser.fullName || clerkUser.firstName || 'User',
-          role: role || 'contractor', // Default to contractor for now
+          role: role || 'homeowner', // Temporary default
           profilePhoto: clerkUser.imageUrl
         });
       } else if (isLoaded) {

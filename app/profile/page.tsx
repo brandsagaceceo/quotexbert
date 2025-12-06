@@ -101,9 +101,35 @@ export default function UnifiedProfilePage() {
       return;
     }
 
+    // Check if user has completed onboarding (selected a role)
+    // Fetch their actual role from the API to be sure
+    const checkOnboarding = async () => {
+      try {
+        const roleResponse = await fetch('/api/user/role');
+        const roleData = await roleResponse.json();
+        
+        if (!roleData.role || roleData.role === null) {
+          console.log("User has no role, redirecting to onboarding");
+          router.push("/onboarding");
+          return false;
+        }
+        return true;
+      } catch (error) {
+        console.error("Error checking role:", error);
+        return true; // If check fails, let them through
+      }
+    };
+
     const fetchProfileData = async () => {
       try {
         setIsLoading(true);
+        
+        // First check if user has completed onboarding
+        const hasRole = await checkOnboarding();
+        if (!hasRole) {
+          setIsLoading(false);
+          return; // Stop here, user is being redirected
+        }
         
         // Create a basic profile from authUser
         const basicProfile: ProfileData = {

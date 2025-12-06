@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const roles = [
     {
@@ -48,10 +50,18 @@ export default function OnboardingPage() {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      console.log("Step 4: Success! Redirecting to profile...");
+      console.log("Step 4: Success! Forcing session refresh...");
       
-      // Simple redirect - let profile page handle role checking
+      // Force Clerk to refresh the session to get updated publicMetadata
+      await getToken({ template: "supabase" }).catch(() => getToken());
+      
+      console.log("Step 5: Session refreshed, redirecting to profile...");
+      
+      // Add a small delay to ensure metadata has propagated
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       router.push("/profile");
+      router.refresh(); // Force Next.js to refetch data
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";
