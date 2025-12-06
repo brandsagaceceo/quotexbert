@@ -43,8 +43,11 @@ export default function OnboardingPage() {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      // Redirect to profile
-      window.location.href = "/profile";
+      // Wait a moment for the database to sync, then redirect
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Use router.push for client-side navigation (no full reload)
+      router.push("/profile");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
