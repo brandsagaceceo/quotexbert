@@ -29,6 +29,8 @@ export default function OnboardingPage() {
     setError(null);
 
     try {
+      console.log("Step 1: Starting role selection for", roleId);
+      
       const response = await fetch("/api/user/role", {
         method: "POST",
         headers: {
@@ -37,18 +39,21 @@ export default function OnboardingPage() {
         body: JSON.stringify({ role: roleId }),
       });
 
+      console.log("Step 2: Response status:", response.status);
+      
       const data = await response.json();
+      console.log("Step 3: Response data:", data);
       
       if (!response.ok) {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      // Wait longer for Clerk to sync the metadata
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log("Step 4: Success! Redirecting to profile...");
       
-      // Do a hard page reload to refresh the session
+      // Redirect immediately - no need to wait
       window.location.href = "/profile";
     } catch (err) {
+      console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       setIsLoading(false);
