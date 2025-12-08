@@ -95,25 +95,36 @@ export default function UnifiedProfilePage() {
 
   useEffect(() => {
     // Wait for auth to load
-    if (authLoading) return;
+    if (authLoading) {
+      console.log("[ProfilePage] Auth still loading...");
+      return;
+    }
 
     // If not signed in, redirect
     if (!isSignedIn || !authUser) {
+      console.log("[ProfilePage] Not signed in, redirecting to sign-in");
       router.push("/sign-in");
       return;
     }
 
-    // Once we have authUser, load the profile
+    // Check if user has a role - if not, send to onboarding
+    if (!authUser.role || authUser.role === 'null' || authUser.role === null) {
+      console.log("[ProfilePage] No role set, redirecting to onboarding");
+      router.push("/onboarding");
+      return;
+    }
+
+    // Once we have authUser with role, load the profile
     const fetchProfileData = async () => {
       try {
-        console.log("[ProfilePage] Starting fetchProfileData");
+        console.log("[ProfilePage] Starting fetchProfileData for user:", authUser.id);
         setIsLoading(true);
         
         // Create a basic profile from authUser
         const basicProfile: ProfileData = {
           id: authUser.id,
           email: authUser.email,
-          name: authUser.name,
+          name: authUser.name || authUser.email,
           role: authUser.role,
         };
         
