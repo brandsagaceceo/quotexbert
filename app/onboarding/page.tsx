@@ -15,9 +15,10 @@ export default function OnboardingPage() {
   useEffect(() => {
     const checkRole = async () => {
       try {
+        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for Clerk to initialize
         const response = await fetch('/api/user/role');
         const data = await response.json();
-        if (data.role && data.role !== null) {
+        if (data.role && data.role !== null && data.role !== 'null') {
           console.log("User already has role:", data.role, "- redirecting to profile");
           window.location.href = "/profile";
         }
@@ -67,15 +68,15 @@ export default function OnboardingPage() {
         throw new Error(data.details || data.error || "Failed to update role");
       }
 
-      console.log("Step 4: Success! Forcing session refresh...");
+      console.log("Step 4: Success! Redirecting to profile...");
       
-      // Force Clerk to refresh the session to get updated publicMetadata
-      await getToken({ template: "supabase" }).catch(() => getToken());
+      // Small delay then redirect to profile
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      console.log("Step 5: Session refreshed, reloading page...");
+      console.log("Step 5: Navigating to profile...");
       
-      // Force full page reload to clear all caches and re-check role
-      window.location.reload();
+      // Direct navigation to profile
+      window.location.href = "/profile";
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";

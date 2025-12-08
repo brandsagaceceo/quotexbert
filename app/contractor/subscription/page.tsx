@@ -148,11 +148,11 @@ export default function ContractorSubscription() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-cyan-700 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-rose-900 to-orange-900 bg-clip-text text-transparent mb-4">
             Contractor Subscription
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -174,16 +174,16 @@ export default function ContractorSubscription() {
                     onClick={() => toggleCategory(category.id)}
                     className={`p-6 rounded-xl border-2 text-left transition-all transform hover:scale-105 ${
                       selectedCategories.includes(category.id)
-                        ? 'border-blue-500 bg-blue-50 shadow-md'
-                        : 'border-slate-200 bg-white hover:border-blue-300'
+                        ? 'border-rose-500 bg-rose-50 shadow-md'
+                        : 'border-slate-200 bg-white hover:border-rose-300'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-slate-900">{category.name}</h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-blue-600 font-bold">${category.price}/mo</span>
+                        <span className="text-rose-700 font-bold">${category.price}/mo</span>
                         {selectedCategories.includes(category.id) && (
-                          <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-6 h-6 text-rose-700" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
                         )}
@@ -218,14 +218,14 @@ export default function ContractorSubscription() {
                   <div className="border-t border-slate-200 pt-4 mb-6">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-bold text-slate-900">Monthly Total</span>
-                      <span className="text-2xl font-bold text-blue-600">${calculateTotal()}</span>
+                      <span className="text-2xl font-bold text-rose-700">${calculateTotal()}</span>
                     </div>
                   </div>
                   
                   <button
                     onClick={handleSubscribe}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
+                    className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
                   >
                     {loading ? 'Processing...' : 'Subscribe Now'}
                   </button>

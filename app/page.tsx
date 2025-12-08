@@ -202,16 +202,16 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceData) }}
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 -mx-4 md:-mx-6 lg:-mx-8">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
         {/* Animated Hero Section */}
         <section className="relative py-12 sm:py-20 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           
           {/* Floating Elements */}
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-          <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-40 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-rose-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+          <div className="absolute top-40 right-10 w-72 h-72 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-40 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           {/* Trust Badges */}
@@ -238,7 +238,7 @@ export default function Home() {
 
           {/* Hero Content */}
           <div className="text-center mb-12 animate-fade-in-up">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-cyan-700 to-blue-800 bg-clip-text text-transparent mb-6 leading-tight">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight">
               Toronto's Most Trusted
               <br />
               Home Improvement Platform
@@ -253,7 +253,7 @@ export default function Home() {
                 <>
                   <Link 
                     href="/sign-up"
-                    className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
+                    className="group relative px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
                   >
                     Get Started Free
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@ export default function Home() {
                   </Link>
                   <Link 
                     href="/sign-in"
-                    className="px-8 py-4 bg-white text-blue-700 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg border-2 border-blue-100 hover:border-blue-300 transition-all duration-200"
+                    className="px-8 py-4 bg-white text-rose-800 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg border-2 border-rose-100 hover:border-rose-300 transition-all duration-200"
                   >
                     Sign In
                   </Link>

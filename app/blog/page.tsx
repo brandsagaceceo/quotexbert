@@ -1,316 +1,369 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import Head from "next/head";
-import { CalendarDaysIcon, ClockIcon, UserIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 
 interface BlogPost {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
   author: string;
   publishedAt: string;
   readTime: number;
   category: string;
   tags: string[];
   imageUrl: string;
-  seoTitle?: string;
-  seoDescription?: string;
+  seoTitle: string;
+  seoDescription: string;
 }
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Sample blog posts with Toronto-focused SEO content
-  const samplePosts: BlogPost[] = [
+  const blogPosts: BlogPost[] = [
     {
       id: "1",
-      title: "10 Home Renovation Projects That Add the Most Value in Toronto 2025",
-      slug: "home-renovation-projects-add-value-toronto-2025",
-      excerpt: "Discover which home improvement projects offer the best ROI for Toronto homeowners. From kitchen updates to bathroom remodels tailored to the GTA market.",
-      content: "Full content would go here...",
-      author: "Sarah Johnson",
-      publishedAt: "2025-01-15",
-      readTime: 8,
-      category: "Home Value",
-      tags: ["toronto renovation", "GTA", "home value", "investment", "ontario"],
-      imageUrl: "/blog/toronto-home-renovation.jpg",
-      seoTitle: "Top 10 Home Renovations That Add Value in Toronto 2025 | QuotexBert",
-      seoDescription: "Maximize your Toronto home's value with these 10 proven renovation projects. Expert insights on ROI, costs, and finding GTA contractors."
+      title: "Complete Guide to Basement Finishing in Toronto 2025",
+      slug: "basement-finishing-toronto-guide-2025",
+      excerpt: "Transform your Toronto basement into a beautiful living space. Learn about permits, costs, design ideas, and finding the right GTA contractor for your project.",
+      author: "Michael Chen",
+      publishedAt: "2025-01-22",
+      readTime: 12,
+      category: "Basement",
+      tags: ["toronto basement", "GTA renovation", "basement finishing", "toronto permits"],
+      imageUrl: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=800&h=500&fit=crop",
+      seoTitle: "Basement Finishing Toronto 2025 | Complete GTA Guide & Costs",
+      seoDescription: "Expert guide to finishing your Toronto basement. Permits, costs, design ideas, and finding qualified GTA contractors for basement renovations."
     },
     {
       id: "2",
-      title: "How to Choose the Right Contractor in Toronto: Complete GTA Guide",
-      slug: "choose-contractor-toronto-gta-guide",
-      excerpt: "Finding a reliable contractor in the Greater Toronto Area can be challenging. Our comprehensive guide covers licensing, permits, and vetting Toronto-area contractors.",
-      content: "Full content would go here...",
-      author: "Mike Rodriguez",
-      publishedAt: "2025-01-10",
-      readTime: 12,
-      category: "Contractor Tips",
-      tags: ["toronto contractors", "GTA", "WSIB", "ontario licensing", "tarion"],
-      imageUrl: "/blog/toronto-contractors.jpg",
-      seoTitle: "How to Choose Toronto Contractors 2025 | GTA Hiring Guide",
-      seoDescription: "Find reliable contractors in Toronto & GTA. Learn about Ontario licensing, WSIB, Tarion warranties, and avoiding contractor scams in the Toronto area."
+      title: "Kitchen Renovation Costs in Toronto & GTA: 2025 Price Guide",
+      slug: "toronto-kitchen-renovation-costs-2025",
+      excerpt: "Planning a kitchen reno in Toronto? Get accurate cost breakdowns for cabinets, countertops, appliances, and labor in the Greater Toronto Area.",
+      author: "Sarah Thompson",
+      publishedAt: "2025-01-20",
+      readTime: 10,
+      category: "Kitchen",
+      tags: ["toronto kitchen", "renovation costs", "GTA pricing", "kitchen remodel"],
+      imageUrl: "https://images.unsplash.com/photo-1556912167-f556f1f39faa?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Kitchen Renovation Costs 2025 | GTA Pricing Guide",
+      seoDescription: "Complete kitchen renovation cost guide for Toronto homeowners. GTA pricing, permit costs, and budgeting tips for your Toronto kitchen remodel."
     },
     {
       id: "3",
-      title: "Kitchen Remodel Costs in Toronto: 2025 GTA Pricing Guide",
-      slug: "kitchen-remodel-costs-toronto-gta-2025",
-      excerpt: "Planning a kitchen renovation in Toronto? Get detailed cost breakdowns for GTA kitchen remodels including permits, labor rates, and material costs.",
-      content: "Full content would go here...",
-      author: "Jennifer Smith",
-      publishedAt: "2025-01-05",
-      readTime: 10,
-      category: "Kitchen",
-      tags: ["toronto kitchen", "GTA renovation", "ontario permits", "kitchen costs"],
-      imageUrl: "/blog/toronto-kitchen-costs.jpg",
-      seoTitle: "Kitchen Renovation Costs Toronto 2025 | GTA Pricing & Permits",
-      seoDescription: "Complete Toronto kitchen remodel cost guide for 2025. GTA pricing, Ontario building permits, and budgeting tips for your Toronto kitchen renovation."
-    },
-    {
-      id: "4",
-      title: "Small Condo Bathroom Renovation Ideas for Toronto Living",
-      slug: "toronto-condo-bathroom-renovation-ideas",
-      excerpt: "Transform your small Toronto condo bathroom with space-maximizing renovation ideas. Perfect solutions for downtown condos and GTA townhomes.",
-      content: "Full content would go here...",
-      author: "David Chen",
-      publishedAt: "2024-12-28",
-      readTime: 6,
-      category: "Bathroom",
-      tags: ["toronto condo", "small bathroom", "GTA", "downtown toronto"],
-      imageUrl: "/blog/toronto-condo-bathroom.jpg",
-      seoTitle: "Toronto Condo Bathroom Renovation Ideas 2025 | Small Space Solutions",
-      seoDescription: "Maximize your Toronto condo bathroom space. Expert renovation ideas for small GTA bathrooms, downtown condos, and space-saving solutions."
-    },
-    {
-      id: "5",
-      title: "Toronto Roofing: Repair vs Replacement for GTA Homes",
-      slug: "toronto-roofing-repair-replacement-guide",
-      excerpt: "Toronto's harsh winters demand quality roofing. Learn when to repair vs replace your roof in the GTA climate, plus finding qualified Toronto roofers.",
-      content: "Full content would go here...",
-      author: "Tom Wilson",
-      publishedAt: "2024-12-20",
-      readTime: 9,
-      category: "Roofing",
-      tags: ["toronto roofing", "GTA roofers", "ontario winter", "roof replacement"],
-      imageUrl: "/blog/toronto-roofing.jpg",
-      seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
-      seoDescription: "Expert Toronto roofing advice for GTA homeowners. Winter damage, repair vs replacement costs, and finding qualified Ontario roofers."
-    },
-    {
-      id: "6",
-      title: "Seasonal Home Maintenance Checklist for Toronto Homeowners",
-      slug: "toronto-seasonal-home-maintenance-checklist",
-      excerpt: "Stay ahead of costly repairs with our Toronto-specific seasonal maintenance checklist. Protect your GTA home from harsh Ontario winters and humid summers.",
-      content: "Full content would go here...",
-      author: "Lisa Parker",
-      publishedAt: "2024-12-15",
-      readTime: 7,
-      category: "Maintenance",
-      tags: ["toronto maintenance", "GTA", "ontario winter prep", "seasonal checklist"],
-      imageUrl: "/blog/toronto-seasonal-maintenance.jpg",
-      seoTitle: "Toronto Home Maintenance Checklist 2025 | GTA Seasonal Care",
-      seoDescription: "Essential seasonal maintenance for Toronto homes. Prepare for Ontario winters, prevent costly repairs, and protect your GTA property year-round."
-    },
-    {
-      id: "7",
-      title: "Complete Guide to Basement Renovations in Toronto: Budget & Design Ideas",
-      slug: "toronto-basement-renovation-guide-budget-ideas",
-      excerpt: "Transform your Toronto basement into a functional living space. Expert budget breakdown, design ideas, and hiring GTA contractors for basement renovations.",
-      content: "Full content would go here...",
-      author: "Marc Thompson",
-      publishedAt: "2025-01-20",
-      readTime: 11,
-      category: "Basement",
-      tags: ["toronto basement", "GTA renovation", "basement ideas", "toronto contractors", "finished basement"],
-      imageUrl: "/blog/toronto-basement-renovation.jpg",
-      seoTitle: "Toronto Basement Renovation Guide 2025 | Budget, Design & Contractors",
-      seoDescription: "Complete guide to finishing your Toronto basement. Budget breakdown, design ideas, GTA contractor tips, and Ontario permit information for basement renovations."
-    },
-    {
-      id: "8",
-      title: "Finding the Right Basement Contractor in Whitby & GTA: 10 Questions to Ask",
-      slug: "whitby-basement-contractor-questions",
-      excerpt: "Choosing a basement contractor in Whitby or the GTA? Learn the 10 critical questions to ask, red flags to avoid, and how to verify credentials.",
-      content: "Full content would go here...",
-      author: "Amanda Wells",
+      title: "How to Hire a Reliable Contractor in Toronto: 2025 Checklist",
+      slug: "hire-reliable-contractor-toronto-checklist",
+      excerpt: "Avoid contractor scams in Toronto! Our comprehensive checklist covers licensing, insurance, WSIB, references, and red flags to watch for in the GTA.",
+      author: "Jennifer Martinez",
       publishedAt: "2025-01-18",
       readTime: 8,
       category: "Contractor Tips",
-      tags: ["whitby contractor", "basement contractor", "GTA", "contractor vetting", "ontario"],
-      imageUrl: "/blog/whitby-basement-contractor.jpg",
-      seoTitle: "Whitby Basement Contractors: 10 Questions to Ask | GTA Hiring Guide",
-      seoDescription: "Find reliable basement contractors in Whitby and GTA. Essential questions to ask, red flags, WSIB verification, and contractor hiring tips."
+      tags: ["toronto contractors", "hiring guide", "contractor tips", "GTA"],
+      imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop",
+      seoTitle: "How to Hire Contractors in Toronto 2025 | GTA Hiring Checklist",
+      seoDescription: "Find reliable contractors in Toronto with our expert checklist. Verify licensing, WSIB, insurance, and avoid common contractor scams in the GTA."
+    },
+    {
+      id: "4",
+      title: "Bathroom Remodeling Ideas for Small Toronto Condos",
+      slug: "small-bathroom-ideas-toronto-condos",
+      excerpt: "Maximize your small Toronto condo bathroom with clever design ideas. Space-saving solutions, modern fixtures, and renovation tips for downtown living.",
+      author: "David Park",
+      publishedAt: "2025-01-15",
+      readTime: 7,
+      category: "Bathroom",
+      tags: ["toronto condo", "small bathroom", "bathroom ideas", "downtown toronto"],
+      imageUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=500&fit=crop",
+      seoTitle: "Small Bathroom Ideas for Toronto Condos 2025 | Space-Saving Tips",
+      seoDescription: "Transform your small Toronto condo bathroom. Expert design ideas, space-saving fixtures, and renovation tips for downtown GTA condos."
+    },
+    {
+      id: "5",
+      title: "Toronto Roofing Guide: When to Repair vs Replace Your Roof",
+      slug: "toronto-roofing-repair-vs-replace",
+      excerpt: "Toronto winters are tough on roofs. Learn when to repair vs replace, costs, materials best for Ontario climate, and finding qualified Toronto roofers.",
+      author: "Robert Wilson",
+      publishedAt: "2025-01-12",
+      readTime: 9,
+      category: "Roofing",
+      tags: ["toronto roofing", "roof replacement", "GTA roofers", "ontario winter"],
+      imageUrl: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
+      seoDescription: "Expert Toronto roofing advice. Learn when to repair vs replace, costs, winter damage prevention, and finding qualified Ontario roofers."
+    },
+    {
+      id: "6",
+      title: "Hardwood Flooring Installation in Toronto: Types, Costs & Care",
+      slug: "hardwood-flooring-toronto-guide",
+      excerpt: "Choose the perfect hardwood flooring for your Toronto home. Compare engineered vs solid wood, costs, installation tips, and top GTA flooring contractors.",
+      author: "Lisa Chang",
+      publishedAt: "2025-01-10",
+      readTime: 8,
+      category: "Flooring",
+      tags: ["toronto flooring", "hardwood floors", "GTA contractors", "flooring costs"],
+      imageUrl: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&h=500&fit=crop",
+      seoTitle: "Hardwood Flooring Toronto 2025 | Installation Guide & Costs",
+      seoDescription: "Complete guide to hardwood flooring in Toronto. Types, costs, installation tips, and finding qualified GTA flooring contractors."
+    },
+    {
+      id: "7",
+      title: "Home Addition Permits in Toronto: Complete 2025 Guide",
+      slug: "toronto-home-addition-permits-guide",
+      excerpt: "Planning a home addition in Toronto? Navigate City of Toronto permits, zoning regulations, costs, and the approval process for GTA home expansions.",
+      author: "Mark Stevens",
+      publishedAt: "2025-01-08",
+      readTime: 11,
+      category: "Permits",
+      tags: ["toronto permits", "home addition", "city of toronto", "zoning"],
+      imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Home Addition Permits 2025 | City Approval Guide",
+      seoDescription: "Navigate Toronto home addition permits easily. City of Toronto regulations, zoning requirements, costs, and approval timeline for GTA additions."
+    },
+    {
+      id: "8",
+      title: "Deck Building in Toronto: Design Ideas, Materials & Costs",
+      slug: "toronto-deck-building-guide",
+      excerpt: "Build the perfect outdoor space for your Toronto home. Deck design ideas, material comparisons, permit requirements, and finding GTA deck builders.",
+      author: "Amanda Rodriguez",
+      publishedAt: "2025-01-05",
+      readTime: 10,
+      category: "Outdoor",
+      tags: ["toronto deck", "outdoor living", "GTA contractors", "deck design"],
+      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop",
+      seoTitle: "Deck Building Toronto 2025 | Design Ideas, Materials & Costs",
+      seoDescription: "Build your dream Toronto deck. Design ideas, material options, permit requirements, and finding qualified GTA deck contractors."
     },
     {
       id: "9",
-      title: "Why Basement Waterproofing is Essential in Toronto's Wet Climate",
-      slug: "toronto-basement-waterproofing-why-important",
-      excerpt: "Toronto's rainy climate makes basement waterproofing essential. Learn about common GTA moisture problems, solutions, and the cost of waterproofing.",
-      content: "Full content would go here...",
-      author: "Robert Hayes",
-      publishedAt: "2025-01-16",
+      title: "Energy-Efficient Home Upgrades for Toronto's Climate",
+      slug: "energy-efficient-upgrades-toronto",
+      excerpt: "Save money and stay comfortable in Toronto's extreme weather. Top energy-efficient upgrades, rebates, and ROI for GTA homeowners.",
+      author: "Tom Anderson",
+      publishedAt: "2025-01-02",
+      readTime: 9,
+      category: "Energy",
+      tags: ["toronto energy", "home efficiency", "ontario rebates", "GTA upgrades"],
+      imageUrl: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop",
+      seoTitle: "Energy-Efficient Home Upgrades Toronto 2025 | Save Money & Stay Warm",
+      seoDescription: "Top energy-efficient upgrades for Toronto homes. Ontario rebates, ROI calculations, and contractors for GTA energy improvements."
+    },
+    {
+      id: "10",
+      title: "Painting Your Toronto Home: Interior & Exterior Guide",
+      slug: "toronto-painting-guide-interior-exterior",
+      excerpt: "Refresh your Toronto home with a new paint job. Color trends, climate considerations, costs, and finding professional GTA painters.",
+      author: "Emily Watson",
+      publishedAt: "2024-12-30",
+      readTime: 7,
+      category: "Painting",
+      tags: ["toronto painting", "interior paint", "exterior paint", "GTA painters"],
+      imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Home Painting Guide 2025 | Interior & Exterior Tips",
+      seoDescription: "Complete painting guide for Toronto homeowners. Color trends, climate considerations, costs, and finding qualified GTA painting contractors."
+    },
+    {
+      id: "11",
+      title: "Toronto HVAC Systems: Choosing the Right Heating & Cooling",
+      slug: "toronto-hvac-heating-cooling-guide",
+      excerpt: "Stay comfortable year-round in Toronto. Compare HVAC systems for Ontario's climate, costs, energy efficiency, and top GTA HVAC contractors.",
+      author: "Kevin Lee",
+      publishedAt: "2024-12-28",
+      readTime: 10,
+      category: "HVAC",
+      tags: ["toronto hvac", "heating cooling", "GTA contractors", "energy efficiency"],
+      imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=500&fit=crop",
+      seoTitle: "Toronto HVAC Guide 2025 | Heating & Cooling Systems for Ontario",
+      seoDescription: "Choose the right HVAC system for your Toronto home. Compare options, costs, energy efficiency, and find qualified GTA HVAC contractors."
+    },
+    {
+      id: "12",
+      title: "Waterproofing Your Toronto Basement: Prevention & Solutions",
+      slug: "toronto-basement-waterproofing-guide",
+      excerpt: "Protect your Toronto home from water damage. Basement waterproofing methods, costs, signs of water problems, and qualified GTA contractors.",
+      author: "Rachel Green",
+      publishedAt: "2024-12-25",
       readTime: 9,
       category: "Basement",
-      tags: ["toronto waterproofing", "basement moisture", "GTA", "foundation", "drainage"],
-      imageUrl: "/blog/toronto-waterproofing.jpg",
-      seoTitle: "Toronto Basement Waterproofing Guide 2025 | GTA Moisture Solutions",
-      seoDescription: "Why waterproofing matters in Toronto. Solutions for GTA basement moisture, drainage problems, and expert waterproofing contractors in Ontario."
+      tags: ["toronto waterproofing", "basement", "water damage", "GTA contractors"],
+      imageUrl: "https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Basement Waterproofing 2025 | Protection & Solutions",
+      seoDescription: "Protect your Toronto basement from water damage. Waterproofing methods, costs, prevention tips, and finding qualified GTA contractors."
+    },
+    {
+      id: "13",
+      title: "Landscaping Ideas for Toronto Yards: Climate-Appropriate Plants",
+      slug: "toronto-landscaping-ideas-climate-plants",
+      excerpt: "Create a beautiful Toronto yard that thrives in Ontario's climate. Native plants, hardscaping ideas, costs, and finding GTA landscapers.",
+      author: "Daniel Brown",
+      publishedAt: "2024-12-22",
+      readTime: 8,
+      category: "Landscaping",
+      tags: ["toronto landscaping", "ontario plants", "GTA contractors", "garden design"],
+      imageUrl: "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Landscaping Guide 2025 | Climate-Appropriate Plants & Ideas",
+      seoDescription: "Beautiful landscaping for Toronto homes. Native Ontario plants, hardscaping ideas, costs, and finding qualified GTA landscaping contractors."
+    },
+    {
+      id: "14",
+      title: "Window Replacement in Toronto: Types, Costs & Energy Savings",
+      slug: "toronto-window-replacement-guide",
+      excerpt: "Upgrade your Toronto home's windows for better energy efficiency. Compare window types, costs, rebates, and top GTA window installers.",
+      author: "Patricia Miller",
+      publishedAt: "2024-12-20",
+      readTime: 9,
+      category: "Windows",
+      tags: ["toronto windows", "energy savings", "window replacement", "GTA contractors"],
+      imageUrl: "https://images.unsplash.com/photo-1545259742-24f9b04e9cfb?w=800&h=500&fit=crop",
+      seoTitle: "Window Replacement Toronto 2025 | Energy-Efficient Options & Costs",
+      seoDescription: "Replace your Toronto home windows for better efficiency. Types, costs, Ontario rebates, and finding qualified GTA window contractors."
+    },
+    {
+      id: "15",
+      title: "Home Insurance and Renovations in Toronto: What You Need to Know",
+      slug: "toronto-home-insurance-renovations",
+      excerpt: "Don't let renovations void your insurance! Learn how Toronto home improvements affect insurance, what to disclose, and protecting your investment.",
+      author: "Steven Adams",
+      publishedAt: "2024-12-18",
+      readTime: 7,
+      category: "Insurance",
+      tags: ["toronto insurance", "home renovations", "ontario insurance", "GTA"],
+      imageUrl: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=500&fit=crop",
+      seoTitle: "Toronto Home Insurance & Renovations 2025 | What to Know",
+      seoDescription: "Protect your Toronto renovation investment. How home improvements affect insurance, what to disclose, and Ontario insurance requirements."
     }
   ];
 
-  useEffect(() => {
-    // Simulate loading blog posts
-    setTimeout(() => {
-      setPosts(samplePosts);
-      setLoading(false);
-    }, 1000);
-  }, []);
+  const categories = ["all", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows"];
 
-  const categories = ["all", ...Array.from(new Set(posts.map(post => post.category)))];
-  
-  const filteredPosts = selectedCategory === "all" 
-    ? posts 
-    : posts.filter(post => post.category === selectedCategory);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  const filteredPosts = selectedCategory === "all"
+    ? blogPosts
+    : blogPosts.filter(post => post.category === selectedCategory);
 
   return (
     <>
-      <Head>
-        <title>Blog | Toronto Home Improvement Tips & Contractor Guides | QuotexBert</title>
-        <meta name="description" content="Expert Toronto home improvement tips, GTA contractor guides, and renovation advice. Get the latest insights on Toronto home projects, costs, and finding the right Ontario contractors." />
-        <meta name="keywords" content="toronto home improvement, GTA renovation tips, toronto contractors, ontario home repair, toronto remodeling, GTA home maintenance" />
-        <meta property="og:title" content="Blog | Toronto Home Improvement Tips & Contractor Guides" />
-        <meta property="og:description" content="Expert Toronto home improvement tips, GTA contractor guides, and renovation advice from Ontario industry professionals." />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="geo.region" content="CA-ON" />
-        <meta name="geo.placename" content="Toronto" />
-        <meta name="geo.position" content="43.6532;-79.3832" />
-        <meta name="ICBM" content="43.6532, -79.3832" />
-      </Head>
-
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-6 leading-tight">
-              Blog
-            </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Expert tips, guides, and insights for Greater Toronto Area homeowners. Make informed decisions about your GTA home improvement projects with local expertise.
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 text-white py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <h1 className="text-5xl font-bold mb-4">Toronto Home Renovation Blog</h1>
+            <p className="text-xl text-orange-100">
+              Expert advice, cost guides, and tips for GTA homeowners
             </p>
           </div>
+        </section>
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-                  selectedCategory === category
-                    ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg"
-                    : "bg-white/80 text-slate-700 hover:bg-orange-100 border border-orange-200"
-                }`}
-              >
-                {category === "all" ? "All Posts" : category}
-              </button>
-            ))}
-          </div>
-
-          {/* Blog Posts Grid */}
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPosts.map((post) => (
-                <article key={post.id} className="group">
-                  <Link href={`/blog/${post.slug}`} className="block">
-                    <div className="bg-gradient-to-br from-white/90 to-orange-50/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                      {/* Image */}
-                      <div className="h-48 bg-gradient-to-br from-orange-200 to-red-200 relative overflow-hidden">
-                        <img
-                          src={post.imageUrl || "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.src = "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop";
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black/20"></div>
-                        <div className="absolute bottom-4 left-4">
-                          <span className="px-3 py-1 bg-orange-600 text-white text-sm font-medium rounded-full">
-                            {post.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6">
-                        <h2 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-orange-700 transition-colors">
-                          {post.title}
-                        </h2>
-                        <p className="text-slate-600 mb-4 line-clamp-3">
-                          {post.excerpt}
-                        </p>
-
-                        {/* Meta info */}
-                        <div className="flex items-center justify-between text-sm text-slate-500">
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center">
-                              <UserIcon className="h-4 w-4 mr-1" />
-                              {post.author}
-                            </div>
-                            <div className="flex items-center">
-                              <ClockIcon className="h-4 w-4 mr-1" />
-                              {post.readTime} min read
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <CalendarDaysIcon className="h-4 w-4 mr-1" />
-                            {formatDate(post.publishedAt)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </article>
+        {/* Category Filter */}
+        <section className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedCategory === category
+                      ? "bg-gradient-to-r from-rose-700 to-orange-600 text-white shadow-md"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {category === "all" ? "All Articles" : category}
+                </button>
               ))}
             </div>
-          )}
+          </div>
+        </section>
 
-          {/* CTA Section */}
-          <div className="mt-20 bg-gradient-to-r from-red-50/80 to-orange-50/80 rounded-xl p-8 text-center shadow-lg">
-            <h3 className="text-2xl font-bold text-slate-900 mb-4">
-              Ready to Start Your Home Improvement Project?
-            </h3>
-            <p className="text-xl text-slate-600 mb-6">
-              Get instant estimates and connect with verified contractors in your area
+        {/* Blog Grid */}
+        <section className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post) => (
+              <article
+                key={post.id}
+                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group hover-lift"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-rose-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      {post.category}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-rose-800 transition-colors">
+                    {post.title}
+                  </h2>
+
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+
+                  <div className="flex items-center justify-between text-sm text-slate-500 mb-4">
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1">
+                        <CalendarDaysIcon className="w-4 h-4" />
+                        {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric"
+                        })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="w-4 h-4" />
+                        {post.readTime} min
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags.slice(0, 2).map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs text-rose-700 bg-rose-50 px-2 py-1 rounded-full"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center gap-2 text-rose-700 font-semibold hover:text-orange-600 transition-colors"
+                  >
+                    Read More
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-gradient-to-r from-rose-900 to-orange-900 text-white py-16 mt-12">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2 className="text-4xl font-bold mb-4">Ready to Start Your Renovation?</h2>
+            <p className="text-xl text-orange-100 mb-8">
+              Get instant estimates and connect with verified Toronto contractors
             </p>
-            <Link 
+            <Link
               href="/"
-              className="inline-block bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105"
+              className="inline-block bg-white text-rose-900 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
             >
-              Get Your Free Estimate
+              Get Free Estimate
             </Link>
           </div>
-        </div>
+        </section>
       </div>
     </>
   );
