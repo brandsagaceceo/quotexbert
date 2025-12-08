@@ -102,12 +102,18 @@ export async function POST(
 
     // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
     try {
+      // Get homeowner profile for city info
+      const homeownerWithProfile = await prisma.user.findUnique({
+        where: { id: estimate.homeownerId },
+        include: { homeownerProfile: true },
+      });
+
       await NotificationService.notifyAllContractors({
         leadId: lead.id,
         title: lead.title,
         description: lead.description,
         budget: lead.budget,
-        city: estimate.homeowner?.homeownerProfile?.city,
+        city: homeownerWithProfile?.homeownerProfile?.city,
       });
     } catch (notificationError) {
       console.error('Failed to notify contractors, but job was posted:', notificationError);

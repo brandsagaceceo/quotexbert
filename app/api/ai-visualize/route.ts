@@ -44,6 +44,10 @@ Important: Create a photorealistic image that looks like a professionally photog
       style: style === 'vivid' ? 'vivid' : 'natural',
     });
 
+    if (!response.data || response.data.length === 0) {
+      throw new Error('No image data returned from DALL-E');
+    }
+
     const imageUrl = response.data[0]?.url;
 
     if (!imageUrl) {
@@ -55,7 +59,7 @@ Important: Create a photorealistic image that looks like a professionally photog
     return NextResponse.json({
       success: true,
       imageUrl,
-      revisedPrompt: response.data[0]?.revised_prompt,
+      revisedPrompt: response.data[0]?.revised_prompt || null,
       message: 'Visualization generated successfully',
     });
   } catch (error: any) {
