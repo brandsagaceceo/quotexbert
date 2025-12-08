@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
+import { AIQuoteEstimator } from "@/components/ui/AIQuoteEstimator";
 import { useAuth } from "@/lib/hooks/useAuth";
 
-// Build: v4 - Professional redesign with animations - Dec 7 2025
+// Build: v5 - AI Quote Estimator + Custom Cursor + Real Images - Dec 8 2025
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
@@ -294,6 +295,75 @@ export default function Home() {
             )}
           </div>
 
+          {/* Featured Contractors Section */}
+          <div className="mb-16 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-center text-slate-900 mb-8">
+              Trusted by Toronto's Top Contractors
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
+                <Image
+                  src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=400&h=400&fit=crop"
+                  alt="Professional contractor installing kitchen cabinets"
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <div className="text-white">
+                    <p className="font-bold">Kitchen Pro</p>
+                    <p className="text-sm text-white/80">150+ Projects</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
+                <Image
+                  src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=400&fit=crop"
+                  alt="Contractor doing electrical work"
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <div className="text-white">
+                    <p className="font-bold">Electrical Expert</p>
+                    <p className="text-sm text-white/80">200+ Projects</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
+                <Image
+                  src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400&h=400&fit=crop"
+                  alt="Contractor doing plumbing work"
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <div className="text-white">
+                    <p className="font-bold">Plumbing Specialist</p>
+                    <p className="text-sm text-white/80">180+ Projects</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
+                <Image
+                  src="https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=400&fit=crop"
+                  alt="Roofing contractor at work"
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                  <div className="text-white">
+                    <p className="font-bold">Roofing Master</p>
+                    <p className="text-sm text-white/80">120+ Projects</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Trust Indicators Strip */}
           <div className="mb-6 py-4 px-6 bg-white/60 backdrop-blur-sm rounded-xl border border-orange-200/50 shadow-sm">
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-gray-700">
@@ -408,6 +478,13 @@ export default function Home() {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* AI Quote Estimator Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <AIQuoteEstimator />
         </div>
       </section>
 
