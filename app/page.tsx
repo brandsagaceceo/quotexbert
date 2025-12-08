@@ -481,9 +481,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Quote Estimator Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* AI Quote Estimator Section - BIG AND PROMINENT */}
+      <section id="ai-estimator" className="py-24 bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-rose-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          {/* BIG ATTENTION-GRABBING HEADER */}
+          <div className="text-center mb-12 animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-full shadow-lg mb-6 animate-pulse-glow">
+              <span className="text-2xl">🤖</span>
+              <span className="font-bold text-lg">AI-Powered Technology</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-6 leading-tight">
+              Get Your Instant Quote<br />
+              <span className="text-4xl md:text-6xl">In Seconds!</span>
+            </h2>
+            
+            <p className="text-xl md:text-2xl text-slate-700 max-w-3xl mx-auto mb-8">
+              📸 Snap a photo • 🎤 Describe your project • ✨ Receive AI estimate • 📊 Visualize the result
+            </p>
+          </div>
+          
           <AIQuoteEstimator />
         </div>
       </section>

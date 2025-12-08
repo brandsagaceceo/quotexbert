@@ -20,12 +20,12 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-ink-200 shadow-sm">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-white via-rose-50/30 to-orange-50/30 backdrop-blur-md border-b-2 border-rose-200 shadow-lg">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center h-16">
-          {/* Brand */}
-          <div className="flex-shrink-0">
-            <Logo size="md" showText={true} />
+        <div className="flex justify-between items-center h-20">
+          {/* Brand - BIGGER */}
+          <div className="flex-shrink-0 transform transition-transform hover:scale-105">
+            <Logo size="lg" showText={true} />
           </div>
 
           {/* Desktop Navigation */}
@@ -50,16 +50,16 @@ export default function SiteHeader() {
                 {user.role === 'homeowner' ? (
                   <Link
                     href="/create-lead"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    Post Project
+                    🏗️ Post Your Project
                   </Link>
                 ) : (
                   <Link
                     href="/contractor/jobs"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                    className="bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    View Jobs
+                    💼 Find Jobs
                   </Link>
                 )}
 
@@ -98,9 +98,9 @@ export default function SiteHeader() {
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
                 >
-                  Get Started
+                  ✨ Get Started Free
                 </Link>
               </>
             )}

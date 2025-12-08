@@ -11,10 +11,10 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: { width: 24, height: 24, textSize: "text-lg" },
-  md: { width: 32, height: 32, textSize: "text-xl" },
-  lg: { width: 48, height: 48, textSize: "text-2xl" },
-  xl: { width: 64, height: 64, textSize: "text-3xl" }
+  sm: { width: 32, height: 32, textSize: "text-lg" },
+  md: { width: 48, height: 48, textSize: "text-2xl" },
+  lg: { width: 64, height: 64, textSize: "text-3xl" },
+  xl: { width: 80, height: 80, textSize: "text-4xl" }
 };
 
 export default function Logo({ 
@@ -36,7 +36,7 @@ export default function Logo({
         priority
       />
       {showText && (
-        <span className={`font-bold bg-gradient-to-r from-red-900 to-teal-700 bg-clip-text text-transparent ${textSize}`}>
+        <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
           QuoteXbert
         </span>
       )}
