@@ -11,23 +11,8 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { getToken } = useAuth();
 
-  // Check if user already has a role on mount - if so, redirect to profile
-  useEffect(() => {
-    const checkRole = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for Clerk to initialize
-        const response = await fetch('/api/user/role');
-        const data = await response.json();
-        if (data.role && data.role !== null && data.role !== 'null') {
-          console.log("User already has role:", data.role, "- redirecting to profile");
-          window.location.href = "/profile";
-        }
-      } catch (error) {
-        console.error("Error checking role:", error);
-      }
-    };
-    checkRole();
-  }, []);
+  // Don't check role on mount - let user select freely
+  // The middleware and profile page will handle redirects
 
   const roles = [
     {
