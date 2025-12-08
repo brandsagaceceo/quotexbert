@@ -130,7 +130,7 @@ export default function PortfolioManagementPage() {
       // Upload image first
       // For demo purposes, we'll use a placeholder URL
       // In production, integrate with your S3 upload utility
-      const imageUrl = `https://via.placeholder.com/400x300/333/fff?text=${encodeURIComponent(formData.title)}`;
+      const imageUrl = `https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400&h=300&fit=crop`;
       
       // Create portfolio item
       const response = await fetch("/api/contractors/portfolio", {

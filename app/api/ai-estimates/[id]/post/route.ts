@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { NotificationService } from '@/lib/notifications';
 
 const prisma = new PrismaClient();
 
@@ -84,11 +85,25 @@ export async function POST(
       },
     });
 
+    // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
+    try {
+      await NotificationService.notifyAllContractors({
+        leadId: lead.id,
+        title: lead.title,
+        description: lead.description,
+        budget: lead.budget,
+        city: estimate.homeowner?.homeownerProfile?.city,
+      });
+    } catch (notificationError) {
+      console.error('Failed to notify contractors, but job was posted:', notificationError);
+      // Continue - job post succeeded even if notifications failed
+    }
+
     return NextResponse.json({
       success: true,
       estimate: updatedEstimate,
       lead: lead,
-      message: 'Successfully posted to job board',
+      message: 'Successfully posted to job board and notified all contractors!',
     });
   } catch (error: any) {
     console.error('Error posting estimate to job board:', error);

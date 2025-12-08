@@ -394,62 +394,27 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       {/* Header/Cover Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 h-64">
+      <div className="relative bg-gradient-to-r from-rose-600 to-orange-600 h-64">
         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         <div className="relative container mx-auto px-4 h-full flex items-end pb-6">
-          <div className="flex items-end space-x-6">
-            {/* Profile Photo */}
-            <div className="relative">
-              <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                {profile?.profilePhoto ? (
-                  <img 
-                    src={profile.profilePhoto} 
-                    alt="Profile" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="h-16 w-16 text-gray-400" />
-                )}
+          {/* Basic Info - NO PROFILE PHOTO */}
+          <div className="text-white">
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">{displayName}</h1>
+            <p className="text-orange-100 capitalize text-xl mb-2">{profile?.trade || authUser.role}</p>
+            {profile?.city && (
+              <div className="flex items-center mt-2 text-orange-100">
+                <MapPin className="h-5 w-5 mr-1" />
+                {profile.city}
               </div>
-              <input
-                type="file"
-                id="profilePictureInput"
-                accept="image/*"
-                onChange={handleProfilePictureUpload}
-                className="hidden"
-              />
-              <button 
-                onClick={() => document.getElementById('profilePictureInput')?.click()}
-                disabled={isUploading}
-                className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-2 rounded-full shadow-lg transition-colors"
-              >
-                {isUploading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                ) : (
-                  <Camera className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-            
-            {/* Basic Info */}
-            <div className="text-white mb-4">
-              <h1 className="text-3xl font-bold">{displayName}</h1>
-              <p className="text-blue-100 capitalize text-lg">{profile?.trade || authUser.role}</p>
-              {profile?.city && (
-                <div className="flex items-center mt-2 text-blue-100">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {profile.city}
-                </div>
-              )}
-              {isContractor && profile?.verified && (
-                <div className="flex items-center mt-2 text-green-300">
-                  <Award className="h-4 w-4 mr-1" />
-                  Verified Contractor
-                </div>
-              )}
-            </div>
+            )}
+            {isContractor && profile?.verified && (
+              <div className="flex items-center mt-2 text-green-300">
+                <Award className="h-5 w-5 mr-1" />
+                Verified Contractor
+              </div>
+            )}
           </div>
           
           {/* Edit Button */}
@@ -457,7 +422,7 @@ export default function UnifiedProfilePage() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 flex items-center"
+                className="bg-white text-rose-700 px-4 py-2 rounded-lg font-medium hover:bg-rose-50 flex items-center"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit Profile
@@ -466,7 +431,7 @@ export default function UnifiedProfilePage() {
               <div className="flex space-x-2">
                 <button
                   onClick={handleSaveProfile}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 flex items-center"
+                  className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg flex items-center"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Save

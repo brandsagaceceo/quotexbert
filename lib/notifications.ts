@@ -113,6 +113,53 @@ export class NotificationService {
   }
 
   /**
+   * Notify ALL contractors about a new job post immediately
+   */
+  static async notifyAllContractors(jobDetails: {
+    leadId: string;
+    title: string;
+    description: string;
+    budget: string;
+    city?: string;
+  }): Promise<void> {
+    try {
+      // Get ALL contractors (not just subscribed ones)
+      const contractors = await prisma.user.findMany({
+        where: { role: 'contractor' },
+        include: { contractorProfile: true },
+      });
+
+      console.log(`🔔 Notifying ${contractors.length} contractors about new job: ${jobDetails.title}`);
+
+      // Create notifications for all contractors in parallel
+      const notificationPromises = contractors.map(contractor =>
+        this.create({
+          userId: contractor.id,
+          type: 'LEAD_MATCHED',
+          payload: {
+            leadId: jobDetails.leadId,
+            title: jobDetails.title,
+            description: jobDetails.description.substring(0, 200) + '...',
+            budget: jobDetails.budget,
+            city: jobDetails.city || 'Not specified',
+          },
+          sendEmail: true,
+          sendSms: false,
+        }).catch(err => {
+          console.error(`❌ Failed to notify contractor ${contractor.id}:`, err);
+          return null; // Continue even if one fails
+        })
+      );
+
+      await Promise.all(notificationPromises);
+      console.log(`✅ Successfully notified all contractors about job ${jobDetails.leadId}`);
+    } catch (error) {
+      console.error('❌ Error notifying all contractors:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Send email notification
    */
   private static async sendEmailNotification(
