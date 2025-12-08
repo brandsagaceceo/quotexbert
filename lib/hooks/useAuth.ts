@@ -30,6 +30,9 @@ export function useAuth() {
           const data = await response.json();
           if (data.role) {
             role = data.role;
+          } else {
+            // If API returns null/undefined, keep role as undefined
+            role = undefined;
           }
         } catch (error) {
           console.error('Error fetching user role:', error);
@@ -37,14 +40,25 @@ export function useAuth() {
           setRoleLoading(false);
         }
         
-        // Map Clerk user to our User interface
-        setAuthUser({
-          id: clerkUser.id,
-          email: clerkUser.primaryEmailAddress?.emailAddress || '',
-          name: clerkUser.fullName || clerkUser.firstName || 'User',
-          role: role || 'homeowner', // fallback if none returned
-          profilePhoto: clerkUser.imageUrl
-        });
+        // Only set authUser if we have a role - otherwise set null so pages know user needs onboarding
+        if (role) {
+          setAuthUser({
+            id: clerkUser.id,
+            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+            name: clerkUser.fullName || clerkUser.firstName || 'User',
+            role: role,
+            profilePhoto: clerkUser.imageUrl
+          });
+        } else {
+          // User is signed in but has no role - set a partial user object
+          setAuthUser({
+            id: clerkUser.id,
+            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+            name: clerkUser.fullName || clerkUser.firstName || 'User',
+            role: null as any, // No role yet - needs onboarding
+            profilePhoto: clerkUser.imageUrl
+          });
+        }
       } else if (isLoaded) {
         setAuthUser(null);
       }
