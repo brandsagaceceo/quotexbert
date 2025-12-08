@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Upload, DollarSign, Clock, AlertCircle, CheckCircle } from "lucide-react";
+import { Sparkles, Upload, DollarSign, Clock, AlertCircle, CheckCircle, Image as ImageIcon, Wand2 } from "lucide-react";
 
 interface AIQuote {
   estimatedCostLow: number;
@@ -31,6 +31,8 @@ export function AIQuoteEstimator() {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [quote, setQuote] = useState<AIQuote | null>(null);
+  const [visualizationUrl, setVisualizationUrl] = useState<string | null>(null);
+  const [generatingViz, setGeneratingViz] = useState(false);
 
   const categories = [
     "General Contracting",
@@ -90,6 +92,35 @@ export function AIQuoteEstimator() {
       alert("Failed to generate quote. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateVisualization = async () => {
+    if (!quote || !jobDescription) return;
+
+    setGeneratingViz(true);
+    try {
+      const response = await fetch("/api/ai-visualize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: jobDescription,
+          items: quote.recommendedSpecialties,
+          style: 'natural'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate visualization");
+      }
+
+      const data = await response.json();
+      setVisualizationUrl(data.imageUrl);
+    } catch (error) {
+      console.error("Error generating visualization:", error);
+      alert("Failed to generate visualization. Please try again.");
+    } finally {
+      setGeneratingViz(false);
     }
   };
 
@@ -333,10 +364,71 @@ export function AIQuoteEstimator() {
             </div>
           </div>
 
+          {/* AI Visualization Section */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl shadow-xl border-2 border-purple-200 p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Wand2 className="w-8 h-8 text-purple-600" />
+              <div>
+                <h4 className="text-2xl font-bold text-slate-900">✨ Visualize Your Project</h4>
+                <p className="text-slate-600">See what your finished project will look like with AI-generated images</p>
+              </div>
+            </div>
+
+            {!visualizationUrl ? (
+              <button
+                onClick={handleGenerateVisualization}
+                disabled={generatingViz}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              >
+                {generatingViz ? (
+                  <>
+                    <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
+                    <span>AI Creating Your Vision...</span>
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon className="w-6 h-6" />
+                    <span>Generate AI Visualization (FREE)</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img 
+                    src={visualizationUrl} 
+                    alt="AI Generated Visualization" 
+                    className="w-full h-auto animate-fade-in"
+                  />
+                  <div className="absolute top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                    🎨 AI Generated
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleGenerateVisualization}
+                    disabled={generatingViz}
+                    className="flex-1 px-4 py-3 border-2 border-purple-300 text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors disabled:opacity-50"
+                  >
+                    {generatingViz ? "Generating..." : "Generate New Vision"}
+                  </button>
+                  <button
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                  >
+                    📸 Post with This Photo
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Actions */}
           <div className="flex gap-4">
             <button
-              onClick={() => setQuote(null)}
+              onClick={() => {
+                setQuote(null);
+                setVisualizationUrl(null);
+              }}
               className="flex-1 px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
             >
               Try Another Quote
@@ -344,7 +436,7 @@ export function AIQuoteEstimator() {
             <button
               className="flex-1 px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
             >
-              Get Professional Quotes
+              {visualizationUrl ? "Post to Job Board with Photos" : "Get Professional Quotes"}
             </button>
           </div>
 

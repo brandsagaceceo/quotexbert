@@ -75,6 +75,10 @@ export async function POST(
       },
     });
 
+    // Get visualization image URL from request body if provided
+    const body = await request.json().catch(() => ({}));
+    const visualizationUrl = body.visualizationUrl || null;
+
     // Update the estimate with the lead ID and status
     const updatedEstimate = await prisma.aIEstimate.update({
       where: { id },
@@ -84,6 +88,17 @@ export async function POST(
         isPublic: true,
       },
     });
+
+    // If visualization URL provided, update the lead with it
+    if (visualizationUrl) {
+      await prisma.lead.update({
+        where: { id: lead.id },
+        data: {
+          // Store visualization in photos field (JSON array)
+          photos: JSON.stringify([visualizationUrl]),
+        },
+      });
+    }
 
     // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
     try {
@@ -103,7 +118,10 @@ export async function POST(
       success: true,
       estimate: updatedEstimate,
       lead: lead,
-      message: 'Successfully posted to job board and notified all contractors!',
+      hasVisualization: !!visualizationUrl,
+      message: visualizationUrl 
+        ? 'Successfully posted to job board with AI visualization and notified all contractors! 🎨'
+        : 'Successfully posted to job board and notified all contractors!',
     });
   } catch (error: any) {
     console.error('Error posting estimate to job board:', error);
