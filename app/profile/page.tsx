@@ -97,35 +97,53 @@ export default function UnifiedProfilePage() {
     // Wait for auth to load
     if (authLoading) {
       console.log("[ProfilePage] Auth still loading...");
+      setIsLoading(true);
       return;
     }
 
     // If not signed in, redirect
     if (!isSignedIn || !authUser) {
       console.log("[ProfilePage] Not signed in, redirecting to sign-in");
+      setIsLoading(false);
       router.push("/sign-in");
       return;
     }
 
-    // Check if user has a role - if not, send to onboarding
-    if (!authUser.role || authUser.role === 'null' || authUser.role === null) {
-      console.log("[ProfilePage] No role set, redirecting to onboarding");
-      router.push("/onboarding");
-      return;
-    }
-
-    // Once we have authUser with role, load the profile
+    // Once we have authUser, load the profile (even without role)
     const fetchProfileData = async () => {
       try {
-        console.log("[ProfilePage] Starting fetchProfileData for user:", authUser.id);
+        console.log("[ProfilePage] Starting fetchProfileData for user:", authUser.id, "role:", authUser.role);
         setIsLoading(true);
         
+        // Fetch the actual role from the server first
+        let userRole = authUser.role;
+        try {
+          const roleResponse = await fetch('/api/user/role');
+          const roleData = await roleResponse.json();
+          if (roleData.role) {
+            userRole = roleData.role;
+          } else if (!userRole) {
+            // No role in either place - send to onboarding
+            console.log("[ProfilePage] No role found, redirecting to onboarding");
+            router.push("/onboarding");
+            setIsLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.log("[ProfilePage] Error fetching role:", error);
+          if (!userRole) {
+            router.push("/onboarding");
+            setIsLoading(false);
+            return;
+          }
+        }
+
         // Create a basic profile from authUser
         const basicProfile: ProfileData = {
           id: authUser.id,
           email: authUser.email,
           name: authUser.name || authUser.email,
-          role: authUser.role,
+          role: userRole,
         };
         
         // Always set the basic profile first so page can render
@@ -156,7 +174,7 @@ export default function UnifiedProfilePage() {
         }
 
         // Fetch portfolio if contractor
-        if (authUser.role === 'contractor') {
+        if (userRole === 'contractor') {
           try {
             const portfolioResponse = await fetch(`/api/contractors/portfolio?contractorId=${authUser.id}`);
             if (portfolioResponse.ok) {
