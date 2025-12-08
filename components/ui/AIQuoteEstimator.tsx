@@ -231,22 +231,34 @@ export function AIQuoteEstimator() {
             </p>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit Button - ENHANCED */}
           <button
             onClick={handleGetQuote}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="group relative w-full bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-rose-500/50 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
           >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                AI Analyzing Your Project...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Get AI Estimate
-              </>
+            {/* Animated background shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            
+            {/* Button content */}
+            <div className="relative flex items-center justify-center gap-3">
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
+                  <span className="animate-pulse">AI Analyzing Your Project...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-7 h-7 animate-pulse" />
+                  <span>✨ Get My AI Estimate Now ✨</span>
+                  <Sparkles className="w-7 h-7 animate-pulse" style={{ animationDelay: "0.5s" }} />
+                </>
+              )}
+            </div>
+            
+            {/* Pulsing glow ring */}
+            {!loading && (
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-700 to-orange-600 opacity-0 group-hover:opacity-50 blur-xl group-hover:animate-pulse"></div>
             )}
           </button>
         </div>

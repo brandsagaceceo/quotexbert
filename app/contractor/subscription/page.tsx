@@ -148,22 +148,62 @@ export default function ContractorSubscription() {
     );
   }
 
+  const totalCategories = categories.length;
+  const allAccessPrice = 199; // Special all-access price
+  const regularPrice = categories.reduce((sum, cat) => sum + cat.price, 0); // Regular total
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
+        {/* ALL ACCESS DEAL - Hero Banner */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 rounded-3xl shadow-2xl p-8 md:p-12 mb-12 animate-fade-in-up">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative z-10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-white text-center md:text-left">
+                <div className="inline-block bg-yellow-400 text-rose-900 px-4 py-2 rounded-full text-sm font-bold mb-4 animate-pulse">
+                  🔥 BEST VALUE - SAVE ${regularPrice - allAccessPrice}!
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black mb-3">ALL ACCESS PASS</h2>
+                <p className="text-xl md:text-2xl text-white/90 mb-4">
+                  Get <span className="font-bold">{totalCategories} Categories</span> for ONE Low Price!
+                </p>
+                <div className="flex items-center gap-4 justify-center md:justify-start">
+                  <span className="text-5xl font-black">${allAccessPrice}</span>
+                  <div className="text-left">
+                    <div className="text-sm line-through opacity-75">${regularPrice}/mo</div>
+                    <div className="text-sm font-semibold">/month</div>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedCategories(categories.map(c => c.id));
+                }}
+                className="group relative px-8 py-5 bg-white text-rose-700 rounded-2xl font-black text-xl shadow-2xl hover:shadow-white/50 transform hover:scale-110 transition-all duration-300 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span className="relative z-10 group-hover:text-white">
+                  ✨ Select All Access ✨
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-lg mb-6 animate-fade-in">
             <Sparkles className="w-5 h-5 text-orange-600" />
-            <span className="text-sm font-semibold text-slate-700">Grow Your Business</span>
+            <span className="text-sm font-semibold text-slate-700">Or Choose Individual Categories</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 animate-fade-in-up">
-            Choose Your Plan
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 animate-fade-in-up">
+            À La Carte Pricing
           </h1>
           
-          <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Select service categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly
+          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Select specific categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly
           </p>
 
           {/* Trust Badges */}

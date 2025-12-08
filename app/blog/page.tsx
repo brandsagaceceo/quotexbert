@@ -48,7 +48,7 @@ export default function BlogPage() {
       readTime: 10,
       category: "Kitchen",
       tags: ["toronto kitchen", "renovation costs", "GTA pricing", "kitchen remodel"],
-      imageUrl: "https://images.unsplash.com/photo-1556912167-f556f1f39faa?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=500&fit=crop&q=80",
       seoTitle: "Toronto Kitchen Renovation Costs 2025 | GTA Pricing Guide",
       seoDescription: "Complete kitchen renovation cost guide for Toronto homeowners. GTA pricing, permit costs, and budgeting tips for your Toronto kitchen remodel."
     },
@@ -90,7 +90,7 @@ export default function BlogPage() {
       readTime: 9,
       category: "Roofing",
       tags: ["toronto roofing", "roof replacement", "GTA roofers", "ontario winter"],
-      imageUrl: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=800&h=500&fit=crop&q=80",
       seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
       seoDescription: "Expert Toronto roofing advice. Learn when to repair vs replace, costs, winter damage prevention, and finding qualified Ontario roofers."
     },
@@ -216,7 +216,7 @@ export default function BlogPage() {
       readTime: 9,
       category: "Windows",
       tags: ["toronto windows", "energy savings", "window replacement", "GTA contractors"],
-      imageUrl: "https://images.unsplash.com/photo-1545259742-24f9b04e9cfb?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1621905252472-67082d6e5e4a?w=800&h=500&fit=crop&q=80",
       seoTitle: "Window Replacement Toronto 2025 | Energy-Efficient Options & Costs",
       seoDescription: "Replace your Toronto home windows for better efficiency. Types, costs, Ontario rebates, and finding qualified GTA window contractors."
     },
@@ -272,7 +272,7 @@ export default function BlogPage() {
       readTime: 8,
       category: "Basement",
       tags: ["garage conversion", "toronto renovation", "GTA contractors", "home addition"],
-      imageUrl: "https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=800&h=500&fit=crop&q=80",
       seoTitle: "Toronto Garage Conversion 2025 | Ideas, Permits & Costs",
       seoDescription: "Convert your Toronto garage into living space. Design ideas, permits, insulation for Ontario climate, costs, and GTA contractors."
     },
@@ -328,7 +328,7 @@ export default function BlogPage() {
       readTime: 8,
       category: "Contractor Tips",
       tags: ["fire safety", "building code", "toronto", "ontario"],
-      imageUrl: "https://images.unsplash.com/photo-1592833159057-c4ea70ad9dd8?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=500&fit=crop&q=80",
       seoTitle: "Fire Safety Upgrades Toronto 2025 | Code Requirements & Costs",
       seoDescription: "Upgrade fire safety in your Toronto home. Ontario Building Code requirements, costs, and finding qualified GTA fire safety contractors."
     },

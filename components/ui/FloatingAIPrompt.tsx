@@ -75,9 +75,9 @@ export function FloatingAIPrompt() {
 
           {/* Animated dots */}
           <div className="absolute -top-2 -right-2 flex gap-1">
-            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
-            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-            <div className="w-3 h-3 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+            <div className="w-3 h-3 bg-white shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
+            <div className="w-3 h-3 bg-orange-400 shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+            <div className="w-3 h-3 bg-rose-400 shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
           </div>
         </div>
       </Link>
