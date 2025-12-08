@@ -6,7 +6,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
+  console.log("[API/profile] GET called. userId:", userId);
+
   if (!userId) {
+    console.log("[API/profile] No userId provided");
     return NextResponse.json({ error: "User ID required" }, { status: 400 });
   }
 
@@ -31,7 +34,10 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    console.log("[API/profile] DB user:", user);
+
     if (!user) {
+      console.log("[API/profile] User not found in DB");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -48,7 +54,6 @@ export async function GET(request: NextRequest) {
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
-      
       // Contractor-specific data
       ...(user.contractorProfile && {
         companyName: user.contractorProfile.companyName,
@@ -66,7 +71,6 @@ export async function GET(request: NextRequest) {
         completedJobs: user._count.acceptedLeads,
         isActive: user.contractorProfile.isActive
       }),
-      
       // Homeowner-specific data
       ...(user.homeownerProfile && {
         name: user.homeownerProfile.name,
@@ -78,9 +82,10 @@ export async function GET(request: NextRequest) {
       })
     };
 
+    console.log("[API/profile] Returning profile:", profile);
     return NextResponse.json(profile);
   } catch (error) {
-    console.error("Error fetching profile:", error);
+    console.error("[API/profile] Error fetching profile:", error);
     return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
   }
 }

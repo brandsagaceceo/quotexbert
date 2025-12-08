@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 
@@ -10,6 +10,23 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { getToken } = useAuth();
+
+  // Check if user already has a role on mount - if so, redirect to profile
+  useEffect(() => {
+    const checkRole = async () => {
+      try {
+        const response = await fetch('/api/user/role');
+        const data = await response.json();
+        if (data.role && data.role !== null) {
+          console.log("User already has role:", data.role, "- redirecting to profile");
+          window.location.href = "/profile";
+        }
+      } catch (error) {
+        console.error("Error checking role:", error);
+      }
+    };
+    checkRole();
+  }, []);
 
   const roles = [
     {
@@ -55,13 +72,10 @@ export default function OnboardingPage() {
       // Force Clerk to refresh the session to get updated publicMetadata
       await getToken({ template: "supabase" }).catch(() => getToken());
       
-      console.log("Step 5: Session refreshed, redirecting to profile...");
+      console.log("Step 5: Session refreshed, reloading page...");
       
-      // Add a small delay to ensure metadata has propagated
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      router.push("/profile");
-      router.refresh(); // Force Next.js to refetch data
+      // Force full page reload to clear all caches and re-check role
+      window.location.reload();
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";

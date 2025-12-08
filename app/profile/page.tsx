@@ -94,42 +94,20 @@ export default function UnifiedProfilePage() {
   });
 
   useEffect(() => {
+    // Wait for auth to load
     if (authLoading) return;
 
+    // If not signed in, redirect
     if (!isSignedIn || !authUser) {
       router.push("/sign-in");
       return;
     }
 
-    // Check if user has completed onboarding (selected a role)
-    // Fetch their actual role from the API to be sure
-    const checkOnboarding = async () => {
-      try {
-        const roleResponse = await fetch('/api/user/role');
-        const roleData = await roleResponse.json();
-        
-        if (!roleData.role || roleData.role === null) {
-          console.log("User has no role, redirecting to onboarding");
-          router.push("/onboarding");
-          return false;
-        }
-        return true;
-      } catch (error) {
-        console.error("Error checking role:", error);
-        return true; // If check fails, let them through
-      }
-    };
-
+    // Once we have authUser, load the profile
     const fetchProfileData = async () => {
       try {
+        console.log("[ProfilePage] Starting fetchProfileData");
         setIsLoading(true);
-        
-        // First check if user has completed onboarding
-        const hasRole = await checkOnboarding();
-        if (!hasRole) {
-          setIsLoading(false);
-          return; // Stop here, user is being redirected
-        }
         
         // Create a basic profile from authUser
         const basicProfile: ProfileData = {
@@ -139,25 +117,31 @@ export default function UnifiedProfilePage() {
           role: authUser.role,
         };
         
-        // Fetch extended profile data
-        const profileResponse = await fetch(`/api/profile?userId=${authUser.id}`);
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          setProfile(profileData);
-          
-          // Initialize edit data
-          setEditData({
-            companyName: profileData.companyName || '',
-            trade: profileData.trade || '',
-            bio: profileData.bio || '',
-            city: profileData.city || '',
-            phone: profileData.phone || '',
-            website: profileData.website || '',
-            serviceRadiusKm: profileData.serviceRadiusKm || 25
-          });
-        } else {
-          // If profile doesn't exist yet, use basic profile
-          setProfile(basicProfile);
+        // Always set the basic profile first so page can render
+        setProfile(basicProfile);
+        console.log("[ProfilePage] Set basicProfile:", basicProfile);
+        
+        // Fetch extended profile data in background
+        try {
+          const profileResponse = await fetch(`/api/profile?userId=${authUser.id}`);
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            console.log("[ProfilePage] Loaded profileData:", profileData);
+            setProfile(profileData);
+            
+            // Initialize edit data
+            setEditData({
+              companyName: profileData.companyName || '',
+              trade: profileData.trade || '',
+              bio: profileData.bio || '',
+              city: profileData.city || '',
+              phone: profileData.phone || '',
+              website: profileData.website || '',
+              serviceRadiusKm: profileData.serviceRadiusKm || 25
+            });
+          }
+        } catch (error) {
+          console.log("[ProfilePage] Error fetching extended profile, using basic profile");
         }
 
         // Fetch portfolio if contractor
@@ -166,10 +150,11 @@ export default function UnifiedProfilePage() {
             const portfolioResponse = await fetch(`/api/contractors/portfolio?contractorId=${authUser.id}`);
             if (portfolioResponse.ok) {
               const portfolioData = await portfolioResponse.json();
+              console.log("[ProfilePage] Loaded portfolioData:", portfolioData);
               setPortfolio(portfolioData || []);
             }
           } catch (error) {
-            console.log("Portfolio not available yet");
+            console.log("[ProfilePage] Portfolio not available yet");
           }
 
           // Fetch jobs
@@ -177,19 +162,22 @@ export default function UnifiedProfilePage() {
             const jobsResponse = await fetch(`/api/jobs?contractorId=${authUser.id}`);
             if (jobsResponse.ok) {
               const jobsData = await jobsResponse.json();
+              console.log("[ProfilePage] Loaded jobsData:", jobsData);
               setJobs(jobsData.jobs?.slice(0, 5) || []);
             }
           } catch (error) {
-            console.log("Jobs not available yet");
+            console.log("[ProfilePage] Jobs not available yet");
           }
         }
       } catch (error) {
-        console.error("Error fetching profile data:", error);
+        console.error("[ProfilePage] Error fetching profile data:", error);
       } finally {
+        console.log("[ProfilePage] Setting isLoading to false");
         setIsLoading(false);
       }
     };
 
+    console.log("[ProfilePage] About to call fetchProfileData");
     fetchProfileData();
   }, [isSignedIn, authUser, authLoading, router]);
 
@@ -349,7 +337,7 @@ export default function UnifiedProfilePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your profile...</p>
+          <p className="text-gray-600">Loading auth... (v2)</p>
         </div>
       </div>
     );
@@ -360,15 +348,19 @@ export default function UnifiedProfilePage() {
   }
 
   if (isLoading) {
+    console.log("[ProfilePage RENDER] Showing loading spinner, isLoading:", isLoading);
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Setting up your profile...</p>
+          <p className="text-gray-600">Setting up profile... (loading data)</p>
+          <p className="text-xs text-gray-400 mt-2">Debug: authUser={authUser?.email}, isLoading={String(isLoading)}</p>
         </div>
       </div>
     );
   }
+
+  console.log("[ProfilePage RENDER] Rendering main profile, profile:", profile);
 
   const displayName = profile?.companyName || profile?.name || authUser.email;
   const isContractor = authUser.role === 'contractor';
