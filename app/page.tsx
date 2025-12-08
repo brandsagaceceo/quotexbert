@@ -1,15 +1,32 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
 import { useAuth } from "@/lib/hooks/useAuth";
 
-// Build: v3 - Cache invalidation force refresh - Dec 5 2025 22:15
+// Build: v4 - Professional redesign with animations - Dec 7 2025
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalJobs: 0, totalContractors: 0, avgRating: 4.8 });
   const { authUser: user, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    // Fetch recent reviews
+    fetch('/api/reviews?limit=6')
+      .then(res => res.json())
+      .then(data => setReviews(data.reviews || []))
+      .catch(err => console.error('Error fetching reviews:', err));
+
+    // Fetch stats
+    fetch('/api/stats')
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(err => console.error('Error fetching stats:', err));
+  }, []);
 
   const testimonials = [
     {
@@ -17,18 +34,21 @@ export default function Home() {
       location: "Toronto, ON",
       text: "Got quotes from GTA contractors in under 5 minutes using voice input. Saved over $2,000 on my downtown Toronto kitchen renovation!",
       rating: 5,
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
     },
     {
       name: "Mike R.",
       location: "Mississauga, ON",
       text: "Amazing service! Found a reliable Mississauga roofer through the instant estimator. The voice feature made it so easy to describe my project!",
       rating: 5,
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
     },
     {
       name: "Jennifer L.",
       location: "North York, ON",
       text: "The photo upload and voice description made getting estimates for my North York condo renovation super simple. Highly recommend!",
       rating: 5,
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
     },
   ];
 
@@ -182,19 +202,74 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceData) }}
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
-        {/* Hero Section with Prominent Estimator */}
-        <section className="py-8 sm:py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-4">
-              Get Instant Home Improvement Estimates
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 -mx-4 md:-mx-6 lg:-mx-8">
+        {/* Animated Hero Section */}
+        <section className="relative py-12 sm:py-20 overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
+          
+          {/* Floating Elements */}
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+          <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-40 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          {/* Trust Badges */}
+          <div className="flex flex-wrap justify-center gap-6 mb-8 animate-fade-in">
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+              <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-slate-700">{stats.totalContractors}+ Verified Contractors</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+              <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              <span className="text-sm font-medium text-slate-700">{stats.avgRating} Average Rating</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">
+              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium text-slate-700">Stripe-Secured Payments</span>
+            </div>
+          </div>
+
+          {/* Hero Content */}
+          <div className="text-center mb-12 animate-fade-in-up">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-900 via-cyan-700 to-blue-800 bg-clip-text text-transparent mb-6 leading-tight">
+              Toronto's Most Trusted
+              <br />
+              Home Improvement Platform
             </h1>
-            <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Use voice or photos to describe your project and get accurate estimates instantly
+            <p className="text-xl sm:text-2xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
+              Connect with verified contractors, get instant AI estimates, and transform your home with confidence
             </p>
             
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              {!isSignedIn && (
+                <>
+                  <Link 
+                    href="/sign-up"
+                    className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
+                  >
+                    Get Started Free
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </Link>
+                  <Link 
+                    href="/sign-in"
+                    className="px-8 py-4 bg-white text-blue-700 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg border-2 border-blue-100 hover:border-blue-300 transition-all duration-200"
+                  >
+                    Sign In
+                  </Link>
+                </>
+              )}
+            </div>
+
             {/* Quick Action for Homeowners */}
             {isSignedIn && user?.role === 'homeowner' && (
               <div className="mt-6">

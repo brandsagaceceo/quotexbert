@@ -82,8 +82,8 @@ async function seedTorontoJobs() {
   // Create contractor users
   const contractors = [];
   for (let i = 0; i < contractorCompanies.length; i++) {
-    const company = contractorCompanies[i];
-    const city = torontoCities[i % torontoCities.length];
+    const company = contractorCompanies[i]!;
+    const city = torontoCities[i % torontoCities.length]!;
     
     const contractor = await prisma.user.create({
       data: {
@@ -101,7 +101,6 @@ async function seedTorontoJobs() {
             phone: `(416) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
             verified: true,
             isActive: true,
-            avgRating: 4.5 + Math.random() * 0.5, // 4.5 to 5.0
           }
         }
       }
@@ -113,9 +112,9 @@ async function seedTorontoJobs() {
 
   // Create homeowner users and jobs
   for (let i = 0; i < 50; i++) {
-    const jobType = jobTypes[i % jobTypes.length];
-    const postalCode = torontoPostalCodes[i % torontoPostalCodes.length];
-    const city = torontoCities[i % torontoCities.length];
+    const jobType = jobTypes[i % jobTypes.length]!;
+    const postalCode = torontoPostalCodes[i % torontoPostalCodes.length]!;
+    const city = torontoCities[i % torontoCities.length]!;
     
     const homeowner = await prisma.user.create({
       data: {
@@ -136,12 +135,9 @@ async function seedTorontoJobs() {
             description: jobType.description,
             category: jobType.type,
             budget: jobType.budget,
-            city: city,
-            postalCode: postalCode,
-            timeline: ['Within 1 month', 'Within 3 months', 'Flexible'][Math.floor(Math.random() * 3)],
-            status: ['OPEN', 'PENDING', 'ACCEPTED'][Math.floor(Math.random() * 3)],
-            urgency: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-            propertyType: ['house', 'condo', 'townhouse'][Math.floor(Math.random() * 3)],
+            zipCode: postalCode,
+            status: ['open', 'draft'][Math.floor(Math.random() * 2)] as any,
+            published: true,
           }
         }
       },
