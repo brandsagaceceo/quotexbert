@@ -8,6 +8,7 @@ import {
   MapPin,
   Phone,
   Globe,
+  Clock,
   Mail,
   Star,
   Award,
@@ -394,60 +395,167 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
-      {/* Header/Cover Section */}
-      <div className="relative bg-gradient-to-r from-rose-600 to-orange-600 h-64">
-        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-        <div className="relative container mx-auto px-4 h-full flex items-end pb-6">
-          {/* Basic Info - NO PROFILE PHOTO */}
-          <div className="text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">{displayName}</h1>
-            <p className="text-orange-100 capitalize text-xl mb-2">{profile?.trade || authUser.role}</p>
-            {profile?.city && (
-              <div className="flex items-center mt-2 text-orange-100">
-                <MapPin className="h-5 w-5 mr-1" />
-                {profile.city}
-              </div>
-            )}
-            {isContractor && profile?.verified && (
-              <div className="flex items-center mt-2 text-green-300">
-                <Award className="h-5 w-5 mr-1" />
-                Verified Contractor
-              </div>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+      {/* Cover Photo Section */}
+      <div className="relative h-80 md:h-96 overflow-hidden">
+        {/* Cover Photo */}
+        <div className="absolute inset-0">
+          {profile?.coverPhoto ? (
+            <img 
+              src={profile.coverPhoto} 
+              alt="Cover" 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600">
+              {/* Default cover with pattern */}
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+              }}></div>
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"></div>
+        </div>
+
+        {/* Cover Photo Edit Button */}
+        {isEditing && (
+          <div className="absolute top-4 right-4 z-10">
+            <input
+              type="file"
+              id="coverPhotoInput"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // TODO: Upload to storage and set URL
+                  console.log('Cover photo selected:', file);
+                }
+              }}
+              className="hidden"
+            />
+            <button
+              onClick={() => document.getElementById('coverPhotoInput')?.click()}
+              className="bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
+            >
+              <Camera className="h-4 w-4" />
+              Change Cover
+            </button>
           </div>
-          
-          {/* Edit Button */}
-          <div className="ml-auto mb-4">
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-white text-rose-700 px-4 py-2 rounded-lg font-medium hover:bg-rose-50 flex items-center"
-              >
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit Profile
-              </button>
-            ) : (
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleSaveProfile}
-                  className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg flex items-center"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
-                </button>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-700 flex items-center"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </button>
+        )}
+
+        {/* Profile Info Container - Overlaps cover photo */}
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-20">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex flex-col md:flex-row md:items-end gap-6">
+              {/* Profile Picture */}
+              <div className="relative group">
+                <div className="relative w-40 h-40 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                  {profile?.profilePhoto ? (
+                    <img 
+                      src={profile.profilePhoto} 
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-600 to-orange-600">
+                      <User className="h-20 w-20 text-white" />
+                    </div>
+                  )}
+                  
+                  {/* Edit overlay */}
+                  {isEditing && (
+                    <>
+                      <input
+                        type="file"
+                        id="profilePhotoInput"
+                        accept="image/*"
+                        onChange={handleProfilePictureUpload}
+                        className="hidden"
+                      />
+                      <button
+                        onClick={() => document.getElementById('profilePhotoInput')?.click()}
+                        disabled={isUploading}
+                        className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        {isUploading ? (
+                          <div className="animate-spin rounded-full h-8 w-8 border-3 border-white border-t-transparent"></div>
+                        ) : (
+                          <>
+                            <Camera className="h-8 w-8 text-white mb-2" />
+                            <span className="text-white text-sm font-medium">Change Photo</span>
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            )}
+
+              {/* Profile Info */}
+              <div className="flex-1 pb-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">{displayName}</h1>
+                      <p className="text-rose-700 font-semibold text-lg capitalize mb-3">
+                        {profile?.trade || authUser.role}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-4 text-slate-600">
+                        {profile?.city && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4 text-rose-600" />
+                            <span>{profile.city}</span>
+                          </div>
+                        )}
+                        {isContractor && profile?.verified && (
+                          <div className="flex items-center gap-1 text-green-600">
+                            <Award className="h-4 w-4" />
+                            <span className="font-medium">Verified Contractor</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Edit Button */}
+                    <div>
+                      {!isEditing ? (
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                          Edit Profile
+                        </button>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleSaveProfile}
+                            className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center gap-2"
+                          >
+                            <Save className="h-4 w-4" />
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setIsEditing(false)}
+                            className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center gap-2"
+                          >
+                            <X className="h-4 w-4" />
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Spacer for overlapping profile card */}
+      <div className="h-32"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -531,58 +639,84 @@ export default function UnifiedProfilePage() {
                 </div>
                 
                 {portfolio.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {portfolio.map((item) => (
-                      <div key={item.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                        <img 
-                          src={item.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop'} 
-                          alt={item.title}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="p-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h3 className="font-bold text-gray-900">{item.title}</h3>
-                              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                              {item.projectCost && (
-                                <p className="text-sm font-medium text-green-600 mt-2">{item.projectCost}</p>
-                              )}
-                              {item.duration && (
-                                <p className="text-xs text-gray-500">{item.duration}</p>
-                              )}
-                              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mt-2">
-                                {item.projectType}
-                              </span>
-                            </div>
-                            <div className="flex space-x-2 ml-4">
-                              <button
-                                onClick={() => setEditingPortfolioItem(item)}
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeletePortfolioItem(item.id)}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <Trash className="h-4 w-4" />
-                              </button>
-                            </div>
+                      <div key={item.id} className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                        {/* Project Image */}
+                        <div className="relative h-64 overflow-hidden">
+                          <img 
+                            src={item.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80'} 
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          
+                          {/* Project Type Badge */}
+                          <div className="absolute top-4 left-4">
+                            <span className="inline-flex items-center gap-1 bg-white/95 backdrop-blur-sm text-rose-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                              {item.projectType}
+                            </span>
+                          </div>
+
+                          {/* Edit/Delete buttons - show on hover */}
+                          <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button
+                              onClick={() => setEditingPortfolioItem(item)}
+                              className="bg-white/95 backdrop-blur-sm text-rose-600 p-2 rounded-full hover:bg-rose-600 hover:text-white transition-colors shadow-lg"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePortfolioItem(item.id)}
+                              className="bg-white/95 backdrop-blur-sm text-red-600 p-2 rounded-full hover:bg-red-600 hover:text-white transition-colors shadow-lg"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Project Details */}
+                        <div className="p-5">
+                          <h3 className="font-bold text-slate-900 text-lg mb-2 line-clamp-1">{item.title}</h3>
+                          <p className="text-sm text-slate-600 mb-4 line-clamp-2">{item.description}</p>
+                          
+                          {/* Project Stats */}
+                          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                            {item.projectCost && (
+                              <div className="flex items-center gap-1 text-green-600 font-semibold">
+                                <DollarSign className="h-4 w-4" />
+                                <span className="text-sm">{item.projectCost}</span>
+                              </div>
+                            )}
+                            {item.duration && (
+                              <div className="text-xs text-slate-500 flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {item.duration}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No portfolio items yet</h3>
-                    <p className="text-gray-600">Showcase your best work by adding photos and descriptions of completed projects.</p>
+                  <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-6">
+                      <Camera className="h-10 w-10 text-rose-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">Showcase Your Best Work</h3>
+                    <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                      {isContractor 
+                        ? "Add photos and details of completed projects to attract more clients"
+                        : "Share AI estimates and past projects you're proud of"}
+                    </p>
                     <button 
                       onClick={() => setShowPortfolioForm(true)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-4"
+                      className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
                     >
-                      Add Your First Project
+                      <Camera className="h-5 w-5" />
+                      Add Your First {isContractor ? "Project" : "Estimate"}
                     </button>
                   </div>
                 )}
