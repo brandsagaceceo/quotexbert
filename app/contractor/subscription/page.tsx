@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
+import { Sparkles, Shield, TrendingUp, Clock, CheckCircle, DollarSign } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -152,64 +153,91 @@ export default function ContractorSubscription() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-4">
-            Contractor Subscription
+          <div className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-lg mb-6 animate-fade-in">
+            <Sparkles className="w-5 h-5 text-orange-600" />
+            <span className="text-sm font-semibold text-slate-700">Grow Your Business</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 animate-fade-in-up">
+            Choose Your Plan
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Choose your service categories and start receiving qualified leads instantly
+          
+          <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Select service categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly
           </p>
+
+          {/* Trust Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center gap-2 text-slate-700">
+              <Shield className="w-6 h-6 text-green-600" />
+              <span className="text-sm font-medium">Stripe Secured</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <TrendingUp className="w-6 h-6 text-blue-600" />
+              <span className="text-sm font-medium">500+ Active Contractors</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-700">
+              <Clock className="w-6 h-6 text-orange-600" />
+              <span className="text-sm font-medium">Cancel Anytime</span>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Category Selection */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-2xl border-2 border-rose-100 p-8 mb-8">
-              <div className="flex items-center justify-between mb-6">
+            <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 p-8 mb-8 animate-fade-in-up hover-lift" style={{ animationDelay: '0.3s' }}>
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Select Your Services</h2>
-                  <p className="text-slate-600">Pick the categories where you want to receive job leads</p>
+                  <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Select Your Services</h2>
+                  <p className="text-slate-600 text-lg">Pick categories to receive instant job notifications</p>
                 </div>
                 {selectedCategories.length > 0 && (
-                  <div className="hidden sm:block bg-rose-100 px-4 py-2 rounded-full">
-                    <span className="text-rose-800 font-semibold">{selectedCategories.length} selected</span>
+                  <div className="hidden sm:block bg-gradient-to-r from-rose-600 to-orange-600 px-5 py-2 rounded-full shadow-lg animate-scale-in">
+                    <span className="text-white font-bold text-lg">{selectedCategories.length} selected</span>
                   </div>
                 )}
               </div>
               
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.map((category) => {
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {categories.map((category, index) => {
                   const isSelected = selectedCategories.includes(category.id);
                   return (
                     <button
                       key={category.id}
                       onClick={() => toggleCategory(category.id)}
-                      className={`group relative p-5 rounded-xl border-2 text-left transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                      className={`group relative p-6 rounded-2xl border-2 text-left transition-all duration-300 transform hover:scale-105 hover:shadow-2xl animate-fade-in-up ${
                         isSelected
-                          ? 'border-rose-500 bg-gradient-to-br from-rose-50 to-orange-50 shadow-lg'
-                          : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50/50'
+                          ? 'border-rose-500 bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 shadow-xl'
+                          : 'border-slate-200 bg-white hover:border-rose-400 hover:bg-gradient-to-br hover:from-rose-50/50 hover:to-orange-50/50'
                       }`}
+                      style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                     >
-                      {/* Checkmark Badge */}
+                      {/* Checkmark Badge with animation */}
                       {isSelected && (
-                        <div className="absolute -top-2 -right-2 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full p-1 shadow-lg">
-                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                        <div className="absolute -top-3 -right-3 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full p-2 shadow-lg animate-scale-in">
+                          <CheckCircle className="w-5 h-5 text-white" />
                         </div>
                       )}
                       
-                      <div className="flex flex-col h-full">
-                        <h3 className={`font-bold text-sm mb-2 leading-tight ${isSelected ? 'text-rose-900' : 'text-slate-900'}`}>
+                      {/* Hover glow effect */}
+                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-400 to-orange-400 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${isSelected ? 'opacity-5' : ''}`}></div>
+                      
+                      <div className="flex flex-col h-full relative z-10">
+                        <h3 className={`font-bold text-base mb-2 leading-tight transition-colors ${isSelected ? 'text-rose-900' : 'text-slate-900 group-hover:text-rose-900'}`}>
                           {category.name}
                         </h3>
-                        <p className="text-xs text-slate-600 mb-3 flex-grow">
+                        <p className="text-sm text-slate-600 mb-4 flex-grow">
                           {category.description}
                         </p>
-                        <div className={`flex items-center justify-between pt-3 border-t ${isSelected ? 'border-rose-200' : 'border-slate-200'}`}>
-                          <span className={`text-lg font-bold ${isSelected ? 'text-rose-700' : 'text-slate-700 group-hover:text-rose-600'}`}>
-                            ${category.price}
-                          </span>
-                          <span className="text-xs text-slate-500">per month</span>
+                        <div className={`flex items-center justify-between pt-4 border-t-2 ${isSelected ? 'border-rose-300' : 'border-slate-200 group-hover:border-rose-200'}`}>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className={`w-5 h-5 ${isSelected ? 'text-rose-700' : 'text-slate-700 group-hover:text-rose-600'}`} />
+                            <span className={`text-2xl font-bold ${isSelected ? 'text-rose-700' : 'text-slate-700 group-hover:text-rose-600'}`}>
+                              {category.price}
+                            </span>
+                          </div>
+                          <span className="text-xs text-slate-500 font-medium">per month</span>
                         </div>
                       </div>
                     </button>
@@ -218,26 +246,29 @@ export default function ContractorSubscription() {
               </div>
               
               {/* Quick Select Options */}
-              <div className="mt-8 pt-6 border-t border-slate-200">
-                <p className="text-sm text-slate-600 mb-3 font-medium">Quick select:</p>
-                <div className="flex flex-wrap gap-2">
+              <div className="mt-10 pt-8 border-t-2 border-slate-200">
+                <p className="text-base text-slate-700 mb-4 font-semibold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-orange-600" />
+                  Quick Select Options
+                </p>
+                <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => setSelectedCategories(categories.map(c => c.id))}
-                    className="px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg transition-all"
+                    className="px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-sm font-bold rounded-xl hover:shadow-2xl transform hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    Select All
+                    🌟 Select All (Save 15%)
                   </button>
                   <button
                     onClick={() => setSelectedCategories([])}
-                    className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-300 transition-all"
+                    className="px-6 py-3 bg-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-300 hover:shadow-lg transition-all duration-200"
                   >
                     Clear All
                   </button>
                   <button
                     onClick={() => setSelectedCategories(['general', 'kitchen', 'bathroom', 'basement'])}
-                    className="px-4 py-2 bg-orange-100 text-orange-800 text-sm font-semibold rounded-lg hover:bg-orange-200 transition-all"
+                    className="px-6 py-3 bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300 text-orange-900 text-sm font-bold rounded-xl hover:shadow-lg transition-all duration-200"
                   >
-                    Popular Package
+                    ⭐ Popular Package
                   </button>
                 </div>
               </div>
@@ -246,83 +277,133 @@ export default function ContractorSubscription() {
 
           {/* Summary & Checkout */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-8 sticky top-24">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Subscription Summary</h3>
+            <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 p-8 sticky top-24 animate-fade-in-up hover-lift" style={{ animationDelay: '0.5s' }}>
+              <div className="flex items-center gap-2 mb-6">
+                <Shield className="w-6 h-6 text-rose-600" />
+                <h3 className="text-2xl font-bold text-slate-900">Order Summary</h3>
+              </div>
               
               {selectedCategories.length > 0 ? (
                 <>
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-3 mb-6 max-h-64 overflow-y-auto custom-scrollbar">
                     {selectedCategories.map(catId => {
                       const category = categories.find(c => c.id === catId);
                       return (
-                        <div key={catId} className="flex justify-between text-sm">
-                          <span className="text-slate-700">{category?.name}</span>
-                          <span className="font-medium text-slate-900">${category?.price}</span>
+                        <div key={catId} className="flex justify-between items-center text-sm p-3 bg-slate-50 rounded-lg">
+                          <span className="text-slate-700 font-medium">{category?.name}</span>
+                          <span className="font-bold text-slate-900 text-base">${category?.price}</span>
                         </div>
                       );
                     })}
                   </div>
                   
-                  <div className="border-t border-slate-200 pt-4 mb-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-slate-900">Monthly Total</span>
-                      <span className="text-2xl font-bold text-rose-700">${calculateTotal()}</span>
+                  <div className="border-t-2 border-slate-200 pt-5 mb-8">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-lg font-semibold text-slate-600">Monthly Total</span>
+                      <span className="text-4xl font-bold bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">${calculateTotal()}</span>
                     </div>
+                    <p className="text-xs text-slate-500 text-right">Billed monthly • Cancel anytime</p>
                   </div>
                   
                   <button
                     onClick={handleSubscribe}
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50"
+                    className="w-full bg-gradient-to-r from-rose-700 via-red-600 to-orange-600 text-white py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
                   >
-                    {loading ? 'Processing...' : 'Subscribe Now'}
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {loading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="w-5 h-5" />
+                          Subscribe Securely
+                        </>
+                      )}
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-rose-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </button>
                   
-                  <div className="mt-6 space-y-2 text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Cancel anytime</span>
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-green-900">Cancel Anytime</p>
+                        <p className="text-xs text-green-700">No long-term commitment required</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Unlimited job access</span>
+                    <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-blue-900">Unlimited Access</p>
+                        <p className="text-xs text-blue-700">Receive all jobs in your categories</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Stripe-secured payments</span>
+                    <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                      <Shield className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-purple-900">Secure Payments</p>
+                        <p className="text-xs text-purple-700">Protected by Stripe encryption</p>
+                      </div>
                     </div>
                   </div>
                 </>
               ) : (
-                <p className="text-slate-600 text-center py-8">
-                  Select categories to see pricing
-                </p>
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-10 h-10 text-slate-400" />
+                  </div>
+                  <p className="text-slate-600 font-medium mb-2">No categories selected</p>
+                  <p className="text-sm text-slate-500">Choose services to view pricing</p>
+                </div>
               )}
             </div>
 
             {/* Payout Section */}
             {payoutInfo && payoutInfo.availableBalance > 0 && (
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg p-8 mt-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Available Earnings</h3>
-                <div className="text-4xl font-bold text-green-600 mb-6">
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-3xl shadow-2xl border-2 border-green-200 p-8 mt-8 animate-scale-in hover-lift">
+                <div className="flex items-center gap-2 mb-4">
+                  <DollarSign className="w-7 h-7 text-green-600" />
+                  <h3 className="text-2xl font-bold text-slate-900">Available Earnings</h3>
+                </div>
+                
+                <div className="text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
                   ${payoutInfo.availableBalance.toFixed(2)}
                 </div>
+                
+                <p className="text-sm text-green-700 font-medium mb-6">
+                  Ready to withdraw
+                </p>
+                
                 <button
                   onClick={handleRequestPayout}
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 relative overflow-hidden group"
                 >
-                  {loading ? 'Processing...' : 'Request Payout'}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <DollarSign className="w-5 h-5" />
+                        Request Payout
+                      </>
+                    )}
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
-                <p className="text-sm text-slate-600 mt-4">
-                  Funds will be deposited to your bank account within 2-3 business days
-                </p>
+                
+                <div className="mt-6 p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-green-200">
+                  <div className="flex items-center gap-2 text-green-800 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <p className="font-medium">Deposited in 2-3 business days</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

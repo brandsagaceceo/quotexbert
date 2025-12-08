@@ -15,7 +15,7 @@ export function useAuth() {
   const { user: clerkUser, isSignedIn: clerkIsSignedIn, isLoaded } = useUser();
   const { signOut: clerkSignOut } = useClerk();
   const [authUser, setAuthUser] = useState<User | null>(null);
-  const [roleLoading, setRoleLoading] = useState(false);
+  const [roleLoading, setRoleLoading] = useState(true); // Start as true
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -86,7 +86,7 @@ export function useAuth() {
     authUser,
     user: authUser, // Alias for backward compatibility
     isSignedIn: clerkIsSignedIn || false,
-    authLoading: !isLoaded,
+    authLoading: !isLoaded || roleLoading, // Auth is loading if Clerk is loading OR role is being fetched
     signInWithGoogle,
     setUserRole,
     signOut
