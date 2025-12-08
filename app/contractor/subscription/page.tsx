@@ -148,50 +148,98 @@ export default function ContractorSubscription() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-rose-900 to-orange-900 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-4">
             Contractor Subscription
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Choose your categories and start receiving qualified leads
+            Choose your service categories and start receiving qualified leads instantly
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Category Selection */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Select Your Categories</h2>
-              <p className="text-slate-600 mb-6">Choose the services you offer to receive relevant job leads</p>
+            <div className="bg-white rounded-2xl shadow-2xl border-2 border-rose-100 p-8 mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Select Your Services</h2>
+                  <p className="text-slate-600">Pick the categories where you want to receive job leads</p>
+                </div>
+                {selectedCategories.length > 0 && (
+                  <div className="hidden sm:block bg-rose-100 px-4 py-2 rounded-full">
+                    <span className="text-rose-800 font-semibold">{selectedCategories.length} selected</span>
+                  </div>
+                )}
+              </div>
               
-              <div className="grid md:grid-cols-2 gap-4">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => toggleCategory(category.id)}
-                    className={`p-6 rounded-xl border-2 text-left transition-all transform hover:scale-105 ${
-                      selectedCategories.includes(category.id)
-                        ? 'border-rose-500 bg-rose-50 shadow-md'
-                        : 'border-slate-200 bg-white hover:border-rose-300'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-slate-900">{category.name}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-rose-700 font-bold">${category.price}/mo</span>
-                        {selectedCategories.includes(category.id) && (
-                          <svg className="w-6 h-6 text-rose-700" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categories.map((category) => {
+                  const isSelected = selectedCategories.includes(category.id);
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => toggleCategory(category.id)}
+                      className={`group relative p-5 rounded-xl border-2 text-left transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                        isSelected
+                          ? 'border-rose-500 bg-gradient-to-br from-rose-50 to-orange-50 shadow-lg'
+                          : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50/50'
+                      }`}
+                    >
+                      {/* Checkmark Badge */}
+                      {isSelected && (
+                        <div className="absolute -top-2 -right-2 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full p-1 shadow-lg">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
-                        )}
+                        </div>
+                      )}
+                      
+                      <div className="flex flex-col h-full">
+                        <h3 className={`font-bold text-sm mb-2 leading-tight ${isSelected ? 'text-rose-900' : 'text-slate-900'}`}>
+                          {category.name}
+                        </h3>
+                        <p className="text-xs text-slate-600 mb-3 flex-grow">
+                          {category.description}
+                        </p>
+                        <div className={`flex items-center justify-between pt-3 border-t ${isSelected ? 'border-rose-200' : 'border-slate-200'}`}>
+                          <span className={`text-lg font-bold ${isSelected ? 'text-rose-700' : 'text-slate-700 group-hover:text-rose-600'}`}>
+                            ${category.price}
+                          </span>
+                          <span className="text-xs text-slate-500">per month</span>
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-sm text-slate-600">{category.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {/* Quick Select Options */}
+              <div className="mt-8 pt-6 border-t border-slate-200">
+                <p className="text-sm text-slate-600 mb-3 font-medium">Quick select:</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedCategories(categories.map(c => c.id))}
+                    className="px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg transition-all"
+                  >
+                    Select All
                   </button>
-                ))}
+                  <button
+                    onClick={() => setSelectedCategories([])}
+                    className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-300 transition-all"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategories(['general', 'kitchen', 'bathroom', 'basement'])}
+                    className="px-4 py-2 bg-orange-100 text-orange-800 text-sm font-semibold rounded-lg hover:bg-orange-200 transition-all"
+                  >
+                    Popular Package
+                  </button>
+                </div>
               </div>
             </div>
           </div>
