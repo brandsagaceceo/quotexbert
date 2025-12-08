@@ -111,31 +111,25 @@ export default function UnifiedProfilePage() {
 
     // Once we have authUser, load the profile (even without role)
     const fetchProfileData = async () => {
+      console.log("[ProfilePage] Starting fetchProfileData for user:", authUser.id, "role:", authUser.role);
+      setIsLoading(true);
+      
       try {
-        console.log("[ProfilePage] Starting fetchProfileData for user:", authUser.id, "role:", authUser.role);
-        setIsLoading(true);
-        
         // Fetch the actual role from the server first
         let userRole = authUser.role;
-        try {
-          const roleResponse = await fetch('/api/user/role');
-          const roleData = await roleResponse.json();
-          if (roleData.role) {
-            userRole = roleData.role;
-          } else if (!userRole) {
-            // No role in either place - send to onboarding
-            console.log("[ProfilePage] No role found, redirecting to onboarding");
-            router.push("/onboarding");
-            setIsLoading(false);
-            return;
-          }
-        } catch (error) {
-          console.log("[ProfilePage] Error fetching role:", error);
-          if (!userRole) {
-            router.push("/onboarding");
-            setIsLoading(false);
-            return;
-          }
+        
+        const roleResponse = await fetch('/api/user/role');
+        const roleData = await roleResponse.json();
+        console.log("[ProfilePage] Role API response:", roleData);
+        
+        if (roleData.role) {
+          userRole = roleData.role;
+        } else if (!userRole) {
+          // No role in either place - send to onboarding
+          console.log("[ProfilePage] No role found, redirecting to onboarding");
+          setIsLoading(false);
+          router.push("/onboarding");
+          return;
         }
 
         // Create a basic profile from authUser
