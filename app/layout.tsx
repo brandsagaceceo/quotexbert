@@ -153,5 +153,14 @@ export default function RootLayout({
     </html>
   );
 
-  return enableAuth ? <ClerkProvider>{content}</ClerkProvider> : content;
+  return enableAuth ? (
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/onboarding"
+      signUpFallbackRedirectUrl="/onboarding"
+    >
+      {content}
+    </ClerkProvider>
+  ) : content;
 }
