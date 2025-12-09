@@ -222,7 +222,10 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        const updatedProfile = await response.json();
+        const body = await response.json();
+        // API returns { success: true, profile: updatedUser }
+        const updatedProfile = body?.profile ?? body;
+        console.debug('[ProfilePage] Save response body:', body);
         setProfile(updatedProfile);
         setIsEditing(false);
       }
