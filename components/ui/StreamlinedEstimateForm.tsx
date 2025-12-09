@@ -372,7 +372,7 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
             size="lg"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 text-white font-bold text-lg py-6 shadow-2xl transform hover:scale-105 transition-all duration-300 ring-4 ring-rose-300 ring-offset-2 animate-pulse-slow relative overflow-hidden group"
+            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 text-white font-bold text-lg py-6 shadow-xl transform hover:scale-105 transition-all duration-200 relative overflow-hidden group"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
             <span className="relative flex items-center justify-center gap-2">

@@ -246,6 +246,40 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
+          {/* ALL ACCESS DEAL - Hero Banner */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="relative z-10">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-white text-center md:text-left">
+                  <div className="inline-block bg-yellow-400 text-rose-900 px-4 py-2 rounded-full text-sm font-bold mb-4 animate-pulse">
+                    🔥 SPECIAL OFFER - UNLIMITED LEADS!
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-black mb-3">ALL ACCESS PASS</h2>
+                  <p className="text-xl md:text-2xl text-white/90 mb-4">
+                    Get <span className="font-bold">ALL Categories</span> + <span className="font-bold">Unlimited Leads</span> for ONE Low Price!
+                  </p>
+                  <div className="flex items-center gap-4 justify-center md:justify-start">
+                    <span className="text-5xl font-black">$199</span>
+                    <div className="text-left">
+                      <div className="text-sm line-through opacity-75">$1,500+/mo</div>
+                      <div className="text-sm font-semibold">/month</div>
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href="/contractor/subscription"
+                  className="group relative px-8 py-5 bg-white text-rose-700 rounded-2xl font-black text-xl shadow-2xl hover:shadow-white/50 transform hover:scale-110 transition-all duration-300 overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="relative z-10 group-hover:text-white">
+                    ✨ Get All Access ✨
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow p-6">

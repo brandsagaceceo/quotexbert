@@ -29,7 +29,7 @@
   <circle cx="40" cy="40" r="35" fill="none" stroke="url(#brandGradient)" stroke-width="4"/>
   
   <!-- Q Letter - BIGGER and BOLDER -->
-  <text x="40" y="54" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="900" text-anchor="middle" fill="url(#brandGradient)" letter-spacing="-2" filter="url(#glow)">Q</text>
+  <text x="40" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="url(#brandGradient)" letter-spacing="-2" filter="url(#glow)">Q</text>
   
   <!-- Accent dots for visual interest -->
   <circle cx="52" cy="52" r="3" fill="#ea580c" opacity="0.8"/>
