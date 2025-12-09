@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { StreamlinedEstimateForm } from "@/components/ui/StreamlinedEstimateForm";
-import { AIQuoteEstimator } from "@/components/ui/AIQuoteEstimator";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 // Build: v5 - AI Quote Estimator + Custom Cursor + Real Images - Dec 8 2025
@@ -398,9 +397,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Main Estimator Form - Center of Attention (prominent AI estimator) */}
+          {/* Main Estimator Form - Center of Attention (voice recorder and photo upload) */}
           <div className="bg-white rounded-3xl shadow-2xl p-8 relative z-10 max-w-4xl mx-auto">
-            <AIQuoteEstimator />
+            <StreamlinedEstimateForm />
           </div>
 
           {/* Estimate Results */}
