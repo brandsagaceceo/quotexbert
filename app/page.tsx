@@ -399,7 +399,18 @@ export default function Home() {
 
           {/* Main Estimator Form - Center of Attention (voice recorder and photo upload) */}
           <div className="bg-white rounded-3xl shadow-2xl p-8 relative z-10 max-w-4xl mx-auto">
-            <StreamlinedEstimateForm />
+            <StreamlinedEstimateForm 
+              onEstimateComplete={(result) => {
+                setEstimateResult(result);
+                setTimeout(() => {
+                  document.getElementById('estimate-results')?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                  });
+                }, 100);
+              }}
+              userId={user?.id}
+            />
           </div>
 
           {/* Estimate Results */}
