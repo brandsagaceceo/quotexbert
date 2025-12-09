@@ -80,12 +80,6 @@ export default function SiteHeader() {
                   >
                     Profile
                   </Link>
-                  <Link
-                    href="/profile"
-                    className="w-8 h-8 bg-brand rounded-full flex items-center justify-center text-white text-sm font-bold hover:bg-brand-dark transition-colors"
-                  >
-                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </Link>
                 </div>
               </>
             ) : (
@@ -173,7 +167,7 @@ export default function SiteHeader() {
                   {user.role === 'homeowner' ? (
                     <Link
                       href="/create-lead"
-                      className="block bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Post Project
@@ -181,7 +175,7 @@ export default function SiteHeader() {
                   ) : (
                     <Link
                       href="/contractor/jobs"
-                      className="block bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       View Jobs

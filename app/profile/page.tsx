@@ -365,7 +365,7 @@ export default function UnifiedProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading auth... (v2)</p>
         </div>
       </div>
@@ -381,7 +381,7 @@ export default function UnifiedProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Setting up profile... (loading data)</p>
           <p className="text-xs text-gray-400 mt-2">Debug: authUser={authUser?.email}, isLoading={String(isLoading)}</p>
         </div>
@@ -396,6 +396,36 @@ export default function UnifiedProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+      {/* Persistent Edit/Save Button - Top Right */}
+      <div className="fixed top-24 right-6 z-50">
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl"
+          >
+            <Edit3 className="h-4 w-4" />
+            Edit Profile
+          </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveProfile}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center gap-2 shadow-xl"
+            >
+              <Save className="h-4 w-4" />
+              Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center gap-2 shadow-xl"
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* Cover Photo Section */}
       <div className="relative h-80 md:h-96 overflow-hidden">
         {/* Cover Photo */}
@@ -495,54 +525,22 @@ export default function UnifiedProfilePage() {
               {/* Profile Info */}
               <div className="flex-1 pb-4">
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">{displayName}</h1>
-                      <p className="text-rose-700 font-semibold text-lg capitalize mb-3">
-                        {profile?.trade || authUser.role}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-4 text-slate-600">
-                        {profile?.city && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4 text-rose-600" />
-                            <span>{profile.city}</span>
-                          </div>
-                        )}
-                        {isContractor && profile?.verified && (
-                          <div className="flex items-center gap-1 text-green-600">
-                            <Award className="h-4 w-4" />
-                            <span className="font-medium">Verified Contractor</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Edit Button */}
-                    <div>
-                      {!isEditing ? (
-                        <button
-                          onClick={() => setIsEditing(true)}
-                          className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2"
-                        >
-                          <Edit3 className="h-4 w-4" />
-                          Edit Profile
-                        </button>
-                      ) : (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={handleSaveProfile}
-                            className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center gap-2"
-                          >
-                            <Save className="h-4 w-4" />
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setIsEditing(false)}
-                            className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center gap-2"
-                          >
-                            <X className="h-4 w-4" />
-                            Cancel
-                          </button>
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">{displayName}</h1>
+                    <p className="text-rose-700 font-semibold text-lg capitalize mb-3">
+                      {profile?.trade || authUser.role}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4 text-slate-600">
+                      {profile?.city && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4 text-rose-600" />
+                          <span>{profile.city}</span>
+                        </div>
+                      )}
+                      {isContractor && profile?.verified && (
+                        <div className="flex items-center gap-1 text-green-600">
+                          <Award className="h-4 w-4" />
+                          <span className="font-medium">Verified Contractor</span>
                         </div>
                       )}
                     </div>
@@ -555,7 +553,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-24 md:h-32"></div>
+      <div className="h-20 md:h-24"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -741,7 +739,7 @@ export default function UnifiedProfilePage() {
                           </div>
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
                             job.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            job.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                            job.status === 'in-progress' ? 'bg-rose-100 text-rose-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>
                             {job.status}
@@ -1095,7 +1093,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
                     />
                     <label
                       htmlFor="portfolioImageUpload"
-                      className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                      className="cursor-pointer bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700"
                     >
                       {uploading ? 'Uploading...' : 'Upload Photo'}
                     </label>
@@ -1114,7 +1112,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700"
               >
                 {initialData ? 'Update Project' : 'Add Project'}
               </button>

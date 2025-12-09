@@ -290,7 +290,7 @@ function PortfolioCard({
               <Pin className={`w-4 h-4 ${item.isPinned ? 'text-orange-600' : ''}`} />
             </Button>
             <Button variant="secondary" size="sm">
-              <MoreHorizontal className="w-4 h-4" />
+              <MoreHorizontal className="w-3 h-3" />
             </Button>
           </div>
         </div>

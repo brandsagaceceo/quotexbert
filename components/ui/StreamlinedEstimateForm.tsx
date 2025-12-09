@@ -349,9 +349,9 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
             size="lg"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1"
+            className="flex-1 animate-pulse-slow shadow-2xl transform hover:scale-105 transition-all duration-300 ring-4 ring-rose-300 ring-offset-2"
           >
-            {isLoading ? "Generating Estimate..." : "Get My Estimate"}
+            {isLoading ? "Generating Estimate..." : "✨ Get My Estimate ✨"}
           </Button>
           
           {(description || images.length > 0) && (
