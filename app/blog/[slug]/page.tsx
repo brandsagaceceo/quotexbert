@@ -338,7 +338,7 @@ export default function BlogPostPage() {
               "dateModified": post.publishedAt,
               "publisher": {
                 "@type": "Organization",
-                "name": "QuotexBert",
+                "name": "QuoteXbert",
                 "logo": {
                   "@type": "ImageObject",
                   "url": "/logo.svg"
@@ -422,6 +422,22 @@ export default function BlogPostPage() {
                 className="prose prose-lg max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-a:text-orange-600 prose-strong:text-slate-900"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
+
+              {/* Author Note / Human Guidance */}
+              <div className="mt-10 p-5 bg-orange-50 border border-orange-200 rounded-lg">
+                <p className="text-sm text-slate-800 font-semibold mb-1">
+                  A quick note from our Toronto team
+                </p>
+                <p className="text-sm text-slate-700 mb-2">
+                  Every project and street in the GTA is slightly different. Use this article as
+                  a practical starting point, then speak with at least two licensed local contractors
+                  before locking in a budget or timeline.
+                </p>
+                <p className="text-xs text-slate-500">
+                  We update these guides regularly based on real projects posted through QuoteXbert
+                  in Toronto, Durham, Peel, and York Region.
+                </p>
+              </div>
 
               {/* Tags */}
               <div className="mt-12 pt-8 border-t border-slate-200">

@@ -22,12 +22,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         availableBalance: 0,
         categories: [],
+        stripeCustomerId: null,
       });
     }
 
+    // ContractorBilling currently tracks spend, not explicit available balance or categories.
+    // Expose a simple derived "availableBalance" and empty categories array for now.
     return NextResponse.json({
-      availableBalance: billing.availableBalance || 0,
-      categories: billing.subscribedCategories || [],
+      availableBalance: Math.max(0, billing.spendThisMonthCents),
+      categories: [],
       stripeCustomerId: billing.stripeCustomerId,
     });
   } catch (error) {
@@ -55,7 +58,7 @@ export async function POST(req: NextRequest) {
       where: { userId },
     });
 
-    if (!billing || (billing.availableBalance || 0) <= 0) {
+    if (!billing || billing.spendThisMonthCents <= 0) {
       return NextResponse.json(
         { error: "No available balance to withdraw" },
         { status: 400 }
@@ -69,7 +72,7 @@ export async function POST(req: NextRequest) {
     await prisma.contractorBilling.update({
       where: { userId },
       data: {
-        availableBalance: 0,
+        spendThisMonthCents: 0,
       },
     });
 

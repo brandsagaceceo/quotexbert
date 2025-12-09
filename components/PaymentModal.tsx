@@ -129,7 +129,7 @@ export default function PaymentModal({
                   value="card"
                   checked={paymentMethod === 'card'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="text-blue-600"
+                  className="text-rose-600"
                 />
                 <CreditCard className="h-5 w-5 ml-3 text-gray-400" />
                 <span className="ml-3">Credit/Debit Card</span>

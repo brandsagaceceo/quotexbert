@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Script from "next/script";
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 
 interface BlogPost {
@@ -18,6 +19,7 @@ interface BlogPost {
   imageUrl: string;
   seoTitle: string;
   seoDescription: string;
+  isDIY?: boolean;
 }
 
 export default function BlogPage() {
@@ -78,7 +80,8 @@ export default function BlogPage() {
       tags: ["toronto condo", "small bathroom", "bathroom ideas", "downtown toronto"],
       imageUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=500&fit=crop",
       seoTitle: "Small Bathroom Ideas for Toronto Condos 2025 | Space-Saving Tips",
-      seoDescription: "Transform your small Toronto condo bathroom. Expert design ideas, space-saving fixtures, and renovation tips for downtown GTA condos."
+      seoDescription: "Transform your small Toronto condo bathroom. Expert design ideas, space-saving fixtures, and renovation tips for downtown GTA condos.",
+      isDIY: true
     },
     {
       id: "5",
@@ -106,7 +109,8 @@ export default function BlogPage() {
       tags: ["toronto flooring", "hardwood floors", "GTA contractors", "flooring costs"],
       imageUrl: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&h=500&fit=crop",
       seoTitle: "Hardwood Flooring Toronto 2025 | Installation Guide & Costs",
-      seoDescription: "Complete guide to hardwood flooring in Toronto. Types, costs, installation tips, and finding qualified GTA flooring contractors."
+      seoDescription: "Complete guide to hardwood flooring in Toronto. Types, costs, installation tips, and finding qualified GTA flooring contractors.",
+      isDIY: true
     },
     {
       id: "7",
@@ -134,7 +138,8 @@ export default function BlogPage() {
       tags: ["toronto deck", "outdoor living", "GTA contractors", "deck design"],
       imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop",
       seoTitle: "Deck Building Toronto 2025 | Design Ideas, Materials & Costs",
-      seoDescription: "Build your dream Toronto deck. Design ideas, material options, permit requirements, and finding qualified GTA deck contractors."
+      seoDescription: "Build your dream Toronto deck. Design ideas, material options, permit requirements, and finding qualified GTA deck contractors.",
+      isDIY: true
     },
     {
       id: "9",
@@ -148,7 +153,8 @@ export default function BlogPage() {
       tags: ["toronto energy", "home efficiency", "ontario rebates", "GTA upgrades"],
       imageUrl: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop",
       seoTitle: "Energy-Efficient Home Upgrades Toronto 2025 | Save Money & Stay Warm",
-      seoDescription: "Top energy-efficient upgrades for Toronto homes. Ontario rebates, ROI calculations, and contractors for GTA energy improvements."
+      seoDescription: "Top energy-efficient upgrades for Toronto homes. Ontario rebates, ROI calculations, and contractors for GTA energy improvements.",
+      isDIY: true
     },
     {
       id: "10",
@@ -162,7 +168,8 @@ export default function BlogPage() {
       tags: ["toronto painting", "interior paint", "exterior paint", "GTA painters"],
       imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=800&h=500&fit=crop",
       seoTitle: "Toronto Home Painting Guide 2025 | Interior & Exterior Tips",
-      seoDescription: "Complete painting guide for Toronto homeowners. Color trends, climate considerations, costs, and finding qualified GTA painting contractors."
+      seoDescription: "Complete painting guide for Toronto homeowners. Color trends, climate considerations, costs, and finding qualified GTA painting contractors.",
+      isDIY: true
     },
     {
       id: "11",
@@ -216,7 +223,7 @@ export default function BlogPage() {
       readTime: 9,
       category: "Windows",
       tags: ["toronto windows", "energy savings", "window replacement", "GTA contractors"],
-      imageUrl: "https://images.unsplash.com/photo-1621905252472-67082d6e5e4a?w=800&h=500&fit=crop&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=800&h=500&fit=crop&q=80",
       seoTitle: "Window Replacement Toronto 2025 | Energy-Efficient Options & Costs",
       seoDescription: "Replace your Toronto home windows for better efficiency. Types, costs, Ontario rebates, and finding qualified GTA window contractors."
     },
@@ -260,7 +267,8 @@ export default function BlogPage() {
       tags: ["smart home", "toronto tech", "home automation", "GTA"],
       imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=500&fit=crop",
       seoTitle: "Smart Home Tech Toronto 2025 | Installation Guide & Costs",
-      seoDescription: "Transform your Toronto home with smart technology. Best devices, costs, installation tips, and finding GTA smart home contractors."
+      seoDescription: "Transform your Toronto home with smart technology. Best devices, costs, installation tips, and finding GTA smart home contractors.",
+      isDIY: true
     },
     {
       id: "18",
@@ -382,16 +390,67 @@ export default function BlogPage() {
     ? blogPosts
     : blogPosts.filter(post => post.category === selectedCategory);
 
+  const diyPosts = blogPosts.filter((post) => post.isDIY);
+
   return (
     <>
+      <Script
+        id="quotexbert-blog-schema"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Blog',
+            name: 'QuoteXbert Toronto Home Renovation Blog',
+            description:
+              'Practical renovation, repair, and DIY advice for Toronto and GTA homeowners, reviewed by local contractors.',
+            url: 'https://www.quotexbert.com/blog',
+            inLanguage: 'en-CA',
+            author: {
+              '@type': 'Organization',
+              name: 'QuoteXbert',
+            },
+          }),
+        }}
+      />
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 text-white py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <h1 className="text-5xl font-bold mb-4">Toronto Home Renovation Blog</h1>
-            <p className="text-xl text-orange-100">
-              Expert advice, cost guides, and tips for GTA homeowners
-            </p>
+          <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm mb-4">
+                <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
+                <span className="uppercase tracking-wide text-xs md:text-sm text-orange-100">For GTA homeowners</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">Toronto Home Renovation Blog</h1>
+              <p className="text-lg md:text-xl text-orange-100 max-w-2xl">
+                Straightforward, experience-based guides written for real Toronto and GTA homeowners.
+                No fluff 	 just practical timelines, cost ranges, and decisions we see every week.
+              </p>
+            </div>
+            <div className="hidden md:block">
+              <div className="relative w-72 h-40 rounded-2xl bg-white/10 border border-white/15 shadow-xl overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/40 via-orange-400/30 to-amber-300/30" />
+                <div className="relative h-full w-full flex flex-col justify-between p-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">Trending this week</span>
+                    <span className="text-xs text-orange-100">Updated for 2025</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-orange-50">
+                    <p>
+                      • Basement finishing timelines in Toronto
+                    </p>
+                    <p>
+                      • What contractors really look for in good leads
+                    </p>
+                    <p>
+                      • DIY vs pro: when to call in help
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -422,7 +481,7 @@ export default function BlogPage() {
             {filteredPosts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group hover-lift"
+                className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:-translate-y-2 hover:scale-[1.01]"
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
@@ -488,6 +547,73 @@ export default function BlogPage() {
             ))}
           </div>
         </section>
+
+        {/* DIY Guides Section */}
+        {diyPosts.length > 0 && (
+          <section className="max-w-6xl mx-auto px-4 pb-16">
+            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                  DIY-Friendly Guides for Homeowners
+                </h2>
+                <p className="text-sm md:text-base text-slate-600 max-w-2xl">
+                  Weekend projects and upgrade ideas you can realistically tackle yourself —
+                  plus clear signals for when it's safer to bring in a licensed pro.
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-2 text-xs md:text-sm text-rose-700 bg-rose-50 px-3 py-1 rounded-full border border-rose-100">
+                <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
+                Curated by Toronto renovation advisors
+              </span>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {diyPosts.map((post) => (
+                <article
+                  key={post.id}
+                  className="bg-white/90 backdrop-blur-sm rounded-xl border border-rose-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group hover:-translate-y-1 hover:scale-[1.005]"
+                >
+                  <div className="relative h-40 overflow-hidden">
+                    <Image
+                      src={post.imageUrl}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-80" />
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-orange-50">
+                      <span className="inline-flex items-center gap-1 bg-black/40 px-2 py-1 rounded-full">
+                        <ClockIcon className="w-3 h-3" />
+                        {post.readTime} min DIY read
+                      </span>
+                      <span className="bg-emerald-500/80 px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide">
+                        DIY-Friendly
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4">
+                    <h3 className="text-base md:text-lg font-semibold text-slate-900 mb-2 line-clamp-2 group-hover:text-rose-800 transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs md:text-sm text-slate-600 mb-3 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="inline-flex items-center gap-2 text-rose-700 text-sm font-semibold hover:text-orange-600 transition-colors"
+                    >
+                      Open Guide
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="bg-gradient-to-r from-rose-900 to-orange-900 text-white py-16 mt-12">

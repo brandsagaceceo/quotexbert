@@ -231,7 +231,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                   <div
                     className={`rounded-lg px-3 py-2 break-words ${
                       message.fromUser.id === currentUserId
-                        ? "bg-blue-500 text-white"
+                        ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white"
                         : "bg-gray-100 text-gray-900"
                     }`}
                   >
@@ -241,7 +241,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                     <p
                       className={`text-xs mt-1 ${
                         message.fromUser.id === currentUserId
-                          ? "text-blue-100"
+                          ? "text-rose-100"
                           : "text-gray-500"
                       }`}
                     >
@@ -250,7 +250,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                   </div>
 
                   {message.fromUser.id === currentUserId && (
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0">
+                    <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0">
                       {message.fromUser.email.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -271,12 +271,12 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                 setNewMessage(e.target.value)
               }
               placeholder="Type your message..."
-              className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
             <button
               type="submit"
               disabled={!newMessage.trim()}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0"
+              className="px-4 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-md hover:from-rose-600 hover:to-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0"
             >
               Send
             </button>

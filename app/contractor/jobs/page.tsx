@@ -206,12 +206,12 @@ export default function ContractorJobsPage() {
 
   if (!isSignedIn || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 flex items-center justify-center">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold text-center mb-4">Access Restricted</h1>
           <p className="text-center mb-6">You need to sign in as a contractor to view jobs.</p>
           <div className="text-center">
-            <Link href="/sign-in" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold">
+            <Link href="/sign-in" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold">
               Sign In
             </Link>
           </div>
@@ -221,10 +221,10 @@ export default function ContractorJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
             Available Jobs
           </h1>
           <p className="text-xl text-gray-600">
@@ -242,7 +242,7 @@ export default function ContractorJobsPage() {
                 <div className="mt-2">
                   <Link 
                     href="/contractor/subscriptions" 
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700 transition-colors"
                   >
                     View Subscriptions →
                   </Link>
@@ -358,7 +358,7 @@ export default function ContractorJobsPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading jobs...</p>
           </div>
         ) : filteredJobs.length === 0 ? (
@@ -391,7 +391,7 @@ export default function ContractorJobsPage() {
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <span>📍 {job.location || job.zipCode}</span>
                       <span>💰 {job.budget}</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{job.category}</span>
+                      <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded">{job.category}</span>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -477,7 +477,7 @@ export default function ContractorJobsPage() {
                         <button 
                           onClick={() => openAcceptanceModal(job.id, job.title)}
                           disabled={accepting === job.id}
-                          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                          className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-colors"
                         >
                           {accepting === job.id ? 'Accepting...' : 'Accept Job'}
                         </button>
@@ -491,7 +491,7 @@ export default function ContractorJobsPage() {
                           </button>
                           <Link 
                             href="/contractor/subscriptions"
-                            className="text-xs text-blue-600 hover:text-blue-800 underline"
+                            className="text-xs text-rose-600 hover:text-rose-800 underline"
                           >
                             Subscribe to {job.category}
                           </Link>
@@ -529,14 +529,14 @@ export default function ContractorJobsPage() {
                   <textarea
                     name="message"
                     rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                     defaultValue="I'm interested in this project and would like to provide you with a quote. Let's discuss the details!"
                   />
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">What happens next?</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                <div className="bg-rose-50 border border-rose-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-rose-900 mb-2">What happens next?</h4>
+                  <ul className="text-sm text-rose-800 space-y-1">
                     <li>• You'll be added to this job (max 3 contractors)</li>
                     <li>• A conversation will start with the homeowner</li>
                     <li>• You can send quotes and discuss details through messages</li>

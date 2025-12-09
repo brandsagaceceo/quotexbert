@@ -70,7 +70,7 @@ Format your response as JSON with this structure:
       response_format: { type: "json_object" }
     });
 
-    const result = completion.choices[0].message.content;
+    const result = completion.choices[0]?.message?.content;
     if (!result) {
       throw new Error("No response from AI");
     }

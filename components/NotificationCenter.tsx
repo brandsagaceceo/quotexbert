@@ -92,7 +92,7 @@ export function NotificationCenter() {
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'job_application':
-        return <Briefcase className="w-4 h-4 text-blue-600" />;
+        return <Briefcase className="w-4 h-4 text-rose-600" />;
       case 'subscription':
         return <CreditCard className="w-4 h-4 text-green-600" />;
       case 'message':
@@ -171,7 +171,7 @@ export function NotificationCenter() {
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    !notification.read ? 'bg-rose-50 border-l-4 border-l-rose-500' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">

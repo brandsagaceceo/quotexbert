@@ -112,8 +112,9 @@ async function handleSubscriptionCreated(subscription: any) {
       const categoryInfo = categoryMap[category] || { name: category, price: 29.99 };
 
       const now = new Date();
-      const trialEnd = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
-      const isTrialing = trialEnd && trialEnd > now;
+      // Treat all subscriptions as standard paid subscriptions; trials are not used.
+      const trialEnd = null;
+      const isTrialing = false;
 
       await prisma.contractorSubscription.create({
         data: {
@@ -126,9 +127,9 @@ async function handleSubscriptionCreated(subscription: any) {
           currentPeriodStart: new Date(subscription.current_period_start * 1000),
           currentPeriodEnd: new Date(subscription.current_period_end * 1000),
           nextBillingDate: new Date(subscription.current_period_end * 1000),
-          trialStart: subscription.trial_start ? new Date(subscription.trial_start * 1000) : null,
+          trialStart: null,
           trialEnd: trialEnd,
-          canClaimLeads: subscription.status === 'active' || subscription.status === 'trialing',
+          canClaimLeads: subscription.status === 'active',
           canViewLeads: true
         }
       });
@@ -138,10 +139,9 @@ async function handleSubscriptionCreated(subscription: any) {
         data: {
           userId: contractorId,
           type: 'SUBSCRIPTION_CREATED',
-          title: isTrialing ? 'Free Trial Started!' : 'Subscription Activated!',
-          message: isTrialing 
-            ? `Your 7-day free trial for ${categoryInfo.name} has started! You'll be billed $${categoryInfo.price}/month after the trial.`
-            : `Your subscription for ${categoryInfo.name} is now active. You can start claiming leads!`,
+          title: 'Subscription Activated!',
+          message:
+            `Your subscription for ${categoryInfo.name} is now active. You can start claiming leads!`,
           read: false
         }
       });

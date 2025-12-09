@@ -108,12 +108,15 @@ export async function POST(
         include: { homeownerProfile: true },
       });
 
+      const city = homeownerWithProfile?.homeownerProfile?.city || undefined;
+
       await NotificationService.notifyAllContractors({
         leadId: lead.id,
         title: lead.title,
         description: lead.description,
         budget: lead.budget,
-        city: homeownerWithProfile?.homeownerProfile?.city,
+        // Only include city when we have a concrete string value
+        ...(city ? { city } : {}),
       });
     } catch (notificationError) {
       console.error('Failed to notify contractors, but job was posted:', notificationError);

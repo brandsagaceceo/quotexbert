@@ -196,8 +196,8 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
             <div className="space-y-2 text-sm">
               {textDescription && (
                 <div className="flex items-start space-x-2">
-                  <span className="text-blue-600">✏️</span>
-                  <span className="text-blue-800">Text: {textDescription.substring(0, 100)}{textDescription.length > 100 ? "..." : ""}</span>
+                  <span className="text-rose-600">✏️</span>
+                  <span className="text-rose-800">Text: {textDescription.substring(0, 100)}{textDescription.length > 100 ? "..." : ""}</span>
                 </div>
               )}
               {voiceTranscript && (
@@ -208,8 +208,8 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
               )}
               {images.length > 0 && (
                 <div className="flex items-start space-x-2">
-                  <span className="text-blue-600">📸</span>
-                  <span className="text-blue-800">{images.length} project photo{images.length !== 1 ? "s" : ""} uploaded</span>
+                  <span className="text-rose-600">📸</span>
+                  <span className="text-rose-800">{images.length} project photo{images.length !== 1 ? "s" : ""} uploaded</span>
                 </div>
               )}
             </div>

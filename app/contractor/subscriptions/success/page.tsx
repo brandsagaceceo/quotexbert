@@ -36,7 +36,7 @@ function SuccessContent() {
         <div className="space-y-3">
           <Link
             href="/contractor/subscriptions"
-            className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
           >
             Manage Subscriptions
           </Link>

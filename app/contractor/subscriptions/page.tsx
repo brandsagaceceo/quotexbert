@@ -103,8 +103,7 @@ export default function SubscriptionsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contractorId: authUser.id,
-          category,
-          startTrial: true // Offer trial for new subscriptions
+          category
         })
       });
 
@@ -162,7 +161,7 @@ export default function SubscriptionsPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading subscription data...</p>
         </div>
       </div>
@@ -371,7 +370,7 @@ export default function SubscriptionsPage() {
                   onClick={() => setActiveTab('subscriptions')}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'subscriptions'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-rose-500 text-rose-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -381,7 +380,7 @@ export default function SubscriptionsPage() {
                   onClick={() => setActiveTab('billing')}
                   className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'billing'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-rose-500 text-rose-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -410,7 +409,7 @@ export default function SubscriptionsPage() {
                         <span>Basic - $15/month</span>
                       </div>
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <div className="w-3 h-3 bg-rose-500 rounded-full mr-2"></div>
                         <span>Standard - $25/month</span>
                       </div>
                       <div className="flex items-center">
@@ -447,7 +446,7 @@ export default function SubscriptionsPage() {
                               const getPriceColor = (price: number) => {
                                 switch(price) {
                                   case 15: return 'bg-green-100 text-green-800';
-                                  case 25: return 'bg-blue-100 text-blue-800';
+                                  case 25: return 'bg-rose-100 text-rose-800';
                                   case 49: return 'bg-purple-100 text-purple-800';
                                   case 79: return 'bg-yellow-100 text-yellow-800';
                                   default: return 'bg-gray-100 text-gray-800';
@@ -485,9 +484,6 @@ export default function SubscriptionsPage() {
                                       {subscription.nextBillingDate && (
                                         <p>Next billing: {new Date(subscription.nextBillingDate).toLocaleDateString()}</p>
                                       )}
-                                      {subscription.trialEnd && new Date(subscription.trialEnd) > new Date() && (
-                                        <p className="text-blue-600">Trial ends: {new Date(subscription.trialEnd).toLocaleDateString()}</p>
-                                      )}
                                     </div>
                                     <button
                                       onClick={() => handleCancel(subscription.id)}
@@ -500,7 +496,7 @@ export default function SubscriptionsPage() {
                                 ) : (
                                   <button
                                     onClick={() => handleSubscribe(category.id)}
-                                    className="w-full px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                    className="w-full px-3 py-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs rounded-md hover:from-rose-700 hover:to-orange-700 disabled:opacity-50"
                                     disabled={loading}
                                   >
                                     Subscribe

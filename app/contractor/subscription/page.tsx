@@ -30,11 +30,16 @@ const categories: Category[] = [
   { id: "landscaping", name: "Landscaping", description: "Gardens, hardscaping, irrigation", price: 29 },
 ];
 
+const MAX_YEARLY_CATEGORIES = 10;
+const YEARLY_DISCOUNT_MONTHS = 10; // Pay for 10 months on annual billing
+type BillingInterval = "month" | "year";
+
 export default function ContractorSubscription() {
-  const { authUser: user, isLoading } = useAuth();
+  const { authUser: user, authLoading } = useAuth();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [payoutInfo, setPayoutInfo] = useState<any>(null);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>("month");
 
   useEffect(() => {
     if (user?.id) {
@@ -57,19 +62,55 @@ export default function ContractorSubscription() {
     }
   };
 
-  const toggleCategory = (categoryId: string) => {
-    if (selectedCategories.includes(categoryId)) {
-      setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
-    } else {
-      setSelectedCategories([...selectedCategories, categoryId]);
+  const handleIntervalChange = (interval: BillingInterval) => {
+    if (interval === "year" && selectedCategories.length > MAX_YEARLY_CATEGORIES) {
+      // If switching to yearly, cap at the first MAX_YEARLY_CATEGORIES selections
+      setSelectedCategories(selectedCategories.slice(0, MAX_YEARLY_CATEGORIES));
     }
+    setBillingInterval(interval);
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    const isSelected = selectedCategories.includes(categoryId);
+
+    if (isSelected) {
+      setSelectedCategories(selectedCategories.filter((id) => id !== categoryId));
+      return;
+    }
+
+    if (billingInterval === "year" && selectedCategories.length >= MAX_YEARLY_CATEGORIES) {
+      alert(`Yearly bundle covers up to ${MAX_YEARLY_CATEGORIES} categories. Deselect one to add another.`);
+      return;
+    }
+
+    setSelectedCategories([...selectedCategories, categoryId]);
   };
 
   const calculateTotal = () => {
-    return selectedCategories.reduce((total, catId) => {
+    const totalCategories = categories.length;
+    const allAccessPrice = 199;
+    const isAllAccessSelected = selectedCategories.length === totalCategories;
+
+    const monthlyTotal = selectedCategories.reduce((total, catId) => {
       const category = categories.find(c => c.id === catId);
       return total + (category?.price || 0);
     }, 0);
+
+    // All Access is a special monthly-only bundle
+    if (billingInterval === "month" && isAllAccessSelected) {
+      return allAccessPrice;
+    }
+
+    if (billingInterval === "month") {
+      return monthlyTotal;
+    }
+
+    // Yearly: charge for YEARLY_DISCOUNT_MONTHS instead of 12 (e.g. 2 months free)
+    if (selectedCategories.length === 0) {
+      return 0;
+    }
+
+    return monthlyTotal * YEARLY_DISCOUNT_MONTHS;
   };
 
   const handleSubscribe = async () => {
@@ -86,7 +127,8 @@ export default function ContractorSubscription() {
         body: JSON.stringify({
           userId: user?.id,
           categories: selectedCategories,
-          amount: calculateTotal()
+          amount: calculateTotal(),
+          billingInterval,
         })
       });
 
@@ -128,10 +170,10 @@ export default function ContractorSubscription() {
     }
   };
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
       </div>
     );
   }
@@ -142,7 +184,7 @@ export default function ContractorSubscription() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">Contractor Access Only</h1>
           <p className="text-slate-600 mb-6">This page is only available to contractors.</p>
-          <Link href="/" className="text-blue-600 hover:underline">Go to Homepage</Link>
+          <Link href="/" className="text-rose-700 hover:underline">Go to Homepage</Link>
         </div>
       </div>
     );
@@ -162,7 +204,7 @@ export default function ContractorSubscription() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-white text-center md:text-left">
                 <div className="inline-block bg-yellow-400 text-rose-900 px-4 py-2 rounded-full text-sm font-bold mb-4 animate-pulse">
-                  🔥 BEST VALUE - SAVE ${regularPrice - allAccessPrice}!
+                  🔥 LAUNCH DEAL - SAVE ${regularPrice - allAccessPrice}!
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black mb-3">ALL ACCESS PASS</h2>
                 <p className="text-xl md:text-2xl text-white/90 mb-4">
@@ -202,9 +244,35 @@ export default function ContractorSubscription() {
             À La Carte Pricing
           </h1>
           
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Select specific categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly
+          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Select specific categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly.
           </p>
+
+          {/* Billing interval toggle */}
+          <div className="inline-flex items-center justify-center gap-2 bg-slate-900/90 text-white rounded-full p-1 shadow-lg animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+            <button
+              type="button"
+              onClick={() => handleIntervalChange("month")}
+              className={`px-5 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                billingInterval === "month"
+                  ? 'bg-white text-slate-900 shadow-md'
+                  : 'bg-transparent text-slate-200 hover:text-white'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => handleIntervalChange("year")}
+              className={`px-5 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                billingInterval === "year"
+                  ? 'bg-white text-slate-900 shadow-md'
+                  : 'bg-transparent text-slate-200 hover:text-white'
+              }`}
+            >
+              Yearly (up to {MAX_YEARLY_CATEGORIES})
+            </button>
+          </div>
 
           {/* Trust Badges */}
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 mt-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -213,7 +281,7 @@ export default function ContractorSubscription() {
               <span className="text-sm font-medium">Stripe Secured</span>
             </div>
             <div className="flex items-center gap-2 text-slate-700">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+                <TrendingUp className="w-6 h-6 text-rose-600" />
               <span className="text-sm font-medium">500+ Active Contractors</span>
             </div>
             <div className="flex items-center gap-2 text-slate-700">
@@ -292,12 +360,14 @@ export default function ContractorSubscription() {
                   Quick Select Options
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setSelectedCategories(categories.map(c => c.id))}
-                    className="px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-sm font-bold rounded-xl hover:shadow-2xl transform hover:-translate-y-0.5 transition-all duration-200"
-                  >
-                    🌟 Select All (Save 15%)
-                  </button>
+                  {billingInterval === "month" && (
+                    <button
+                      onClick={() => setSelectedCategories(categories.map((c) => c.id))}
+                      className="px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-sm font-bold rounded-xl hover:shadow-2xl transform hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                      🌟 Select All (All Access $199/mo)
+                    </button>
+                  )}
                   <button
                     onClick={() => setSelectedCategories([])}
                     className="px-6 py-3 bg-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-300 hover:shadow-lg transition-all duration-200"
@@ -374,11 +444,11 @@ export default function ContractorSubscription() {
                         <p className="text-xs text-green-700">No long-term commitment required</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                      <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-3 p-3 bg-rose-50 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-rose-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-semibold text-blue-900">Unlimited Access</p>
-                        <p className="text-xs text-blue-700">Receive all jobs in your categories</p>
+                        <p className="text-sm font-semibold text-rose-900">Unlimited Access</p>
+                        <p className="text-xs text-rose-700">Receive all jobs in your categories</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">

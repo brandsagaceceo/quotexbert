@@ -11,7 +11,7 @@ function getStripePriceId(categoryId: string, price: number): string {
 export async function POST(request: NextRequest) {
   try {
     console.log('Subscription API called');
-    const { contractorId, category, paymentMethodId, startTrial = false } = await request.json();
+    const { contractorId, category } = await request.json();
 
     if (!contractorId || !category) {
       return NextResponse.json(
@@ -73,8 +73,6 @@ export async function POST(request: NextRequest) {
       
       // Create subscription record directly for demo
       const now = new Date();
-      const trialStart = startTrial ? now : null;
-      const trialEnd = startTrial ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) : null;
 
       const subscription = await prisma.contractorSubscription.create({
         data: {
@@ -87,8 +85,8 @@ export async function POST(request: NextRequest) {
           stripePriceId: stripePriceId,
           currentPeriodStart: now,
           currentPeriodEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days
-          trialStart,
-          trialEnd,
+          trialStart: null,
+          trialEnd: null,
           canClaimLeads: true,
           canViewLeads: true
         }
@@ -99,10 +97,9 @@ export async function POST(request: NextRequest) {
         data: {
           userId: contractorId,
           type: 'SUBSCRIPTION_CREATED',
-          title: startTrial ? 'Free Trial Started! (Demo)' : 'Subscription Created (Demo)',
-          message: startTrial 
-            ? `Your 7-day free trial for ${category} category has started. Enjoy full access! (Demo Mode)`
-            : `Your subscription for ${category} category has been created. You now have access to leads in this category. (Demo Mode)`,
+          title: 'Subscription Created (Demo)',
+          message:
+            `Your subscription for ${category} category has been created. You now have access to leads in this category. (Demo Mode)`,
           relatedId: subscription.id,
           relatedType: 'subscription'
         }

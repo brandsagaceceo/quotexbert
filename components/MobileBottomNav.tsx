@@ -115,11 +115,11 @@ export default function MobileBottomNav() {
               className={`
                 flex flex-col items-center justify-center h-full px-1 transition-colors relative
                 ${item.active 
-                  ? "text-blue-600" 
-                  : "text-gray-500 hover:text-blue-600"
+                  ? "text-rose-600" 
+                  : "text-gray-500 hover:text-rose-600"
                 }
                 ${item.isAction 
-                  ? "bg-blue-600 text-white hover:bg-blue-700 mx-2 my-1 rounded-xl" 
+                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700 mx-2 my-1 rounded-xl" 
                   : ""
                 }
               `}

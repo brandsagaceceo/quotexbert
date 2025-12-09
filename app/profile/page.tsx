@@ -444,13 +444,13 @@ export default function UnifiedProfilePage() {
           </div>
         )}
 
-        {/* Profile Info Container - Overlaps cover photo */}
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-20">
+        {/* Profile Info Container - Fixed positioning */}
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-16">
           <div className="container mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-40 h-40 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -555,7 +555,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-32"></div>
+      <div className="h-24 md:h-32"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -567,7 +567,7 @@ export default function UnifiedProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium text-sm capitalize ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
+                    ? 'border-rose-600 text-rose-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -591,7 +591,7 @@ export default function UnifiedProfilePage() {
                     <textarea
                       value={editData.bio}
                       onChange={(e) => setEditData({...editData, bio: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                       rows={4}
                       placeholder="Tell people about your experience, specialties, and what makes you unique..."
                     />
@@ -606,7 +606,7 @@ export default function UnifiedProfilePage() {
                 {isContractor && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Briefcase className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                      <Briefcase className="h-8 w-8 text-rose-600 mx-auto mb-2" />
                       <div className="text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
                       <div className="text-sm text-gray-600">Completed Jobs</div>
                     </div>
@@ -631,7 +631,7 @@ export default function UnifiedProfilePage() {
                   <h2 className="text-xl font-bold text-gray-900">Portfolio</h2>
                   <button 
                     onClick={() => setShowPortfolioForm(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700 flex items-center"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Project

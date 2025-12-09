@@ -230,7 +230,7 @@ export default function Home() {
               <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ⭐ Average Rating</span>
             </div>
             <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '1s' }}>
-              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span className="text-sm font-semibold text-slate-700">🔒 Stripe-Secured</span>
@@ -279,7 +279,7 @@ export default function Home() {
                   <div className="flex gap-3 justify-center">
                     <Link 
                       href="/homeowner/estimates" 
-                      className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                      className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                     >
                       📊 View My Estimates
                     </Link>
@@ -635,6 +635,42 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contractor Launch Deal Banner */}
+      <section className="py-16 bg-gradient-to-br from-rose-900 via-red-800 to-orange-900">
+        <div className="max-w-5xl mx-auto px-4 text-center text-white">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-xs font-semibold mb-4">
+            <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
+            <span>Launch Offer for GTA Contractors</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+            All-Access Leads for $199/month
+          </h2>
+          <p className="text-sm sm:text-base md:text-lg text-orange-100 max-w-2xl mx-auto mb-6">
+            Get every category unlocked across Toronto and the GTA 
+            kitchen, bathroom, roofing, basement, decks, and more 
+            for a flat monthly price. No per-lead surprises.
+          </p>
+          <p className="text-xs sm:text-sm text-orange-100 mb-6">
+            Normally ${stats.totalJobs ? 259 : 259}+ if you picked categories one by one. During launch,
+            contractors lock in <span className="font-semibold">$199/month</span> for full access.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/contractor/subscription"
+              className="px-8 py-4 bg-white text-rose-800 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              🔨 Claim All-Access Pass
+            </Link>
+            <Link
+              href="/contractor/subscriptions"
+              className="px-6 py-3 bg-transparent border border-white/30 rounded-xl text-sm font-medium text-orange-100 hover:bg-white/10 transition-all duration-200"
+            >
+              View Category Pricing
+            </Link>
           </div>
         </div>
       </section>
