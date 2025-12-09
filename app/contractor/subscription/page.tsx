@@ -235,17 +235,19 @@ export default function ContractorSubscription() {
 
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-lg mb-6 animate-fade-in">
-            <Sparkles className="w-5 h-5 text-orange-600" />
-            <span className="text-sm font-semibold text-slate-700">Or Choose Individual Categories</span>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-full shadow-lg mb-6 animate-fade-in">
+            <Sparkles className="w-5 h-5 text-white" />
+            <span className="text-sm font-bold text-white">🔥 LIMITED TIME OFFER - 20% OFF!</span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 animate-fade-in-up">
-            À La Carte Pricing
+          <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-4 animate-fade-in-up px-4 leading-tight">
+            Build Your Perfect
+            <br />
+            Lead Package
           </h1>
           
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Select specific categories and start receiving <span className="font-bold text-rose-700">qualified leads</span> instantly.
+          <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto mb-6 animate-fade-in-up px-4" style={{ animationDelay: '0.1s' }}>
+            Choose only the services you offer. Pay only for what you need. <span className="font-black text-rose-700">Get qualified leads instantly.</span>
           </p>
 
           {/* Billing interval toggle */}
@@ -295,16 +297,37 @@ export default function ContractorSubscription() {
           {/* Category Selection */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 p-8 mb-8 animate-fade-in-up hover-lift" style={{ animationDelay: '0.3s' }}>
-              <div className="flex items-center justify-between mb-8">
-                <div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div className="flex-1">
                   <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Select Your Services</h2>
                   <p className="text-slate-600 text-lg">Pick categories to receive instant job notifications</p>
                 </div>
-                {selectedCategories.length > 0 && (
-                  <div className="hidden sm:block bg-gradient-to-r from-rose-600 to-orange-600 px-5 py-2 rounded-full shadow-lg animate-scale-in">
-                    <span className="text-white font-bold text-lg">{selectedCategories.length} selected</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-3 flex-wrap">
+                  {selectedCategories.length > 0 && (
+                    <div className="bg-gradient-to-r from-rose-600 to-orange-600 px-5 py-2 rounded-full shadow-lg animate-scale-in">
+                      <span className="text-white font-bold text-lg">{selectedCategories.length} selected</span>
+                    </div>
+                  )}
+                  <select
+                    className="px-4 py-2 bg-white border-2 border-slate-300 rounded-xl font-semibold text-slate-700 hover:border-rose-500 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all cursor-pointer"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === 'all') {
+                        setSelectedCategories(categories.map(c => c.id));
+                      } else if (value === 'none') {
+                        setSelectedCategories([]);
+                      } else if (value === 'popular') {
+                        setSelectedCategories(['general', 'plumbing', 'electrical', 'roofing']);
+                      }
+                    }}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Quick Select</option>
+                    <option value="all">✓ Select All</option>
+                    <option value="popular">⭐ Popular Bundle</option>
+                    <option value="none">✕ Clear All</option>
+                  </select>
+                </div>
               </div>
               
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

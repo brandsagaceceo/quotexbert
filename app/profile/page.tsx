@@ -780,10 +780,11 @@ export default function UnifiedProfilePage() {
                         <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
                         <input
                           type="text"
-                          value={editData.companyName}
+                          value={editData.companyName || ''}
                           onChange={(e) => setEditData({...editData, companyName: e.target.value})}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="Your Company Name"
+                          required
                         />
                       </div>
                       <div>

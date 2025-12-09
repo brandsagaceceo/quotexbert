@@ -26,20 +26,10 @@ export default function Logo({
   const { width, height, textSize } = sizeMap[size];
   
   const logoContent = (
-    <div className={`flex items-center space-x-3 ${className}`}>
-      <Image
-        src="/logo.svg"
-        alt="QuoteXbert Logo"
-        width={width}
-        height={height}
-        className="w-auto h-auto"
-        priority
-      />
-      {showText && (
-        <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
-          QuoteXbert
-        </span>
-      )}
+    <div className={`flex items-center ${className}`}>
+      <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
+        QuoteXbert
+      </span>
     </div>
   );
 

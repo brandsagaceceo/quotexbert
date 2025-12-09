@@ -10,15 +10,8 @@ export default function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center space-x-3 mb-4">
-              <Image
-                src="/logo.svg"
-                alt="quotexbert logo"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span className="text-xl font-bold text-brand">quotexbert</span>
+            <Link href="/" className="flex items-center mb-4">
+              <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">quotexbert</span>
             </Link>
             <p className="text-ink-600 mb-4 max-w-md">
               Connect homeowners with trusted contractors. Get instant quotes
