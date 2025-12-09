@@ -397,7 +397,7 @@ export default function UnifiedProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
       {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed top-20 right-4 md:top-24 md:right-6 z-50">
+      <div className="fixed top-24 right-6 md:top-28 md:right-8 z-50">
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
@@ -428,9 +428,9 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative h-80 md:h-96 overflow-hidden">
+      <div className="relative h-64 md:h-80 overflow-visible">
         {/* Cover Photo */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
             <img 
               src={profile.coverPhoto} 
@@ -467,21 +467,21 @@ export default function UnifiedProfilePage() {
             />
             <button
               onClick={() => document.getElementById('coverPhotoInput')?.click()}
-              className="bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
+              className="bg-white/95 backdrop-blur-sm text-slate-900 px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold border border-white/20"
             >
-              <Camera className="h-4 w-4" />
+              <Camera className="h-5 w-5 text-rose-600" />
               Change Cover
             </button>
           </div>
         )}
 
         {/* Profile Info Container - Fixed positioning */}
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-8 md:translate-y-12">
+        <div className="absolute -bottom-24 left-0 right-0">
           <div className="container mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
-              <div className="relative group">
-                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+              <div className="relative group flex-shrink-0">
+                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -507,14 +507,14 @@ export default function UnifiedProfilePage() {
                       <button
                         onClick={() => document.getElementById('profilePhotoInput')?.click()}
                         disabled={isUploading}
-                        className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:bg-black/80"
                       >
                         {isUploading ? (
-                          <div className="animate-spin rounded-full h-8 w-8 border-3 border-white border-t-transparent"></div>
+                          <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
                         ) : (
                           <>
-                            <Camera className="h-8 w-8 text-white mb-2" />
-                            <span className="text-white text-sm font-medium">Change Photo</span>
+                            <Camera className="h-10 w-10 text-white mb-2" />
+                            <span className="text-white text-sm font-bold">Change Photo</span>
                           </>
                         )}
                       </button>
@@ -524,8 +524,8 @@ export default function UnifiedProfilePage() {
               </div>
 
               {/* Profile Info */}
-              <div className="flex-1 pb-4">
-                <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+              <div className="flex-1 pb-6">
+                <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
                   <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">{displayName}</h1>
                     <p className="text-rose-700 font-semibold text-lg capitalize mb-3">
@@ -554,7 +554,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-12 md:h-20"></div>
+      <div className="h-32 md:h-36"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -584,18 +584,23 @@ export default function UnifiedProfilePage() {
             {activeTab === 'overview' && (
               <>
                 {/* Bio Section */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">About</h2>
+                <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold text-slate-900">About</h2>
+                    {isEditing && (
+                      <span className="text-xs text-rose-600 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
+                    )}
+                  </div>
                   {isEditing ? (
                     <textarea
                       value={editData.bio}
                       onChange={(e) => setEditData({...editData, bio: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-                      rows={4}
+                      className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                      rows={5}
                       placeholder="Tell people about your experience, specialties, and what makes you unique..."
                     />
                   ) : (
-                    <p className="text-gray-600">
+                    <p className="text-slate-600 leading-relaxed text-base">
                       {profile?.bio || "No bio added yet. Click Edit Profile to add information about your experience and services."}
                     </p>
                   )}
@@ -625,14 +630,14 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'portfolio' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Portfolio</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">Portfolio</h2>
                   <button 
                     onClick={() => setShowPortfolioForm(true)}
-                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700 flex items-center"
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-5 py-3 rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-5 w-5" />
                     Add Project
                   </button>
                 </div>
@@ -760,82 +765,127 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'contact' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h2>
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900">Contact Information</h2>
+                  {isEditing && (
+                    <span className="text-xs text-rose-600 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
+                  )}
+                </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {isEditing ? (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
                         <input
                           type="text"
                           value={editData.companyName}
                           onChange={(e) => setEditData({...editData, companyName: e.target.value})}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                          placeholder="Your Company Name"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Trade/Specialty</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Trade/Specialty</label>
                         <input
                           type="text"
                           value={editData.trade}
                           onChange={(e) => setEditData({...editData, trade: e.target.value})}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                          placeholder="e.g., General Contractor, Plumber, Electrician"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
                         <input
                           type="tel"
                           value={editData.phone}
                           onChange={(e) => setEditData({...editData, phone: e.target.value})}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                          placeholder="(555) 123-4567"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
                         <input
                           type="text"
                           value={editData.city}
                           onChange={(e) => setEditData({...editData, city: e.target.value})}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                          placeholder="Toronto"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Website</label>
                         <input
                           type="url"
                           value={editData.website}
                           onChange={(e) => setEditData({...editData, website: e.target.value})}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                          placeholder="https://yourwebsite.com"
                         />
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center text-gray-600">
-                        <Mail className="h-5 w-5 mr-3" />
-                        {authUser.email}
+                      <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center">
+                          <Mail className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="ml-4">
+                          <p className="text-xs font-semibold text-slate-500 uppercase">Email</p>
+                          <p className="text-base font-medium text-slate-900">{authUser.email}</p>
+                        </div>
                       </div>
-                      {profile?.phone && (
-                        <div className="flex items-center text-gray-600">
-                          <Phone className="h-5 w-5 mr-3" />
-                          {profile.phone}
+                      {profile?.phone ? (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center">
+                            <Phone className="h-6 w-6 text-white" />
+                          </div>
+                          <div className="ml-4">
+                            <p className="text-xs font-semibold text-slate-500 uppercase">Phone</p>
+                            <p className="text-base font-medium text-slate-900">{profile.phone}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <Phone className="h-5 w-5 text-slate-400 mr-3" />
+                          <span className="text-slate-500 italic">No phone number added</span>
                         </div>
                       )}
-                      {profile?.website && (
-                        <div className="flex items-center text-gray-600">
-                          <Globe className="h-5 w-5 mr-3" />
-                          <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            {profile.website}
-                          </a>
+                      {profile?.website ? (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center">
+                            <Globe className="h-6 w-6 text-white" />
+                          </div>
+                          <div className="ml-4 flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-slate-500 uppercase">Website</p>
+                            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-rose-600 hover:text-rose-700 hover:underline truncate block">
+                              {profile.website}
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <Globe className="h-5 w-5 text-slate-400 mr-3" />
+                          <span className="text-slate-500 italic">No website added</span>
                         </div>
                       )}
-                      {profile?.city && (
-                        <div className="flex items-center text-gray-600">
-                          <MapPin className="h-5 w-5 mr-3" />
-                          {profile.city}
+                      {profile?.city ? (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center">
+                            <MapPin className="h-6 w-6 text-white" />
+                          </div>
+                          <div className="ml-4">
+                            <p className="text-xs font-semibold text-slate-500 uppercase">Location</p>
+                            <p className="text-base font-medium text-slate-900">{profile.city}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <MapPin className="h-5 w-5 text-slate-400 mr-3" />
+                          <span className="text-slate-500 italic">No location added</span>
                         </div>
                       )}
                     </>
