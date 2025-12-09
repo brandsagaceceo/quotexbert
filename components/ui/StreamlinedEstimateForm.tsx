@@ -308,7 +308,7 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your project in detail... (e.g., 'I need to replace my kitchen faucet. It's a standard single-handle faucet with a pull-out sprayer. The current one is leaking from the base.')"
-              className="w-full bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-500 min-h-[120px] resize-none focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+              className="w-full bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-500 min-h-[120px] resize-none focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 caret-teal-700 cursor-text"
             />
             
             {/* Voice and Photo Buttons */}

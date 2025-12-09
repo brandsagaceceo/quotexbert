@@ -242,7 +242,7 @@ export default function Home() {
             <div className="inline-block mb-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg animate-bounce">
               <span className="text-sm font-bold">🎨 NEW: AI Photo Visualization Available!</span>
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight flex flex-col items-center gap-4">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight flex flex-col items-center gap-4">
               <span className="flex items-center gap-4">
                 <svg className="w-16 h-16 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -250,9 +250,9 @@ export default function Home() {
                 </svg>
                 Take a Picture
               </span>
-              <span className="text-4xl sm:text-5xl lg:text-6xl">Get a Quote. Easy as That.</span>
+              <span className="text-5xl sm:text-6xl lg:text-7xl">Get a Quote. Easy as That.</span>
             </h1>
-            <p className="text-xl sm:text-2xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
+            <p className="text-2xl sm:text-3xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
               Snap a photo or describe your project → Get instant AI estimates → Connect with verified GTA contractors → See what it could look like with AI visualization!
             </p>
             
@@ -356,7 +356,7 @@ export default function Home() {
               </div>
               <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
                 <Image
-                  src="https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=400&fit=crop&q=80"
+                  src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=400&h=400&fit=crop&q=80"
                   alt="Roofing contractor at work"
                   width={400}
                   height={400}
@@ -398,12 +398,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Main Estimator Form - Center of Attention */}
-          <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
-            <StreamlinedEstimateForm 
-              onEstimateComplete={handleEstimateComplete} 
-              userId={user?.id}
-            />
+          {/* Main Estimator Form - Center of Attention (prominent AI estimator) */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 relative z-10 max-w-4xl mx-auto">
+            <AIQuoteEstimator />
           </div>
 
           {/* Estimate Results */}
@@ -490,33 +487,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Quote Estimator Section - BIG AND PROMINENT */}
-      <section id="ai-estimator" className="py-24 bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-72 h-72 bg-rose-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          {/* BIG ATTENTION-GRABBING HEADER */}
-          <div className="text-center mb-12 animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-full shadow-lg mb-6 animate-pulse-glow">
-              <span className="text-2xl">🤖</span>
-              <span className="font-bold text-lg">AI-Powered Technology</span>
-            </div>
-            
-            <h2 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-6 leading-tight">
-              Get Your Instant Quote<br />
-              <span className="text-4xl md:text-6xl">In Seconds!</span>
-            </h2>
-            
-            <p className="text-xl md:text-2xl text-slate-700 max-w-3xl mx-auto mb-8">
-              📸 Snap a photo • 🎤 Describe your project • ✨ Receive AI estimate • 📊 Visualize the result
-            </p>
-          </div>
-          
-          <AIQuoteEstimator />
-        </div>
-      </section>
+      
 
       {/* How It Works - Below the fold */}
       <section className="py-16 bg-gradient-to-br from-orange-100/40 to-red-100/40 backdrop-blur-sm">

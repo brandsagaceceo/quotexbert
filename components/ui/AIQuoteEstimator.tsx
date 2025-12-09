@@ -224,7 +224,7 @@ export function AIQuoteEstimator() {
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Example: I want to renovate my 10x12 kitchen. Need new cabinets, countertops, backsplash, and flooring. The space currently has old laminate counters and vinyl flooring from the 90s..."
               rows={6}
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all resize-none"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all resize-none caret-rose-700 text-slate-900"
             />
             <p className="text-sm text-slate-500 mt-2">
               Be as detailed as possible for accurate estimates. Include dimensions, materials, current condition, etc.
@@ -256,10 +256,7 @@ export function AIQuoteEstimator() {
               )}
             </div>
             
-            {/* Pulsing glow ring */}
-            {!loading && (
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-rose-700 to-orange-600 opacity-0 group-hover:opacity-50 blur-xl group-hover:animate-pulse"></div>
-            )}
+            {/* Remove heavy blur overlay to keep button crisp */}
           </button>
         </div>
       ) : (
