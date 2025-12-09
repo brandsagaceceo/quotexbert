@@ -648,11 +648,22 @@ export default function UnifiedProfilePage() {
                       <div key={item.id} className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                         {/* Project Image */}
                         <div className="relative h-64 overflow-hidden">
-                          <img 
-                            src={item.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80'} 
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
+                          {item.imageUrl ? (
+                            <img 
+                              src={item.imageUrl} 
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80';
+                              }}
+                            />
+                          ) : (
+                            <img 
+                              src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80' 
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                          )}
                           {/* Gradient overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           
@@ -1125,13 +1136,6 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
                 {formData.imageUrl ? (
                   <div className="relative">
                     <img src={formData.imageUrl} alt="Project" className="w-full h-48 object-cover rounded" />
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
                   </div>
                 ) : (
                   <div className="text-center">

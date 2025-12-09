@@ -356,11 +356,12 @@ export default function Home() {
               </div>
               <div className="group relative overflow-hidden rounded-2xl shadow-lg hover-lift">
                 <Image
-                  src="https://images.unsplash.com/photo-1625428408967-ed4a21ef0d95?w=400&h=400&fit=crop"
+                  src="https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=400&h=400&fit=crop&q=80"
                   alt="Roofing contractor at work"
                   width={400}
                   height={400}
                   className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
                   <div className="text-white">
