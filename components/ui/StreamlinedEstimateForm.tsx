@@ -197,6 +197,7 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [generateVisualization, setGenerateVisualization] = useState(false);
 
   const handleVoiceTranscript = (transcript: string) => {
     // Append voice transcript to existing description
@@ -318,6 +319,28 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
           </div>
         </div>
 
+        {/* AI Visualization Toggle */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="aiVisualization"
+              checked={generateVisualization}
+              onChange={(e) => setGenerateVisualization(e.target.checked)}
+              className="mt-1 w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+            />
+            <div className="flex-1">
+              <label htmlFor="aiVisualization" className="block font-semibold text-gray-900 cursor-pointer">
+                🎨 Generate AI Photo Visualization
+              </label>
+              <p className="text-sm text-gray-600 mt-1">
+                See what your completed project could look like with AI-generated before & after photos! 
+                <span className="inline-block ml-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded">NEW</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Photo Previews */}
         {imagePreviews.length > 0 && (
           <div>
@@ -349,9 +372,24 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
             size="lg"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1 animate-pulse-slow shadow-2xl transform hover:scale-105 transition-all duration-300 ring-4 ring-rose-300 ring-offset-2"
+            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 text-white font-bold text-lg py-6 shadow-2xl transform hover:scale-105 transition-all duration-300 ring-4 ring-rose-300 ring-offset-2 animate-pulse-slow relative overflow-hidden group"
           >
-            {isLoading ? "Generating Estimate..." : "✨ Get My Estimate ✨"}
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+            <span className="relative flex items-center justify-center gap-2">
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating Estimate...
+                </>
+              ) : (
+                <>
+                  📸 Get My Instant Estimate 🚀
+                </>
+              )}
+            </span>
           </Button>
           
           {(description || images.length > 0) && (

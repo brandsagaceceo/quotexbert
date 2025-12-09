@@ -251,8 +251,8 @@ function PortfolioCard({
   return (
     <Card className={`${item.isPinned ? 'border-orange-200 bg-orange-50' : ''}`}>
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
+        <div className="flex justify-between items-start gap-3">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2 mb-2">
               {item.isPinned && (
                 <Badge variant="warning" size="sm">
@@ -274,23 +274,25 @@ function PortfolioCard({
             )}
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => onToggleVisibility(item.id, item.isPublic)}
+              className="p-2"
             >
-              {item.isPublic ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {item.isPublic ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             </Button>
             <Button
               variant="secondary"
               size="sm"
               onClick={() => onTogglePin(item.id, item.isPinned)}
+              className="p-2"
             >
-              <Pin className={`w-4 h-4 ${item.isPinned ? 'text-orange-600' : ''}`} />
+              <Pin className={`w-3.5 h-3.5 ${item.isPinned ? 'text-orange-600' : ''}`} />
             </Button>
-            <Button variant="secondary" size="sm">
-              <MoreHorizontal className="w-3 h-3" />
+            <Button variant="secondary" size="sm" className="p-2">
+              <MoreHorizontal className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>

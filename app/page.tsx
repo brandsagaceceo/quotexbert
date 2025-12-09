@@ -239,13 +239,16 @@ export default function Home() {
 
           {/* Hero Content */}
           <div className="text-center mb-12 animate-fade-in-up">
+            <div className="inline-block mb-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg animate-bounce">
+              <span className="text-sm font-bold">🎨 NEW: AI Photo Visualization Available!</span>
+            </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight">
-              Toronto's Most Trusted
+              📸 Take a Picture
               <br />
-              Home Improvement Platform
+              <span className="text-4xl sm:text-5xl lg:text-6xl">Get a Quote. Easy as That.</span>
             </h1>
             <p className="text-xl sm:text-2xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
-              Connect with verified contractors, get instant AI estimates, and transform your home with confidence
+              Snap a photo or describe your project → Get instant AI estimates → Connect with verified GTA contractors → See what it could look like with AI visualization!
             </p>
             
             {/* CTA Buttons */}

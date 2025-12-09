@@ -397,29 +397,30 @@ export default function UnifiedProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
       {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed top-24 right-6 z-50">
+      <div className="fixed top-20 right-4 md:top-24 md:right-6 z-50">
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl"
+            className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl text-sm md:text-base"
           >
-            <Edit3 className="h-4 w-4" />
-            Edit Profile
+            <Edit3 className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="hidden sm:inline">Edit Profile</span>
+            <span className="sm:hidden">Edit</span>
           </button>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center gap-2 shadow-xl"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
             >
-              <Save className="h-4 w-4" />
+              <Save className="h-3 w-3 md:h-4 md:w-4" />
               Save
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center gap-2 shadow-xl"
+              className="bg-slate-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3 md:h-4 md:w-4" />
               Cancel
             </button>
           </div>
@@ -475,7 +476,7 @@ export default function UnifiedProfilePage() {
         )}
 
         {/* Profile Info Container - Fixed positioning */}
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-16">
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-12 md:translate-y-16">
           <div className="container mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
@@ -553,7 +554,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-20 md:h-24"></div>
+      <div className="h-16 md:h-24"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
