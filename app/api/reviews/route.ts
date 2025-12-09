@@ -10,18 +10,13 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    if (!contractorId) {
-      return NextResponse.json(
-        { error: "Contractor ID is required" },
-        { status: 400 }
-      );
-    }
-
+    // If contractorId is not provided, return the most recent reviews across all contractors
     const skip = (page - 1) * limit;
+    const where = contractorId ? { contractorId } : {};
 
     const [reviews, totalCount] = await Promise.all([
       prisma.review.findMany({
-        where: { contractorId },
+        where,
         include: {
           homeowner: {
             select: {
@@ -35,7 +30,7 @@ export async function GET(request: NextRequest) {
         take: limit,
       }),
       prisma.review.count({
-        where: { contractorId },
+        where,
       }),
     ]);
 
