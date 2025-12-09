@@ -9,12 +9,17 @@ export function FloatingAIPrompt() {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Show bubble after 8 seconds
-    const timer = setTimeout(() => {
+    // Show bubble after 30 seconds
+    const showTimer = setTimeout(() => {
       setIsVisible(true);
-    }, 8000);
+      // Auto-hide after 15 seconds
+      const hideTimer = setTimeout(() => {
+        handleClose();
+      }, 15000);
+      return () => clearTimeout(hideTimer);
+    }, 30000);
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(showTimer);
   }, []);
 
   const handleClose = () => {
@@ -73,12 +78,7 @@ export function FloatingAIPrompt() {
             </div>
           </div>
 
-          {/* Animated dots */}
-          <div className="absolute -top-2 -right-2 flex gap-1">
-            <div className="w-3 h-3 bg-white shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
-            <div className="w-3 h-3 bg-orange-400 shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-            <div className="w-3 h-3 bg-rose-400 shadow-lg rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
-          </div>
+
         </div>
       </Link>
     </div>

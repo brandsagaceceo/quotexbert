@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -226,20 +226,20 @@ export default function Home() {
               <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ⭐ Average Rating</span>
+              <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ? Average Rating</span>
             </div>
             <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '1s' }}>
               <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">🔒 Stripe-Secured</span>
+              <span className="text-sm font-semibold text-slate-700">?? Stripe-Secured</span>
             </div>
           </div>
 
           {/* Hero Content */}
           <div className="text-center mb-12 animate-fade-in-up">
             <div className="inline-block mb-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg animate-bounce">
-              <span className="text-sm font-bold">🎨 NEW: AI Photo Visualization Available!</span>
+              <span className="text-sm font-bold">?? NEW: AI Photo Visualization Available!</span>
             </div>
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight flex flex-col items-center gap-4">
               <span className="flex items-center gap-4">
@@ -252,7 +252,7 @@ export default function Home() {
               <span className="text-5xl sm:text-6xl lg:text-7xl">Get a Quote. Easy as That.</span>
             </h1>
             <p className="text-2xl sm:text-3xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
-              Snap a photo or describe your project → Get instant AI estimates → Connect with verified GTA contractors → See what it could look like with AI visualization!
+              Snap a photo or describe your project ? Get instant AI estimates ? Connect with verified GTA contractors ? See what it could look like with AI visualization!
             </p>
             
             {/* CTA Buttons */}
@@ -288,13 +288,13 @@ export default function Home() {
                       href="/homeowner/estimates" 
                       className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                     >
-                      📊 View My Estimates
+                      ?? View My Estimates
                     </Link>
                     <Link 
                       href="/create-lead" 
                       className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                     >
-                      🚀 Post Project
+                      ?? Post Project
                     </Link>
                   </div>
                 </div>
@@ -376,22 +376,22 @@ export default function Home() {
           <div className="mb-6 py-4 px-6 bg-white/60 backdrop-blur-sm rounded-xl border border-orange-200/50 shadow-sm">
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-gray-700">
               <div className="flex items-center gap-2">
-                <span className="text-green-600 font-bold">✓</span>
+                <span className="text-green-600 font-bold">?</span>
                 <span className="font-medium">Serving the GTA</span>
               </div>
-              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
-                <span className="text-blue-600 font-bold">🔒</span>
+                <span className="text-blue-600 font-bold">??</span>
                 <span className="font-medium">Stripe-Secured Payments</span>
               </div>
-              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
-                <span className="text-purple-600 font-bold">✓</span>
+                <span className="text-purple-600 font-bold">?</span>
                 <span className="font-medium">Background-Checked Contractors</span>
               </div>
-              <div className="hidden sm:block text-gray-300">•</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
-                <span className="text-orange-600 font-bold">⭐</span>
+                <span className="text-orange-600 font-bold">?</span>
                 <span className="font-medium">Verified Reviews</span>
               </div>
             </div>
@@ -423,7 +423,7 @@ export default function Home() {
                   </h2>
                   {estimateResult.aiPowered && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                      🤖 AI
+                      ?? AI
                     </span>
                   )}
                 </div>
@@ -438,7 +438,7 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Cost Estimate */}
                 <div className="bg-gradient-to-br from-green-50/80 to-green-100/80 rounded-xl p-6">
-                  <h3 className="text-xl font-semibold text-green-900 mb-4">💰 Estimated Cost</h3>
+                  <h3 className="text-xl font-semibold text-green-900 mb-4">?? Estimated Cost</h3>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-800 mb-2">
                       ${estimateResult.min?.toLocaleString()} - ${estimateResult.max?.toLocaleString()}
@@ -452,11 +452,11 @@ export default function Home() {
 
                 {/* Analysis Factors */}
                 <div className="bg-gradient-to-br from-orange-50/80 to-orange-100/80 rounded-xl p-6">
-                  <h3 className="text-xl font-semibold text-red-900 mb-4">🔍 Analysis Factors</h3>
+                  <h3 className="text-xl font-semibold text-red-900 mb-4">?? Analysis Factors</h3>
                   <ul className="space-y-2">
                     {estimateResult.factors?.map((factor: string, index: number) => (
                       <li key={index} className="flex items-center text-red-800">
-                        <span className="text-red-900 mr-2">✓</span>
+                        <span className="text-red-900 mr-2">?</span>
                         {factor}
                       </li>
                     ))}
@@ -467,7 +467,7 @@ export default function Home() {
               {/* Description */}
               {estimateResult.description && (
                 <div className="mt-6 p-4 bg-gradient-to-br from-slate-50/80 to-slate-100/80 rounded-lg">
-                  <h4 className="font-semibold text-slate-800 mb-2">📋 Estimate Details</h4>
+                  <h4 className="font-semibold text-slate-800 mb-2">?? Estimate Details</h4>
                   <p className="text-slate-700">{estimateResult.description}</p>
                 </div>
               )}
@@ -629,38 +629,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contractor Launch Deal Banner */}
-      <section className="py-16 bg-gradient-to-br from-rose-900 via-red-800 to-orange-900">
-        <div className="max-w-5xl mx-auto px-4 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-xs font-semibold mb-4">
-            <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-            <span>Launch Offer for GTA Contractors</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-            All-Access Leads for $199/month
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-orange-100 max-w-2xl mx-auto mb-6">
-            Get every category unlocked across Toronto and the GTA 
-            kitchen, bathroom, roofing, basement, decks, and more 
-            for a flat monthly price. No per-lead surprises.
-          </p>
-          <p className="text-xs sm:text-sm text-orange-100 mb-6">
-            Normally ${stats.totalJobs ? 259 : 259}+ if you picked categories one by one. During launch,
-            contractors lock in <span className="font-semibold">$199/month</span> for full access.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/contractor/subscription"
-              className="px-8 py-4 bg-white text-rose-800 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              🔨 Claim All-Access Pass
-            </Link>
-            <Link
-              href="/contractor/subscriptions"
-              className="px-6 py-3 bg-transparent border border-white/30 rounded-xl text-sm font-medium text-orange-100 hover:bg-white/10 transition-all duration-200"
-            >
-              View Category Pricing
-            </Link>
           </div>
         </div>
       </section>

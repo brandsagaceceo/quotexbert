@@ -329,11 +329,23 @@ export default function ContractorSubscription() {
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-6 py-4 rounded-2xl border-2 border-rose-200">
-                    <p className="text-2xl font-black text-rose-700">
-                      {pkg.leadLimit} leads/month
-                    </p>
-                    <p className="text-sm text-slate-600 font-semibold mt-1">
-                      {pkg.categories.length} trade categories
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="text-center">
+                        <p className="text-2xl font-black text-rose-700">
+                          ${pkg.price}
+                        </p>
+                        <p className="text-xs text-slate-500 font-semibold">per month</p>
+                      </div>
+                      <div className="text-2xl font-bold text-slate-400">vs</div>
+                      <div className="text-center">
+                        <p className="text-2xl font-black text-slate-400 line-through">
+                          ${pkg.leadLimit * 10}
+                        </p>
+                        <p className="text-xs text-slate-500 font-semibold">per lead model</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-slate-600 font-semibold mt-3 text-center">
+                      {pkg.categories.length} trade categories included
                     </p>
                   </div>
                 </div>

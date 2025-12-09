@@ -104,8 +104,8 @@ export function AIChatbot() {
         className="fixed bottom-6 right-6 z-50 group"
       >
         <div className="relative">
-          {/* Pulse animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-orange-600 rounded-full animate-ping opacity-75"></div>
+          {/* Subtle pulse animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-orange-600 rounded-full opacity-50 animate-pulse"></div>
           
           {/* Main button */}
           <div className="relative bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full p-4 shadow-2xl hover:shadow-rose-500/50 transform hover:scale-110 transition-all duration-300">
@@ -113,7 +113,7 @@ export function AIChatbot() {
           </div>
 
           {/* Badge */}
-          <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-bounce">
+          <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
             AI
           </div>
         </div>

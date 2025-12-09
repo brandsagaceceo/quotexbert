@@ -459,11 +459,15 @@ export default function UnifiedProfilePage() {
               type="file"
               id="coverPhotoInput"
               accept="image/*"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  // TODO: Upload to storage and set URL
-                  console.log('Cover photo selected:', file);
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    setProfile(prev => prev ? { ...prev, coverPhoto: base64String } : prev);
+                  };
+                  reader.readAsDataURL(file);
                 }
               }}
               className="hidden"
