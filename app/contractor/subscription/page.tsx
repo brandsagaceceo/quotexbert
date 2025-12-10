@@ -4,31 +4,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
-import { Sparkles, Shield, TrendingUp, Clock, CheckCircle, DollarSign } from "lucide-react";
+import { Shield, TrendingUp, Clock, CheckCircle } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-}
-
-const categories: Category[] = [
-  { id: "general", name: "General Contracting", description: "Full home renovations, additions, remodeling", price: 49 },
-  { id: "plumbing", name: "Plumbing", description: "Pipes, fixtures, water heaters, drains", price: 39 },
-  { id: "electrical", name: "Electrical", description: "Wiring, panels, lighting, outlets", price: 39 },
-  { id: "hvac", name: "HVAC", description: "Heating, cooling, ventilation systems", price: 39 },
-  { id: "roofing", name: "Roofing", description: "Roof repairs, replacement, gutters", price: 39 },
-  { id: "flooring", name: "Flooring", description: "Hardwood, tile, carpet installation", price: 29 },
-  { id: "painting", name: "Painting", description: "Interior and exterior painting", price: 29 },
-  { id: "kitchen", name: "Kitchen Remodeling", description: "Cabinets, countertops, backsplash", price: 49 },
-  { id: "bathroom", name: "Bathroom Remodeling", description: "Showers, vanities, tile work", price: 39 },
-  { id: "basement", name: "Basement Finishing", description: "Framing, drywall, flooring, lighting", price: 39 },
-  { id: "deck", name: "Decks & Patios", description: "Outdoor living spaces, pergolas", price: 39 },
-  { id: "landscaping", name: "Landscaping", description: "Gardens, hardscaping, irrigation", price: 29 },
-];
 
 interface Package {
   id: string;
@@ -79,7 +57,7 @@ const packages: Package[] = [
     name: "General Contractor",
     price: 199,
     leadLimit: 50,
-    categories: categories.map(c => c.id),
+    categories: ["general", "plumbing", "electrical", "hvac", "roofing", "flooring", "painting", "kitchen", "bathroom", "basement", "deck", "landscaping"],
     features: [
       "ALL 12 Categories",
       "Up to 50 leads/month",
@@ -99,28 +77,6 @@ export default function ContractorSubscription() {
   const { authUser: user, authLoading } = useAuth();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [payoutInfo, setPayoutInfo] = useState<any>(null);
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchPayoutInfo();
-    }
-  }, [user]);
-
-  const fetchPayoutInfo = async () => {
-    try {
-      const response = await fetch(`/api/contractor/payout?userId=${user?.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setPayoutInfo(data);
-        if (data.categories) {
-          setSelectedCategories(data.categories);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching payout info:', error);
-    }
-  };
 
 
 
@@ -169,29 +125,6 @@ export default function ContractorSubscription() {
     }
   };
 
-  const handleRequestPayout = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/contractor/payout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id })
-      });
-
-      if (response.ok) {
-        alert('Payout request submitted! Funds will be transferred within 2-3 business days.');
-        fetchPayoutInfo();
-      } else {
-        alert('Failed to request payout. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -215,50 +148,6 @@ export default function ContractorSubscription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        
-        {/* Active Subscriptions / Payout Section - TOP */}
-        {payoutInfo && payoutInfo.availableBalance > 0 && (
-          <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-3xl shadow-2xl border-2 border-green-200 p-8 mb-12 animate-fade-in-up">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <DollarSign className="w-8 h-8 text-green-600" />
-                  <h3 className="text-3xl font-bold text-slate-900">Available Earnings</h3>
-                </div>
-                
-                <div className="text-6xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-                  ${payoutInfo.availableBalance.toFixed(2)}
-                </div>
-                
-                <p className="text-sm text-green-700 font-medium mb-4">
-                  Ready to withdraw • Deposited in 2-3 business days
-                </p>
-              </div>
-              
-              <button
-                onClick={handleRequestPayout}
-                disabled={loading}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 relative overflow-hidden group"
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <DollarSign className="w-6 h-6" />
-                      Request Payout
-                    </>
-                  )}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
           <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight">
@@ -384,17 +273,17 @@ export default function ContractorSubscription() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                <tr>
-                  <td className="py-4 px-4 font-semibold text-slate-700">Monthly Leads</td>
-                  <td className="py-4 px-4 text-center font-bold text-slate-900">15</td>
-                  <td className="py-4 px-4 text-center font-bold text-rose-700">30</td>
-                  <td className="py-4 px-4 text-center font-bold text-slate-900">50</td>
-                </tr>
                 <tr className="bg-slate-50">
                   <td className="py-4 px-4 font-semibold text-slate-700">Trade Categories</td>
-                  <td className="py-4 px-4 text-center font-bold text-slate-900">4</td>
-                  <td className="py-4 px-4 text-center font-bold text-rose-700">8</td>
-                  <td className="py-4 px-4 text-center font-bold text-slate-900">All 12</td>
+                  <td className="py-4 px-4 text-center font-bold text-slate-900">4 Categories</td>
+                  <td className="py-4 px-4 text-center font-bold text-rose-700">8 Categories</td>
+                  <td className="py-4 px-4 text-center font-bold text-slate-900">All 12 Categories</td>
+                </tr>
+                <tr>
+                  <td className="py-4 px-4 font-semibold text-slate-700">Monthly Price</td>
+                  <td className="py-4 px-4 text-center font-bold text-slate-900">$79/mo</td>
+                  <td className="py-4 px-4 text-center font-bold text-rose-700">$139/mo</td>
+                  <td className="py-4 px-4 text-center font-bold text-slate-900">$199/mo</td>
                 </tr>
                 <tr>
                   <td className="py-4 px-4 font-semibold text-slate-700">Profile Badge</td>
