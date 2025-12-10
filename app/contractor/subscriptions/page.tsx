@@ -246,40 +246,6 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* ALL ACCESS DEAL - Hero Banner */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative z-10">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="text-white text-center md:text-left">
-                  <div className="inline-block bg-yellow-400 text-rose-900 px-4 py-2 rounded-full text-sm font-bold mb-4 animate-pulse">
-                    🔥 SPECIAL OFFER - UNLIMITED LEADS!
-                  </div>
-                  <h2 className="text-4xl md:text-6xl font-black mb-3">ALL ACCESS PASS</h2>
-                  <p className="text-xl md:text-2xl text-white/90 mb-4">
-                    Get <span className="font-bold">ALL Categories</span> + <span className="font-bold">Unlimited Leads</span> for ONE Low Price!
-                  </p>
-                  <div className="flex items-center gap-4 justify-center md:justify-start">
-                    <span className="text-5xl font-black">$199</span>
-                    <div className="text-left">
-                      <div className="text-sm line-through opacity-75">$1,500+/mo</div>
-                      <div className="text-sm font-semibold">/month</div>
-                    </div>
-                  </div>
-                </div>
-                <a
-                  href="/contractor/subscription"
-                  className="group relative px-8 py-5 bg-white text-rose-700 rounded-2xl font-black text-xl shadow-2xl hover:shadow-white/50 transform hover:scale-110 transition-all duration-300 overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <span className="relative z-10 group-hover:text-white">
-                    ✨ Get All Access ✨
-                  </span>
-                </a>
-              </div>
-            </div>
-          </div>
-
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow p-6">
@@ -314,6 +280,78 @@ export default function SubscriptionsPage() {
               </div>
             </div>
           </div>
+
+          {/* Current Subscriptions - Moved to Top */}
+          {subscriptions.length > 0 && (
+            <div className="bg-white rounded-lg shadow mb-8">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">Your Subscriptions</h2>
+                <p className="text-sm text-gray-600">Manage your active category subscriptions</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Category
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Monthly Fee
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Leads Used
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Next Billing
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {subscriptions.map((subscription) => {
+                      const categoryConfig = getCategoryById(subscription.category);
+                      return (
+                        <tr key={subscription.id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <span className="text-sm font-medium text-gray-900">
+                                {categoryConfig?.name || subscription.category}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              subscription.status === 'active' 
+                                ? 'bg-green-100 text-green-800'
+                                : subscription.status === 'past_due'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {subscription.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${subscription.monthlyPrice.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {subscription.leadsThisMonth}/{subscription.monthlyLeadLimit}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {subscription.nextBillingDate 
+                              ? new Date(subscription.nextBillingDate).toLocaleDateString()
+                              : '-'
+                            }
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* Filters Section */}
           {activeTab === 'subscriptions' && (
@@ -547,76 +585,7 @@ export default function SubscriptionsPage() {
                 </div>
               </div>
 
-              {/* Current Subscriptions */}
-              {subscriptions.length > 0 && (
-                <div className="bg-white rounded-lg shadow">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h2 className="text-lg font-medium text-gray-900">Your Subscriptions</h2>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Category
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Monthly Fee
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Leads Used
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Next Billing
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {subscriptions.map((subscription) => {
-                          const categoryConfig = getCategoryById(subscription.category);
-                          return (
-                            <tr key={subscription.id}>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {categoryConfig?.name || subscription.category}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 text-xs rounded-full ${
-                                  subscription.status === 'active' 
-                                    ? 'bg-green-100 text-green-800'
-                                    : subscription.status === 'past_due'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {subscription.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${subscription.monthlyPrice.toFixed(2)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {subscription.leadsThisMonth}/{subscription.monthlyLeadLimit}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {subscription.nextBillingDate 
-                                  ? new Date(subscription.nextBillingDate).toLocaleDateString()
-                                  : '-'
-                                }
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+
             </div>
           )}
 
