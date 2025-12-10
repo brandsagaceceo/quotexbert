@@ -226,20 +226,20 @@ export default function Home() {
               <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ? Average Rating</span>
+              <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ⭐ Average Rating</span>
             </div>
             <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '1s' }}>
               <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">?? Stripe-Secured</span>
+              <span className="text-sm font-semibold text-slate-700">🔒 Stripe-Secured</span>
             </div>
           </div>
 
           {/* Hero Content */}
           <div className="text-center mb-12 animate-fade-in-up">
             <div className="inline-block mb-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg animate-bounce">
-              <span className="text-sm font-bold">?? NEW: AI Photo Visualization Available!</span>
+              <span className="text-sm font-bold">✨ NEW: AI Photo Visualization Available!</span>
             </div>
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight flex flex-col items-center gap-4">
               <span className="flex items-center gap-4">
@@ -252,7 +252,7 @@ export default function Home() {
               <span className="text-5xl sm:text-6xl lg:text-7xl">Get a Quote. Easy as That.</span>
             </h1>
             <p className="text-2xl sm:text-3xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
-              Snap a photo or describe your project ? Get instant AI estimates ? Connect with verified GTA contractors ? See what it could look like with AI visualization!
+              Snap a photo or describe your project → Get instant AI estimates → Connect with verified GTA contractors → See what it could look like with AI visualization!
             </p>
             
             {/* CTA Buttons */}
@@ -288,13 +288,13 @@ export default function Home() {
                       href="/homeowner/estimates" 
                       className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                     >
-                      ?? View My Estimates
+                      📋 View My Estimates
                     </Link>
                     <Link 
                       href="/create-lead" 
                       className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
                     >
-                      ?? Post Project
+                      ➕ Post Project
                     </Link>
                   </div>
                 </div>
@@ -379,17 +379,17 @@ export default function Home() {
                 <span className="text-green-600 font-bold">?</span>
                 <span className="font-medium">Serving the GTA</span>
               </div>
-              <div className="hidden sm:block text-gray-300">�</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
                 <span className="text-blue-600 font-bold">??</span>
                 <span className="font-medium">Stripe-Secured Payments</span>
               </div>
-              <div className="hidden sm:block text-gray-300">�</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
                 <span className="text-purple-600 font-bold">?</span>
                 <span className="font-medium">Background-Checked Contractors</span>
               </div>
-              <div className="hidden sm:block text-gray-300">�</div>
+              <div className="hidden sm:block text-gray-300">�</div>
               <div className="flex items-center gap-2">
                 <span className="text-orange-600 font-bold">?</span>
                 <span className="font-medium">Verified Reviews</span>
@@ -625,10 +625,6 @@ export default function Home() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
           </div>
         </div>
       </section>
