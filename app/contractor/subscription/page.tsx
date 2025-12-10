@@ -261,10 +261,6 @@ export default function ContractorSubscription() {
 
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
-          <div className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-8 py-4 rounded-full text-lg font-bold mb-6 shadow-xl animate-pulse">
-            🚀 LAUNCH SPECIAL - Limited Time Only!
-          </div>
-          
           <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight">
             Choose Your Plan
           </h1>
@@ -322,30 +318,18 @@ export default function ContractorSubscription() {
                       <span className="text-6xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
                         ${pkg.price}
                       </span>
-                      <span className="text-xl text-slate-600 font-bold">/mo</span>
-                    </div>
-                    <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold">
-                      💰 LAUNCH PRICING
+                      <span className="text-xl text-slate-600 font-bold">/month</span>
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-6 py-4 rounded-2xl border-2 border-rose-200">
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="text-center">
-                        <p className="text-2xl font-black text-rose-700">
-                          ${pkg.price}
-                        </p>
-                        <p className="text-xs text-slate-500 font-semibold">per month</p>
-                      </div>
-                      <div className="text-2xl font-bold text-slate-400">vs</div>
-                      <div className="text-center">
-                        <p className="text-2xl font-black text-slate-400 line-through">
-                          ${pkg.leadLimit * 10}
-                        </p>
-                        <p className="text-xs text-slate-500 font-semibold">per lead model</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-600 font-semibold mt-3 text-center">
-                      {pkg.categories.length} trade categories included
+                    <p className="text-2xl font-black text-rose-700 text-center mb-2">
+                      {pkg.categories.length} Trade {pkg.categories.length === 1 ? 'Category' : 'Categories'}
+                    </p>
+                    <p className="text-sm text-slate-600 font-semibold text-center">
+                      Unlimited leads per month
+                    </p>
+                    <p className="text-xs text-slate-500 mt-2 text-center">
+                      One flat monthly rate
                     </p>
                   </div>
                 </div>

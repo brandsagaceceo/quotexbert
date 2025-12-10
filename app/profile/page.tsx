@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import {
   User,
@@ -72,6 +73,21 @@ interface JobData {
   createdAt: string;
 }
 
+interface SavedEstimate {
+  id: string;
+  description: string;
+  minCost: number;
+  maxCost: number;
+  confidence: number;
+  aiPowered: boolean;
+  enhancedDescription: string;
+  factors: string[];
+  hasVoice: boolean;
+  imageCount: number;
+  status: string;
+  createdAt: string;
+}
+
 export default function UnifiedProfilePage() {
   const { isSignedIn, authUser, authLoading } = useAuth();
   const router = useRouter();
@@ -79,6 +95,7 @@ export default function UnifiedProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [jobs, setJobs] = useState<JobData[]>([]);
+  const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [isUploading, setIsUploading] = useState(false);
@@ -195,6 +212,18 @@ export default function UnifiedProfilePage() {
             }
           } catch (error) {
             console.log("[ProfilePage] Jobs not available yet");
+          }
+        } else if (userRole === 'homeowner') {
+          // Fetch saved estimates for homeowners
+          try {
+            const estimatesResponse = await fetch(`/api/estimates?homeownerId=${authUser.id}`);
+            if (estimatesResponse.ok) {
+              const estimatesData = await estimatesResponse.json();
+              console.log("[ProfilePage] Loaded estimatesData:", estimatesData);
+              setSavedEstimates(estimatesData.estimates || []);
+            }
+          } catch (error) {
+            console.log("[ProfilePage] Saved estimates not available yet");
           }
         }
         
@@ -431,7 +460,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative h-64 md:h-80 overflow-visible">
+      <div className="relative h-64 md:h-80 mb-32 overflow-visible">
         {/* Cover Photo */}
         <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
@@ -567,7 +596,10 @@ export default function UnifiedProfilePage() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
-            {['overview', 'portfolio', 'jobs', 'contact'].map((tab) => (
+            {(isContractor 
+              ? ['overview', 'portfolio', 'jobs', 'contact'] 
+              : ['overview', 'quotes', 'contact']
+            ).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -577,7 +609,7 @@ export default function UnifiedProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab}
+                {tab === 'quotes' ? 'Saved Quotes' : tab}
               </button>
             ))}
           </nav>
@@ -777,6 +809,130 @@ export default function UnifiedProfilePage() {
                     <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs yet</h3>
                     <p className="text-gray-600">Start accepting jobs to build your work history.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'quotes' && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Saved Quotes</h2>
+                
+                {savedEstimates.length > 0 ? (
+                  <div className="space-y-6">
+                    {savedEstimates.map((estimate) => (
+                      <div key={estimate.id} className="border-2 border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-slate-50">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              {estimate.aiPowered && (
+                                <span className="inline-flex items-center gap-1 bg-gradient-to-r from-rose-100 to-orange-100 text-rose-700 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
+                                  ✨ AI-Powered
+                                </span>
+                              )}
+                              {estimate.hasVoice && (
+                                <span className="inline-flex items-center gap-1 bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                  🎤 Voice
+                                </span>
+                              )}
+                              {estimate.imageCount > 0 && (
+                                <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                  📸 {estimate.imageCount} {estimate.imageCount === 1 ? 'Photo' : 'Photos'}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-slate-700 font-medium text-lg leading-relaxed">
+                              {estimate.description}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-2">
+                              Created {new Date(estimate.createdAt).toLocaleDateString('en-US', { 
+                                month: 'long', 
+                                day: 'numeric', 
+                                year: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              if (confirm('Are you sure you want to delete this estimate?')) {
+                                try {
+                                  const response = await fetch(`/api/estimates?id=${estimate.id}&homeownerId=${authUser?.id}`, {
+                                    method: 'DELETE'
+                                  });
+                                  if (response.ok) {
+                                    setSavedEstimates(prev => prev.filter(e => e.id !== estimate.id));
+                                  }
+                                } catch (error) {
+                                  console.error('Error deleting estimate:', error);
+                                }
+                              }
+                            }}
+                            className="text-slate-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <Trash className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-6 border-2 border-rose-100 mb-4">
+                          <div className="flex items-baseline justify-center gap-3 mb-2">
+                            <span className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
+                              ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 text-sm">
+                            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                            <span className="text-slate-600 font-semibold">
+                              {estimate.confidence}% Confidence
+                            </span>
+                          </div>
+                        </div>
+
+                        {estimate.enhancedDescription && (
+                          <p className="text-slate-600 text-sm mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                            {estimate.enhancedDescription}
+                          </p>
+                        )}
+
+                        {estimate.factors && estimate.factors.length > 0 && (
+                          <div className="space-y-2">
+                            <h4 className="font-semibold text-slate-900 text-sm">Cost Factors:</h4>
+                            <ul className="space-y-2">
+                              {estimate.factors.map((factor, index) => (
+                                <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
+                                  <span className="text-rose-600 mt-1">•</span>
+                                  <span>{factor}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <div className="mt-6 pt-4 border-t border-slate-200">
+                          <Link
+                            href={`/?estimate=${estimate.id}`}
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
+                          >
+                            Post Job & Get Quotes
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-6">
+                      <DollarSign className="h-10 w-10 text-rose-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 mb-3">No Saved Quotes Yet</h3>
+                    <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                      Get instant AI-powered estimates for your home projects. Upload photos and describe your needs using voice or text.
+                    </p>
+                    <Link
+                      href="/"
+                      className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
+                    >
+                      Get Your First Quote
+                    </Link>
                   </div>
                 )}
               </div>

@@ -104,8 +104,8 @@ export function AIChatbot() {
         className="fixed bottom-6 right-6 z-50 group"
       >
         <div className="relative">
-          {/* Subtle pulse animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-orange-600 rounded-full opacity-50 animate-pulse"></div>
+          {/* Subtle glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-orange-600 rounded-full opacity-20 blur-md"></div>
           
           {/* Main button */}
           <div className="relative bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full p-4 shadow-2xl hover:shadow-rose-500/50 transform hover:scale-110 transition-all duration-300">
@@ -175,7 +175,7 @@ export function AIChatbot() {
         {!isMinimized && (
           <>
             {/* Messages */}
-            <div className="h-[450px] overflow-y-auto p-4 bg-gradient-to-b from-slate-50 to-white">
+            <div className="h-[450px] overflow-y-auto overflow-x-hidden p-4 bg-gradient-to-b from-slate-50 to-white">
               {messages.map((message, index) => (
                 <div
                   key={index}
