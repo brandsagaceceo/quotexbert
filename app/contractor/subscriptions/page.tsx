@@ -454,22 +454,31 @@ export default function SubscriptionsPage() {
                 <h3 className="text-2xl font-black mb-6 text-center">How It Works</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
-                      1
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-4xl">📋</span>
+                    </div>
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                      <span className="text-sm font-black">STEP 1</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Choose Your Plan</h4>
                     <p className="text-white text-opacity-90">Select how many categories you want access to (3, 6, or 10)</p>
                   </div>
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
-                      2
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-4xl">🎯</span>
+                    </div>
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                      <span className="text-sm font-black">STEP 2</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Pick Categories</h4>
                     <p className="text-white text-opacity-90">After subscribing, select your job categories from 30+ options</p>
                   </div>
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
-                      3
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-4xl">🚀</span>
+                    </div>
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                      <span className="text-sm font-black">STEP 3</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Start Bidding</h4>
                     <p className="text-white text-opacity-90">Apply to unlimited jobs and keep 100% of what you earn</p>

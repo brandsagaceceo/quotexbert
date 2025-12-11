@@ -93,7 +93,7 @@ export default function BlogPage() {
       readTime: 9,
       category: "Roofing",
       tags: ["toronto roofing", "roof replacement", "GTA roofers", "ontario winter"],
-      imageUrl: "https://images.unsplash.com/photo-1632563468798-63a62ab0f5f3?w=800&h=500&fit=crop&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1625428408967-ed4a21ef0d95?w=800&h=500&fit=crop&q=80",
       seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
       seoDescription: "Expert Toronto roofing advice. Learn when to repair vs replace, costs, winter damage prevention, and finding qualified Ontario roofers."
     },

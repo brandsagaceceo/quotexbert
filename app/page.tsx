@@ -553,14 +553,14 @@ export default function Home() {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">Handyman</h3>
                 <div className="flex items-baseline justify-center gap-2 mb-4">
-                  <span className="text-5xl font-black bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                    $79
+                  <span className="text-5xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    $49
                   </span>
                   <span className="text-lg text-slate-600 font-semibold">/month</span>
                 </div>
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 rounded-xl">
-                  <p className="text-lg font-bold text-blue-900">4 Trade Categories</p>
-                  <p className="text-sm text-blue-700 font-semibold">Unlimited leads/month</p>
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 rounded-xl border-2 border-green-200">
+                  <p className="text-lg font-bold text-green-900">3 Trade Categories</p>
+                  <p className="text-sm text-green-700 font-semibold">Unlimited leads/month</p>
                 </div>
               </div>
               <ul className="space-y-3 mb-8 text-sm">
@@ -589,23 +589,23 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Renovation Expert Tier - MOST POPULAR */}
+            {/* Renovation Xbert Tier - MOST POPULAR */}
             <div className="relative bg-white rounded-3xl shadow-2xl border-4 border-rose-600 p-8 transition-all duration-300 hover:scale-105 hover:shadow-3xl transform md:-translate-y-4">
-              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                  MOST POPULAR
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white whitespace-nowrap">
+                  ⭐ MOST POPULAR
                 </span>
               </div>
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Renovation Expert</h3>
+              <div className="text-center mb-6 mt-2">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Renovation Xbert</h3>
                 <div className="flex items-baseline justify-center gap-2 mb-4">
                   <span className="text-6xl font-black bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
-                    $139
+                    $99
                   </span>
                   <span className="text-lg text-slate-600 font-semibold">/month</span>
                 </div>
                 <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-4 py-3 rounded-xl border-2 border-rose-200">
-                  <p className="text-lg font-bold text-rose-900">8 Trade Categories</p>
+                  <p className="text-lg font-bold text-rose-900">6 Trade Categories</p>
                   <p className="text-sm text-rose-700 font-semibold">Unlimited leads/month</p>
                 </div>
               </div>
@@ -649,12 +649,12 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">General Contractor</h3>
                 <div className="flex items-baseline justify-center gap-2 mb-4">
                   <span className="text-5xl font-black bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-text text-transparent">
-                    $199
+                    $149
                   </span>
                   <span className="text-lg text-slate-600 font-semibold">/month</span>
                 </div>
-                <div className="bg-gradient-to-r from-purple-50 to-indigo-100 px-4 py-3 rounded-xl">
-                  <p className="text-lg font-bold text-purple-900">ALL 12 Categories</p>
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-100 px-4 py-3 rounded-xl border-2 border-purple-200">
+                  <p className="text-lg font-bold text-purple-900">ALL 10+ Categories</p>
                   <p className="text-sm text-purple-700 font-semibold">Unlimited leads/month</p>
                 </div>
               </div>

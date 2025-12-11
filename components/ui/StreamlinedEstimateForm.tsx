@@ -320,28 +320,6 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
           </div>
         </div>
 
-        {/* AI Visualization Toggle */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id="aiVisualization"
-              checked={generateVisualization}
-              onChange={(e) => setGenerateVisualization(e.target.checked)}
-              className="mt-1 w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
-            />
-            <div className="flex-1">
-              <label htmlFor="aiVisualization" className="block font-semibold text-gray-900 cursor-pointer">
-                🎨 Generate AI Photo Visualization
-              </label>
-              <p className="text-sm text-gray-600 mt-1">
-                See what your completed project could look like with AI-generated before & after photos! 
-                <span className="inline-block ml-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded">NEW</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Photo Previews */}
         {imagePreviews.length > 0 && (
           <div>
@@ -372,11 +350,9 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
             type="button"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1 relative overflow-hidden text-white font-black text-xl py-7 rounded-2xl shadow-2xl hover:shadow-[0_25px_60px_rgba(74,0,0,0.6)] transform hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 disabled:cursor-not-allowed disabled:transform-none disabled:opacity-50 group"
+            className="flex-1 relative overflow-hidden text-white font-black text-xl py-7 rounded-2xl shadow-2xl hover:shadow-[0_25px_60px_rgba(74,0,0,0.6)] transform hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 disabled:cursor-not-allowed disabled:transform-none disabled:opacity-70 group"
             style={{
-              background: isLoading || (!description.trim() && images.length === 0) 
-                ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
-                : 'linear-gradient(135deg, #4A0000 0%, #8B0000 25%, #FF7A00 75%, #FFB347 100%)',
+              background: 'linear-gradient(135deg, #4A0000 0%, #8B0000 25%, #FF7A00 75%, #FFB347 100%)',
               backgroundSize: '200% 200%',
               animation: (isLoading || (!description.trim() && images.length === 0)) ? 'none' : 'gradient-shift 3s ease infinite'
             }}
@@ -397,7 +373,7 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
               ) : (
                 <>
                   <span className="text-3xl animate-bounce drop-shadow-lg">🚀</span>
-                  <span className="tracking-wide drop-shadow-lg">Get My Instant Estimate</span>
+                  <span className="tracking-wide drop-shadow-lg">Get My Estimate Now</span>
                   <span className="text-3xl animate-bounce animation-delay-200 drop-shadow-lg">✨</span>
                 </>
               )}
