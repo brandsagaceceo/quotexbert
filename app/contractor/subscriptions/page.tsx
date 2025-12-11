@@ -246,102 +246,245 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* Pricing Tiers - 3D BUBBLE DESIGN */}
+          {/* Pricing Tiers - CATEGORY BUNDLE DESIGN */}
           <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-2xl p-8 mb-8 relative overflow-hidden">
             {/* Background Decorative Bubbles */}
-            <div className="absolute top-0 left-0 w-72 h-72 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute top-0 right-0 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-0 left-0 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
             
             <div className="relative z-10">
-              <div className="text-center mb-8">
-                <h2 className="text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-3">
-                  Subscription Pricing Tiers
+              <div className="text-center mb-10">
+                <div className="inline-block mb-4">
+                  <span className="px-6 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-bold shadow-lg">
+                    💎 One Price, Multiple Categories
+                  </span>
+                </div>
+                <h2 className="text-5xl font-black bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent mb-4">
+                  Choose Your Plan
                 </h2>
-                <p className="text-lg text-gray-700 font-medium">Choose the categories that match your expertise. Pay per category, cancel anytime.</p>
+                <p className="text-xl text-gray-700 font-semibold max-w-2xl mx-auto">
+                  Pay one monthly fee to access multiple job categories. No per-lead charges!
+                </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Basic Tier */}
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {/* Handyman Tier */}
                 <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-green-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-green-300">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-3xl font-black">B</span>
+                  <div className="absolute -inset-1 bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
+                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-green-400">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
+                        STARTER
+                      </span>
+                    </div>
+                    
+                    <div className="text-center mt-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-4xl">🔧</span>
                       </div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Basic</h3>
-                      <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent">$15</span>
-                        <span className="text-gray-600 font-semibold">/mo</span>
+                      
+                      <h3 className="text-3xl font-black text-gray-900 mb-3">Handyman</h3>
+                      
+                      <div className="mb-4">
+                        <span className="text-6xl font-black bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">$49</span>
+                        <span className="text-gray-600 font-bold text-xl">/month</span>
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">per category</p>
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500">Perfect for starting out</p>
+                      
+                      <div className="bg-green-50 rounded-2xl p-4 mb-6 border-2 border-green-200">
+                        <p className="text-sm font-black text-green-800 mb-2">Access to 3 Categories</p>
+                        <p className="text-xs text-green-700">Perfect for solo contractors</p>
                       </div>
+                      
+                      <ul className="text-left space-y-3 mb-8">
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Choose any 3 job categories</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Direct homeowner messaging</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Profile on contractor directory</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Cancel anytime</span>
+                        </li>
+                      </ul>
+                      
+                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-[length:200%_100%] animate-gradient"></div>
+                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
+                          <span>Get Started</span>
+                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Standard Tier */}
-                <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-pink-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-rose-300">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-rose-400 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-3xl font-black">S</span>
+                {/* Renovation Xbert Tier */}
+                <div className="group relative scale-105">
+                  <div className="absolute -inset-1 bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-90 transition duration-500 animate-pulse"></div>
+                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-orange-400">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg animate-pulse">
+                        ⭐ MOST POPULAR
+                      </span>
+                    </div>
+                    
+                    <div className="text-center mt-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-4xl">🏗️</span>
                       </div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Standard</h3>
-                      <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-rose-500 to-pink-700 bg-clip-text text-transparent">$25</span>
-                        <span className="text-gray-600 font-semibold">/mo</span>
+                      
+                      <h3 className="text-3xl font-black text-gray-900 mb-3">Renovation Xbert</h3>
+                      
+                      <div className="mb-4">
+                        <span className="text-6xl font-black bg-gradient-to-r from-orange-500 to-rose-700 bg-clip-text text-transparent">$99</span>
+                        <span className="text-gray-600 font-bold text-xl">/month</span>
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">per category</p>
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500">Most popular choice</p>
+                      
+                      <div className="bg-orange-50 rounded-2xl p-4 mb-6 border-2 border-orange-200">
+                        <p className="text-sm font-black text-orange-800 mb-2">Access to 6 Categories</p>
+                        <p className="text-xs text-orange-700">Best value for growing businesses</p>
                       </div>
+                      
+                      <ul className="text-left space-y-3 mb-8">
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Choose any 6 job categories</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Priority in search results</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Featured contractor badge</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Portfolio showcase</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-orange-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Everything in Handyman</span>
+                        </li>
+                      </ul>
+                      
+                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%] animate-gradient"></div>
+                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
+                          <span className="text-xl">🚀</span>
+                          <span>Get Started</span>
+                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Premium Tier */}
+                {/* General Contractor Tier */}
                 <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-indigo-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-purple-300">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-3xl font-black">P</span>
+                  <div className="absolute -inset-1 bg-gradient-to-br from-purple-400 via-indigo-500 to-blue-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
+                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-purple-400">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
+                        PRO
+                      </span>
+                    </div>
+                    
+                    <div className="text-center mt-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-4xl">👷</span>
                       </div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Premium</h3>
-                      <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-purple-500 to-indigo-700 bg-clip-text text-transparent">$49</span>
-                        <span className="text-gray-600 font-semibold">/mo</span>
+                      
+                      <h3 className="text-3xl font-black text-gray-900 mb-3">General Contractor</h3>
+                      
+                      <div className="mb-4">
+                        <span className="text-6xl font-black bg-gradient-to-r from-purple-500 to-indigo-700 bg-clip-text text-transparent">$149</span>
+                        <span className="text-gray-600 font-bold text-xl">/month</span>
                       </div>
-                      <p className="text-sm text-gray-600 font-medium">per category</p>
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500">For serious contractors</p>
+                      
+                      <div className="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200">
+                        <p className="text-sm font-black text-purple-800 mb-2">Access to ALL 10+ Categories</p>
+                        <p className="text-xs text-purple-700">Complete access for full-service contractors</p>
                       </div>
+                      
+                      <ul className="text-left space-y-3 mb-8">
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">ALL job categories included</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Top priority in search results</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Premium contractor badge</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Featured homepage placement</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Dedicated account manager</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-sm font-semibold text-gray-700">Everything in Renovation Xbert</span>
+                        </li>
+                      </ul>
+                      
+                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 bg-[length:200%_100%] animate-gradient"></div>
+                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
+                          <span className="text-xl">👑</span>
+                          <span>Get Started</span>
+                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                        </div>
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Professional Tier */}
-                <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
-                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-yellow-300">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-3xl font-black">P</span>
-                      </div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Professional</h3>
-                      <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-yellow-500 to-orange-700 bg-clip-text text-transparent">$79</span>
-                        <span className="text-gray-600 font-semibold">/mo</span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">per category</p>
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-500">Maximum lead access</p>
-                      </div>
-                    </div>
+              {/* Trust Badges */}
+              <div className="mt-12 pt-8 border-t border-gray-300">
+                <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-semibold">No Hidden Fees</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-semibold">Cancel Anytime</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-semibold">Switch Categories Monthly</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">✓</span>
+                    <span className="font-semibold">No Per-Lead Charges</span>
                   </div>
                 </div>
               </div>
@@ -387,151 +530,30 @@ export default function SubscriptionsPage() {
           {subscriptions.length > 0 && (
             <div className="bg-white rounded-lg shadow mb-6">
               <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-rose-50 to-orange-50">
-                <h2 className="text-xl font-bold text-gray-900">Your Active Subscriptions</h2>
-                <p className="text-sm text-gray-700 mt-1">Manage and monitor your category subscriptions</p>
+                <h2 className="text-xl font-bold text-gray-900">Your Active Categories</h2>
+                <p className="text-sm text-gray-700 mt-1">Categories you can currently accept jobs from</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Monthly Fee
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Leads Used
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Next Billing
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {subscriptions.map((subscription) => {
-                      const categoryConfig = getCategoryById(subscription.category);
-                      return (
-                        <tr key={subscription.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-semibold text-gray-900">
-                              {categoryConfig?.name || subscription.category}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                              subscription.status === 'active' 
-                                ? 'bg-green-100 text-green-800 border border-green-300'
-                                : subscription.status === 'past_due'
-                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-                                : 'bg-gray-100 text-gray-800 border border-gray-300'
-                            }`}>
-                              {subscription.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-bold text-gray-900">
-                              ${subscription.monthlyPrice.toFixed(2)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900">
-                              <span className="font-bold text-rose-600">{subscription.leadsThisMonth}</span>
-                              <span className="text-gray-500"> / {subscription.monthlyLeadLimit}</span>
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            {subscription.nextBillingDate 
-                              ? new Date(subscription.nextBillingDate).toLocaleDateString()
-                              : '-'
-                            }
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Simplified Filters */}
-          {activeTab === 'subscriptions' && (
-            <div className="bg-white rounded-lg shadow p-5 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">Filter Categories</h3>
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setPriceFilter('all');
-                    setCategoryGroupFilter('all');
-                  }}
-                  className="text-sm text-rose-600 hover:text-rose-800 font-medium underline"
-                >
-                  Clear Filters
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Search */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Search</label>
-                  <input
-                    type="text"
-                    placeholder="Search categories..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-                  />
-                </div>
-
-                {/* Status Filter */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Status</label>
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="subscribed">Subscribed</option>
-                    <option value="unsubscribed">Not Subscribed</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-
-                {/* Price Filter */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Price Range</label>
-                  <select
-                    value={priceFilter}
-                    onChange={(e) => setPriceFilter(e.target.value)}
-                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-                  >
-                    <option value="all">All Prices</option>
-                    <option value="low">Basic ($15)</option>
-                    <option value="medium">Standard-Premium ($25-$49)</option>
-                    <option value="high">Professional ($79)</option>
-                  </select>
-                </div>
-
-                {/* Category Group Filter */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Category Group</label>
-                  <select
-                    value={categoryGroupFilter}
-                    onChange={(e) => setCategoryGroupFilter(e.target.value)}
-                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-                  >
-                    <option value="all">All Groups</option>
-                    {CATEGORY_GROUPS.map(group => (
-                      <option key={group.id} value={group.id}>{group.name}</option>
-                    ))}
-                  </select>
+              <div className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {subscriptions.map((subscription) => {
+                    const categoryConfig = getCategoryById(subscription.category);
+                    return (
+                      <div key={subscription.id} className="group relative">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl blur opacity-30 group-hover:opacity-60 transition"></div>
+                        <div className="relative bg-white rounded-xl shadow p-4 border-2 border-green-200 text-center transform hover:scale-105 transition-all">
+                          <div className="text-3xl mb-2">✓</div>
+                          <p className="text-sm font-bold text-gray-900">{categoryConfig?.name || subscription.category}</p>
+                          <span className={`inline-block mt-2 px-2 py-1 text-xs font-bold rounded-full ${
+                            subscription.status === 'active' 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {subscription.status}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -543,23 +565,23 @@ export default function SubscriptionsPage() {
               <nav className="-mb-px flex space-x-8">
                 <button
                   onClick={() => setActiveTab('subscriptions')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-4 font-bold text-base ${
                     activeTab === 'subscriptions'
                       ? 'border-rose-500 text-rose-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Subscriptions
+                  📦 Plan Details
                 </button>
                 <button
                   onClick={() => setActiveTab('billing')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-4 font-bold text-base ${
                     activeTab === 'billing'
                       ? 'border-rose-500 text-rose-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Billing History
+                  💳 Billing History
                 </button>
               </nav>
             </div>
@@ -568,139 +590,99 @@ export default function SubscriptionsPage() {
           {/* Tab Content */}
           {activeTab === 'subscriptions' && (
             <div className="space-y-6">
-              {/* Available Categories */}
-              <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                  <h2 className="text-xl font-bold text-gray-900">Browse Available Categories</h2>
-                  <p className="text-sm text-gray-700 mt-1">Subscribe to categories matching your expertise. Each category is billed separately.</p>
+              {/* Plan Comparison */}
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl p-8 border-2 border-gray-200">
+                <h2 className="text-3xl font-black text-center mb-8 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  What's Included in Each Plan
+                </h2>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b-2 border-gray-300">
+                        <th className="text-left py-4 px-4 text-sm font-bold text-gray-600 uppercase">Feature</th>
+                        <th className="text-center py-4 px-4">
+                          <div className="text-2xl mb-1">🔧</div>
+                          <div className="font-black text-lg">Handyman</div>
+                          <div className="text-sm text-gray-600">$49/mo</div>
+                        </th>
+                        <th className="text-center py-4 px-4 bg-orange-50 rounded-t-xl">
+                          <div className="text-2xl mb-1">🏗️</div>
+                          <div className="font-black text-lg">Renovation Xbert</div>
+                          <div className="text-sm text-gray-600">$99/mo</div>
+                        </th>
+                        <th className="text-center py-4 px-4">
+                          <div className="text-2xl mb-1">👷</div>
+                          <div className="font-black text-lg">General Contractor</div>
+                          <div className="text-sm text-gray-600">$149/mo</div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-4 px-4 font-semibold">Job Categories</td>
+                        <td className="text-center py-4 px-4 font-black text-green-600">3 Categories</td>
+                        <td className="text-center py-4 px-4 bg-orange-50 font-black text-orange-600">6 Categories</td>
+                        <td className="text-center py-4 px-4 font-black text-purple-600">ALL 10+ Categories</td>
+                      </tr>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <td className="py-4 px-4 font-semibold">Job Applications</td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-4 px-4 font-semibold">Direct Messaging</td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <td className="py-4 px-4 font-semibold">Profile Directory</td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-4 px-4 font-semibold">Priority in Search</td>
+                        <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <td className="py-4 px-4 font-semibold">Featured Badge</td>
+                        <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-4 px-4 font-semibold">Portfolio Showcase</td>
+                        <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+                        <td className="py-4 px-4 font-semibold">Homepage Placement</td>
+                        <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="py-4 px-4 font-semibold">Account Manager</td>
+                        <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4 bg-orange-50 rounded-b-xl"><span className="text-gray-400">—</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div className="p-6">
-                  {/* Category Groups */}
-                  <div className="space-y-8">
-                    {getFilteredCategoryGroups().length === 0 ? (
-                      <div className="text-center py-16">
-                        <div className="text-gray-400 text-5xl mb-4">🔍</div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">No categories found</h3>
-                        <p className="text-gray-600 mb-4">Try adjusting your filters to see more categories.</p>
-                        <button
-                          onClick={() => {
-                            setSearchTerm('');
-                            setStatusFilter('all');
-                            setPriceFilter('all');
-                            setCategoryGroupFilter('all');
-                          }}
-                          className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium"
-                        >
-                          Reset Filters
-                        </button>
-                      </div>
-                    ) : (
-                      getFilteredCategoryGroups().map((group) => (
-                        <div key={group.id}>
-                          <div className="mb-4 pb-2 border-b-2 border-gray-200">
-                            <h3 className="text-lg font-bold text-gray-900">{group.name}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{group.description}</p>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {group.categories.map((category) => {
-                              const subscription = subscriptions.find(sub => sub.category === category.id);
-                              const isSubscribed = subscribedCategories.has(category.id);
-                              
-                              const getPriceColor = (price: number) => {
-                                switch(price) {
-                                  case 15: return 'bg-green-500 text-white border-green-600';
-                                  case 25: return 'bg-rose-500 text-white border-rose-600';
-                                  case 49: return 'bg-purple-500 text-white border-purple-600';
-                                  case 79: return 'bg-yellow-500 text-white border-yellow-600';
-                                  default: return 'bg-gray-500 text-white border-gray-600';
-                                }
-                              };
 
-                              const getTierName = (price: number) => {
-                                switch(price) {
-                                  case 15: return 'Basic';
-                                  case 25: return 'Standard';
-                                  case 49: return 'Premium';
-                                  case 79: return 'Professional';
-                                  default: return 'Custom';
-                                }
-                              };
-                            
-                            return (
-                              <div key={category.id} className={`border-2 rounded-lg p-5 hover:shadow-lg transition-all ${
-                                isSubscribed ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-white'
-                              }`}>
-                                <div className="mb-3">
-                                  <div className="flex items-start justify-between mb-2">
-                                    <h4 className="font-bold text-gray-900 text-base flex-1 pr-2">{category.name}</h4>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className={`px-3 py-1.5 text-sm font-bold rounded-lg border-2 ${getPriceColor(category.monthlyPrice)}`}>
-                                      ${category.monthlyPrice}/mo
-                                    </span>
-                                    <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                      {getTierName(category.monthlyPrice)} Tier
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {isSubscribed && subscription ? (
-                                  <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-                                        subscription.status === 'active' 
-                                          ? 'bg-green-100 text-green-800 border-2 border-green-300'
-                                          : subscription.status === 'past_due'
-                                          ? 'bg-yellow-100 text-yellow-800 border-2 border-yellow-300'
-                                          : 'bg-gray-100 text-gray-800 border-2 border-gray-300'
-                                      }`}>
-                                        ✓ {subscription.status.toUpperCase()}
-                                      </span>
-                                    </div>
-                                    <div className="text-xs text-gray-700 bg-white p-3 rounded-lg border">
-                                      <p className="font-semibold mb-1">
-                                        Leads: <span className="text-rose-600">{subscription.leadsThisMonth}</span> / {subscription.monthlyLeadLimit}
-                                      </p>
-                                      {subscription.nextBillingDate && (
-                                        <p className="text-gray-600">
-                                          Next billing: {new Date(subscription.nextBillingDate).toLocaleDateString()}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <button
-                                      onClick={() => handleCancel(subscription.id)}
-                                      className="w-full px-4 py-2 text-sm font-semibold border-2 border-red-400 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-                                      disabled={loading}
-                                    >
-                                      {subscription.cancelAtPeriodEnd ? 'Canceling at period end' : 'Cancel Subscription'}
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={() => handleSubscribe(category.id)}
-                                    className="group relative w-full overflow-hidden rounded-xl font-bold text-sm shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-                                    disabled={loading}
-                                  >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-orange-500 to-rose-500 bg-[length:200%_100%] animate-gradient"></div>
-                                    <div className="relative px-4 py-3 text-white flex items-center justify-center gap-2">
-                                      <span className="text-lg">✨</span>
-                                      <span>Subscribe Now</span>
-                                      <span className="text-lg">✨</span>
-                                    </div>
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))
-                    )}
-                  </div>
+                <div className="mt-8 text-center">
+                  <p className="text-gray-600 text-sm">
+                    💡 <span className="font-semibold">Switch categories anytime!</span> Change your selected categories monthly at no extra cost.
+                  </p>
                 </div>
               </div>
-
-
             </div>
           )}
 
