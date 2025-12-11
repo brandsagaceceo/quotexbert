@@ -1,13 +1,17 @@
 import Stripe from "stripe";
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set in environment variables");
+  console.error('[Stripe] STRIPE_SECRET_KEY is missing from environment variables');
+  console.error('[Stripe] Available env vars:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
+  throw new Error("STRIPE_SECRET_KEY is not set in environment variables. Please configure it in your production environment.");
 }
 
+console.log('[Stripe] Initializing Stripe with API version 2025-08-27.basil');
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-08-27.basil",
   typescript: true,
 });
+console.log('[Stripe] Stripe initialized successfully');
 
 // Subscription pricing configuration
 export const SUBSCRIPTION_PLANS = {

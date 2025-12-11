@@ -62,7 +62,7 @@ export default function SiteHeader() {
                 ) : (
                   <Link
                     href="/contractor/jobs"
-                    className="bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ring-2 ring-green-400 ring-offset-2"
                   >
                     💼 Find Jobs
                   </Link>
@@ -184,10 +184,10 @@ export default function SiteHeader() {
                   ) : (
                     <Link
                       href="/contractor/jobs"
-                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      className="block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-center px-4 py-3 rounded-lg text-base font-bold ring-2 ring-green-400 ring-offset-1 transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      View Jobs
+                      💼 Find Jobs
                     </Link>
                   )}
                   

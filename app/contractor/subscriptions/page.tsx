@@ -128,7 +128,7 @@ export default function SubscriptionsPage() {
     
     if (!authUser) {
       console.error('[Subscription] No authUser found');
-      setError('Please sign in to subscribe');
+      alert('Please sign in to subscribe to a plan');
       return;
     }
 
@@ -136,6 +136,7 @@ export default function SubscriptionsPage() {
 
     try {
       setCheckoutLoading(tier);
+      setError(null);
       console.log('[Subscription] Calling API...');
       
       // Create Stripe Checkout session
@@ -150,6 +151,13 @@ export default function SubscriptionsPage() {
       });
 
       console.log('[Subscription] API response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Subscription] HTTP error:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
       console.log('[Subscription] API response data:', data);
 
@@ -159,12 +167,12 @@ export default function SubscriptionsPage() {
         window.location.href = data.checkoutUrl;
       } else {
         console.error('[Subscription] API error:', data.error);
-        setError(data.error || 'Failed to create checkout session');
+        alert(data.error || 'Failed to create checkout session. Please try again.');
         setCheckoutLoading(null);
       }
     } catch (err) {
       console.error('[Subscription] Catch error:', err);
-      setError('Failed to start checkout process');
+      alert('Failed to start checkout process. Please check your connection and try again.');
       setCheckoutLoading(null);
     }
   };

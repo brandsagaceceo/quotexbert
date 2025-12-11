@@ -26,9 +26,12 @@ const TIER_PRICING = {
 
 export async function POST(req: Request) {
   try {
+    console.log('[API] Create checkout request received');
     const { contractorId, tier, email } = await req.json();
+    console.log('[API] Request data:', { contractorId, tier, email });
 
     if (!contractorId || !tier || !email) {
+      console.error('[API] Missing required fields');
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
@@ -37,6 +40,7 @@ export async function POST(req: Request) {
 
     // Validate tier
     if (!TIER_PRICING[tier as keyof typeof TIER_PRICING]) {
+      console.error('[API] Invalid tier:', tier);
       return NextResponse.json(
         { success: false, error: "Invalid subscription tier" },
         { status: 400 }
@@ -113,8 +117,8 @@ export async function POST(req: Request) {
           quantity: 1
         }
       ],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/contractor/subscriptions?success=true&tier=${tier}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/contractor/subscriptions?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"}/contractor/subscriptions?success=true&tier=${tier}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"}/contractor/subscriptions?canceled=true`,
       metadata: {
         contractorId: contractorId,
         tier: tier,
@@ -122,6 +126,9 @@ export async function POST(req: Request) {
       }
     });
 
+    console.log('[API] Checkout session created successfully:', session.id);
+    console.log('[API] Checkout URL:', session.url);
+    
     return NextResponse.json({
       success: true,
       checkoutUrl: session.url,
@@ -129,7 +136,8 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error("[API] Error creating checkout session:", error);
+    console.error("[API] Error details:", error instanceof Error ? error.stack : error);
     return NextResponse.json(
       { 
         success: false, 
