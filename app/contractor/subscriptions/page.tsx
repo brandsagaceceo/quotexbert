@@ -246,65 +246,134 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="text-3xl">📊</div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Active Subscriptions</p>
-                  <p className="text-2xl font-bold text-gray-900">{activeSubscriptions.length}</p>
+          {/* Pricing Tiers - PROMINENT DISPLAY */}
+          <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl shadow-lg p-8 mb-8 border-2 border-rose-200">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Pricing Tiers</h2>
+              <p className="text-gray-700">Choose the categories that match your expertise. Pay per category, cancel anytime.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Basic Tier */}
+              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-green-400 hover:shadow-xl transition-shadow">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">B</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Basic</h3>
+                  <div className="mb-2">
+                    <span className="text-3xl font-bold text-green-600">$15</span>
+                    <span className="text-gray-600">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-600">per category</p>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="text-3xl">💰</div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Monthly Total</p>
-                  <p className="text-2xl font-bold text-gray-900">${totalMonthlyFees.toFixed(2)}</p>
+              {/* Standard Tier */}
+              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-rose-400 hover:shadow-xl transition-shadow">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-rose-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">S</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Standard</h3>
+                  <div className="mb-2">
+                    <span className="text-3xl font-bold text-rose-600">$25</span>
+                    <span className="text-gray-600">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-600">per category</p>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="text-3xl">🎯</div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Leads This Month</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {activeSubscriptions.reduce((sum, sub) => sum + sub.leadsThisMonth, 0)}
-                  </p>
+              {/* Premium Tier */}
+              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-purple-400 hover:shadow-xl transition-shadow">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">P</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Premium</h3>
+                  <div className="mb-2">
+                    <span className="text-3xl font-bold text-purple-600">$49</span>
+                    <span className="text-gray-600">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-600">per category</p>
+                </div>
+              </div>
+
+              {/* Professional Tier */}
+              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-yellow-400 hover:shadow-xl transition-shadow">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-yellow-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                    <span className="text-white text-2xl font-bold">P</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Professional</h3>
+                  <div className="mb-2">
+                    <span className="text-3xl font-bold text-yellow-600">$79</span>
+                    <span className="text-gray-600">/month</span>
+                  </div>
+                  <p className="text-sm text-gray-600">per category</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Current Subscriptions - Moved to Top */}
+          {/* Summary Cards - Compact */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 uppercase">Active Subscriptions</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{activeSubscriptions.length}</p>
+                </div>
+                <div className="text-2xl">📊</div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 uppercase">Monthly Total</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">${totalMonthlyFees.toFixed(2)}</p>
+                </div>
+                <div className="text-2xl">💰</div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-rose-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 uppercase">Leads This Month</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {activeSubscriptions.reduce((sum, sub) => sum + sub.leadsThisMonth, 0)}
+                  </p>
+                </div>
+                <div className="text-2xl">🎯</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Current Subscriptions - Streamlined */}
           {subscriptions.length > 0 && (
-            <div className="bg-white rounded-lg shadow mb-8">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Your Subscriptions</h2>
-                <p className="text-sm text-gray-600">Manage your active category subscriptions</p>
+            <div className="bg-white rounded-lg shadow mb-6">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-rose-50 to-orange-50">
+                <h2 className="text-xl font-bold text-gray-900">Your Active Subscriptions</h2>
+                <p className="text-sm text-gray-700 mt-1">Manage and monitor your category subscriptions</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Monthly Fee
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Leads Used
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Next Billing
                       </th>
                     </tr>
@@ -313,32 +382,35 @@ export default function SubscriptionsPage() {
                     {subscriptions.map((subscription) => {
                       const categoryConfig = getCategoryById(subscription.category);
                       return (
-                        <tr key={subscription.id}>
+                        <tr key={subscription.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <span className="text-sm font-medium text-gray-900">
-                                {categoryConfig?.name || subscription.category}
-                              </span>
-                            </div>
+                            <span className="text-sm font-semibold text-gray-900">
+                              {categoryConfig?.name || subscription.category}
+                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
+                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                               subscription.status === 'active' 
-                                ? 'bg-green-100 text-green-800'
+                                ? 'bg-green-100 text-green-800 border border-green-300'
                                 : subscription.status === 'past_due'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
+                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+                                : 'bg-gray-100 text-gray-800 border border-gray-300'
                             }`}>
                               {subscription.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${subscription.monthlyPrice.toFixed(2)}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-bold text-gray-900">
+                              ${subscription.monthlyPrice.toFixed(2)}
+                            </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {subscription.leadsThisMonth}/{subscription.monthlyLeadLimit}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">
+                              <span className="font-bold text-rose-600">{subscription.leadsThisMonth}</span>
+                              <span className="text-gray-500"> / {subscription.monthlyLeadLimit}</span>
+                            </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {subscription.nextBillingDate 
                               ? new Date(subscription.nextBillingDate).toLocaleDateString()
                               : '-'
@@ -353,30 +425,43 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* Filters Section */}
+          {/* Simplified Filters */}
           {activeTab === 'subscriptions' && (
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter Categories</h3>
+            <div className="bg-white rounded-lg shadow p-5 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">Filter Categories</h3>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setStatusFilter('all');
+                    setPriceFilter('all');
+                    setCategoryGroupFilter('all');
+                  }}
+                  className="text-sm text-rose-600 hover:text-rose-800 font-medium underline"
+                >
+                  Clear Filters
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Search */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Search</label>
                   <input
                     type="text"
                     placeholder="Search categories..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   />
                 </div>
 
                 {/* Status Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Status</label>
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   >
                     <option value="all">All Categories</option>
                     <option value="subscribed">Subscribed</option>
@@ -388,26 +473,26 @@ export default function SubscriptionsPage() {
 
                 {/* Price Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Price Range</label>
                   <select
                     value={priceFilter}
                     onChange={(e) => setPriceFilter(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   >
                     <option value="all">All Prices</option>
-                    <option value="low">Low ($15-$25)</option>
-                    <option value="medium">Medium ($25-$49)</option>
-                    <option value="high">High ($49+)</option>
+                    <option value="low">Basic ($15)</option>
+                    <option value="medium">Standard-Premium ($25-$49)</option>
+                    <option value="high">Professional ($79)</option>
                   </select>
                 </div>
 
                 {/* Category Group Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category Group</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wide">Category Group</label>
                   <select
                     value={categoryGroupFilter}
                     onChange={(e) => setCategoryGroupFilter(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                   >
                     <option value="all">All Groups</option>
                     {CATEGORY_GROUPS.map(group => (
@@ -415,21 +500,6 @@ export default function SubscriptionsPage() {
                     ))}
                   </select>
                 </div>
-              </div>
-
-              {/* Clear Filters */}
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setPriceFilter('all');
-                    setCategoryGroupFilter('all');
-                  }}
-                  className="text-sm text-gray-600 hover:text-gray-800 underline"
-                >
-                  Clear all filters
-                </button>
               </div>
             </div>
           )}
@@ -467,48 +537,36 @@ export default function SubscriptionsPage() {
             <div className="space-y-6">
               {/* Available Categories */}
               <div className="bg-white rounded-lg shadow">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Available Categories</h2>
-                  <p className="text-sm text-gray-600">Subscribe to categories to access leads. Pricing varies by category tier.</p>
+                <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                  <h2 className="text-xl font-bold text-gray-900">Browse Available Categories</h2>
+                  <p className="text-sm text-gray-700 mt-1">Subscribe to categories matching your expertise. Each category is billed separately.</p>
                 </div>
                 <div className="p-6">
-                  {/* Price Tier Legend */}
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">Pricing Tiers</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span>Basic - $15/month</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-rose-500 rounded-full mr-2"></div>
-                        <span>Standard - $25/month</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                        <span>Premium - $49/month</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                        <span>Professional - $79/month</span>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Category Groups */}
                   <div className="space-y-8">
                     {getFilteredCategoryGroups().length === 0 ? (
-                      <div className="text-center py-12">
-                        <div className="text-gray-400 text-lg mb-2">🔍</div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">No categories found</h3>
-                        <p className="text-gray-600">Try adjusting your filters to see more categories.</p>
+                      <div className="text-center py-16">
+                        <div className="text-gray-400 text-5xl mb-4">🔍</div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">No categories found</h3>
+                        <p className="text-gray-600 mb-4">Try adjusting your filters to see more categories.</p>
+                        <button
+                          onClick={() => {
+                            setSearchTerm('');
+                            setStatusFilter('all');
+                            setPriceFilter('all');
+                            setCategoryGroupFilter('all');
+                          }}
+                          className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium"
+                        >
+                          Reset Filters
+                        </button>
                       </div>
                     ) : (
                       getFilteredCategoryGroups().map((group) => (
                         <div key={group.id}>
-                          <div className="mb-4">
-                            <h3 className="text-md font-semibold text-gray-900">{group.name}</h3>
-                            <p className="text-sm text-gray-600">{group.description}</p>
+                          <div className="mb-4 pb-2 border-b-2 border-gray-200">
+                            <h3 className="text-lg font-bold text-gray-900">{group.name}</h3>
+                            <p className="text-sm text-gray-600 mt-1">{group.description}</p>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {group.categories.map((category) => {
@@ -517,61 +575,80 @@ export default function SubscriptionsPage() {
                               
                               const getPriceColor = (price: number) => {
                                 switch(price) {
-                                  case 15: return 'bg-green-100 text-green-800';
-                                  case 25: return 'bg-rose-100 text-rose-800';
-                                  case 49: return 'bg-purple-100 text-purple-800';
-                                  case 79: return 'bg-yellow-100 text-yellow-800';
-                                  default: return 'bg-gray-100 text-gray-800';
+                                  case 15: return 'bg-green-500 text-white border-green-600';
+                                  case 25: return 'bg-rose-500 text-white border-rose-600';
+                                  case 49: return 'bg-purple-500 text-white border-purple-600';
+                                  case 79: return 'bg-yellow-500 text-white border-yellow-600';
+                                  default: return 'bg-gray-500 text-white border-gray-600';
+                                }
+                              };
+
+                              const getTierName = (price: number) => {
+                                switch(price) {
+                                  case 15: return 'Basic';
+                                  case 25: return 'Standard';
+                                  case 49: return 'Premium';
+                                  case 79: return 'Professional';
+                                  default: return 'Custom';
                                 }
                               };
                             
                             return (
-                              <div key={category.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                <div className="flex items-center justify-between mb-3">
-                                  <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                      <h4 className="font-medium text-gray-900 text-sm">{category.name}</h4>
-                                      <span className={`px-2 py-1 text-xs rounded-full ${getPriceColor(category.monthlyPrice)}`}>
-                                        ${category.monthlyPrice}/mo
-                                      </span>
-                                    </div>
+                              <div key={category.id} className={`border-2 rounded-lg p-5 hover:shadow-lg transition-all ${
+                                isSubscribed ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-white'
+                              }`}>
+                                <div className="mb-3">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <h4 className="font-bold text-gray-900 text-base flex-1 pr-2">{category.name}</h4>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`px-3 py-1.5 text-sm font-bold rounded-lg border-2 ${getPriceColor(category.monthlyPrice)}`}>
+                                      ${category.monthlyPrice}/mo
+                                    </span>
+                                    <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                      {getTierName(category.monthlyPrice)} Tier
+                                    </span>
                                   </div>
                                 </div>
 
                                 {isSubscribed && subscription ? (
-                                  <div className="space-y-2">
+                                  <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                      <span className={`px-2 py-1 text-xs rounded-full ${
+                                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${
                                         subscription.status === 'active' 
-                                          ? 'bg-green-100 text-green-800'
+                                          ? 'bg-green-100 text-green-800 border-2 border-green-300'
                                           : subscription.status === 'past_due'
-                                          ? 'bg-yellow-100 text-yellow-800'
-                                          : 'bg-gray-100 text-gray-800'
+                                          ? 'bg-yellow-100 text-yellow-800 border-2 border-yellow-300'
+                                          : 'bg-gray-100 text-gray-800 border-2 border-gray-300'
                                       }`}>
-                                        {subscription.status}
+                                        ✓ {subscription.status.toUpperCase()}
                                       </span>
                                     </div>
-                                    <div className="text-xs text-gray-600">
-                                      <p>Leads this month: {subscription.leadsThisMonth}/{subscription.monthlyLeadLimit}</p>
+                                    <div className="text-xs text-gray-700 bg-white p-3 rounded-lg border">
+                                      <p className="font-semibold mb-1">
+                                        Leads: <span className="text-rose-600">{subscription.leadsThisMonth}</span> / {subscription.monthlyLeadLimit}
+                                      </p>
                                       {subscription.nextBillingDate && (
-                                        <p>Next billing: {new Date(subscription.nextBillingDate).toLocaleDateString()}</p>
+                                        <p className="text-gray-600">
+                                          Next billing: {new Date(subscription.nextBillingDate).toLocaleDateString()}
+                                        </p>
                                       )}
                                     </div>
                                     <button
                                       onClick={() => handleCancel(subscription.id)}
-                                      className="w-full px-3 py-1 text-xs border border-red-300 text-red-700 rounded-md hover:bg-red-50"
+                                      className="w-full px-4 py-2 text-sm font-semibold border-2 border-red-400 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
                                       disabled={loading}
                                     >
-                                      {subscription.cancelAtPeriodEnd ? 'Canceling at period end' : 'Cancel'}
+                                      {subscription.cancelAtPeriodEnd ? 'Canceling at period end' : 'Cancel Subscription'}
                                     </button>
                                   </div>
                                 ) : (
                                   <button
                                     onClick={() => handleSubscribe(category.id)}
-                                    className="w-full px-3 py-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs rounded-md hover:from-rose-700 hover:to-orange-700 disabled:opacity-50"
+                                    className="w-full px-4 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-bold rounded-lg hover:from-rose-700 hover:to-orange-700 disabled:opacity-50 shadow-md hover:shadow-lg transition-all"
                                     disabled={loading}
                                   >
-                                    Subscribe
+                                    Subscribe Now
                                   </button>
                                 )}
                               </div>

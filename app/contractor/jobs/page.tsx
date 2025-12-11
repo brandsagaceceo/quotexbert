@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
+import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
 
 interface JobFilters {
   category?: string;
@@ -24,6 +25,7 @@ export default function ContractorJobsPage() {
   const [acceptanceModal, setAcceptanceModal] = useState<{jobId: string; title: string} | null>(null);
   const [filters, setFilters] = useState<JobFilters>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showOnboardingPopup, setShowOnboardingPopup] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const router = useRouter();
 
@@ -32,7 +34,30 @@ export default function ContractorJobsPage() {
   useEffect(() => {
     fetchJobs();
     fetchSubscriptions();
+    
+    // Check if this is a new contractor (show popup once)
+    const hasSeenOnboarding = localStorage.getItem('contractor_seen_onboarding');
+    const userCreatedRecently = user && checkIfNewUser(user);
+    
+    if (!hasSeenOnboarding && userCreatedRecently && subscriptions.length === 0) {
+      // Show popup after a short delay for better UX
+      setTimeout(() => {
+        setShowOnboardingPopup(true);
+        localStorage.setItem('contractor_seen_onboarding', 'true');
+      }, 1500);
+    }
   }, [user]);
+
+  const checkIfNewUser = (user: any) => {
+    // Check if user was created in the last 7 days
+    if (user.createdAt) {
+      const createdDate = new Date(user.createdAt);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      return createdDate > sevenDaysAgo;
+    }
+    return false;
+  };
 
   const fetchSubscriptions = async () => {
     if (!user) return;
@@ -565,6 +590,13 @@ export default function ContractorJobsPage() {
           </div>
         </div>
       )}
+
+      {/* Onboarding Popup for New Contractors */}
+      <ContractorOnboardingPopup 
+        isOpen={showOnboardingPopup}
+        onClose={() => setShowOnboardingPopup(false)}
+        contractorName={user?.name}
+      />
     </div>
   );
 }

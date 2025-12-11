@@ -587,6 +587,182 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Contractor Pricing Tiers Section */}
+      <section className="py-20 bg-gradient-to-br from-white via-orange-50 to-red-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+              Simple Contractor Pricing
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Choose the plan that fits your business. One flat monthly rate. No commissions. Cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+            {/* Handyman Tier */}
+            <div className="relative bg-white rounded-3xl shadow-xl border-2 border-slate-200 p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Handyman</h3>
+                <div className="flex items-baseline justify-center gap-2 mb-4">
+                  <span className="text-5xl font-black bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                    $79
+                  </span>
+                  <span className="text-lg text-slate-600 font-semibold">/month</span>
+                </div>
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 rounded-xl">
+                  <p className="text-lg font-bold text-blue-900">4 Trade Categories</p>
+                  <p className="text-sm text-blue-700 font-semibold">Unlimited leads/month</p>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span>Professional profile</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span>Email & phone support</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span>Portfolio showcase</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span>Customer reviews</span>
+                </li>
+              </ul>
+              <Link
+                href="/contractor/subscription"
+                className="block w-full py-4 rounded-xl font-bold text-center bg-slate-100 text-slate-800 hover:bg-slate-200 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* Renovation Expert Tier - MOST POPULAR */}
+            <div className="relative bg-white rounded-3xl shadow-2xl border-4 border-rose-600 p-8 transition-all duration-300 hover:scale-105 hover:shadow-3xl transform md:-translate-y-4">
+              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
+                <span className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                  MOST POPULAR
+                </span>
+              </div>
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Renovation Expert</h3>
+                <div className="flex items-baseline justify-center gap-2 mb-4">
+                  <span className="text-6xl font-black bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+                    $139
+                  </span>
+                  <span className="text-lg text-slate-600 font-semibold">/month</span>
+                </div>
+                <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-4 py-3 rounded-xl border-2 border-rose-200">
+                  <p className="text-lg font-bold text-rose-900">8 Trade Categories</p>
+                  <p className="text-sm text-rose-700 font-semibold">Unlimited leads/month</p>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Enhanced profile badge</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Priority support</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Featured in search</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Portfolio showcase</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Advanced analytics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Lead notifications</span>
+                </li>
+              </ul>
+              <Link
+                href="/contractor/subscription"
+                className="block w-full py-4 rounded-xl font-bold text-center bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            {/* General Contractor Tier */}
+            <div className="relative bg-white rounded-3xl shadow-xl border-2 border-slate-200 p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">General Contractor</h3>
+                <div className="flex items-baseline justify-center gap-2 mb-4">
+                  <span className="text-5xl font-black bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-text text-transparent">
+                    $199
+                  </span>
+                  <span className="text-lg text-slate-600 font-semibold">/month</span>
+                </div>
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-100 px-4 py-3 rounded-xl">
+                  <p className="text-lg font-bold text-purple-900">ALL 12 Categories</p>
+                  <p className="text-sm text-purple-700 font-semibold">Unlimited leads/month</p>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Premium profile badge</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">24/7 priority support</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Top of search results</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Portfolio showcase</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Advanced analytics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Dedicated account manager</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-600 mt-0.5">✓</span>
+                  <span className="font-semibold">Custom branding</span>
+                </li>
+              </ul>
+              <Link
+                href="/contractor/subscription"
+                className="block w-full py-4 rounded-xl font-bold text-center bg-slate-100 text-slate-800 hover:bg-slate-200 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-slate-600 text-lg mb-2">
+              ✓ Money-back guarantee · Cancel anytime · No commission on projects
+            </p>
+            <Link
+              href="/contractor/subscription"
+              className="inline-flex items-center text-rose-600 hover:text-rose-700 font-semibold text-lg"
+            >
+              View detailed comparison →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="py-16 bg-gradient-to-r from-orange-50 to-red-50">
         <div className="max-w-5xl mx-auto px-4">
