@@ -246,70 +246,103 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* Pricing Tiers - PROMINENT DISPLAY */}
-          <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl shadow-lg p-8 mb-8 border-2 border-rose-200">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Subscription Pricing Tiers</h2>
-              <p className="text-gray-700">Choose the categories that match your expertise. Pay per category, cancel anytime.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Basic Tier */}
-              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-green-400 hover:shadow-xl transition-shadow">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">B</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Basic</h3>
-                  <div className="mb-2">
-                    <span className="text-3xl font-bold text-green-600">$15</span>
-                    <span className="text-gray-600">/month</span>
-                  </div>
-                  <p className="text-sm text-gray-600">per category</p>
-                </div>
+          {/* Pricing Tiers - 3D BUBBLE DESIGN */}
+          <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-2xl p-8 mb-8 relative overflow-hidden">
+            {/* Background Decorative Bubbles */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-0 right-0 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-20 w-72 h-72 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+            
+            <div className="relative z-10">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-extrabold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-3">
+                  Subscription Pricing Tiers
+                </h2>
+                <p className="text-lg text-gray-700 font-medium">Choose the categories that match your expertise. Pay per category, cancel anytime.</p>
               </div>
-
-              {/* Standard Tier */}
-              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-rose-400 hover:shadow-xl transition-shadow">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-rose-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">S</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Basic Tier */}
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-green-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-green-300">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-3xl font-black">B</span>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Basic</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent">$15</span>
+                        <span className="text-gray-600 font-semibold">/mo</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">per category</p>
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">Perfect for starting out</p>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Standard</h3>
-                  <div className="mb-2">
-                    <span className="text-3xl font-bold text-rose-600">$25</span>
-                    <span className="text-gray-600">/month</span>
-                  </div>
-                  <p className="text-sm text-gray-600">per category</p>
                 </div>
-              </div>
 
-              {/* Premium Tier */}
-              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-purple-400 hover:shadow-xl transition-shadow">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">P</span>
+                {/* Standard Tier */}
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-pink-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-rose-300">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-gradient-to-br from-rose-400 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-3xl font-black">S</span>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Standard</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-rose-500 to-pink-700 bg-clip-text text-transparent">$25</span>
+                        <span className="text-gray-600 font-semibold">/mo</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">per category</p>
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">Most popular choice</p>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Premium</h3>
-                  <div className="mb-2">
-                    <span className="text-3xl font-bold text-purple-600">$49</span>
-                    <span className="text-gray-600">/month</span>
-                  </div>
-                  <p className="text-sm text-gray-600">per category</p>
                 </div>
-              </div>
 
-              {/* Professional Tier */}
-              <div className="bg-white rounded-lg shadow-md p-6 border-2 border-yellow-400 hover:shadow-xl transition-shadow">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-yellow-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">P</span>
+                {/* Premium Tier */}
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-indigo-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-purple-300">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-3xl font-black">P</span>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Premium</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-purple-500 to-indigo-700 bg-clip-text text-transparent">$49</span>
+                        <span className="text-gray-600 font-semibold">/mo</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">per category</p>
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">For serious contractors</p>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">Professional</h3>
-                  <div className="mb-2">
-                    <span className="text-3xl font-bold text-yellow-600">$79</span>
-                    <span className="text-gray-600">/month</span>
+                </div>
+
+                {/* Professional Tier */}
+                <div className="group relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-3xl blur-lg opacity-40 group-hover:opacity-70 transition duration-500"></div>
+                  <div className="relative bg-white rounded-3xl shadow-xl p-6 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border-2 border-yellow-300">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform duration-300">
+                        <span className="text-white text-3xl font-black">P</span>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Professional</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-yellow-500 to-orange-700 bg-clip-text text-transparent">$79</span>
+                        <span className="text-gray-600 font-semibold">/mo</span>
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">per category</p>
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">Maximum lead access</p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600">per category</p>
                 </div>
               </div>
             </div>
@@ -645,10 +678,15 @@ export default function SubscriptionsPage() {
                                 ) : (
                                   <button
                                     onClick={() => handleSubscribe(category.id)}
-                                    className="w-full px-4 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-bold rounded-lg hover:from-rose-700 hover:to-orange-700 disabled:opacity-50 shadow-md hover:shadow-lg transition-all"
+                                    className="group relative w-full overflow-hidden rounded-xl font-bold text-sm shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                                     disabled={loading}
                                   >
-                                    Subscribe Now
+                                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-orange-500 to-rose-500 bg-[length:200%_100%] animate-gradient"></div>
+                                    <div className="relative px-4 py-3 text-white flex items-center justify-center gap-2">
+                                      <span className="text-lg">✨</span>
+                                      <span>Subscribe Now</span>
+                                      <span className="text-lg">✨</span>
+                                    </div>
                                   </button>
                                 )}
                               </div>
