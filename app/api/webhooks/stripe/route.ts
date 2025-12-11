@@ -25,6 +25,10 @@ export async function POST(request: NextRequest) {
 
     // Handle the event
     switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object);
+        break;
+
       case 'customer.subscription.created':
         await handleSubscriptionCreated(event.data.object);
         break;
@@ -61,6 +65,66 @@ export async function POST(request: NextRequest) {
       { error: "Webhook processing failed" },
       { status: 500 }
     );
+  }
+}
+
+// Handle checkout session completed (new tier-based subscriptions)
+async function handleCheckoutSessionCompleted(session: any) {
+  try {
+    console.log("Checkout session completed:", session.id);
+    
+    const contractorId = session.metadata?.contractorId;
+    const tier = session.metadata?.tier;
+    const categoryCount = parseInt(session.metadata?.categoryCount || "0");
+    
+    if (!contractorId || !tier) {
+      console.error("Missing contractor ID or tier in checkout session metadata");
+      return;
+    }
+
+    // Map tier to pricing
+    const tierPricing: Record<string, { name: string; price: number }> = {
+      handyman: { name: 'Handyman', price: 49 },
+      renovation: { name: 'Renovation Xbert', price: 99 },
+      general: { name: 'General Contractor', price: 149 }
+    };
+
+    const tierInfo = tierPricing[tier];
+    
+    if (!tierInfo) {
+      console.error(`Unknown tier: ${tier}`);
+      return;
+    }
+
+    // Update user record with subscription info
+    const stripeSubscriptionId = session.subscription as string;
+    
+    await prisma.user.update({
+      where: { id: contractorId },
+      data: {
+        stripeCustomerId: session.customer as string,
+        stripeSubscriptionId,
+        subscriptionPlan: tier,
+        subscriptionStatus: 'active',
+        subscriptionInterval: 'month'
+      }
+    });
+
+    // Create notification
+    await prisma.notification.create({
+      data: {
+        userId: contractorId,
+        type: 'SUBSCRIPTION_CREATED',
+        title: 'Subscription Activated!',
+        message: `Your ${tierInfo.name} subscription is now active! You can now select up to ${categoryCount} categories to receive leads from.`,
+        read: false
+      }
+    });
+
+    console.log(`Successfully activated ${tier} subscription for contractor ${contractorId}`);
+
+  } catch (error) {
+    console.error("Error handling checkout session completed:", error);
   }
 }
 

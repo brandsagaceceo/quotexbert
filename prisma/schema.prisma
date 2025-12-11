@@ -22,11 +22,12 @@ model User {
   // Stripe integration
   stripeCustomerId     String?  @unique
   stripeSubscriptionId String?  @unique
-  subscriptionPlan     String?  // 'basic' | 'professional' | 'premium'
+  subscriptionPlan     String?  // 'handyman' | 'renovation' | 'general' for tier subscriptions
   subscriptionStatus   String?  // 'active' | 'canceled' | 'past_due' | 'unpaid'
   subscriptionInterval String?  // 'month' | 'year'
   subscriptionCurrentPeriodStart DateTime?
   subscriptionCurrentPeriodEnd   DateTime?
+  selectedCategories   String?  @default("[]") // JSON array of category IDs contractor selected
   
   // Relations
   contractorProfile    ContractorProfile?
@@ -61,6 +62,10 @@ model User {
   
   // AI Estimates
   aiEstimates         AIEstimate[]   @relation("HomeownerEstimates")
+  
+  // AI Visualizer
+  visualizerSubscription VisualizerSubscription?
+  visualizerGenerations  VisualizerGeneration[]
   
   @@map("users")
 }
@@ -788,4 +793,64 @@ model EstimateItem {
   
   @@index([estimateId])
   @@map("estimate_items")
+}
+
+// ============================================
+// AI HOME VISUALIZER TABLES
+// ============================================
+
+// Tracks AI visualizer subscription and usage
+model VisualizerSubscription {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Subscription details
+  isPaid                Boolean  @default(false)
+  stripeSubscriptionId  String?  @unique
+  monthlyGenerationsUsed Int     @default(0)
+  lastResetDate         DateTime @default(now())
+  
+  // Limits
+  freeMonthlyLimit      Int      @default(10)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("visualizer_subscriptions")
+}
+
+// Stores AI visualizer generations
+model VisualizerGeneration {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Images
+  beforeImageUrl  String   // Original room photo
+  afterImageUrl   String   // AI-generated result
+  
+  // User selections
+  roomType        String?  // "living_room", "kitchen", "bedroom", "bathroom", "basement"
+  flooringStyle   String?  // "tile", "vinyl", "hardwood", "laminate", "carpet"
+  flooringColor   String?  // "light_oak", "dark_walnut", "gray", "white", etc.
+  wallColor       String?  // "white", "beige", "gray", "blue", etc.
+  designStyle     String?  // "modern", "farmhouse", "luxury", "minimalist", "industrial"
+  customRequest   String?  // Free-text design request
+  
+  // AI details
+  aiModel         String?  // Which AI model was used
+  promptUsed      String?  // The actual prompt sent to AI
+  processingTime  Int?     // Time in milliseconds
+  
+  // Metadata
+  wasSentToQuote  Boolean  @default(false) // If user sent these images to quote flow
+  quoteId         String?  // Reference to AIEstimate if created
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@map("visualizer_generations")
 }

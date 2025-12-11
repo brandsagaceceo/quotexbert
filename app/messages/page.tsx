@@ -156,8 +156,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex flex-col">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col">
+    <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex flex-col overflow-hidden">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden">
         {/* Modern Header */}
         <div className="mb-8 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -174,10 +174,10 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
-          <div className="lg:col-span-4 xl:col-span-3 flex flex-col min-h-0">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full">
+          <div className="lg:col-span-4 xl:col-span-3 flex flex-col min-h-0 h-full max-h-[calc(100vh-240px)] lg:max-h-full">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
               <div className="p-6 border-b border-slate-200/50 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">

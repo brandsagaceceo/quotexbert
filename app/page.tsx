@@ -203,8 +203,8 @@ export default function Home() {
       />
       
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 -mx-4 md:-mx-6 lg:-mx-8">
-        {/* Animated Hero Section */}
-        <section className="relative py-12 sm:py-20 overflow-hidden">
+        {/* Hero Section - AI Estimator */}
+        <section className="relative py-8 sm:py-12 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           
@@ -214,96 +214,104 @@ export default function Home() {
           <div className="absolute -bottom-8 left-40 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
+          {/* Hero Title */}
+          <div className="text-center mb-8 animate-fade-in-up">
+            <div className="inline-block mb-3 px-5 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-lg">
+              <span className="text-sm font-bold">🤖 AI-POWERED ESTIMATES</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-3 leading-tight">
+              Get Your Project Estimate
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
+              Upload photos or describe your project. Get instant AI-powered cost estimates.
+            </p>
+          </div>
+
           {/* Trust Badges */}
-          <div className="flex flex-wrap justify-center gap-6 mb-8 animate-fade-in">
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '0s' }}>
-              <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex flex-wrap justify-center gap-4 mb-6 animate-fade-in">
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
+              <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">{stats.totalContractors}+ Verified Contractors</span>
+              <span className="text-xs font-semibold text-slate-700">{stats.totalContractors}+ Contractors</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '0.5s' }}>
-              <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
+              <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">{stats.avgRating} ⭐ Average Rating</span>
+              <span className="text-xs font-semibold text-slate-700">{stats.avgRating} ⭐ Rating</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-full shadow-lg hover-lift animate-float" style={{ animationDelay: '1s' }}>
-              <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
+              <svg className="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-semibold text-slate-700">🔒 Stripe-Secured</span>
+              <span className="text-xs font-semibold text-slate-700">🔒 Secure</span>
             </div>
           </div>
 
-          {/* Hero Content */}
-          <div className="text-center mb-12 animate-fade-in-up">
-            <div className="inline-block mb-4 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-lg animate-bounce">
-              <span className="text-sm font-bold">✨ NEW: AI Photo Visualization Available!</span>
-            </div>
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-6 leading-tight flex flex-col items-center gap-4">
-              <span className="flex items-center gap-4">
-                <svg className="w-16 h-16 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Take a Picture
-              </span>
-              <span className="text-5xl sm:text-6xl lg:text-7xl">Get a Quote. Easy as That.</span>
-            </h1>
-            <p className="text-2xl sm:text-3xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-8">
-              Snap a photo or describe your project → Get instant AI estimates → Connect with verified GTA contractors → See what it could look like with AI visualization!
-            </p>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {!isSignedIn && (
-                <>
-                  <Link 
-                    href="/sign-up"
-                    className="group relative px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
-                  >
-                    Get Started Free
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </Link>
-                  <Link 
-                    href="/sign-in"
-                    className="px-8 py-4 bg-white text-rose-800 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg border-2 border-rose-100 hover:border-rose-300 transition-all duration-200"
-                  >
-                    Sign In
-                  </Link>
-                </>
-              )}
-            </div>
+          {/* Main Estimator Form - NO CARD, CLEAN LAYOUT */}
+          <div className="max-w-4xl mx-auto mb-6">
+            <StreamlinedEstimateForm 
+              onEstimateComplete={(result) => {
+                setEstimateResult(result);
+                setTimeout(() => {
+                  document.getElementById('estimate-results')?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                  });
+                }, 100);
+              }}
+              userId={user?.id}
+            />
+          </div>
 
-            {/* Quick Action for Homeowners */}
-            {isSignedIn && user?.role === 'homeowner' && (
-              <div className="mt-6">
-                <div className="bg-gradient-to-r from-green-50/80 to-orange-50/80 rounded-xl p-4 max-w-md mx-auto">
-                  <p className="text-green-800 font-medium mb-3">Welcome back, {user.name}!</p>
-                  <div className="flex gap-3 justify-center">
-                    <Link 
-                      href="/homeowner/estimates" 
-                      className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                    >
-                      📋 View My Estimates
-                    </Link>
-                    <Link 
-                      href="/create-lead" 
-                      className="inline-block bg-gradient-to-r from-green-600 to-orange-600 hover:from-green-700 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                    >
-                      ➕ Post Project
-                    </Link>
-                  </div>
+          {/* Quick Action for Homeowners */}
+          {isSignedIn && user?.role === 'homeowner' && (
+            <div className="mb-6">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 max-w-md mx-auto shadow-sm border border-orange-200">
+                <p className="text-slate-700 font-medium text-center mb-3">Welcome back, {user.name}!</p>
+                <div className="flex gap-3 justify-center">
+                  <Link 
+                    href="/homeowner/estimates" 
+                    className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold transition-all transform hover:scale-105 text-sm"
+                  >
+                    📋 My Estimates
+                  </Link>
+                  <Link 
+                    href="/create-lead" 
+                    className="inline-block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2 rounded-lg font-semibold transition-all transform hover:scale-105 text-sm"
+                  >
+                    ➕ Post Project
+                  </Link>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* AI Visualizer Banner - NO WHITE BORDER */}
+          <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 rounded-2xl p-6 max-w-4xl mx-auto mb-8 shadow-lg">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-white">
+              <div className="text-center md:text-left">
+                <div className="text-2xl font-black mb-2 flex items-center gap-2 justify-center md:justify-start">
+                  <span className="text-3xl">✨</span>
+                  <span>NEW: AI Home Visualizer</span>
+                </div>
+                <p className="text-base text-white text-opacity-90">
+                  See your renovation BEFORE you start! Upload a room photo, AI transforms it.
+                </p>
+              </div>
+              <Link 
+                href="/visualizer"
+                className="bg-white text-purple-600 px-6 py-3 rounded-xl font-black text-base shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all whitespace-nowrap flex items-center gap-2"
+              >
+                <span>Try It Free</span>
+                <span className="text-xl">→</span>
+              </Link>
+            </div>
           </div>
 
           {/* Featured Contractors Section */}
-          <div className="mb-16 animate-fade-in-up">
+          <div className="mb-12 animate-fade-in-up">
             <h3 className="text-2xl font-bold text-center text-slate-900 mb-8">
               Trusted by Toronto's Top Contractors
             </h3>
@@ -372,47 +380,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Trust Indicators Strip */}
-          <div className="mb-6 py-4 px-6 bg-white/60 backdrop-blur-sm rounded-xl border border-orange-200/50 shadow-sm">
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-gray-700">
-              <div className="flex items-center gap-2">
-                <span className="text-green-600 font-bold">?</span>
-                <span className="font-medium">Serving the GTA</span>
-              </div>
-              <div className="hidden sm:block text-gray-300">�</div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600 font-bold">??</span>
-                <span className="font-medium">Stripe-Secured Payments</span>
-              </div>
-              <div className="hidden sm:block text-gray-300">�</div>
-              <div className="flex items-center gap-2">
-                <span className="text-purple-600 font-bold">?</span>
-                <span className="font-medium">Background-Checked Contractors</span>
-              </div>
-              <div className="hidden sm:block text-gray-300">�</div>
-              <div className="flex items-center gap-2">
-                <span className="text-orange-600 font-bold">?</span>
-                <span className="font-medium">Verified Reviews</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Estimator Form - Center of Attention (voice recorder and photo upload) */}
-          <div className="bg-white rounded-3xl shadow-2xl p-8 relative z-10 max-w-4xl mx-auto">
-            <StreamlinedEstimateForm 
-              onEstimateComplete={(result) => {
-                setEstimateResult(result);
-                setTimeout(() => {
-                  document.getElementById('estimate-results')?.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                  });
-                }, 100);
-              }}
-              userId={user?.id}
-            />
-          </div>
-
           {/* Estimate Results */}
           {estimateResult && (
             <div id="estimate-results" className="mt-8 bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 relative z-10">
@@ -423,7 +390,7 @@ export default function Home() {
                   </h2>
                   {estimateResult.aiPowered && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                      ?? AI
+                      🤖 AI
                     </span>
                   )}
                 </div>
@@ -587,7 +554,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contractor Pricing Tiers Section */}
+      {/* Contractor Pricing Tiers Section - Only show to contractors */}
+      {user?.role === 'contractor' && (
       <section className="py-20 bg-gradient-to-br from-white via-orange-50 to-red-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
@@ -759,6 +727,59 @@ export default function Home() {
             >
               View detailed comparison →
             </Link>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* Stop Overpaying Section - Near Bottom */}
+      <section className="py-12 bg-gradient-to-r from-rose-50 to-orange-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 border border-rose-200 shadow-md">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+              <div className="text-center md:text-left flex-1">
+                <div className="text-red-600 font-bold text-xl mb-2">❌ The Old Problem</div>
+                <p className="text-gray-700 text-lg">Contractors charging whatever they want. You have no idea if the price is fair.</p>
+              </div>
+              <div className="hidden md:block text-4xl text-rose-600">→</div>
+              <div className="text-center md:text-left flex-1">
+                <div className="text-green-600 font-bold text-xl mb-2">✅ Our Solution</div>
+                <p className="text-gray-700 text-lg font-semibold">AI tells you what the job SHOULD cost before quotes come in!</p>
+              </div>
+            </div>
+            <div className="text-center mt-6">
+              <h3 className="text-3xl font-black bg-gradient-to-r from-rose-900 to-orange-900 bg-clip-text text-transparent mb-2">
+                Stop Overpaying for Home Jobs
+              </h3>
+              <p className="text-slate-600 text-lg">
+                Quote anything from ❄️ snow removal to ⚡ electrical work and everything in between
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 100% FREE Section - Subtle, Bottom Placement */}
+      <section className="py-8 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-green-200 shadow-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+              <div className="flex items-center gap-4">
+                <div className="bg-green-100 rounded-full p-3">
+                  <span className="text-3xl">🎉</span>
+                </div>
+                <div>
+                  <div className="text-2xl font-black text-green-800 mb-1">
+                    100% FREE for All Homeowners
+                  </div>
+                  <p className="text-base text-green-700">No hidden fees • No commissions • Forever</p>
+                </div>
+              </div>
+              <div className="bg-green-100 rounded-xl px-6 py-3 border-2 border-green-300">
+                <div className="text-3xl font-black text-green-800">$0</div>
+                <div className="text-xs font-semibold text-green-700">Just great contractors</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

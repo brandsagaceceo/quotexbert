@@ -308,7 +308,8 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your project in detail... (e.g., 'I need to replace my kitchen faucet. It's a standard single-handle faucet with a pull-out sprayer. The current one is leaking from the base.')"
-              className="w-full bg-gray-50 border border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-500 min-h-[120px] resize-none focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 caret-teal-700 cursor-text"
+              className="w-full bg-white border-2 border-gray-300 rounded-lg p-4 text-gray-900 placeholder-gray-400 min-h-[120px] resize-none focus:outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-200 caret-rose-600 cursor-text shadow-sm"
+              style={{ caretColor: '#e11d48' }}
             />
             
             {/* Voice and Photo Buttons */}
@@ -367,30 +368,31 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-          <Button
-            variant="primary"
-            size="lg"
+          <button
+            type="button"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 text-white font-bold text-lg py-6 shadow-xl transform hover:scale-105 transition-all duration-200 relative overflow-hidden group"
+            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 text-white font-black text-xl py-7 rounded-2xl shadow-2xl hover:shadow-[0_20px_50px_rgba(251,113,133,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 relative overflow-hidden group border-2 border-rose-400 hover:border-rose-300 disabled:cursor-not-allowed disabled:transform-none"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
-            <span className="relative flex items-center justify-center gap-2">
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+            <span className="relative flex items-center justify-center gap-3">
               {isLoading ? (
                 <>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Generating Estimate...
+                  <span className="animate-pulse">Generating Your Estimate...</span>
                 </>
               ) : (
                 <>
-                  📸 Get My Instant Estimate 🚀
+                  <span className="text-3xl animate-bounce">🚀</span>
+                  <span className="tracking-wide">Get My Instant Estimate</span>
+                  <span className="text-3xl animate-bounce animation-delay-200">✨</span>
                 </>
               )}
             </span>
-          </Button>
+          </button>
           
           {(description || images.length > 0) && (
             <Button

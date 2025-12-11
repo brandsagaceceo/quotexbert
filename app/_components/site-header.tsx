@@ -14,15 +14,16 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "Home" },
+    { href: "/visualizer", label: "AI Visualizer", highlight: true },
     { href: "/blog", label: "Blog" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-white via-rose-50/30 to-orange-50/30 backdrop-blur-md border-b-2 border-rose-200 shadow-lg">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200/50 shadow-sm">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-20 px-4">
           {/* Brand - BIGGER */}
           <div className="flex-shrink-0 transform transition-transform hover:scale-105">
             <Logo size="lg" showText={true} />
@@ -34,9 +35,13 @@ export default function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+                className={`${
+                  link.highlight 
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transform hover:scale-105' 
+                    : 'text-ink-700 hover:text-brand px-3 py-2 rounded-md font-medium'
+                } text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2`}
               >
-                {link.label}
+                {link.highlight && '✨ '}{link.label}
               </Link>
             ))}
           </nav>
@@ -153,10 +158,14 @@ export default function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md"
+                  className={`block py-2 text-base font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md ${
+                    link.highlight
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center px-4 py-3 rounded-lg font-bold'
+                      : 'text-ink-700 hover:text-[var(--brand)]'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {link.label}
+                  {link.highlight && '✨ '}{link.label}
                 </Link>
               ))}
 

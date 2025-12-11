@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import {
   User,
   MapPin,
@@ -21,7 +22,8 @@ import {
   Briefcase,
   DollarSign,
   Edit,
-  Trash
+  Trash,
+  CheckCircle2
 } from "lucide-react";
 
 interface ProfileData {
@@ -101,6 +103,8 @@ export default function UnifiedProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [maxCategories, setMaxCategories] = useState<number>(0);
   const [editData, setEditData] = useState({
     companyName: '',
     trade: '',
@@ -187,6 +191,38 @@ export default function UnifiedProfilePage() {
           }
         } catch (error) {
           console.log("[ProfilePage] Error fetching extended profile, using basic profile");
+        }
+
+        // Fetch subscription and categories for contractors
+        if (userRole === 'contractor') {
+          try {
+            const subscriptionResponse = await fetch(`/api/user/subscription?userId=${authUser.id}`);
+            if (subscriptionResponse.ok) {
+              const subscriptionData = await subscriptionResponse.json();
+              console.log("[ProfilePage] Loaded subscription:", subscriptionData);
+              
+              // Set max categories based on tier
+              const tierLimits: Record<string, number> = {
+                'handyman': 3,
+                'renovation': 6,
+                'general': 10
+              };
+              const limit = tierLimits[subscriptionData.subscriptionPlan || ''] || 0;
+              setMaxCategories(limit);
+              
+              // Load selected categories
+              if (subscriptionData.selectedCategories) {
+                try {
+                  const categories = JSON.parse(subscriptionData.selectedCategories);
+                  setSelectedCategories(categories);
+                } catch (e) {
+                  setSelectedCategories([]);
+                }
+              }
+            }
+          } catch (error) {
+            console.log("[ProfilePage] Subscription info not available");
+          }
         }
 
         // Fetch portfolio if contractor
@@ -460,7 +496,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative h-64 md:h-80 mb-32 overflow-visible">
+      <div className="relative h-64 md:h-80 mb-8 overflow-visible">
         {/* Cover Photo */}
         <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
@@ -512,7 +548,7 @@ export default function UnifiedProfilePage() {
         )}
 
         {/* Profile Info Container - Fixed positioning */}
-        <div className="absolute -bottom-24 left-0 right-0">
+        <div className="absolute -bottom-16 left-0 right-0">
           <div className="container mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
@@ -590,14 +626,14 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-32 md:h-36"></div>
+      <div className="h-4"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8">
             {(isContractor 
-              ? ['overview', 'portfolio', 'jobs', 'contact'] 
+              ? ['overview', 'portfolio', 'categories', 'jobs', 'contact'] 
               : ['overview', 'quotes', 'contact']
             ).map((tab) => (
               <button
@@ -773,6 +809,154 @@ export default function UnifiedProfilePage() {
                       Add Your First {isContractor ? "Project" : "Estimate"}
                     </button>
                   </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'categories' && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">My Categories</h2>
+                  <p className="text-slate-600">
+                    {maxCategories > 0 
+                      ? `Select up to ${maxCategories} categories to receive leads from. You've selected ${selectedCategories.length}/${maxCategories}.`
+                      : "Subscribe to a tier to start selecting categories and receiving leads."}
+                  </p>
+                </div>
+
+                {maxCategories === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 max-w-md mx-auto">
+                      <div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Briefcase className="h-8 w-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Subscription</h3>
+                      <p className="text-slate-600 mb-6">
+                        Subscribe to a tier to unlock category selection and start receiving leads.
+                      </p>
+                      <Link
+                        href="/contractor/subscriptions"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
+                      >
+                        View Subscription Tiers
+                        <span className="text-xl">→</span>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Selected Categories */}
+                    {selectedCategories.length > 0 && (
+                      <div className="mb-8 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                          Active Categories ({selectedCategories.length})
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedCategories.map((catId) => {
+                            const category = CATEGORY_GROUPS
+                              .flatMap(g => g.categories)
+                              .find(c => c.id === catId);
+                            return category ? (
+                              <div
+                                key={catId}
+                                className="bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200 flex items-center gap-2 group hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer"
+                                onClick={async () => {
+                                  const newCategories = selectedCategories.filter(id => id !== catId);
+                                  setSelectedCategories(newCategories);
+                                  try {
+                                    await fetch('/api/user/subscription', {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ userId: authUser?.id, categories: newCategories })
+                                    });
+                                  } catch (e) {
+                                    console.error('Failed to update categories:', e);
+                                  }
+                                }}
+                              >
+                                <span className="font-medium text-slate-900">{category.name}</span>
+                                <X className="h-4 w-4 text-slate-400 group-hover:text-red-600" />
+                              </div>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Available Categories */}
+                    {selectedCategories.length < maxCategories && (
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-4">
+                          Available Categories ({maxCategories - selectedCategories.length} slots remaining)
+                        </h3>
+                        <div className="space-y-6">
+                          {CATEGORY_GROUPS.map((group) => {
+                            const availableCategories = group.categories.filter(
+                              cat => !selectedCategories.includes(cat.id)
+                            );
+                            
+                            if (availableCategories.length === 0) return null;
+                            
+                            return (
+                              <div key={group.id} className="border border-slate-200 rounded-xl p-6">
+                                <h4 className="font-bold text-slate-900 mb-2">{group.name}</h4>
+                                <p className="text-sm text-slate-600 mb-4">{group.description}</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {availableCategories.map((category) => (
+                                    <button
+                                      key={category.id}
+                                      onClick={async () => {
+                                        if (selectedCategories.length >= maxCategories) return;
+                                        const newCategories = [...selectedCategories, category.id];
+                                        setSelectedCategories(newCategories);
+                                        try {
+                                          await fetch('/api/user/subscription', {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ userId: authUser?.id, categories: newCategories })
+                                          });
+                                        } catch (e) {
+                                          console.error('Failed to update categories:', e);
+                                        }
+                                      }}
+                                      disabled={selectedCategories.length >= maxCategories}
+                                      className="text-left p-4 border-2 border-slate-200 rounded-lg hover:border-rose-500 hover:bg-rose-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                                    >
+                                      <div className="font-medium text-slate-900 group-hover:text-rose-600">
+                                        {category.name}
+                                      </div>
+                                      <div className="text-sm text-slate-500 mt-1">
+                                        Click to add
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedCategories.length >= maxCategories && (
+                      <div className="mt-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">
+                          🎉 All category slots filled!
+                        </h3>
+                        <p className="text-slate-600 mb-4">
+                          You've selected the maximum number of categories for your tier. Want to add more?
+                        </p>
+                        <Link
+                          href="/contractor/subscriptions"
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
+                        >
+                          Upgrade Your Subscription
+                          <span className="text-xl">→</span>
+                        </Link>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}

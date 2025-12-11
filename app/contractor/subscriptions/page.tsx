@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { CATEGORY_GROUPS, getCategoryById } from "@/lib/categories";
@@ -35,17 +36,46 @@ interface Transaction {
 
 export default function SubscriptionsPage() {
   const { authUser, authLoading } = useAuth();
+  const searchParams = useSearchParams();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'subscriptions' | 'billing'>('subscriptions');
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showCancelMessage, setShowCancelMessage] = useState(false);
   
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [categoryGroupFilter, setCategoryGroupFilter] = useState<string>('all');
+
+  // Check for success/cancel URL parameters
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    const tier = searchParams.get('tier');
+
+    if (success === 'true') {
+      setShowSuccessMessage(true);
+      // Auto-hide after 10 seconds
+      setTimeout(() => setShowSuccessMessage(false), 10000);
+      
+      // Clean URL
+      window.history.replaceState({}, '', '/contractor/subscriptions');
+    }
+
+    if (canceled === 'true') {
+      setShowCancelMessage(true);
+      // Auto-hide after 8 seconds
+      setTimeout(() => setShowCancelMessage(false), 8000);
+      
+      // Clean URL
+      window.history.replaceState({}, '', '/contractor/subscriptions');
+    }
+  }, [searchParams]);
 
   // Fetch subscription data
   const fetchSubscriptions = async () => {
@@ -91,6 +121,53 @@ export default function SubscriptionsPage() {
       fetchBillingHistory();
     }
   }, [authUser, authLoading]);
+
+  // Subscribe to a tier (create Stripe Checkout session)
+  const handleTierSubscription = async (tier: 'handyman' | 'renovation' | 'general') => {
+    console.log('[Subscription] Button clicked for tier:', tier);
+    
+    if (!authUser) {
+      console.error('[Subscription] No authUser found');
+      setError('Please sign in to subscribe');
+      return;
+    }
+
+    console.log('[Subscription] Auth user:', authUser.id, authUser.email);
+
+    try {
+      setCheckoutLoading(tier);
+      console.log('[Subscription] Calling API...');
+      
+      // Create Stripe Checkout session
+      const response = await fetch('/api/subscriptions/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contractorId: authUser.id,
+          tier: tier,
+          email: authUser.email
+        })
+      });
+
+      console.log('[Subscription] API response status:', response.status);
+      const data = await response.json();
+      console.log('[Subscription] API response data:', data);
+
+      if (data.success && data.checkoutUrl) {
+        console.log('[Subscription] Redirecting to Stripe:', data.checkoutUrl);
+        // Redirect to Stripe Checkout
+        window.location.href = data.checkoutUrl;
+      } else {
+        console.error('[Subscription] API error:', data.error);
+        setError(data.error || 'Failed to create checkout session');
+        setCheckoutLoading(null);
+      }
+    } catch (err) {
+      console.error('[Subscription] Catch error:', err);
+      setError('Failed to start checkout process');
+      setCheckoutLoading(null);
+    }
+  };
 
   // Subscribe to a category
   const handleSubscribe = async (category: string) => {
@@ -228,6 +305,48 @@ export default function SubscriptionsPage() {
             </p>
           </div>
 
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4 flex items-start">
+              <svg className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-green-800 font-medium">Subscription Activated!</h3>
+                <p className="text-green-700 mt-1">
+                  Your subscription payment was successful. You can now select your categories below to start receiving leads.
+                </p>
+                <button
+                  onClick={() => setShowSuccessMessage(false)}
+                  className="text-green-600 hover:text-green-800 text-sm font-medium mt-2"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cancel Message */}
+          {showCancelMessage && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-md p-4 flex items-start">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-yellow-800 font-medium">Checkout Canceled</h3>
+                <p className="text-yellow-700 mt-1">
+                  No payment was processed. You can try again anytime by selecting a subscription tier below.
+                </p>
+                <button
+                  onClick={() => setShowCancelMessage(false)}
+                  className="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-2"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Error Alert */}
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
@@ -245,6 +364,131 @@ export default function SubscriptionsPage() {
               </div>
             </div>
           )}
+
+          {/* Introduction Section */}
+          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-8 border-2 border-rose-100">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold text-lg mb-6 shadow-lg">
+                  <span className="text-2xl">👷</span>
+                  <span>Welcome, Contractor!</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                  Get More Jobs, Keep 100% of Your Profits
+                </h2>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  Unlike other platforms, we <span className="font-bold text-rose-600">never take a percentage of your job earnings</span>. 
+                  Pay a simple monthly subscription per category and keep every dollar you earn.
+                </p>
+              </div>
+
+              {/* Key Benefits Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-green-500 rounded-full p-3 flex-shrink-0">
+                      <span className="text-3xl">💰</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Zero Commission</h3>
+                      <p className="text-gray-700">
+                        Keep 100% of your earnings. We only charge for category access, never per job or commission.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-blue-500 rounded-full p-3 flex-shrink-0">
+                      <span className="text-3xl">🎯</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Choose Your Categories</h3>
+                      <p className="text-gray-700">
+                        Select 3, 6, or 10 job categories based on your expertise. From roofing to electrical, plumbing to landscaping.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-purple-500 rounded-full p-3 flex-shrink-0">
+                      <span className="text-3xl">📬</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Unlimited Applications</h3>
+                      <p className="text-gray-700">
+                        Apply to as many jobs as you want in your selected categories. No per-lead fees, ever.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-6 border-2 border-orange-200">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-orange-500 rounded-full p-3 flex-shrink-0">
+                      <span className="text-3xl">💬</span>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-gray-900 mb-2">Direct Messaging</h3>
+                      <p className="text-gray-700">
+                        Chat directly with homeowners, negotiate terms, and close deals—all through our platform.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* How It Works */}
+              <div className="bg-gradient-to-r from-rose-500 to-orange-500 rounded-2xl p-8 text-white">
+                <h3 className="text-2xl font-black mb-6 text-center">How It Works</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
+                      1
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Choose Your Plan</h4>
+                    <p className="text-white text-opacity-90">Select how many categories you want access to (3, 6, or 10)</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
+                      2
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Pick Categories</h4>
+                    <p className="text-white text-opacity-90">After subscribing, select your job categories from 30+ options</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-3xl font-black">
+                      3
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">Start Bidding</h4>
+                    <p className="text-white text-opacity-90">Apply to unlimited jobs and keep 100% of what you earn</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Examples */}
+              <div className="mt-8 text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Available Categories Include:</h3>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {[
+                    '🏠 Roofing', '⚡ Electrical', '🚰 Plumbing', '🎨 Painting', 
+                    '🌳 Landscaping', '❄️ HVAC', '🪟 Windows & Doors', '🧱 Masonry',
+                    '🛠️ General Repairs', '🏗️ Renovations', '🔧 Carpentry', '☃️ Snow Removal'
+                  ].map((cat) => (
+                    <span key={cat} className="bg-gray-100 hover:bg-rose-100 border border-gray-300 hover:border-rose-300 px-4 py-2 rounded-full text-sm font-semibold text-gray-700 transition-colors">
+                      {cat}
+                    </span>
+                  ))}
+                  <span className="bg-gradient-to-r from-rose-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                    + 18 More!
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Pricing Tiers - CATEGORY BUNDLE DESIGN */}
           <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-2xl p-8 mb-8 relative overflow-hidden">
@@ -319,11 +563,23 @@ export default function SubscriptionsPage() {
                         </li>
                       </ul>
                       
-                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                      <button 
+                        onClick={() => handleTierSubscription('handyman')}
+                        disabled={checkoutLoading !== null}
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                         <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-[length:200%_100%] animate-gradient"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          <span>Get Started</span>
-                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                          {checkoutLoading === 'handyman' ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              <span>Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Get Started</span>
+                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                            </>
+                          )}
                         </div>
                       </button>
                     </div>
@@ -332,10 +588,10 @@ export default function SubscriptionsPage() {
 
                 {/* Renovation Xbert Tier */}
                 <div className="group relative scale-105">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-90 transition duration-500 animate-pulse"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-90 transition duration-500"></div>
                   <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-orange-400">
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg animate-pulse">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                      <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white">
                         ⭐ MOST POPULAR
                       </span>
                     </div>
@@ -384,12 +640,24 @@ export default function SubscriptionsPage() {
                         </li>
                       </ul>
                       
-                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                      <button 
+                        onClick={() => handleTierSubscription('renovation')}
+                        disabled={checkoutLoading !== null}
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                         <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%] animate-gradient"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          <span className="text-xl">🚀</span>
-                          <span>Get Started</span>
-                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                          {checkoutLoading === 'renovation' ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              <span>Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-xl">🚀</span>
+                              <span>Get Started</span>
+                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                            </>
+                          )}
                         </div>
                       </button>
                     </div>
@@ -454,12 +722,24 @@ export default function SubscriptionsPage() {
                         </li>
                       </ul>
                       
-                      <button className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                      <button 
+                        onClick={() => handleTierSubscription('general')}
+                        disabled={checkoutLoading !== null}
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 bg-[length:200%_100%] animate-gradient"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          <span className="text-xl">👑</span>
-                          <span>Get Started</span>
-                          <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                          {checkoutLoading === 'general' ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              <span>Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-xl">👑</span>
+                              <span>Get Started</span>
+                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
+                            </>
+                          )}
                         </div>
                       </button>
                     </div>

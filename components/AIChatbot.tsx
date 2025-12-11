@@ -101,7 +101,7 @@ export function AIChatbot() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 group"
+        className="fixed bottom-24 md:bottom-6 right-6 z-50 group"
       >
         <div className="relative">
           {/* Subtle glow effect */}
@@ -129,11 +129,11 @@ export function AIChatbot() {
   }
 
   return (
-    <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
-      isMinimized ? 'w-80' : 'w-96'
+    <div className={`fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50 transition-all duration-300 ${
+      isMinimized ? 'w-80' : 'w-[calc(100vw-2rem)] md:w-96 max-w-96'
     }`}>
       <div className={`bg-white rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden transition-all duration-300 ${
-        isMinimized ? 'h-16' : 'h-[600px]'
+        isMinimized ? 'h-16' : 'h-[500px] md:h-[600px]'
       }`}>
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white p-4 flex items-center justify-between">
