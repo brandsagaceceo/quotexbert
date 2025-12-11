@@ -272,6 +272,30 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   animation: gradient 3s ease infinite;
 }
 
+/* Gradient Shift Animation for Estimate Button */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Scrolling Animation for Reviews */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
 /* 3D Float Effect */
 @keyframes float {
   0%, 100% {

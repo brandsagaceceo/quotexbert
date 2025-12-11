@@ -372,9 +372,19 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
             type="button"
             onClick={generateEstimate}
             disabled={isLoading || (!description.trim() && images.length === 0)}
-            className="flex-1 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 text-white font-black text-xl py-7 rounded-2xl shadow-2xl hover:shadow-[0_20px_50px_rgba(251,113,133,0.5)] transform hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 relative overflow-hidden group border-2 border-rose-400 hover:border-rose-300 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex-1 relative overflow-hidden text-white font-black text-xl py-7 rounded-2xl shadow-2xl hover:shadow-[0_25px_60px_rgba(74,0,0,0.6)] transform hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 disabled:cursor-not-allowed disabled:transform-none disabled:opacity-50 group"
+            style={{
+              background: isLoading || (!description.trim() && images.length === 0) 
+                ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                : 'linear-gradient(135deg, #4A0000 0%, #8B0000 25%, #FF7A00 75%, #FFB347 100%)',
+              backgroundSize: '200% 200%',
+              animation: (isLoading || (!description.trim() && images.length === 0)) ? 'none' : 'gradient-shift 3s ease infinite'
+            }}
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+            {/* Shine effect overlay */}
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 group-disabled:hidden"></span>
+            
+            {/* Button content */}
             <span className="relative flex items-center justify-center gap-3">
               {isLoading ? (
                 <>
@@ -382,13 +392,13 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span className="animate-pulse">Generating Your Estimate...</span>
+                  <span className="animate-pulse drop-shadow-lg">Generating Your Estimate...</span>
                 </>
               ) : (
                 <>
-                  <span className="text-3xl animate-bounce">🚀</span>
-                  <span className="tracking-wide">Get My Instant Estimate</span>
-                  <span className="text-3xl animate-bounce animation-delay-200">✨</span>
+                  <span className="text-3xl animate-bounce drop-shadow-lg">🚀</span>
+                  <span className="tracking-wide drop-shadow-lg">Get My Instant Estimate</span>
+                  <span className="text-3xl animate-bounce animation-delay-200 drop-shadow-lg">✨</span>
                 </>
               )}
             </span>

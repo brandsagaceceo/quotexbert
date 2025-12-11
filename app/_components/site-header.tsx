@@ -37,7 +37,7 @@ export default function SiteHeader() {
                 href={link.href}
                 className={`${
                   link.highlight 
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transform hover:scale-105' 
+                    ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-1' 
                     : 'text-ink-700 hover:text-brand px-3 py-2 rounded-md font-medium'
                 } text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2`}
               >
@@ -160,7 +160,7 @@ export default function SiteHeader() {
                   href={link.href}
                   className={`block py-2 text-base font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md ${
                     link.highlight
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center px-4 py-3 rounded-lg font-bold'
+                      ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white text-center px-4 py-3 rounded-lg font-bold shadow-lg'
                       : 'text-ink-700 hover:text-[var(--brand)]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}

@@ -48,20 +48,20 @@ export default function AffiliatePage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
         <div className="max-w-7xl mx-auto px-4 py-16">
           {/* Hero Section with Image */}
           <div className="text-center mb-16">
-            <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-bold shadow-lg">
+            <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-full font-bold shadow-lg">
               ✨ AFFILIATE PROGRAM
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-purple-900 via-pink-700 to-orange-900 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-rose-900 via-orange-700 to-amber-900 bg-clip-text text-transparent leading-tight">
               Earn Recurring Income
               <br />
               Referring Contractors
             </h1>
             <p className="text-2xl text-slate-700 max-w-3xl mx-auto mb-8 font-medium">
-              Join our affiliate program and earn <span className="text-purple-600 font-black">50% commission</span> for every contractor you refer. Turn your network into <span className="text-pink-600 font-black">passive income</span>.
+              Join our affiliate program and earn <span className="text-rose-700 font-black">50% commission</span> for every contractor you refer. Turn your network into <span className="text-orange-600 font-black">passive income</span>.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-lg">
               <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-md">
@@ -80,20 +80,20 @@ export default function AffiliatePage() {
           </div>
 
           {/* How It Works */}
-          <div className="bg-white rounded-3xl p-8 md:p-12 mb-16 shadow-2xl border-2 border-purple-100">
-            <h2 className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-12 text-center">
+          <div className="bg-white rounded-3xl p-8 md:p-12 mb-16 shadow-2xl border-2 border-orange-100">
+            <h2 className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent mb-12 text-center">
               How It Works
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <div className="bg-gradient-to-br from-rose-700 to-rose-800 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   1
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-slate-900">Share Your Link</h3>
                 <p className="text-slate-600">Get your unique referral link from your dashboard and share it with contractors</p>
               </div>
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <div className="bg-gradient-to-br from-rose-600 to-orange-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   2
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-slate-900">They Subscribe</h3>
@@ -118,14 +118,14 @@ export default function AffiliatePage() {
 
           {/* Earning Potential Table */}
           <div className="mb-16">
-            <h2 className="text-4xl font-black text-center mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Your Income Potential</h2>
+            <h2 className="text-4xl font-black text-center mb-4 bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">Your Income Potential</h2>
             <p className="text-center text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
               Real numbers. Real income. Based on average contractor subscription of $149/month.
             </p>
-            <div className="bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-purple-100">
+            <div className="bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-orange-100">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                  <thead className="bg-gradient-to-r from-rose-700 to-orange-600 text-white">
                     <tr>
                       <th className="px-6 py-5 text-left font-bold text-base">Contractors</th>
                       <th className="px-6 py-5 text-left font-bold text-base">Their Revenue</th>
@@ -134,34 +134,34 @@ export default function AffiliatePage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    <tr className="hover:bg-purple-50/50 transition-colors">
+                    <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">5 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$745/mo</td>
-                      <td className="px-6 py-5 font-bold text-purple-600 text-lg">$372/mo</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$372/mo</td>
                       <td className="px-6 py-5 font-bold text-slate-900">$4,464/yr</td>
                     </tr>
-                    <tr className="hover:bg-purple-50/50 transition-colors">
+                    <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">10 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$1,490/mo</td>
-                      <td className="px-6 py-5 font-bold text-purple-600 text-lg">$745/mo</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$745/mo</td>
                       <td className="px-6 py-5 font-bold text-slate-900">$8,940/yr</td>
                     </tr>
-                    <tr className="bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-colors">
+                    <tr className="bg-gradient-to-r from-rose-50 to-orange-50 hover:from-rose-100 hover:to-orange-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-lg">25 contractors ⭐</td>
                       <td className="px-6 py-5 text-slate-700 font-semibold">$3,725/mo</td>
-                      <td className="px-6 py-5 font-black text-purple-600 text-xl">$1,862/mo</td>
+                      <td className="px-6 py-5 font-black text-rose-700 text-xl">$1,862/mo</td>
                       <td className="px-6 py-5 font-black text-slate-900 text-lg">$22,344/yr</td>
                     </tr>
-                    <tr className="hover:bg-purple-50/50 transition-colors">
+                    <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">50 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$7,450/mo</td>
-                      <td className="px-6 py-5 font-bold text-purple-600 text-lg">$3,725/mo</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$3,725/mo</td>
                       <td className="px-6 py-5 font-bold text-slate-900">$44,700/yr</td>
                     </tr>
-                    <tr className="bg-gradient-to-r from-orange-50 to-pink-50 hover:from-orange-100 hover:to-pink-100 transition-colors">
+                    <tr className="bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-xl">100 contractors 🚀</td>
                       <td className="px-6 py-5 text-slate-700 font-bold text-lg">$14,900/mo</td>
-                      <td className="px-6 py-5 font-black text-transparent bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-2xl">$7,450/mo</td>
+                      <td className="px-6 py-5 font-black text-transparent bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-2xl">$7,450/mo</td>
                       <td className="px-6 py-5 font-black text-slate-900 text-xl">$89,400/yr</td>
                     </tr>
                   </tbody>
