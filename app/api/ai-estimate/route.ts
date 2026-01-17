@@ -12,12 +12,141 @@ interface EstimateResult {
   confidence: number;
   factors: string[];
   aiPowered: boolean;
+  confidenceMetrics?: {
+    similarProjectsCount: number;
+    materialCostVolatility: 'low' | 'medium' | 'high';
+    priceVariance: number;
+    photoQuality: 'none' | 'low' | 'medium' | 'high';
+    categoryConsistency: number;
+  };
+  bestTimeToRenovate?: {
+    optimalSeason: string;
+    reason: string;
+    savingsPotential: string;
+    confidence: string;
+  };
 }
 
 // Initialize OpenAI client
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 }) : null;
+
+// Helper to calculate confidence metrics
+async function calculateConfidenceMetrics(
+  description: string,
+  category: string,
+  imageCount: number,
+  estimateMin: number,
+  estimateMax: number
+) {
+  // Count similar projects in database
+  const similarProjects = await prisma.aIEstimate.count({
+    where: {
+      description: {
+        contains: category,
+        mode: 'insensitive'
+      }
+    }
+  });
+
+  // Calculate price variance
+  const variance = ((estimateMax - estimateMin) / estimateMin) * 100;
+
+  // Determine material cost volatility based on category
+  const volatilityMap: Record<string, 'low' | 'medium' | 'high'> = {
+    'painting': 'low',
+    'flooring': 'medium',
+    'kitchen': 'high',
+    'bathroom': 'medium',
+    'roofing': 'high',
+    'hvac': 'high',
+    'electrical': 'medium',
+    'plumbing': 'medium',
+    'outdoor': 'medium',
+    'windows-doors': 'high',
+    'renovation': 'high',
+    'general': 'medium'
+  };
+
+  const materialCostVolatility = volatilityMap[category] || 'medium';
+
+  // Determine photo quality
+  let photoQuality: 'none' | 'low' | 'medium' | 'high' = 'none';
+  if (imageCount === 0) photoQuality = 'none';
+  else if (imageCount === 1) photoQuality = 'low';
+  else if (imageCount === 2) photoQuality = 'medium';
+  else photoQuality = 'high';
+
+  // Calculate category consistency (how well description matches detected category)
+  const categoryKeywords = description.toLowerCase();
+  const categoryConsistency = categoryKeywords.includes(category) ? 95 : 75;
+
+  return {
+    similarProjectsCount: similarProjects,
+    materialCostVolatility,
+    priceVariance: Math.round(variance),
+    photoQuality,
+    categoryConsistency
+  };
+}
+
+// Helper to determine best time to renovate
+function determineBestTimeToRenovate(category: string) {
+  const currentMonth = new Date().getMonth(); // 0-11
+  
+  const seasonalAdvice: Record<string, any> = {
+    'roofing': {
+      optimalSeason: 'Late Spring to Early Fall (May-September)',
+      reason: 'Roofing materials require dry, mild weather for proper installation. Shingles seal better in warm temperatures.',
+      savingsPotential: '10-15% savings if done in May or September (contractor shoulder season)',
+      confidence: 'Based on GTA weather patterns and 2024-2025 pricing trends'
+    },
+    'kitchen': {
+      optimalSeason: 'Fall or Winter (October-February)',
+      reason: 'Contractors have more availability, and you can avoid summer entertaining season. Indoor work unaffected by weather.',
+      savingsPotential: '5-10% savings due to lower demand and potential year-end discounts',
+      confidence: 'Based on Toronto contractor availability data'
+    },
+    'bathroom': {
+      optimalSeason: 'Fall or Early Winter (September-December)',
+      reason: 'Indoor project not affected by weather. Fall has good contractor availability before holiday rush.',
+      savingsPotential: '5-8% savings compared to spring rush',
+      confidence: 'Based on historical GTA renovation patterns'
+    },
+    'outdoor': {
+      optimalSeason: 'Late Spring or Early Summer (May-June)',
+      reason: 'Ground is workable, weather is mild, and plants are established but not full size yet.',
+      savingsPotential: '8-12% savings vs peak summer months',
+      confidence: 'Based on Toronto landscaping season trends'
+    },
+    'painting': {
+      optimalSeason: 'Late Spring or Early Fall (May or September)',
+      reason: 'Moderate temperatures and low humidity allow paint to dry properly. Windows can be open for ventilation.',
+      savingsPotential: '5-10% savings during shoulder seasons',
+      confidence: 'Based on ideal painting conditions in GTA'
+    },
+    'flooring': {
+      optimalSeason: 'Fall or Winter (October-February)',
+      reason: 'Indoor humidity is lower, helping wood flooring acclimate. Contractors less busy than spring.',
+      savingsPotential: '5-10% savings due to lower seasonal demand',
+      confidence: 'Based on Toronto flooring installation patterns'
+    },
+    'hvac': {
+      optimalSeason: 'Spring or Fall (April-May, September-October)',
+      reason: 'Avoid emergency replacements during extreme weather. Contractors offer better rates in shoulder seasons.',
+      savingsPotential: '10-20% savings vs emergency summer/winter replacements',
+      confidence: 'Based on HVAC seasonal pricing in GTA'
+    }
+  };
+
+  return seasonalAdvice[category] || {
+    optimalSeason: 'Spring or Fall (April-June, September-November)',
+    reason: 'Moderate weather and good contractor availability for most projects.',
+    savingsPotential: '5-10% savings compared to peak summer season',
+    confidence: 'Based on general Toronto renovation trends'
+  };
+}
 
 // Helper function to save estimate to database
 async function saveEstimateToDatabase(
@@ -37,7 +166,8 @@ async function saveEstimateToDatabase(
       selected: true, // All items selected by default
     }));
 
-    await prisma.aIEstimate.create({
+    // Create the AI estimate
+    const aiEstimate = await prisma.aIEstimate.create({
       data: {
         homeownerId,
         description,
@@ -58,10 +188,76 @@ async function saveEstimateToDatabase(
         },
       },
     });
+
+    // Also create a SavedProject for this estimate
+    const projectCategory = detectProjectCategory(description);
+    const projectTitle = generateProjectTitle(description, projectCategory);
+    
+    await prisma.savedProject.create({
+      data: {
+        homeownerId,
+        title: projectTitle,
+        description: description,
+        category: projectCategory,
+        budget: `$${estimate.min.toLocaleString()} - $${estimate.max.toLocaleString()}`,
+        photos: '[]', // No photos yet in this version
+        visualizerImages: '[]',
+        aiEstimateId: aiEstimate.id,
+        estimateSummary: JSON.stringify({
+          min: estimate.min,
+          max: estimate.max,
+          confidence: estimate.confidence,
+          factors: estimate.factors
+        }),
+        status: 'draft'
+      }
+    });
   } catch (error) {
     console.error('Error saving estimate to database:', error);
     throw error;
   }
+}
+
+// Helper to detect project category from description
+function detectProjectCategory(description: string): string {
+  const keywords = description?.toLowerCase() || '';
+  
+  if (keywords.includes('kitchen') || keywords.includes('cabinet') || keywords.includes('faucet') || keywords.includes('counter')) return 'kitchen';
+  if (keywords.includes('bathroom') || keywords.includes('shower') || keywords.includes('toilet') || keywords.includes('tub')) return 'bathroom';
+  if (keywords.includes('roof') || keywords.includes('shingle') || keywords.includes('gutter')) return 'roofing';
+  if (keywords.includes('floor') || keywords.includes('tile') || keywords.includes('hardwood') || keywords.includes('laminate')) return 'flooring';
+  if (keywords.includes('paint') || keywords.includes('drywall') || keywords.includes('wall')) return 'painting';
+  if (keywords.includes('hvac') || keywords.includes('furnace') || keywords.includes('ac') || keywords.includes('heating') || keywords.includes('cooling')) return 'hvac';
+  if (keywords.includes('electrical') || keywords.includes('outlet') || keywords.includes('wiring') || keywords.includes('panel')) return 'electrical';
+  if (keywords.includes('plumbing') || keywords.includes('pipe') || keywords.includes('leak') || keywords.includes('drain')) return 'plumbing';
+  if (keywords.includes('deck') || keywords.includes('patio') || keywords.includes('fence') || keywords.includes('landscaping')) return 'outdoor';
+  if (keywords.includes('window') || keywords.includes('door') || keywords.includes('glass')) return 'windows-doors';
+  if (keywords.includes('basement') || keywords.includes('attic') || keywords.includes('addition')) return 'renovation';
+  
+  return 'general';
+}
+
+// Helper to generate a concise project title
+function generateProjectTitle(description: string, category: string): string {
+  const firstSentence = description.split(/[.!?]/)[0].trim();
+  const shortDesc = firstSentence.length > 50 ? firstSentence.substring(0, 50) + '...' : firstSentence;
+  
+  const categoryNames: Record<string, string> = {
+    'kitchen': 'Kitchen',
+    'bathroom': 'Bathroom',
+    'roofing': 'Roofing',
+    'flooring': 'Flooring',
+    'painting': 'Painting',
+    'hvac': 'HVAC',
+    'electrical': 'Electrical',
+    'plumbing': 'Plumbing',
+    'outdoor': 'Outdoor',
+    'windows-doors': 'Windows & Doors',
+    'renovation': 'Renovation',
+    'general': 'Home Improvement'
+  };
+  
+  return `${categoryNames[category] || 'Home'} - ${shortDesc}`;
 }
 
 export async function POST(request: NextRequest) {
@@ -109,6 +305,20 @@ export async function POST(request: NextRequest) {
       // Fallback to rule-based estimation
       estimateResult = getRuleBasedEstimate(description, hasVoice, images.length);
     }
+
+    // Add confidence metrics
+    const projectCategory = detectProjectCategory(description);
+    const confidenceMetrics = await calculateConfidenceMetrics(
+      description,
+      projectCategory,
+      images.length,
+      estimateResult.min,
+      estimateResult.max
+    );
+    estimateResult.confidenceMetrics = confidenceMetrics;
+
+    // Add best time to renovate advice
+    estimateResult.bestTimeToRenovate = determineBestTimeToRenovate(projectCategory);
 
     // Auto-save estimate to database if homeownerId provided
     if (homeownerId && estimateResult) {

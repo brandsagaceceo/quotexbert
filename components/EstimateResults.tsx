@@ -1,0 +1,330 @@
+"use client";
+
+import { useState } from "react";
+import { 
+  CheckCircleIcon, 
+  ExclamationTriangleIcon, 
+  ClipboardDocumentIcon,
+  ShareIcon,
+  EnvelopeIcon 
+} from "@heroicons/react/24/outline";
+
+interface LineItem {
+  name: string;
+  qty: number;
+  unit: string;
+  material_cost: number;
+  labor_cost: number;
+  notes?: string;
+}
+
+interface Totals {
+  materials: number;
+  labor: number;
+  permit_or_fees: number;
+  overhead_profit: number;
+  subtotal: number;
+  tax_estimate: number;
+  total_low: number;
+  total_high: number;
+}
+
+interface Timeline {
+  duration_days_low: number;
+  duration_days_high: number;
+}
+
+interface EstimateResultData {
+  summary: string;
+  scope: string[];
+  assumptions: string[];
+  line_items: LineItem[];
+  totals: Totals;
+  timeline: Timeline;
+  confidence: number;
+  questions_to_confirm: string[];
+  next_steps: string[];
+}
+
+interface EstimateResultsProps {
+  data: EstimateResultData;
+  onGetContractorBids?: () => void;
+  onSaveEstimate?: () => void;
+}
+
+export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: EstimateResultsProps) {
+  const [copied, setCopied] = useState(false);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 0.8) return "text-green-600 bg-green-50";
+    if (confidence >= 0.6) return "text-yellow-600 bg-yellow-50";
+    return "text-orange-600 bg-orange-50";
+  };
+
+  const getConfidenceLabel = (confidence: number) => {
+    if (confidence >= 0.8) return "High Confidence";
+    if (confidence >= 0.6) return "Medium Confidence";
+    return "Low Confidence - More Info Needed";
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-6 text-white">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">Your AI Estimate</h2>
+            <p className="text-rose-100 text-sm">Generated in seconds • Based on GTA pricing</p>
+          </div>
+          <div className={`px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-sm`}>
+            {getConfidenceLabel(data.confidence)} ({Math.round(data.confidence * 100)}%)
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 md:p-8 space-y-8">
+        {/* Summary */}
+        <div>
+          <h3 className="text-xl font-bold text-slate-900 mb-3">Project Summary</h3>
+          <p className="text-slate-700 leading-relaxed">{data.summary}</p>
+        </div>
+
+        {/* Total Cost - Prominent */}
+        <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl p-6 border-2 border-orange-200">
+          <div className="text-center">
+            <p className="text-sm font-semibold text-slate-600 mb-2">Estimated Total Cost</p>
+            <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1">
+              {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
+            </div>
+            <p className="text-xs text-slate-500">CAD, including HST estimate</p>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h4 className="font-bold text-slate-900">Estimated Timeline</h4>
+          </div>
+          <p className="text-slate-700">
+            <span className="font-semibold">{data.timeline.duration_days_low}-{data.timeline.duration_days_high} days</span>
+            {" "}of work (excluding permits and material delivery)
+          </p>
+        </div>
+
+        {/* Scope of Work */}
+        <div>
+          <h3 className="text-xl font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            Scope of Work
+          </h3>
+          <ul className="space-y-2">
+            {data.scope.map((item, index) => (
+              <li key={index} className="flex items-start gap-2 text-slate-700">
+                <span className="text-green-600 mt-1">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Line Items Table */}
+        <div>
+          <h3 className="text-xl font-bold text-slate-900 mb-4">Cost Breakdown</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-slate-300">
+                  <th className="text-left py-3 px-2 font-bold text-slate-900">Item</th>
+                  <th className="text-center py-3 px-2 font-bold text-slate-900">Qty</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900">Materials</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900">Labor</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.line_items.map((item, index) => (
+                  <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
+                    <td className="py-3 px-2">
+                      <div>
+                        <div className="font-semibold text-slate-900">{item.name}</div>
+                        {item.notes && <div className="text-xs text-slate-500 mt-1">{item.notes}</div>}
+                      </div>
+                    </td>
+                    <td className="text-center py-3 px-2 text-slate-700">
+                      {item.qty} {item.unit}
+                    </td>
+                    <td className="text-right py-3 px-2 text-slate-700">
+                      {formatCurrency(item.material_cost)}
+                    </td>
+                    <td className="text-right py-3 px-2 text-slate-700">
+                      {formatCurrency(item.labor_cost)}
+                    </td>
+                    <td className="text-right py-3 px-2 font-semibold text-slate-900">
+                      {formatCurrency(item.material_cost + item.labor_cost)}
+                    </td>
+                  </tr>
+                ))}
+                
+                {/* Totals Rows */}
+                <tr className="border-t-2 border-slate-300 font-semibold">
+                  <td colSpan={2} className="py-2 px-2 text-right text-slate-700">Subtotal:</td>
+                  <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.materials)}</td>
+                  <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.labor)}</td>
+                  <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.subtotal)}</td>
+                </tr>
+                {data.totals.permit_or_fees > 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-2 px-2 text-right text-slate-700">Permits & Fees:</td>
+                    <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.permit_or_fees)}</td>
+                  </tr>
+                )}
+                <tr>
+                  <td colSpan={4} className="py-2 px-2 text-right text-slate-700">Overhead & Profit (15-20%):</td>
+                  <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.overhead_profit)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={4} className="py-2 px-2 text-right text-slate-700">HST (13%):</td>
+                  <td className="text-right py-2 px-2 text-slate-900">{formatCurrency(data.totals.tax_estimate)}</td>
+                </tr>
+                <tr className="border-t-2 border-slate-900 text-lg font-bold">
+                  <td colSpan={4} className="py-3 px-2 text-right text-slate-900">Estimated Total:</td>
+                  <td className="text-right py-3 px-2 text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700">
+                    {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Assumptions */}
+        {data.assumptions.length > 0 && (
+          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+            <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+              <ExclamationTriangleIcon className="w-5 h-5 text-amber-600" />
+              Assumptions
+            </h3>
+            <ul className="space-y-2 text-sm text-slate-700">
+              {data.assumptions.map((assumption, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="text-amber-600 mt-0.5">•</span>
+                  <span>{assumption}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Questions to Confirm */}
+        {data.questions_to_confirm.length > 0 && (
+          <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
+            <h3 className="text-lg font-bold text-slate-900 mb-3">Questions for a More Accurate Estimate</h3>
+            <ul className="space-y-2 text-sm text-slate-700">
+              {data.questions_to_confirm.map((question, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">?</span>
+                  <span>{question}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Next Steps */}
+        <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+          <h3 className="text-lg font-bold text-slate-900 mb-3">Recommended Next Steps</h3>
+          <ol className="space-y-2 text-sm text-slate-700">
+            {data.next_steps.map((step, index) => (
+              <li key={index} className="flex items-start gap-2">
+                <span className="font-bold text-green-600 mt-0.5">{index + 1}.</span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded">
+          <div className="flex items-start gap-3">
+            <ExclamationTriangleIcon className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-slate-700">
+              <p className="font-semibold text-slate-900 mb-1">Important Disclaimer</p>
+              <p>
+                This is an AI-generated estimate based on the information provided. Final pricing will depend on 
+                site conditions, material availability, local labor rates, and specific contractor quotes. Always 
+                get multiple quotes from licensed contractors before starting work.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            onClick={onGetContractorBids}
+            className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
+                     hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl
+                     transition-all transform hover:scale-[1.02] shadow-lg"
+          >
+            Get 3 Contractor Bids
+          </button>
+          <button
+            onClick={onSaveEstimate}
+            className="flex-1 bg-white border-2 border-slate-300 hover:border-orange-500 
+                     text-slate-900 font-bold py-4 px-6 rounded-xl
+                     transition-all flex items-center justify-center gap-2"
+          >
+            <EnvelopeIcon className="w-5 h-5" />
+            Save / Email Estimate
+          </button>
+        </div>
+
+        {/* Share Actions */}
+        <div className="flex gap-3 pt-2 border-t border-slate-200">
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center gap-2 text-sm text-slate-600 hover:text-orange-600 
+                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50"
+          >
+            {copied ? (
+              <>
+                <CheckCircleIcon className="w-4 h-4 text-green-600" />
+                <span className="text-green-600">Copied!</span>
+              </>
+            ) : (
+              <>
+                <ClipboardDocumentIcon className="w-4 h-4" />
+                <span>Copy Link</span>
+              </>
+            )}
+          </button>
+          <button
+            className="flex items-center gap-2 text-sm text-slate-600 hover:text-orange-600 
+                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50"
+          >
+            <ShareIcon className="w-4 h-4" />
+            <span>Share</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

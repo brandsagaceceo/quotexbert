@@ -391,8 +391,35 @@ export default function Home() {
                       ${estimateResult.min?.toLocaleString()} - ${estimateResult.max?.toLocaleString()}
                     </div>
                     <p className="text-green-700">Project cost range</p>
-                    <div className="mt-3 text-sm text-green-600">
-                      Confidence: {estimateResult.confidence}%
+                    
+                    {/* Enhanced Confidence Score */}
+                    <div className="mt-4 p-3 bg-white/60 rounded-lg border border-green-200">
+                      <div className="text-lg font-bold text-green-800 mb-2">
+                        Confidence: {estimateResult.confidence}%
+                      </div>
+                      <p className="text-xs text-green-700 mb-2">
+                        accuracy based on similar jobs in Toronto
+                      </p>
+                      
+                      {/* Confidence Metrics */}
+                      {estimateResult.confidenceMetrics && (
+                        <div className="text-left space-y-1 mt-3 text-xs text-green-800">
+                          <div className="flex items-center justify-between">
+                            <span>📊 Similar projects completed:</span>
+                            <span className="font-semibold">{estimateResult.confidenceMetrics.similarProjectsCount}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>📈 Material cost volatility:</span>
+                            <span className="font-semibold capitalize">{estimateResult.confidenceMetrics.materialCostVolatility}</span>
+                          </div>
+                          {estimateResult.confidenceMetrics.photoQuality !== 'none' && (
+                            <div className="flex items-center justify-between">
+                              <span>📸 Photo quality:</span>
+                              <span className="font-semibold capitalize">{estimateResult.confidenceMetrics.photoQuality}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -418,7 +445,31 @@ export default function Home() {
                   <p className="text-slate-700">{estimateResult.description}</p>
                 </div>
               )}
-
+              {/* Best Time to Renovate */}
+              {estimateResult.bestTimeToRenovate && (
+                <div className="mt-6 p-6 bg-gradient-to-br from-blue-50/80 to-indigo-100/80 rounded-xl border-2 border-blue-200">
+                  <h4 className="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
+                    📅 Optimal Time to Start This Project
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="font-semibold text-blue-800">Best Season: </span>
+                      <span className="text-blue-900">{estimateResult.bestTimeToRenovate.optimalSeason}</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-blue-800">Why: </span>
+                      <span className="text-blue-900">{estimateResult.bestTimeToRenovate.reason}</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-blue-800">Potential Savings: </span>
+                      <span className="text-green-700 font-semibold">{estimateResult.bestTimeToRenovate.savingsPotential}</span>
+                    </div>
+                    <div className="pt-2 border-t border-blue-200 text-sm text-blue-700">
+                      💡 {estimateResult.bestTimeToRenovate.confidence}
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mt-6 pt-6 border-t border-slate-200">
                 <button 

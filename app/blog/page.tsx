@@ -6,6 +6,9 @@ import Image from "next/image";
 import Script from "next/script";
 import { CalendarDaysIcon, ClockIcon } from "@heroicons/react/24/outline";
 
+// Default fallback image for blog posts without images
+const DEFAULT_BLOG_IMAGE = "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop&q=80";
+
 interface BlogPost {
   id: string;
   title: string;
@@ -478,17 +481,28 @@ export default function BlogPage() {
         {/* Blog Grid */}
         <section className="max-w-6xl mx-auto px-4 py-12">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
+            {filteredPosts.map((post) => {
+              // Ensure every blog post has an image - use fallback if missing or invalid
+              const imageUrl = post.imageUrl && post.imageUrl.trim() !== '' ? post.imageUrl : DEFAULT_BLOG_IMAGE;
+              
+              return (
               <article
                 key={post.id}
                 className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:-translate-y-2 hover:scale-[1.01]"
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={post.imageUrl}
+                    src={imageUrl}
                     alt={post.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      // Additional fallback if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== DEFAULT_BLOG_IMAGE) {
+                        target.src = DEFAULT_BLOG_IMAGE;
+                      }
+                    }}
                   />
                   <div className="absolute top-3 right-3">
                     <span className="bg-rose-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -544,7 +558,8 @@ export default function BlogPage() {
                   </Link>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         </section>
 

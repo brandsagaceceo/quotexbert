@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
+import SavedProjectsList from "@/components/SavedProjectsList";
 import {
   User,
   MapPin,
@@ -347,7 +348,14 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        setProfile(prev => prev ? { ...prev, profilePhoto: uploadResult.url } : null);
+        // Refetch profile to ensure data is in sync
+        const profileResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          setProfile(profileData);
+        } else {
+          setProfile(prev => prev ? { ...prev, profilePhoto: uploadResult.url } : null);
+        }
         alert('Profile picture updated successfully!');
       } else {
         throw new Error('Failed to update profile');
@@ -362,6 +370,7 @@ export default function UnifiedProfilePage() {
 
   const handleAddPortfolioItem = async (portfolioData: any) => {
     try {
+      console.log('Adding portfolio item:', portfolioData);
       const response = await fetch('/api/portfolio', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -373,15 +382,18 @@ export default function UnifiedProfilePage() {
 
       if (response.ok) {
         const newItem = await response.json();
+        console.log('Portfolio item added:', newItem);
         setPortfolio(prev => [newItem, ...prev]);
         setShowPortfolioForm(false);
         alert('Portfolio item added successfully!');
       } else {
-        throw new Error('Failed to add portfolio item');
+        const errorData = await response.json();
+        console.error('Portfolio API error:', errorData);
+        throw new Error(errorData.error || 'Failed to add portfolio item');
       }
     } catch (error) {
       console.error('Error adding portfolio item:', error);
-      alert('Failed to add portfolio item. Please try again.');
+      alert(`Failed to add portfolio item: ${error instanceof Error ? error.message : 'Please try again'}`);
     }
   };
 
@@ -431,10 +443,11 @@ export default function UnifiedProfilePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-orange-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading auth... (v2)</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-rose-600 mx-auto mb-6"></div>
+          <p className="text-xl font-semibold text-slate-800 mb-2">Loading your profile...</p>
+          <p className="text-sm text-slate-600">This should only take a moment</p>
         </div>
       </div>
     );
@@ -631,21 +644,21 @@ export default function UnifiedProfilePage() {
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-8 overflow-x-auto">
             {(isContractor 
               ? ['overview', 'portfolio', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'quotes', 'contact']
+              : ['overview', 'projects', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize ${
+                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize whitespace-nowrap ${
                   activeTab === tab
                     ? 'border-rose-600 text-rose-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab === 'quotes' ? 'Saved Quotes' : tab}
+                {tab === 'projects' ? 'My Projects' : tab === 'estimates' ? 'AI Estimates' : tab === 'visualizations' ? 'AI Visualizations' : tab}
               </button>
             ))}
           </nav>
@@ -998,6 +1011,153 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
+            {activeTab === 'projects' && !isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <SavedProjectsList homeownerId={profile?.id || ''} />
+              </div>
+            )}
+
+            {activeTab === 'estimates' && !isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Recent AI Estimates</h2>
+                {savedEstimates.length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {savedEstimates.map((estimate) => (
+                      <div key={estimate.id} className="border-2 border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50">
+                        <div className="flex items-center gap-2 mb-2">
+                          {estimate.aiPowered && (
+                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gradient-to-r from-rose-100 to-orange-100 text-rose-700">
+                              ✨ AI
+                            </span>
+                          )}
+                          {estimate.hasVoice && (
+                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-teal-100 text-teal-700">
+                              🎤 Voice
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-slate-700 text-sm mb-3 line-clamp-2">{estimate.description}</p>
+                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-3 border border-rose-100">
+                          <div className="text-lg font-bold text-rose-700">
+                            ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-slate-600">{estimate.confidence}% confidence</div>
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => window.location.href = '/create-lead'}
+                            className="flex-1 text-xs bg-rose-600 text-white py-2 px-3 rounded-lg hover:bg-rose-700 transition-colors"
+                          >
+                            Post Job
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (confirm('Delete this estimate?')) {
+                                await fetch(`/api/estimates?id=${estimate.id}&homeownerId=${authUser?.id}`, { method: 'DELETE' });
+                                setSavedEstimates(prev => prev.filter(e => e.id !== estimate.id));
+                              }
+                            }}
+                            className="px-3 py-2 text-slate-400 hover:text-red-600 transition-colors"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
+                    <div className="text-6xl mb-4">🤖</div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No AI Estimates Yet</h3>
+                    <p className="text-slate-600 mb-4">Get instant cost estimates for your renovation projects</p>
+                    <a href="/" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Get Free Estimate
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'visualizations' && !isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Visualizations</h2>
+                <div className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+                  <div className="text-6xl mb-4">🎨</div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Visualize Your Dream Space</h3>
+                  <p className="text-slate-600 mb-4">See AI-generated before/after visualizations of your renovation ideas</p>
+                  <div className="flex gap-3 justify-center">
+                    <a href="/visualizer" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Try AI Visualizer
+                    </a>
+                    <a href="/visualizer-library" className="inline-block bg-white text-slate-700 border-2 border-slate-200 font-bold py-3 px-6 rounded-lg hover:border-slate-300 transition-all">
+                      Browse Gallery
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'jobs' && !isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">My Posted Jobs</h2>
+                {jobs.length > 0 ? (
+                  <div className="space-y-4">
+                    {jobs.map((job) => (
+                      <div key={job.id} className="border-2 border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
+                            <div className="flex items-center gap-3 text-sm text-slate-600">
+                              <span>Budget: {job.budget}</span>
+                              <span>•</span>
+                              <span className={`font-semibold ${
+                                job.status === 'open' ? 'text-green-600' : 
+                                job.status === 'assigned' ? 'text-blue-600' : 'text-slate-600'
+                              }`}>
+                                {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {new Date(job.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <a
+                          href={`/homeowner/jobs/${job.id}`}
+                          className="inline-block text-sm bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-colors"
+                        >
+                          View Applications
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
+                    <div className="text-6xl mb-4">📝</div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No Posted Jobs Yet</h3>
+                    <p className="text-slate-600 mb-4">Post a job to get quotes from verified contractors</p>
+                    <a href="/create-lead" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Post a Job
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'favorites' && !isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Favorite Contractors</h2>
+                <div className="text-center py-12 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl">
+                  <div className="text-6xl mb-4">⭐</div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Save Your Favorite Contractors</h3>
+                  <p className="text-slate-600 mb-4">Keep track of contractors you want to work with</p>
+                  <a href="/contractors" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                    Browse Contractors
+                  </a>
+                </div>
+              </div>
+            )}
+
             {activeTab === 'quotes' && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">Saved Quotes</h2>
@@ -1318,6 +1478,20 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG, PNG, or WebP)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('Image file is too large. Maximum size is 5MB');
+      return;
+    }
+
     setUploading(true);
     try {
       const formDataUpload = new FormData();
@@ -1333,12 +1507,14 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
       if (response.ok) {
         const result = await response.json();
         setFormData(prev => ({ ...prev, imageUrl: result.url }));
+        console.log('Image uploaded successfully:', result.url);
       } else {
-        alert('Failed to upload image');
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to upload image');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload image');
+      alert('Failed to upload image. Please check your connection and try again.');
     } finally {
       setUploading(false);
     }

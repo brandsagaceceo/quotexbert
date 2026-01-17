@@ -338,6 +338,252 @@ export default function AffiliatePage() {
           </div>
         </div>
 
+        {/* Who It's For Section */}
+        <div className="mb-20">
+          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+            Who Is This For?
+          </h2>
+          <p className="text-center text-gray-600 text-lg mb-12">Perfect for anyone connected to the home improvement industry</p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">🏡</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Real Estate Agents</h3>
+              <p className="text-gray-600 text-sm">
+                Recommend QuoteXbert to buyers and sellers needing renovations. Earn recurring income from every referral.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Home Inspectors</h3>
+              <p className="text-gray-600 text-sm">
+                Every inspection reveals repair needs. Connect clients with quality contractors and earn commissions.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">🎨</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Interior Designers</h3>
+              <p className="text-gray-600 text-sm">
+                Your designs need reliable contractors. Partner with QuoteXbert and earn while delivering value.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">📱</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Content Creators</h3>
+              <p className="text-gray-600 text-sm">
+                Share QuoteXbert with your home improvement audience. Earn passive income from social media and blogs.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">🏢</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Property Managers</h3>
+              <p className="text-gray-600 text-sm">
+                Managing multiple properties means constant maintenance. Streamline contractor connections and earn commissions.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">🔨</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Contractors</h3>
+              <p className="text-gray-600 text-sm">
+                Refer contractors in other trades you don't offer. Build a network and earn from cross-referrals.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">💼</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Business Owners</h3>
+              <p className="text-gray-600 text-sm">
+                Own a hardware store, paint shop, or home services business? Recommend QuoteXbert and monetize your network.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl mb-4">👥</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Anyone!</h3>
+              <p className="text-gray-600 text-sm">
+                Know homeowners or contractors? Share your link and start earning. No industry experience required.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Real World Examples */}
+        <div className="mb-20 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-12 border-4 border-blue-200">
+          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Real-World Examples
+          </h2>
+          <p className="text-center text-gray-700 text-lg mb-12">See how affiliates are earning with QuoteXbert</p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">📸</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">Social Media Strategy</h3>
+              <p className="text-gray-600 mb-4">
+                Post before/after renovation content on Instagram and TikTok. Add your affiliate link in bio and stories. 
+                One viral post can bring 50+ sign-ups.
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $400-800/month</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">QR Code at Job Sites</h3>
+              <p className="text-gray-600 mb-4">
+                Contractors can print QR codes linking to QuoteXbert and place them at completed projects. 
+                Neighbors see the work and scan to get quotes for their own homes.
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $200-500/month</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">✉️</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">Email Newsletter</h3>
+              <p className="text-gray-600 mb-4">
+                Real estate agents and home bloggers include QuoteXbert in their monthly newsletters. 
+                One email blast to 5,000 subscribers = 100+ clicks and 10-20 conversions.
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $600-1,200/month</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">🌐</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">Website Integration</h3>
+              <p className="text-gray-600 mb-4">
+                Add QuoteXbert banners to your home improvement blog or business website. 
+                Passive traffic converts 24/7 without additional effort.
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $300-700/month</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">🤝</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">Word of Mouth</h3>
+              <p className="text-gray-600 mb-4">
+                Simply recommend QuoteXbert during conversations with homeowners or contractors. 
+                Personal referrals convert at the highest rate (30-40%).
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $150-400/month</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-4xl mb-4">🎥</div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3">YouTube Reviews</h3>
+              <p className="text-gray-600 mb-4">
+                Create home renovation guides and tutorials on YouTube. Include your affiliate link in description. 
+                Videos rank in search and generate passive income for years.
+              </p>
+              <div className="bg-green-100 rounded-lg p-4">
+                <p className="text-green-800 font-bold text-sm">Average: $500-1,500/month</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* How Payouts Work */}
+        <div className="mb-20 bg-white rounded-3xl shadow-2xl p-12">
+          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+            How Payouts Work
+          </h2>
+          <p className="text-center text-gray-600 text-lg mb-12">Transparent, fast, and reliable payments</p>
+          
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="flex items-start gap-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+              <div className="text-4xl">💰</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Recurring Monthly Income</h3>
+                <p className="text-gray-700 mb-3">
+                  Earn 15% commission on contractor subscriptions for <strong>12 full months</strong> from each referral. 
+                  If they stay subscribed longer, you keep earning. That's $7-22 per month per contractor, automatically.
+                </p>
+                <div className="bg-white rounded-lg p-4 border border-green-300">
+                  <p className="text-sm text-gray-600">
+                    <strong>Example:</strong> Refer 10 contractors in January → Earn $150/month every month for a year = <strong className="text-green-600">$1,800 total</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+              <div className="text-4xl">📅</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Schedule</h3>
+                <p className="text-gray-700 mb-3">
+                  Commissions are paid on <strong>Net-15 terms</strong>. That means you get paid 15 days after the end of each month. 
+                  Example: January earnings paid by February 15th.
+                </p>
+                <div className="bg-white rounded-lg p-4 border border-blue-300">
+                  <p className="text-sm text-gray-600">
+                    <strong>No minimum threshold!</strong> Even if you earn $10, we'll send it to you. Most platforms require $50-100 minimum.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+              <div className="text-4xl">💳</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Methods</h3>
+                <p className="text-gray-700 mb-3">
+                  Choose how you want to get paid:
+                </p>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-600 font-bold">✓</span>
+                    <span><strong>Direct Deposit</strong> - Fastest method (1-2 business days)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-600 font-bold">✓</span>
+                    <span><strong>PayPal</strong> - Instant transfer to your PayPal account</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-600 font-bold">✓</span>
+                    <span><strong>Check</strong> - Mailed to your address (allow 5-7 days)</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-6 bg-gradient-to-r from-orange-50 to-rose-50 rounded-2xl p-6 border-2 border-orange-200">
+              <div className="text-4xl">🏆</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Performance Bonuses</h3>
+                <p className="text-gray-700 mb-3">
+                  Top performers get rewarded with quarterly bonuses:
+                </p>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <span className="text-orange-600 font-bold">🥉</span>
+                    <span><strong>10+ referrals/quarter:</strong> $250 bonus</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-orange-600 font-bold">🥈</span>
+                    <span><strong>25+ referrals/quarter:</strong> $500 bonus</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-orange-600 font-bold">🥇</span>
+                    <span><strong>50+ referrals/quarter:</strong> $1,000 bonus + VIP perks</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Testimonials */}
         <div className="mb-20">
           <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">

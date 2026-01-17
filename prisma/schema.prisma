@@ -62,6 +62,7 @@ model User {
   
   // AI Estimates
   aiEstimates         AIEstimate[]   @relation("HomeownerEstimates")
+  savedProjects       SavedProject[] @relation("HomeownerSavedProjects")
   
   // AI Visualizer
   visualizerSubscription VisualizerSubscription?
@@ -112,6 +113,11 @@ model Lead {
   maxContractors   Int              @default(3) // Maximum contractors that can apply
   acceptedContractors String        @default("[]") // JSON array of contractor IDs who accepted the job (max 3)
   
+  // Auto-follow-up tracking
+  viewCount        Int              @default(0) // Track how many contractors viewed the job
+  followUpSent     Boolean          @default(false) // Track if 48hr no-response follow-up was sent
+  viewedNoBidFollowUpSent Boolean   @default(false) // Track if viewed-but-no-bid follow-up was sent
+  
   homeownerId      String
   homeowner        User             @relation("HomeownerLeads", fields: [homeownerId], references: [id])
   
@@ -131,6 +137,7 @@ model Lead {
   conversations    Conversation[]
   quotes           Quote[]
   aiEstimate       AIEstimate?      // Link back to the original AI estimate
+  savedProject     SavedProject?    @relation("SavedProjectToLead")
   
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -756,6 +763,7 @@ model AIEstimate {
   // Lead relationship (if posted to job board)
   leadId            String?          @unique
   lead              Lead?            @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  savedProject      SavedProject?    @relation("SavedProjectEstimate")
   
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
@@ -793,6 +801,47 @@ model EstimateItem {
   
   @@index([estimateId])
   @@map("estimate_items")
+}
+
+// SavedProject - Combines AI Estimates with Visualizer results for easy management
+model SavedProject {
+  id                  String           @id @default(cuid())
+  
+  // User relationship
+  homeownerId         String
+  homeowner           User             @relation("HomeownerSavedProjects", fields: [homeownerId], references: [id], onDelete: Cascade)
+  
+  // Project details
+  title               String           // User-friendly project name
+  description         String           // Project description
+  category            String           // Job category
+  location            String?          // City/address
+  budget              String?          // Budget range or estimate
+  
+  // Media
+  photos              String           @default("[]") // JSON array of uploaded photo URLs
+  visualizerImages    String           @default("[]") // JSON array of AI visualizer result URLs
+  
+  // AI Data
+  aiEstimateId        String?          @unique
+  aiEstimate          AIEstimate?      @relation("SavedProjectEstimate", fields: [aiEstimateId], references: [id], onDelete: SetNull)
+  
+  estimateSummary     String?          // JSON object with cost range, materials, etc.
+  
+  // Status
+  status              String           @default("draft") // "draft" | "posted" | "archived"
+  postedAsLeadId      String?          @unique
+  postedAsLead        Lead?            @relation("SavedProjectToLead", fields: [postedAsLeadId], references: [id], onDelete: SetNull)
+  
+  // Metadata
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  
+  @@index([homeownerId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@map("saved_projects")
 }
 
 // ============================================

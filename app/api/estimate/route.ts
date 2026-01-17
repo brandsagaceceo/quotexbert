@@ -8,14 +8,39 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// AI estimate using real OpenAI API
+interface EstimateRequest {
+  description?: string;
+  photos?: string[]; // base64 encoded images
+  projectType: string;
+  postalCode?: string;
+  userId?: string;
+}
+
+// AI estimate using real OpenAI API with multimodal support
 export async function POST(req: NextRequest) {
   try {
-    const { description, userId } = await req.json();
+    const body: EstimateRequest = await req.json();
+    const { description, photos, projectType, postalCode, userId } = body;
 
-    if (!description || description.trim().length < 5) {
+    // Validation
+    if (!projectType) {
       return NextResponse.json(
-        { error: "Please provide a more detailed job description" },
+        { error: "Project type is required" },
+        { status: 400 },
+      );
+    }
+
+    if ((!description || description.trim().length < 3) && (!photos || photos.length === 0)) {
+      return NextResponse.json(
+        { error: "Please provide either a description or upload photos" },
+        { status: 400 },
+      );
+    }
+
+    // Validate photo count and size
+    if (photos && photos.length > 5) {
+      return NextResponse.json(
+        { error: "Maximum 5 photos allowed" },
         { status: 400 },
       );
     }
@@ -23,22 +48,29 @@ export async function POST(req: NextRequest) {
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo')) {
       console.warn("OpenAI API key not configured, using fallback");
-      const estimate = generateFallbackEstimate(description.toLowerCase());
+      const estimate = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
       return NextResponse.json(estimate);
     }
 
-    // Generate AI-powered estimate using OpenAI
-    const estimate = await generateAIEstimate(description);
+    // Generate AI-powered estimate using OpenAI (multimodal)
+    const estimate = await generateAIEstimateMultimodal({
+      description: description || "",
+      photos: photos || [],
+      projectType,
+      postalCode: postalCode || "",
+    });
 
     // Log analytics event
     await logEventServer(
       userId || "anonymous",
       "estimate_created",
       {
-        description: description.substring(0, 100), // First 100 chars for privacy
-        estimateMin: estimate.min,
-        estimateMax: estimate.max,
-        descriptionLength: description.length,
+        projectType,
+        hasDescription: !!description,
+        photoCount: photos?.length || 0,
+        postalCode: postalCode || "not_provided",
+        estimateTotal: estimate.totals.total_low,
+        confidence: estimate.confidence,
         aiPowered: true,
       }
     );
@@ -47,10 +79,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error generating estimate:", error);
     
-    // Fallback to keyword-based estimate if OpenAI fails
+    // Fallback to basic estimate if OpenAI fails
     try {
-      const { description } = await req.json();
-      const fallbackEstimate = generateFallbackEstimate(description.toLowerCase());
+      const body = await req.json();
+      const fallbackEstimate = generateFallbackEstimate(
+        body.description?.toLowerCase() || body.projectType?.toLowerCase() || "home repair"
+      );
       return NextResponse.json({
         ...fallbackEstimate,
         warning: "AI service temporarily unavailable, using basic estimate"
@@ -62,6 +96,203 @@ export async function POST(req: NextRequest) {
       );
     }
   }
+}
+
+async function generateAIEstimateMultimodal(params: {
+  description: string;
+  photos: string[];
+  projectType: string;
+  postalCode: string;
+}): Promise<{
+  summary: string;
+  scope: string[];
+  assumptions: string[];
+  line_items: Array<{
+    name: string;
+    qty: number;
+    unit: string;
+    material_cost: number;
+    labor_cost: number;
+    notes?: string;
+  }>;
+  totals: {
+    materials: number;
+    labor: number;
+    permit_or_fees: number;
+    overhead_profit: number;
+    subtotal: number;
+    tax_estimate: number;
+    total_low: number;
+    total_high: number;
+  };
+  timeline: {
+    duration_days_low: number;
+    duration_days_high: number;
+  };
+  confidence: number;
+  questions_to_confirm: string[];
+  next_steps: string[];
+}> {
+  const { description, photos, projectType, postalCode } = params;
+
+  // Build the prompt for detailed contractor-style estimate
+  const systemPrompt = `You are an expert contractor and cost estimator specializing in the Greater Toronto Area (GTA) and Southern Ontario. You provide detailed, contractor-style estimates with line items, accurate CAD pricing based on current 2026 Toronto/GTA market rates, and realistic timelines.
+
+IMPORTANT PRICING CONTEXT:
+- All prices must be in CAD (Canadian Dollars)
+- Use current 2026 GTA/Toronto labor rates: $65-95/hour for skilled trades
+- Include Ontario HST (13%) in tax calculations
+- Factor in typical GTA material costs (10-15% higher than US pricing)
+- Consider permit requirements for Toronto/Ontario
+- Account for GTA-specific challenges (old homes, narrow lots, winter conditions)
+
+RESPONSE FORMAT:
+You must respond with ONLY a valid JSON object (no markdown, no explanations outside JSON) with this exact structure:
+{
+  "summary": "Brief 2-3 sentence overview of the project",
+  "scope": ["Detailed scope item 1", "Detailed scope item 2", ...],
+  "assumptions": ["Assumption 1", "Assumption 2", ...],
+  "line_items": [
+    {
+      "name": "Item name",
+      "qty": number,
+      "unit": "sq ft | linear ft | each | etc",
+      "material_cost": number,
+      "labor_cost": number,
+      "notes": "Optional notes about this line item"
+    }
+  ],
+  "totals": {
+    "materials": number,
+    "labor": number,
+    "permit_or_fees": number,
+    "overhead_profit": number,
+    "subtotal": number,
+    "tax_estimate": number,
+    "total_low": number,
+    "total_high": number
+  },
+  "timeline": {
+    "duration_days_low": number,
+    "duration_days_high": number
+  },
+  "confidence": number between 0-1,
+  "questions_to_confirm": ["Question 1?", "Question 2?", ...],
+  "next_steps": ["Step 1", "Step 2", ...]
+}
+
+ESTIMATION GUIDELINES:
+- Be realistic and conservative with pricing
+- Break down costs into granular line items (materials + labor separately)
+- Include permit costs when applicable (Toronto building permits typically $500-2000)
+- Add 15-20% overhead and profit for contractor
+- If photos are unclear or information is limited, reduce confidence score and add specific questions
+- Provide 5-10 line items minimum for substantial projects
+- Timeline should account for permits, inspections, material delivery
+- Always provide actionable next steps`;
+
+  // Build content array with text and images
+  const contentParts: Array<{ type: string; text?: string; image_url?: { url: string } }> = [];
+
+  // Add description if provided
+  if (description && description.trim()) {
+    contentParts.push({
+      type: "text",
+      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Project Description: ${description}`,
+    });
+  } else {
+    contentParts.push({
+      type: "text",
+      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Please analyze the provided photos and provide a detailed estimate.`,
+    });
+  }
+
+  // Add photos if provided
+  for (const photo of photos) {
+    contentParts.push({
+      type: "image_url",
+      image_url: {
+        url: photo, // base64 data URL
+      },
+    });
+  }
+
+  // Make API call with retry logic
+  let attempt = 0;
+  const maxAttempts = 2;
+  let lastError: Error | null = null;
+
+  while (attempt < maxAttempts) {
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // GPT-4 with vision support
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: contentParts as any,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 2500,
+        response_format: { type: "json_object" },
+      });
+
+      const response = completion.choices[0]?.message?.content?.trim();
+      
+      if (!response) {
+        throw new Error("No response from OpenAI");
+      }
+
+      // Parse and validate the JSON response
+      const estimate = JSON.parse(response);
+
+      // Validate structure
+      if (!estimate.summary || !estimate.totals || !estimate.line_items) {
+        throw new Error("Invalid estimate format from AI");
+      }
+
+      // Calculate totals if not properly set
+      const materialsTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.material_cost || 0), 0);
+      const laborTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.labor_cost || 0), 0);
+      const subtotal = materialsTotal + laborTotal;
+      const overheadProfit = Math.round(subtotal * 0.175); // 17.5% average
+      const beforeTax = subtotal + overheadProfit + (estimate.totals.permit_or_fees || 0);
+      const taxEstimate = Math.round(beforeTax * 0.13); // Ontario HST
+      const totalLow = beforeTax + taxEstimate;
+      const totalHigh = Math.round(totalLow * 1.15); // 15% range for uncertainty
+
+      // Ensure totals are calculated correctly
+      estimate.totals = {
+        materials: Math.round(materialsTotal),
+        labor: Math.round(laborTotal),
+        permit_or_fees: estimate.totals.permit_or_fees || 0,
+        overhead_profit: overheadProfit,
+        subtotal: Math.round(subtotal),
+        tax_estimate: taxEstimate,
+        total_low: totalLow,
+        total_high: totalHigh,
+      };
+
+      return estimate;
+    } catch (error) {
+      lastError = error as Error;
+      attempt++;
+      console.error(`Attempt ${attempt} failed:`, error);
+      
+      if (attempt >= maxAttempts) {
+        throw lastError;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  throw lastError || new Error("Failed to generate estimate");
 }
 
 async function generateAIEstimate(description: string): Promise<{
