@@ -122,7 +122,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 animate-bounce group"
+        className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 animate-bounce group"
         aria-label="Open AI Helper"
       >
         <Sparkles className="w-6 h-6" />
@@ -134,7 +134,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
+    <div className="fixed bottom-6 left-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
       <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 flex items-center justify-between">
