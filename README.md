@@ -13,7 +13,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15.4.6-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 
-[Live Demo](https://quotexbert.vercel.app) · [Documentation](./docs/) · [Report Bug](https://github.com/yourusername/quotexbert/issues) · [Request Feature](https://github.com/yourusername/quotexbert/issues)
+[Live Site](https://www.quotexbert.com) · [Documentation](./docs/) · [Report Bug](https://github.com/yourusername/quotexbert/issues) · [Request Feature](https://github.com/yourusername/quotexbert/issues)
 
 </div>
 
@@ -87,7 +87,8 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
    ```
 
 6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+   - Production: Navigate to [https://www.quotexbert.com](https://www.quotexbert.com)
+   - Local Dev: Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 🏗️ System Architecture
 
