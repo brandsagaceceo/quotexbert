@@ -583,13 +583,13 @@ export default function SubscriptionsPage() {
                       <button 
                         onClick={() => handleTierSubscription('handyman')}
                         disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-[length:200%_100%] animate-gradient"></div>
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-[length:200%_100%]"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
                           {checkoutLoading === 'handyman' ? (
                             <>
                               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Loading...</span>
+                              <span>Processing...</span>
                             </>
                           ) : (
                             <>
@@ -660,13 +660,13 @@ export default function SubscriptionsPage() {
                       <button 
                         onClick={() => handleTierSubscription('renovation')}
                         disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%] animate-gradient"></div>
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%]"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
                           {checkoutLoading === 'renovation' ? (
                             <>
                               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Loading...</span>
+                              <span>Processing...</span>
                             </>
                           ) : (
                             <>
@@ -742,13 +742,13 @@ export default function SubscriptionsPage() {
                       <button 
                         onClick={() => handleTierSubscription('general')}
                         disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 bg-[length:200%_100%] animate-gradient"></div>
+                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 bg-[length:200%_100%]"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
                           {checkoutLoading === 'general' ? (
                             <>
                               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Loading...</span>
+                              <span>Processing...</span>
                             </>
                           ) : (
                             <>
