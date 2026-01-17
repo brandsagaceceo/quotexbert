@@ -57,8 +57,8 @@ export default function AIAssistantPopup() {
               { label: '📖 View Terms', href: '#', variant: 'secondary' },
             ]
         : [
-            { label: '🏠 I'm a Homeowner', href: '#homeowner', variant: 'primary' },
-            { label: '👷 I'm a Contractor', href: '#contractor', variant: 'secondary' },
+            { label: '🏠 I am a Homeowner', href: '#homeowner', variant: 'primary' },
+            { label: '👷 I am a Contractor', href: '#contractor', variant: 'secondary' },
           ]
     };
     setMessages([welcomeMessage]);

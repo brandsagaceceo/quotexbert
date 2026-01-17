@@ -65,6 +65,13 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
     const files = Array.from(e.target.files || []);
     addPhotos(files);
   };
+  
+  const openCamera = () => {
+    if (fileInputRef.current) {
+      // On mobile, this will open camera directly
+      fileInputRef.current.click();
+    }
+  };
 
   const addPhotos = (files: File[]) => {
     if (photos.length + files.length > 5) {
@@ -164,6 +171,20 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             Upload Photos (Optional, max 5)
           </label>
+          
+          {/* Mobile-First Camera Button */}
+          <button
+            type="button"
+            onClick={openCamera}
+            className="w-full mb-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white 
+                     py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-3
+                     hover:from-rose-600 hover:to-orange-600 transition-all shadow-lg
+                     md:hidden"
+          >
+            <PhotoIcon className="w-7 h-7" />
+            📸 Take Photo
+          </button>
+
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -180,13 +201,14 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           >
             <CloudArrowUpIcon className="w-12 h-12 mx-auto mb-3 text-slate-400" />
             <p className="text-sm font-medium text-slate-700 mb-1">
-              Drop photos here or click to upload
+              <span className="md:inline hidden">Drop photos here or </span>Click to upload
             </p>
             <p className="text-xs text-slate-500">PNG, JPG up to 5MB each</p>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              capture="environment"
               multiple
               onChange={handleFileInput}
               className="hidden"
@@ -233,8 +255,8 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             onChange={(e) => setDescription(e.target.value)}
             placeholder="E.g., Kitchen needs new cabinets and countertops, appliances are staying"
             rows={3}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900"
+            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
           />
         </div>
 
@@ -248,9 +270,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             value={projectType}
             onChange={(e) => setProjectType(e.target.value)}
             required
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900
-                     bg-white"
+            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
+                     bg-white cursor-pointer"
           >
             <option value="">Select project type...</option>
             {PROJECT_TYPES.map(type => (
@@ -271,8 +293,8 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
             placeholder="M1A 1A1"
             maxLength={7}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900"
+            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
           />
           <p className="text-xs text-slate-500 mt-1">For accurate GTA pricing</p>
         </div>
@@ -289,9 +311,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           type="submit"
           disabled={isLoading}
           className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                   hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl
+                   hover:to-orange-700 text-white font-bold py-5 md:py-4 px-6 rounded-xl text-lg md:text-base
                    transition-all transform hover:scale-[1.02] disabled:opacity-50 
-                   disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                   disabled:cursor-not-allowed disabled:transform-none shadow-xl"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
