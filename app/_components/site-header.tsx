@@ -21,67 +21,67 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200/50 shadow-sm">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-white via-purple-50/30 to-pink-50/30 backdrop-blur-xl border-b-2 border-purple-200/50 shadow-xl">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center h-20 px-4">
-          {/* Brand - BIGGER */}
-          <div className="flex-shrink-0 transform transition-transform hover:scale-105">
-            <Logo size="lg" showText={true} />
+        <div className="flex justify-between items-center h-24 px-4">
+          {/* Brand - BIGGER & MORE PROMINENT */}
+          <div className="flex-shrink-0 transform transition-transform hover:scale-110">
+            <Logo size="xl" showText={true} />
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Desktop Navigation - BIGGER & MORE MODERN */}
+          <nav className="hidden lg:flex items-center space-x-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={`${
                   link.highlight 
-                    ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-1' 
-                    : 'text-ink-700 hover:text-brand px-3 py-2 rounded-md font-medium'
-                } text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2`}
+                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-110 ring-2 ring-purple-400 ring-offset-2 text-base animate-pulse-glow' 
+                    : 'text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl font-semibold text-base'
+                } transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-600 focus-visible:ring-offset-2`}
               >
                 {link.highlight && '✨ '}{link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Right Side Actions */}
-          <div className="hidden md:flex items-center space-x-3">
+          {/* Right Side Actions - BIGGER & MORE PROMINENT */}
+          <div className="hidden lg:flex items-center space-x-3">
             {/* Authentication */}
             {isSignedIn && user ? (
               <>
-                {/* Primary Action Button */}
+                {/* Primary Action Button - BIGGER */}
                 {user.role === 'homeowner' ? (
                   <Link
                     href="/create-lead"
-                    className="bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white px-7 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 ring-2 ring-orange-400 ring-offset-2"
                   >
                     🏗️ Post Your Project
                   </Link>
                 ) : (
                   <Link
                     href="/contractor/jobs"
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ring-2 ring-green-400 ring-offset-2"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-7 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 ring-2 ring-green-400 ring-offset-2"
                   >
                     💼 Find Jobs
                   </Link>
                 )}
 
-                {/* Messages with badge */}
+                {/* Messages with badge - BIGGER */}
                 <Link
                   href="/messages"
-                  className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 relative inline-flex items-center"
+                  className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 relative inline-flex items-center"
                 >
                   Messages
-                  <UnreadBadge count={unreadCount} className="ml-1" />
+                  <UnreadBadge count={unreadCount} className="ml-2" />
                 </Link>
 
-                {/* Profile Menu */}
+                {/* Profile Menu - BIGGER */}
                 <div className="flex items-center space-x-2">
                   <Link
                     href="/profile"
-                    className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
                   >
                     Profile
                   </Link>
@@ -91,13 +91,13 @@ export default function SiteHeader() {
               <>
                 <Link
                   href="/sign-in"
-                  className="text-ink-700 hover:text-brand px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-5 py-3 rounded-xl text-base font-semibold transition-all duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
+                  className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white px-8 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-600 focus-visible:ring-offset-2 ring-2 ring-purple-400 ring-offset-2"
                 >
                   ✨ Get Started Free
                 </Link>

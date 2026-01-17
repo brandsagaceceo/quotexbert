@@ -75,88 +75,89 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-        {/* Hero Section - 2 Column Layout */}
-        <section className="relative py-12 md:py-20 overflow-hidden">
-          {/* Background Elements */}
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50">
+        {/* Hero Section - 2 Column Layout - BIGGER & MORE MODERN */}
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
-          <div className="absolute top-20 left-10 w-72 h-72 bg-rose-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-          <div className="absolute top-40 right-10 w-72 h-72 bg-amber-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-20 left-10 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+          <div className="absolute top-40 right-10 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
           <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Column - Headline & Benefits */}
-              <div className="text-center lg:text-left">
-                <div className="inline-block mb-4 px-5 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-lg">
-                  <span className="text-sm font-bold">🤖 AI-POWERED ESTIMATES</span>
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Left Column - Headline & Benefits - BIGGER */}
+              <div className="text-center lg:text-left space-y-6">
+                <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-full shadow-2xl animate-pulse-glow">
+                  <span className="text-base font-bold">🤖 AI-POWERED ESTIMATES • 100% FREE</span>
                 </div>
                 
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
-                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight animate-fade-in-up">
+                  <span className="bg-gradient-to-r from-purple-900 via-pink-800 to-rose-900 bg-clip-text text-transparent">
                     Upload Photos.
                   </span>
                   <br />
-                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-purple-900 via-pink-800 to-rose-900 bg-clip-text text-transparent">
                     Get Instant Quote.
                   </span>
                 </h1>
 
-                <p className="text-xl md:text-2xl text-slate-700 mb-8 leading-relaxed">
+                <p className="text-2xl md:text-3xl text-slate-700 mb-10 leading-relaxed font-medium">
                   Stop overpaying for home repairs. Our AI analyzes your project and gives you a 
-                  detailed contractor-style estimate in seconds.
+                  detailed contractor-style estimate in <span className="text-purple-700 font-bold">30 seconds</span>.
                 </p>
 
-                {/* Key Benefits */}
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {/* Key Benefits - BIGGER & MORE MODERN */}
+                <div className="space-y-6 mb-10">
+                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-lg text-slate-900">Instant AI Estimates</div>
-                      <div className="text-slate-600">Detailed line items, not vague ranges</div>
+                      <div className="font-bold text-xl text-slate-900">Instant AI Estimates</div>
+                      <div className="text-slate-600 text-base">Detailed line items, not vague ranges</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-lg text-slate-900">Photo + Text Analysis</div>
-                      <div className="text-slate-600">Upload photos or describe your project</div>
+                      <div className="font-bold text-xl text-slate-900">Photo + Text Analysis</div>
+                      <div className="text-slate-600 text-base">Upload photos or describe your project</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-lg text-slate-900">Toronto & GTA Pricing</div>
-                      <div className="text-slate-600">Accurate local labor and material costs</div>
+                      <div className="font-bold text-xl text-slate-900">Toronto & GTA Pricing</div>
+                      <div className="text-slate-600 text-base">Accurate local labor and material costs</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Social Proof */}
+                {/* Social Proof - BIGGER */}
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
-                    <span className="text-sm font-semibold text-slate-700">⭐ 4.8/5 Rating</span>
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-purple-200">
+                    <span className="text-base font-bold text-slate-700">⭐ 4.8/5 Rating</span>
                   </div>
-                  <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
-                    <span className="text-sm font-semibold text-slate-700">🔒 100% Secure</span>
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-green-200">
+                    <span className="text-base font-bold text-slate-700">🔒 100% Secure</span>
                   </div>
-                  <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
-                    <span className="text-sm font-semibold text-slate-700">✓ GTA Verified</span>
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-blue-200">
+                    <span className="text-base font-bold text-slate-700">✓ GTA Verified</span>
                   </div>
                 </div>
               </div>
@@ -248,7 +249,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* AI Assistant Popup */}
+      {/* AI Assistant Popup - OLD */}
       <AIAssistantPopup />
     </>
   );
