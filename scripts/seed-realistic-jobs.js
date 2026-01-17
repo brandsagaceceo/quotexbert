@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
 
 const prisma = new PrismaClient();
 
@@ -20,7 +21,7 @@ const LOCATIONS = [
 ];
 
 // Realistic job templates by category
-const JOB_TEMPLATES: Record<string, Array<{title: string, description: string, budgetRange: [number, number]}>> = {
+const JOB_TEMPLATES = {
   'Painting': [
     {
       title: 'Interior Painting - 3 Bedrooms & Hallway',
@@ -214,7 +215,7 @@ async function createRealisticJobs() {
       {
         title: `${category} Project`,
         description: `Looking for professional ${category.toLowerCase()} services. Need experienced contractor with references. Project details to be discussed.`,
-        budgetRange: [1000, 5000] as [number, number]
+        budgetRange: [1000, 5000]
       }
     ];
 
