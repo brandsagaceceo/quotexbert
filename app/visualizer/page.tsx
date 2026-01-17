@@ -385,39 +385,39 @@ export default function VisualizerPage() {
                   <span className="drop-shadow-md">Why QuoteXbert is Different</span>
                 </h2>
                 <div className="space-y-4">
-                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
-                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                  <div className="bg-white rounded-xl p-5 shadow-lg">
+                    <div className="font-black text-xl mb-2 text-gray-900 flex items-center gap-2">
                       <span className="text-2xl">💡</span>
                       <span>AI-Powered Fair Pricing</span>
                     </div>
-                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
+                    <p className="text-gray-700 text-base leading-relaxed">
                       Unlike other platforms, we show you what jobs SHOULD cost before contractors bid. No more overpaying!
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
-                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                  <div className="bg-white rounded-xl p-5 shadow-lg">
+                    <div className="font-black text-xl mb-2 text-gray-900 flex items-center gap-2">
                       <span className="text-2xl">🎨</span>
                       <span>Visualize THEN Quote</span>
                     </div>
-                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
+                    <p className="text-gray-700 text-base leading-relaxed">
                       See your renovation with AI, then get real quotes from verified contractors. Make informed decisions.
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
-                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                  <div className="bg-white rounded-xl p-5 shadow-lg">
+                    <div className="font-black text-xl mb-2 text-gray-900 flex items-center gap-2">
                       <span className="text-2xl">💰</span>
                       <span>100% Free for Homeowners</span>
                     </div>
-                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
+                    <p className="text-gray-700 text-base leading-relaxed">
                       Zero commissions, zero hidden fees. We charge contractors, not you. Get quotes completely free.
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
-                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                  <div className="bg-white rounded-xl p-5 shadow-lg">
+                    <div className="font-black text-xl mb-2 text-gray-900 flex items-center gap-2">
                       <span className="text-2xl">✅</span>
                       <span>Verified Contractors Only</span>
                     </div>
-                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
+                    <p className="text-gray-700 text-base leading-relaxed">
                       Every contractor is screened, reviewed, and rated. No sketchy operators allowed.
                     </p>
                   </div>
