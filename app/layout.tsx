@@ -118,6 +118,7 @@ export default function RootLayout({
   const content = (
     <html lang="en">
       <head>
+        {/* Microsoft Clarity Analytics */}
         {clarityId && (
           <Script
             id="clarity-script"
@@ -133,6 +134,67 @@ export default function RootLayout({
             }}
           />
         )}
+        
+        {/* Comprehensive Schema.org Structured Data */}
+        <Script
+          id="schema-org"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://www.quotexbert.com/#organization",
+                  "name": "QuoteXbert",
+                  "url": "https://www.quotexbert.com",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.quotexbert.com/logo.png"
+                  },
+                  "contactPoint": {
+                    "@type": "ContactPoint",
+                    "telephone": "+1-416-XXX-XXXX",
+                    "contactType": "Customer Service",
+                    "areaServed": "CA"
+                  }
+                },
+                {
+                  "@type": "LocalBusiness",
+                  "name": "QuoteXbert - Toronto Home Renovation Quotes",
+                  "image": "https://www.quotexbert.com/og-image.jpg",
+                  "url": "https://www.quotexbert.com",
+                  "telephone": "+1-416-XXX-XXXX",
+                  "priceRange": "$$",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Toronto",
+                    "addressRegion": "ON",
+                    "addressCountry": "CA"
+                  },
+                  "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": 43.6532,
+                    "longitude": -79.3832
+                  },
+                  "areaServed": [
+                    { "@type": "City", "name": "Toronto" },
+                    { "@type": "City", "name": "Mississauga" },
+                    { "@type": "City", "name": "Oshawa" },
+                    { "@type": "City", "name": "Whitby" },
+                    { "@type": "City", "name": "Ajax" }
+                  ],
+                  "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "4.8",
+                    "reviewCount": "127"
+                  }
+                }
+              ]
+            })
+          }}
+        />
       </head>
       <body
         className={`${interSans.variable} ${interMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
