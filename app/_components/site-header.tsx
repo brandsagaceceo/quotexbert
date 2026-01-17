@@ -21,7 +21,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-white via-purple-50/30 to-pink-50/30 backdrop-blur-xl border-b-2 border-purple-200/50 shadow-xl">
+    <header className="sticky top-0 z-40 bg-gradient-to-r from-white via-rose-50/30 to-orange-50/30 backdrop-blur-xl border-b-2 border-rose-200/50 shadow-xl">
       <div className="container mx-auto">
         <div className="flex justify-between items-center h-24 px-4">
           {/* Brand - BIGGER & MORE PROMINENT */}
@@ -37,9 +37,9 @@ export default function SiteHeader() {
                 href={link.href}
                 className={`${
                   link.highlight 
-                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-110 ring-2 ring-purple-400 ring-offset-2 text-base animate-pulse-glow' 
-                    : 'text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl font-semibold text-base'
-                } transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-600 focus-visible:ring-offset-2`}
+                    ? 'bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-110 ring-2 ring-orange-400 ring-offset-2 text-base animate-pulse-glow' 
+                    : 'text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl font-semibold text-base'
+                } transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2`}
               >
                 {link.highlight && '✨ '}{link.label}
               </Link>
@@ -71,7 +71,7 @@ export default function SiteHeader() {
                 {/* Messages with badge - BIGGER */}
                 <Link
                   href="/messages"
-                  className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 relative inline-flex items-center"
+                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 relative inline-flex items-center"
                 >
                   Messages
                   <UnreadBadge count={unreadCount} className="ml-2" />
@@ -81,7 +81,7 @@ export default function SiteHeader() {
                 <div className="flex items-center space-x-2">
                   <Link
                     href="/profile"
-                    className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                    className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
                   >
                     Profile
                   </Link>
@@ -91,13 +91,13 @@ export default function SiteHeader() {
               <>
                 <Link
                   href="/sign-in"
-                  className="text-gray-700 hover:text-purple-700 hover:bg-purple-50 px-5 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-5 py-3 rounded-xl text-base font-semibold transition-all duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white px-8 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-600 focus-visible:ring-offset-2 ring-2 ring-purple-400 ring-offset-2"
+                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 ring-2 ring-orange-400 ring-offset-2"
                 >
                   ✨ Get Started Free
                 </Link>

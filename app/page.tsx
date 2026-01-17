@@ -75,36 +75,36 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
         {/* Hero Section - 2 Column Layout - BIGGER & MORE MODERN */}
         <section className="relative py-16 md:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
-          <div className="absolute top-20 left-10 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-          <div className="absolute top-40 right-10 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+          <div className="absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+          <div className="absolute top-40 right-10 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Left Column - Headline & Benefits - BIGGER */}
               <div className="text-center lg:text-left space-y-6">
-                <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-full shadow-2xl animate-pulse-glow">
+                <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white rounded-full shadow-2xl animate-pulse-glow">
                   <span className="text-base font-bold">🤖 AI-POWERED ESTIMATES • 100% FREE</span>
                 </div>
                 
                 <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight animate-fade-in-up">
-                  <span className="bg-gradient-to-r from-purple-900 via-pink-800 to-rose-900 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
                     Upload Photos.
                   </span>
                   <br />
-                  <span className="bg-gradient-to-r from-purple-900 via-pink-800 to-rose-900 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
                     Get Instant Quote.
                   </span>
                 </h1>
 
                 <p className="text-2xl md:text-3xl text-slate-700 mb-10 leading-relaxed font-medium">
                   Stop overpaying for home repairs. Our AI analyzes your project and gives you a 
-                  detailed contractor-style estimate in <span className="text-purple-700 font-bold">30 seconds</span>.
+                  detailed contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
                 </p>
 
                 {/* Key Benefits - BIGGER & MORE MODERN */}
@@ -135,7 +135,7 @@ export default function Home() {
                   </div>
 
                   <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-xl">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-rose-600 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl">
                       <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -150,13 +150,13 @@ export default function Home() {
 
                 {/* Social Proof - BIGGER */}
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-purple-200">
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-rose-200">
                     <span className="text-base font-bold text-slate-700">⭐ 4.8/5 Rating</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-green-200">
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-orange-200">
                     <span className="text-base font-bold text-slate-700">🔒 100% Secure</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-blue-200">
+                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-amber-200">
                     <span className="text-base font-bold text-slate-700">✓ GTA Verified</span>
                   </div>
                 </div>

@@ -122,7 +122,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-110 animate-bounce group"
+        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 animate-bounce group"
         aria-label="Open AI Helper"
       >
         <Sparkles className="w-6 h-6" />
@@ -135,16 +135,16 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
-      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-2xl border-2 border-purple-200 overflow-hidden">
+      <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-lg">AI Assistant</h3>
-              <p className="text-xs text-purple-100">Here to help you!</p>
+              <p className="text-xs text-rose-100">Here to help you!</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
           {/* CTA Button */}
           <button
             onClick={currentTip.action}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 group"
+            className="w-full bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 group"
           >
             <span>{currentTip.cta}</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -196,8 +196,8 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
                 onClick={() => setCurrentTipIndex(index)}
                 className={`h-2 rounded-full transition-all ${
                   index === currentTipIndex
-                    ? 'w-8 bg-purple-600'
-                    : 'w-2 bg-purple-300 hover:bg-purple-400'
+                    ? 'w-8 bg-rose-600'
+                    : 'w-2 bg-rose-300 hover:bg-rose-400'
                 }`}
                 aria-label={`Show tip ${index + 1}`}
               />
@@ -205,24 +205,24 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
           </div>
 
           {/* Quick Links */}
-          <div className="mt-4 pt-4 border-t border-purple-200">
+          <div className="mt-4 pt-4 border-t border-rose-200">
             <p className="text-xs text-gray-600 text-center mb-2">Quick Actions:</p>
             <div className="flex flex-wrap gap-2 justify-center">
               <button
                 onClick={scrollToEstimator}
-                className="text-xs bg-white hover:bg-purple-50 text-purple-700 font-semibold px-3 py-1.5 rounded-full border border-purple-300 transition-all hover:border-purple-400"
+                className="text-xs bg-white hover:bg-rose-50 text-rose-700 font-semibold px-3 py-1.5 rounded-full border border-rose-300 transition-all hover:border-rose-400"
               >
                 Get Estimate
               </button>
               <button
                 onClick={() => window.location.href = '/visualizer'}
-                className="text-xs bg-white hover:bg-pink-50 text-pink-700 font-semibold px-3 py-1.5 rounded-full border border-pink-300 transition-all hover:border-pink-400"
+                className="text-xs bg-white hover:bg-orange-50 text-orange-700 font-semibold px-3 py-1.5 rounded-full border border-orange-300 transition-all hover:border-orange-400"
               >
                 AI Visualizer
               </button>
               <button
                 onClick={() => window.location.href = '/blog'}
-                className="text-xs bg-white hover:bg-purple-50 text-purple-700 font-semibold px-3 py-1.5 rounded-full border border-purple-300 transition-all hover:border-purple-400"
+                className="text-xs bg-white hover:bg-rose-50 text-rose-700 font-semibold px-3 py-1.5 rounded-full border border-rose-300 transition-all hover:border-rose-400"
               >
                 Read Blog
               </button>
@@ -231,8 +231,8 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
         </div>
 
         {/* Footer */}
-        <div className="bg-purple-100 px-4 py-2 text-center">
-          <p className="text-xs text-purple-700">
+        <div className="bg-rose-100 px-4 py-2 text-center">
+          <p className="text-xs text-rose-700">
             💡 <span className="font-semibold">Pro tip:</span> Try our AI Room Visualizer to see your renovation before you start!
           </p>
         </div>
