@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import SavedProjectsList from "@/components/SavedProjectsList";
+import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
+import MessagesTab from "@/components/profile/MessagesTab";
 import {
   User,
   MapPin,
@@ -560,8 +562,8 @@ export default function UnifiedProfilePage() {
           </div>
         )}
 
-        {/* Profile Info Container - Fixed positioning */}
-        <div className="absolute -bottom-24 left-0 right-0">
+        {/* Profile Info Container - Improved positioning */}
+        <div className="absolute -bottom-16 left-0 right-0">
           <div className="container mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
@@ -639,14 +641,14 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-12"></div>
+      <div className="h-24 md:h-20"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8 overflow-x-auto">
             {(isContractor 
-              ? ['overview', 'portfolio', 'categories', 'jobs', 'contact'] 
+              ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button
@@ -658,7 +660,11 @@ export default function UnifiedProfilePage() {
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab === 'projects' ? 'My Projects' : tab === 'estimates' ? 'AI Estimates' : tab === 'visualizations' ? 'AI Visualizations' : tab}
+                {tab === 'projects' ? 'My Projects' : 
+                 tab === 'estimates' ? 'AI Estimates' : 
+                 tab === 'visualizations' ? 'AI Visualizations' : 
+                 tab === 'accepted-jobs' ? 'Accepted Jobs' : 
+                 tab}
               </button>
             ))}
           </nav>
@@ -823,6 +829,28 @@ export default function UnifiedProfilePage() {
                     </button>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'accepted-jobs' && isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Accepted Jobs</h2>
+                  <p className="text-slate-600">Jobs you've accepted and are currently working on or have completed.</p>
+                </div>
+
+                <AcceptedJobsList contractorId={authUser?.id || ''} />
+              </div>
+            )}
+
+            {activeTab === 'messages' && isContractor && (
+              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Messages</h2>
+                  <p className="text-slate-600">Chat with homeowners about your accepted jobs.</p>
+                </div>
+
+                <MessagesTab contractorId={authUser?.id || ''} />
               </div>
             )}
 

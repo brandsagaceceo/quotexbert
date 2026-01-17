@@ -7,6 +7,7 @@ import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { ServiceAreaCities } from "@/components/ServiceAreaCities";
 import { ReviewsSection, Review } from "@/components/ReviewsSection";
+import AIAssistantPopup from "@/components/AIAssistantPopup";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function Home() {
@@ -246,6 +247,9 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      {/* AI Assistant Popup */}
+      <AIAssistantPopup />
     </>
   );
 }

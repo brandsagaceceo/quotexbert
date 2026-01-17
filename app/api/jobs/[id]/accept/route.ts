@@ -99,20 +99,17 @@ export async function POST(
       }
     });
 
-    // Update lead status if this is the first acceptance
-    if (currentAcceptedList.length === 0) {
-      await prisma.lead.update({
-        where: { id: jobId },
-        data: { status: "reviewing" }
-      });
-    }
-
     // Update acceptedContractors array
     const updatedAccepted = [...currentAcceptedList, contractorId];
+    
+    // If this is the 3rd contractor, close the job
+    const newStatus = updatedAccepted.length >= 3 ? 'closed' : currentAcceptedList.length === 0 ? 'reviewing' : currentLead.status;
+    
     await prisma.lead.update({
       where: { id: jobId },
       data: { 
-        acceptedContractors: JSON.stringify(updatedAccepted)
+        acceptedContractors: JSON.stringify(updatedAccepted),
+        status: newStatus
       }
     });
 

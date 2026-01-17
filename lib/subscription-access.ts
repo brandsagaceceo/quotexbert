@@ -95,7 +95,8 @@ export async function getAllOpenLeads() {
   try {
     const leads = await prisma.lead.findMany({
       where: {
-        status: 'open' // Only show open leads
+        status: 'open', // Only show open leads
+        published: true // Only show published leads
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -108,7 +109,13 @@ export async function getAllOpenLeads() {
       }
     });
 
-    return leads;
+    // Filter out jobs that have reached maximum contractors (3)
+    const availableLeads = leads.filter(lead => {
+      const acceptedContractors = JSON.parse(lead.acceptedContractors || '[]');
+      return acceptedContractors.length < 3;
+    });
+
+    return availableLeads;
   } catch (error) {
     console.error('Error fetching all open leads:', error);
     return [];
