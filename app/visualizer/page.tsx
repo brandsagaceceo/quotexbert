@@ -258,8 +258,8 @@ export default function VisualizerPage() {
         {!afterImage ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Left: Upload & Options */}
-            <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-100">
-              <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-gray-100 order-1">
+              <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-6 flex items-center gap-3">
                 <span className="text-3xl">📸</span>
                 <span>1. Upload Room Photo</span>
               </h2>
@@ -377,35 +377,47 @@ export default function VisualizerPage() {
             </div>
 
             {/* Right: Why Different Section */}
-            <div className="space-y-6">
+            <div className="space-y-6 order-2 lg:order-2">
               {/* Why QuoteXbert is Different */}
-              <div className="bg-gradient-to-br from-rose-600 to-orange-600 rounded-3xl shadow-xl p-8 text-white">
-                <h2 className="text-3xl font-black mb-6 flex items-center gap-3">
+              <div className="bg-gradient-to-br from-rose-600 via-rose-500 to-orange-500 rounded-3xl shadow-2xl p-8 text-white border-4 border-white">
+                <h2 className="text-3xl font-black mb-6 flex items-center gap-3 drop-shadow-lg">
                   <span className="text-4xl">🏆</span>
-                  <span>Why QuoteXbert is Different</span>
+                  <span className="drop-shadow-md">Why QuoteXbert is Different</span>
                 </h2>
                 <div className="space-y-4">
-                  <div className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-4">
-                    <div className="font-black text-lg mb-2">💡 AI-Powered Fair Pricing</div>
-                    <p className="text-white text-opacity-90">
+                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
+                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                      <span className="text-2xl">💡</span>
+                      <span>AI-Powered Fair Pricing</span>
+                    </div>
+                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
                       Unlike other platforms, we show you what jobs SHOULD cost before contractors bid. No more overpaying!
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-4">
-                    <div className="font-black text-lg mb-2">🎨 Visualize THEN Quote</div>
-                    <p className="text-white text-opacity-90">
+                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
+                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                      <span className="text-2xl">🎨</span>
+                      <span>Visualize THEN Quote</span>
+                    </div>
+                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
                       See your renovation with AI, then get real quotes from verified contractors. Make informed decisions.
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-4">
-                    <div className="font-black text-lg mb-2">💰 100% Free for Homeowners</div>
-                    <p className="text-white text-opacity-90">
+                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
+                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                      <span className="text-2xl">💰</span>
+                      <span>100% Free for Homeowners</span>
+                    </div>
+                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
                       Zero commissions, zero hidden fees. We charge contractors, not you. Get quotes completely free.
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-20 backdrop-blur rounded-xl p-4">
-                    <div className="font-black text-lg mb-2">✅ Verified Contractors Only</div>
-                    <p className="text-white text-opacity-90">
+                  <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white border-opacity-30">
+                    <div className="font-black text-xl mb-2 drop-shadow-md flex items-center gap-2">
+                      <span className="text-2xl">✅</span>
+                      <span>Verified Contractors Only</span>
+                    </div>
+                    <p className="text-white drop-shadow-sm text-base leading-relaxed">
                       Every contractor is screened, reviewed, and rated. No sketchy operators allowed.
                     </p>
                   </div>
@@ -413,32 +425,36 @@ export default function VisualizerPage() {
               </div>
 
               {/* Example transformations */}
-              <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-100">
-                <h3 className="text-2xl font-black text-gray-900 mb-4">✨ Example Transformations</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-gray-100">
+                <h3 className="text-3xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="text-3xl">✨</span>
+                  <span>Example Transformations</span>
+                </h3>
+                <div className="grid grid-cols-2 gap-6">
                   <div className="relative group">
+                    <div className="absolute -top-3 left-3 bg-gray-900 text-white px-4 py-1.5 rounded-full text-sm font-bold z-10 shadow-lg">
+                      Before
+                    </div>
                     <Image
                       src="https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=300&h=200&fit=crop"
                       alt="Before example"
                       width={300}
                       height={200}
-                      className="rounded-xl shadow-lg w-full h-32 object-cover"
+                      className="rounded-xl shadow-lg w-full h-40 object-cover border-4 border-gray-200"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-60 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white font-bold">Before</span>
-                    </div>
                   </div>
                   <div className="relative group">
+                    <div className="absolute -top-3 left-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-bold z-10 shadow-lg flex items-center gap-1">
+                      <span>✨</span>
+                      <span>After</span>
+                    </div>
                     <Image
                       src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop"
                       alt="After example"
                       width={300}
                       height={200}
-                      className="rounded-xl shadow-lg w-full h-32 object-cover"
+                      className="rounded-xl shadow-lg w-full h-40 object-cover border-4 border-green-200"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 bg-opacity-60 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="text-white font-bold">✨ After</span>
-                    </div>
                   </div>
                 </div>
               </div>
