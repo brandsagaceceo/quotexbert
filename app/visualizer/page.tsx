@@ -424,41 +424,6 @@ export default function VisualizerPage() {
                 </div>
               </div>
 
-              {/* Example transformations */}
-              <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-gray-100">
-                <h3 className="text-3xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                  <span className="text-3xl">✨</span>
-                  <span>Example Transformations</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="relative group">
-                    <div className="absolute -top-3 left-3 bg-gray-900 text-white px-4 py-1.5 rounded-full text-sm font-bold z-10 shadow-lg">
-                      Before
-                    </div>
-                    <Image
-                      src="https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=300&h=200&fit=crop"
-                      alt="Before example"
-                      width={300}
-                      height={200}
-                      className="rounded-xl shadow-lg w-full h-40 object-cover border-4 border-gray-200"
-                    />
-                  </div>
-                  <div className="relative group">
-                    <div className="absolute -top-3 left-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-bold z-10 shadow-lg flex items-center gap-1">
-                      <span>✨</span>
-                      <span>After</span>
-                    </div>
-                    <Image
-                      src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300&h=200&fit=crop"
-                      alt="After example"
-                      width={300}
-                      height={200}
-                      className="rounded-xl shadow-lg w-full h-40 object-cover border-4 border-green-200"
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Pro Testimonials */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl shadow-xl p-8 border-2 border-purple-200">
                 <h3 className="text-2xl font-black text-gray-900 mb-4">💬 Pro Users Love It</h3>
