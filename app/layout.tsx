@@ -6,8 +6,6 @@ import SiteHeader from "./_components/site-header";
 import SiteFooter from "./_components/site-footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import DevStatus from "./_components/DevStatus";
-import { FloatingAIPrompt } from "@/components/ui/FloatingAIPrompt";
-import { AIChatbot } from "@/components/AIChatbot";
 import ProactiveAIHelper from "@/components/ProactiveAIHelper";
 import "./globals.css";
 import "../styles/mobile.css";
@@ -213,8 +211,6 @@ export default function RootLayout({
         </main>
         <SiteFooter />
         <MobileBottomNav />
-        <FloatingAIPrompt />
-        <AIChatbot />
         <ProactiveAIHelper delayMs={5000} />
         <DevStatus />
       </body>
