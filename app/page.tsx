@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { InstantQuoteCard } from "@/components/InstantQuoteCard";
+import { IPhoneEstimatorMockup } from "@/components/IPhoneEstimatorMockup";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { ServiceAreaCities } from "@/components/ServiceAreaCities";
@@ -162,9 +162,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Column - Instant Quote Card */}
+              {/* Right Column - iPhone Estimator Mockup */}
               <div className="lg:pl-8" data-estimator>
-                <InstantQuoteCard 
+                <IPhoneEstimatorMockup 
                   onEstimateComplete={setEstimateResult}
                   userId={user?.id}
                 />
