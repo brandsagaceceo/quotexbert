@@ -26,6 +26,20 @@ export default function Home() {
 
   const handleGetContractorBids = () => {
     trackCTAClick('estimate_results', 'Get Contractor Bids');
+    
+    // Save estimate data to localStorage before redirecting
+    if (estimateResult) {
+      const estimateData = {
+        projectDescription: estimateResult.summary,
+        min: estimateResult.totals?.total_low || 0,
+        max: estimateResult.totals?.total_high || 0,
+        photos: [], // Photos will be re-uploaded in create-lead page
+        scope: estimateResult.scope || [],
+        lineItems: estimateResult.line_items || [],
+      };
+      localStorage.setItem('estimate_data', JSON.stringify(estimateData));
+    }
+    
     if (isSignedIn) {
       window.location.href = '/create-lead';
     } else {

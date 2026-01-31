@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Plus, Users, MessageCircle, Clock, DollarSign } from 'lucide-react';
+import { Plus, Users, MessageCircle, Clock, DollarSign, Edit, Trash2 } from 'lucide-react';
 
 interface JobApplication {
   id: string;
@@ -46,6 +46,7 @@ export default function HomeownerJobsPage() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -66,6 +67,32 @@ export default function HomeownerJobsPage() {
       console.error('Error fetching jobs:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingJobId(jobId);
+    
+    try {
+      const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${user?.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove the job from the list
+        setJobs(jobs.filter(job => job.id !== jobId));
+      } else {
+        alert('Failed to delete job. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      alert('Failed to delete job. Please try again.');
+    } finally {
+      setDeletingJobId(null);
     }
   };
 
@@ -166,7 +193,7 @@ export default function HomeownerJobsPage() {
                 </CardHeader>
                 
                 <CardContent>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 flex-wrap">
                     <Link href={`/homeowner/jobs/${job.id}`}>
                       <Button variant="secondary" size="sm">
                         <Clock className="w-4 h-4 mr-2" />
@@ -191,6 +218,27 @@ export default function HomeownerJobsPage() {
                         </Button>
                       </Link>
                     )}
+
+                    {/* Edit button - available for draft and open jobs */}
+                    {(job.status === 'draft' || job.status === 'open') && (
+                      <Link href={`/homeowner/jobs/${job.id}/edit`}>
+                        <Button variant="secondary" size="sm">
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit
+                        </Button>
+                      </Link>
+                    )}
+
+                    {/* Delete button */}
+                    <Button 
+                      variant="error" 
+                      size="sm"
+                      onClick={() => handleDeleteJob(job.id)}
+                      disabled={deletingJobId === job.id}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      {deletingJobId === job.id ? 'Deleting...' : 'Delete'}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

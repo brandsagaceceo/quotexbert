@@ -69,6 +69,8 @@ export default function CreateLeadPage() {
   // Load estimate data on component mount
   useEffect(() => {
     const estimateData = localStorage.getItem('estimate_data');
+    const estimatePhotos = localStorage.getItem('estimate_photos');
+    
     if (estimateData) {
       try {
         const estimate = JSON.parse(estimateData);
@@ -89,6 +91,19 @@ export default function CreateLeadPage() {
               ? `$${estimate.min.toLocaleString()} - $${estimate.max.toLocaleString()}`
               : ""
           }));
+        }
+        
+        // Load photos if available
+        if (estimatePhotos) {
+          try {
+            const photosArray = JSON.parse(estimatePhotos);
+            console.log('Loading photos:', photosArray.length);
+            setPhotos(photosArray);
+            // Clear photos from localStorage after loading
+            localStorage.removeItem('estimate_photos');
+          } catch (photoError) {
+            console.error('Error loading photos:', photoError);
+          }
         }
         
         // Clear the estimate data from localStorage after loading

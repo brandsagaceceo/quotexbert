@@ -140,6 +140,11 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
       const photoBase64 = await Promise.all(photoPromises);
 
+      // Save photos to localStorage for later use
+      if (photoBase64.length > 0) {
+        localStorage.setItem('estimate_photos', JSON.stringify(photoBase64));
+      }
+
       const response = await fetch("/api/estimate", {
         method: "POST",
         headers: {
