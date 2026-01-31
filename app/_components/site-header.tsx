@@ -6,11 +6,13 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useUnreadMessageCount } from "@/lib/hooks/useUnreadMessageCount";
 import { UnreadBadge } from "./UnreadBadge";
 import Logo from "@/components/Logo";
+import { useClerk } from "@clerk/nextjs";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isSignedIn, authUser: user } = useAuth();
   const { unreadCount } = useUnreadMessageCount();
+  const { signOut } = useClerk();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -85,6 +87,12 @@ export default function SiteHeader() {
                   >
                     Profile
                   </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-gray-700 hover:text-red-700 hover:bg-red-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                  >
+                    Sign Out
+                  </button>
                 </div>
               </>
             ) : (
@@ -203,6 +211,17 @@ export default function SiteHeader() {
                   
                   {/* Profile */}
                   <Link
+
+                  {/* Sign Out */}
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-2 rounded-lg text-base font-medium transition-colors duration-200"
+                  >
+                    Sign Out
+                  </button>
                     href="/profile"
                     className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
