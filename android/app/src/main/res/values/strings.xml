@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuoteXbert</string>
+    <string name="title_activity_main">QuoteXbert</string>
+    <string name="package_name">com.quotexbert.app</string>
+    <string name="custom_url_scheme">com.quotexbert.app</string>
+</resources>

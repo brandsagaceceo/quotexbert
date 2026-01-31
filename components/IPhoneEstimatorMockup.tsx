@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent } from "react";
 import Image from "next/image";
-import { CameraIcon, PhotoIcon, XMarkIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
 
 interface IPhoneEstimatorMockupProps {
@@ -40,8 +40,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -67,14 +66,6 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     addPhotos(files);
-  };
-
-  const openCamera = () => {
-    cameraInputRef.current?.click();
-  };
-
-  const openUpload = () => {
-    uploadInputRef.current?.click();
   };
 
   const addPhotos = (files: File[]) => {
@@ -178,44 +169,20 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
           block: 'start'
         });
       }, 300);
-    } {/* Background Image with Overlay - TODO: Add /public/mock-livingroom.jpg */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300"
-          style={{
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23cbd5e1\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            backgroundSize: '60px 60px'
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/90 to-white/95 backdrop-blur-sm" />
-      </div>
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate estimate");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      <div className="relative px-4 md:px-6 pb-4">
+  return (
+    <IPhoneFrame>
+      <div className="px-4 md:px-6 pb-4">
         {/* Header */}
-        <div className="text-center mb-4 pt-2">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-3 shadow-lg">
-            <SparkleThumbnails */}
-          {photos.length > 0 && (
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-2">
-                Your Photos ({photos.length}/5)
-              </label>
-          aria-label="Take a photo with camera"
-        />
-        <input
-          ref={uploadInputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFileInput}
-          className="hidden"
-          aria-label="Upload photos from gallery"
-        />
-
-        {/* Microcopy */}
-        <p className="text-xs text-center text-slate-500 mb-4 font-medium">
-          Photos work best. Add notes if you want.
-        </pSparklesIcon className="w-4 h-4" />
+        <div className="text-center mb-6 pt-2">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-3">
+            <SparklesIcon className="w-4 h-4" />
             AI Instant Estimate
           </div>
           <h3 className="text-xl font-black text-slate-900 mb-1">
@@ -343,19 +310,19 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Postal Code */}
           <div>
-            <lAdd details (optional)
+            <label htmlFor="postalCode" className="block text-xs font-bold text-slate-700 mb-2">
+              Postal Code (optional)
             </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="E.g., Replace kitchen cabinets, 12x10 space..."
-              rows={2}
+            <input
+              id="postalCode"
+              type="text"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
+              placeholder="M5H 2N2"
+              maxLength={7}
               className="w-full px-3 py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
                        focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
-                       placeholder:text-slate-400 bg-white/80 backdrop-blur-smr-2 border-slate-300 rounded-lg focus:border-orange-500 
-                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
-                       placeholder:text-slate-400 bg-white/80 backdrop-blur-sm"
+                       placeholder:text-slate-400"
             />
             <p className="text-xs text-slate-500 mt-1">For accurate GTA pricing</p>
           </div>
@@ -369,7 +336,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Submit Button */}
           <button
-            type="submit"/80 backdrop-blur-sm
+            type="submit"
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
                      hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl text-base
