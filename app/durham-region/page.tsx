@@ -74,7 +74,7 @@ export default function DurhamRegionPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-blue-500" />
-                <span className="font-semibold">< 3min Estimates</span>
+                <span className="font-semibold">&lt;3min Estimates</span>
               </div>
             </div>
 
