@@ -206,15 +206,21 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
           <p className="text-sm text-slate-600">
             Get your detailed estimate in 30 seconds
           </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="bg-green-50 text-green-700 px-2 py-1 rounded-full font-semibold">✓ No signup required</span>
+            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-semibold">✓ 100% free</span>
+            <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full font-semibold">✓ No spam</span>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Photo Upload Area */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
               <DevicePhoneMobileIcon className="w-4 h-4 text-rose-600" />
               Upload Photos (max 5)
             </label>
+            <p className="text-xs text-slate-500 mb-2">💡 Tip: More photos = more accurate pricing</p>
             
             <div
               onDragOver={handleDragOver}
@@ -236,6 +242,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
                   Tap to upload or drag photos here
                 </p>
                 <p className="text-xs text-slate-500">PNG, JPG • Max 5MB each</p>
+                <p className="text-xs text-green-600 font-semibold mt-1">🔒 Your photos are private & secure</p>
               </div>
               
               <input
@@ -287,9 +294,10 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-xs font-bold text-slate-700 mb-2">
+            <label htmlFor="description" className="block text-xs font-bold text-slate-700 mb-1">
               Describe your project (optional)
             </label>
+            <p className="text-xs text-slate-500 mb-2">The more details, the more accurate your estimate</p>
             <textarea
               id="description"
               value={description}
@@ -304,9 +312,10 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Project Type */}
           <div>
-            <label htmlFor="projectType" className="block text-xs font-bold text-slate-700 mb-2">
+            <label htmlFor="projectType" className="block text-xs font-bold text-slate-700 mb-1">
               Project Type <span className="text-red-500">*</span>
             </label>
+            <p className="text-xs text-slate-500 mb-2">Helps us match you with the right contractors</p>
             <select
               id="projectType"
               value={projectType}
@@ -325,9 +334,10 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Postal Code */}
           <div>
-            <label htmlFor="postalCode" className="block text-xs font-bold text-slate-700 mb-2">
+            <label htmlFor="postalCode" className="block text-xs font-bold text-slate-700 mb-1">
               Postal Code (optional)
             </label>
+            <p className="text-xs text-slate-500 mb-2">For accurate GTA pricing • We never share your location</p>
             <input
               id="postalCode"
               type="text"
@@ -366,18 +376,25 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 <span className="font-bold">{loadingStage}</span>
+                <span className="text-xs opacity-75">This takes just 10-15 seconds...</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <SparklesIcon className="w-5 h-5" />
-                Get Instant Quote
+                See My Detailed Estimate Now
               </span>
             )}
           </button>
 
-          {/* Microcopy */}
+          {/* Enhanced Reassurance Microcopy */}
           <div className="text-center space-y-1">
             <p className="text-xs text-slate-600 font-medium">
+              \u2713 No signup required \u2022 \u2713 No credit card \u2022 \u2713 No obligation
+            </p>
+            <p className="text-xs text-slate-500">
+              Contractors won't see your info until you choose to share it
+            </p>
+          </div>
               No signup required • Takes ~20 seconds • GTA pricing (CAD)
             </p>
             <button

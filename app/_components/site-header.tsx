@@ -66,7 +66,7 @@ export default function SiteHeader() {
                     href="/contractor/jobs"
                     className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-7 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 ring-2 ring-green-400 ring-offset-2"
                   >
-                    💼 Find Jobs
+                    💼 See Jobs in Your Area
                   </Link>
                 )}
 

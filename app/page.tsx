@@ -112,17 +112,18 @@ export default function Home() {
                 
                 <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight animate-fade-in-up">
                   <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
-                    Upload Photos.
+                    Is Your Quote
                   </span>
                   <br />
                   <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
-                    Get Instant Quote.
+                    Fair?
                   </span>
                 </h1>
 
                 <p className="text-2xl md:text-3xl text-slate-700 mb-10 leading-relaxed font-medium">
-                  Stop overpaying for home repairs. Our AI analyzes your project and gives you a 
-                  detailed contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
+                  <span className="text-rose-700 font-bold">Upload photos</span> of your project. 
+                  Get a detailed, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
+                  Compare before you commit.
                 </p>
 
                 {/* Key Benefits - BIGGER & MORE MODERN */}
@@ -134,8 +135,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Instant AI Estimates</div>
-                      <div className="text-slate-600 text-base">Detailed line items, not vague ranges</div>
+                      <div className="font-bold text-xl text-slate-900">Get Prices in 30 Seconds</div>
+                      <div className="text-slate-600 text-base">Detailed breakdown, not guesswork</div>
                     </div>
                   </div>
 
@@ -147,8 +148,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Photo + Text Analysis</div>
-                      <div className="text-slate-600 text-base">Upload photos or describe your project</div>
+                      <div className="font-bold text-xl text-slate-900">Just Upload Photos</div>
+                      <div className="text-slate-600 text-base">Or describe it—works both ways</div>
                     </div>
                   </div>
 
@@ -160,8 +161,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Toronto & GTA Pricing</div>
-                      <div className="text-slate-600 text-base">Accurate local labor and material costs</div>
+                      <div className="font-bold text-xl text-slate-900">Real Toronto Prices</div>
+                      <div className="text-slate-600 text-base">What contractors actually charge here</div>
                     </div>
                   </div>
                 </div>

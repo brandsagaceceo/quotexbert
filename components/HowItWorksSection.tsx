@@ -16,8 +16,8 @@ const steps = [
   },
   {
     icon: CpuChipIcon,
-    title: "AI Analyzes & Estimates",
-    description: "Our advanced AI instantly analyzes your project and generates a detailed cost estimate with line items.",
+    title: "Get Your Estimate",
+    description: "We check your project against 1,000+ real Toronto jobs and give you detailed costs with line items.",
     color: "from-purple-500 to-pink-500",
   },
   {

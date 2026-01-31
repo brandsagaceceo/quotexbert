@@ -7,7 +7,7 @@ const TRUST_FAQS = [
   {
     id: 1,
     question: "How does QuoteXbert pricing work?",
-    answer: "Our AI analyzes your photos and project description against 1,000+ real contractor quotes from the Toronto/GTA area. We provide detailed line-item estimates including materials, labor, and timeline. The estimate shows both a low and high range based on project complexity and quality levels. This gives you realistic pricing to negotiate with contractors and avoid overpaying."
+    answer: "We look at your photos and description, then compare them to 1,000+ real contractor quotes from Toronto and the GTA. You get a detailed breakdown showing materials, labor, and timeline. We show both a low and high price based on how complex your project is and what quality level you want. This gives you realistic numbers so you don't overpay and can negotiate with confidence."
   },
   {
     id: 2,

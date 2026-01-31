@@ -88,14 +88,14 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
           {/* Heading */}
           <div className="text-center space-y-3">
             <h2 className="text-4xl md:text-5xl font-black text-gray-900">
-              Before You Go! 👋
+              Wait! Don't Get Ripped Off 💰
             </h2>
             <p className="text-xl text-gray-700 font-semibold">
-              Get your <span className="text-rose-600">FREE instant renovation estimate</span>
+              See <span className="text-rose-600">what your project should actually cost</span> before hiring anyone
             </p>
             <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>AI-powered • Takes 2 minutes • No commitment</span>
+              <span>Free • 30 seconds • Based on 1,000+ real GTA projects</span>
             </div>
           </div>
 

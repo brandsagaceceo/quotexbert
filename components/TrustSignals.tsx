@@ -13,7 +13,7 @@ export function TrustSignals() {
             <span className="text-sm font-semibold text-gray-700">Trusted in Toronto</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Toronto's Most Trusted <br />Renovation Estimate Platform
+            Toronto's Most Trusted <br />Home Renovation Pricing
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Serving homeowners and contractors across the Greater Toronto Area
