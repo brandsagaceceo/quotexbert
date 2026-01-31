@@ -211,6 +211,12 @@ export default function SiteHeader() {
                   
                   {/* Profile */}
                   <Link
+                    href="/profile"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
 
                   {/* Sign Out */}
                   <button
@@ -222,12 +228,6 @@ export default function SiteHeader() {
                   >
                     Sign Out
                   </button>
-                    href="/profile"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3 pt-4 border-t border-ink-200">

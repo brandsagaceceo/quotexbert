@@ -98,9 +98,8 @@ export default function CreateLeadPage() {
           try {
             const photosArray = JSON.parse(estimatePhotos);
             console.log('Loading photos:', photosArray.length);
+            // Keep photos in base64 format - they'll be converted during submission
             setPhotos(photosArray);
-            // Clear photos from localStorage after loading
-            localStorage.removeItem('estimate_photos');
           } catch (photoError) {
             console.error('Error loading photos:', photoError);
           }
@@ -271,13 +270,11 @@ export default function CreateLeadPage() {
                 Estimated Budget (CAD)
               </label>
               <input
-                type="number"
+                type="text"
                 id="budget"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                placeholder="5000"
-                min="100"
-                step="100"
+                placeholder="$5,000 - $10,000"
                 className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
                 required
               />

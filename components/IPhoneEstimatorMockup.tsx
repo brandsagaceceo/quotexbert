@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent } from "react";
 import Image from "next/image";
-import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
 
 interface IPhoneEstimatorMockupProps {
@@ -41,7 +41,9 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -51,6 +53,70 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+  };
+
+  const toggleVoiceInput = () => {
+    if (typeof window === 'undefined') return;
+
+    // Check if browser supports speech recognition
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      alert('Voice input is not supported in your browser. Please try Chrome or Safari.');
+      return;
+    }
+
+    if (isListening) {
+      // Stop listening
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsListening(false);
+      return;
+    }
+
+    // Start listening
+    if (!recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          setDescription(prev => (prev + ' ' + finalTranscript).trim());
+        }
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'no-speech') {
+          alert('No speech detected. Please try again.');
+        } else if (event.error === 'not-allowed') {
+          alert('Microphone access denied. Please enable microphone permissions.');
+        }
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    recognitionRef.current.start();
+    setIsListening(true);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -236,14 +302,13 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
                 }
               `}
             >
-              <div className={`transition-all duration-300 ${isDragging ? 'scale-110' : ''}`}>
-                <CloudArrowUpIcon className="w-10 h-10 mx-auto mb-2 text-slate-400" />
-                <p className="text-sm font-semibold text-slate-700 mb-0.5">
-                  Tap to upload or drag photos here
-                </p>
-                <p className="text-xs text-slate-500">PNG, JPG • Max 5MB each</p>
-                <p className="text-xs text-green-600 font-semibold mt-1">🔒 Your photos are private & secure</p>
-              </div>
+              <CloudArrowUpIcon className="w-10 h-10 mx-auto mb-2 text-slate-400" />
+              <p className="text-sm font-semibold text-slate-700">
+                Tap to take or upload photos
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                or drag and drop here
+              </p>
               
               <input
                 ref={fileInputRef}
@@ -298,16 +363,35 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
               Describe your project (optional)
             </label>
             <p className="text-xs text-slate-500 mb-2">The more details, the more accurate your estimate</p>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="E.g., Kitchen needs new cabinets and countertops..."
-              rows={3}
-              className="w-full px-3 py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
-                       placeholder:text-slate-400"
-            />
+            <div className="relative">
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="E.g., Kitchen needs new cabinets and countertops..."
+                rows={3}
+                className="w-full px-3 py-2.5 pr-12 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
+                         placeholder:text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                className={`absolute right-2 top-2 p-2 rounded-lg transition-all ${
+                  isListening 
+                    ? 'bg-red-500 text-white animate-pulse' 
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+                title={isListening ? "Stop voice input" : "Use voice input"}
+              >
+                <MicrophoneIcon className="w-5 h-5" />
+              </button>
+            </div>
+            {isListening && (
+              <p className="text-xs text-red-600 mt-1 font-semibold animate-pulse">
+                🎤 Listening... Speak your project description
+              </p>
+            )}
           </div>
 
           {/* Project Type */}
@@ -394,16 +478,6 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
             <p className="text-xs text-slate-500">
               Contractors won't see your info until you choose to share it
             </p>
-          </div>
-              No signup required • Takes ~20 seconds • GTA pricing (CAD)
-            </p>
-            <button
-              type="button"
-              onClick={loadExample}
-              className="text-xs text-rose-600 hover:text-rose-700 font-semibold underline"
-            >
-              Try Example Project →
-            </button>
           </div>
         </form>
       </div>

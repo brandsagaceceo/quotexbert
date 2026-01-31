@@ -314,16 +314,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
                       {formatCurrency(item.material_cost)}
                     </td>
                     <td className="text-right py-3 px-2 text-slate-700">
-                      {formDownloadPDF}
-            disabled={downloading}
-            className="flex items-center gap-2 text-sm text-slate-600 hover:text-orange-600 
-                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-          >
-            <ArrowDownTrayIcon className="w-4 h-4" />
-            <span>{downloading ? 'Downloading...' : 'Download PDF'}</span>
-          </button>
-          <button
-            onClick={handleatCurrency(item.labor_cost)}
+                      {formatCurrency(item.labor_cost)}
                     </td>
                     <td className="text-right py-3 px-2 font-semibold text-slate-900">
                       {formatCurrency(item.material_cost + item.labor_cost)}
