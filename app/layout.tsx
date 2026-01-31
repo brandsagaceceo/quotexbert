@@ -7,6 +7,7 @@ import SiteFooter from "./_components/site-footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import DevStatus from "./_components/DevStatus";
 import ProactiveAIHelper from "@/components/ProactiveAIHelper";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import "./globals.css";
 import "../styles/mobile.css";
 
@@ -26,30 +27,27 @@ const interMono = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
   title: {
-    default: "QuoteXbert - AI Home Repair Estimates Toronto, Whitby & GTA | Free Contractor Quotes",
-    template: "%s | QuoteXbert - Toronto Home Repair Estimates"
+    default: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA",
+    template: "%s | QuoteXbert"
   },
   description:
-    "Get instant AI home repair estimates in Toronto, Whitby, and Greater Toronto Area. Connect with verified, background-checked contractors. Free quotes, secure payments. Available for basements, kitchens, roofing, and more.",
+    "Get instant AI-powered home renovation estimates in Toronto & the Greater Toronto Area. Upload photos, get free quotes from verified contractors. Kitchen, bathroom, basement renovations & more.",
   keywords: [
-    "home repair estimates Toronto",
-    "contractor quotes Whitby",
-    "GTA contractors",
-    "Toronto home repair",
-    "AI estimates Ontario",
-    "home improvement quotes Greater Toronto Area",
-    "verified contractors Toronto",
-    "basement renovation Toronto",
-    "kitchen renovation quotes Toronto",
-    "home renovation estimates Whitby",
-    "contractor marketplace GTA",
-    "background checked contractors Toronto",
-    "free home repair estimates",
-    "local contractors near me",
-    "home repair services Toronto",
-    "roof repair quotes Toronto",
-    "bathroom renovation Whitby",
-    "contractor bidding platform Ontario"
+    "home renovation estimates Toronto",
+    "Toronto contractors",
+    "GTA home repair quotes",
+    "instant renovation estimates",
+    "AI contractor quotes",
+    "Toronto kitchen renovation cost",
+    "Toronto bathroom renovation",
+    "basement finishing Toronto",
+    "Durham Region contractors",
+    "Ajax home renovation",
+    "Bowmanville contractors",
+    "Whitby renovation quotes",
+    "verified contractors GTA",
+    "home improvement Toronto",
+    "renovation cost calculator"
   ],
   authors: [{ name: "QuoteXbert" }],
   creator: "QuoteXbert",
@@ -69,23 +67,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_CA",
     url: "https://www.quotexbert.com",
-    title: "QuoteXbert - AI Home Repair Estimates in Toronto & GTA", 
+    title: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA", 
     description:
-      "Get instant AI home repair estimates and connect with verified contractors in Toronto, Whitby, and Greater Toronto Area. Free quotes, background-checked professionals, secure Stripe payments.",
+      "Upload photos and get instant AI-powered renovation estimates. Connect with verified contractors across Toronto and the Greater Toronto Area. Free, fast, and accurate.",
     siteName: "QuoteXbert",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "QuoteXbert - AI Home Repair Estimates Toronto"
+        alt: "QuoteXbert - Instant Home Renovation Estimates in Toronto & GTA"
       }
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QuoteXbert - AI-Powered Home Repair Estimates",
-    description: "Get instant AI home repair estimates. Connect with verified GTA contractors. Stripe-secured payments.",
+    title: "QuoteXbert - AI Home Renovation Estimates Toronto & GTA",
+    description: "Get instant AI renovation estimates. Connect with verified GTA contractors. Upload photos, receive accurate quotes in minutes.",
     images: ["/og-image.jpg"],
     creator: "@quotexbert",
   },
@@ -198,6 +196,12 @@ export default function RootLayout({
       <body
         className={`${interSans.variable} ${interMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
       >
+        {/* Google Analytics & Tag Manager */}
+        <GoogleAnalytics 
+          GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+          GTM_ID={process.env.NEXT_PUBLIC_GTM_ID}
+        />
+        
         {/* Skip to content link for accessibility */}
         <a
           href="#main-content"

@@ -1,27 +1,55 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://quotexbert.com'
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
   
-  // Toronto-specific SEO landing pages (highest priority)
-  const torontoPages: MetadataRoute.Sitemap = [
+  // Location pages (NEW - highest priority for local SEO)
+  const locationPages: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}/toronto-renovation-quotes`,
+      url: `${baseUrl}/toronto`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.95,
     },
     {
-      url: `${baseUrl}/toronto-bathroom-renovation`,
+      url: `${baseUrl}/durham-region`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/toronto-kitchen-renovation`,
+      url: `${baseUrl}/ajax`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/bowmanville`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+  ]
+  
+  // Toronto-specific SEO landing pages (existing)
+  const torontoPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/toronto-renovation-quotes`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/toronto-bathroom-renovation`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/toronto-kitchen-renovation`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
     },
   ]
   
@@ -85,7 +113,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // Blog posts
+  // Blog posts (existing + NEW 2026 SEO posts)
   const blogPosts = [
     'home-renovation-projects-add-value-toronto-2025',
     'choose-contractor-toronto-gta-guide',
@@ -108,6 +136,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'waterproofing-your-toronto-basement-prevention-solutions',
     'landscaping-ideas-for-toronto-yards-climate-appropriate-plants',
     'window-replacement-in-toronto-types-costs-energy-savings',
+    // NEW 2026 SEO-focused blog posts
+    'bathroom-renovation-cost-toronto-2026',
+    'kitchen-renovation-cost-gta-2026',
+    'why-contractors-overquote-avoid-it-2026',
   ]
 
   const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map(slug => ({
@@ -118,6 +150,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }))
 
   return [
+    ...locationPages,
     ...torontoPages,
     ...staticPages,
     ...contractorPages,

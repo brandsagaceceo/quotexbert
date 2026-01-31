@@ -7,48 +7,25 @@ import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { ServiceAreaCities } from "@/components/ServiceAreaCities";
 import { ReviewsSection, Review } from "@/components/ReviewsSection";
+import { LocalBusinessSchema } from "@/components/LocalBusinessSchema";
+import { TrustSignals } from "@/components/TrustSignals";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
+import { ExitIntentModal } from "@/components/ExitIntentModal";
+import { StickyCTA } from "@/components/StickyCTA";
+import { ReviewCaptureModal } from "@/components/ReviewCaptureModal";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { trackEstimateComplete, trackCTAClick } from "@/components/GoogleAnalytics";
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
 
   // In production, fetch real reviews from API
   const realReviews: Review[] = []; // Empty for now - will show examples
 
-  // Structured Data for SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "QuoteXbert",
-    "image": "https://www.quotexbert.com/og-image.jpg",
-    "@id": "https://www.quotexbert.com",
-    "url": "https://www.quotexbert.com",
-    "telephone": "+1-416-XXX-XXXX",
-    "priceRange": "$$",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Toronto",
-      "addressRegion": "ON",
-      "addressCountry": "CA"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 43.6532,
-      "longitude": -79.3832
-    },
-    "areaServed": [
-      { "@type": "City", "name": "Toronto" },
-      { "@type": "City", "name": "Oshawa" },
-      { "@type": "City", "name": "Whitby" },
-      { "@type": "City", "name": "Ajax" },
-      { "@type": "City", "name": "Pickering" },
-      { "@type": "City", "name": "Bowmanville" },
-      { "@type": "City", "name": "Clarington" }
-    ]
-  };
-
   const handleGetContractorBids = () => {
+    trackCTAClick('estimate_results', 'Get Contractor Bids');
     if (isSignedIn) {
       window.location.href = '/create-lead';
     } else {
@@ -66,12 +43,38 @@ export default function Home() {
     }
   };
 
+  const handleEstimateComplete = (result: any) => {
+    setEstimateResult(result);
+    trackEstimateComplete(result?.total);
+    
+    // Show review modal after successful estimate (5 second delay)
+    setTimeout(() => {
+      setShowReviewModal(true);
+    }, 5000);
+  };
+
+  const handleCaptureEmail = async (email: string) => {
+    // Send email to backend
+    console.log('Captured email:', email);
+    // TODO: Implement email capture API call
+  };
+
   return (
     <>
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      {/* Enhanced JSON-LD Structured Data */}
+      <LocalBusinessSchema googleBusinessUrl="YOUR_GOOGLE_BUSINESS_URL_HERE" />
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal onCaptureEmail={handleCaptureEmail} />
+
+      {/* Sticky Mobile CTA */}
+      <StickyCTA />
+
+      {/* Review Capture Modal */}
+      <ReviewCaptureModal 
+        isOpen={showReviewModal} 
+        onClose={() => setShowReviewModal(false)}
+        googleReviewUrl="YOUR_GOOGLE_REVIEW_URL_HERE"
       />
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
@@ -164,8 +167,8 @@ export default function Home() {
               {/* Right Column - iPhone Estimator Mockup */}
               <div className="lg:pl-8" data-estimator>
                 <IPhoneEstimatorMockup 
-                  onEstimateComplete={setEstimateResult}
-                  userId={user?.id}
+                  onEstimateComplete={handleEstimateComplete}
+                  userId={user?.id || undefined}
                 />
               </div>
             </div>
@@ -185,14 +188,17 @@ export default function Home() {
           </section>
         )}
 
+        {/* Trust Signals Section */}
+        <TrustSignals />
+
         {/* How It Works */}
         <HowItWorksSection />
 
+        {/* Testimonials with Social Proof */}
+        <TestimonialsSection />
+
         {/* Service Area Cities */}
         <ServiceAreaCities />
-
-        {/* Reviews/Testimonials */}
-        <ReviewsSection reviews={realReviews} showExamples={true} />
 
         {/* Free for Homeowners Banner */}
         <section className="py-12 bg-gradient-to-r from-green-50 to-emerald-50">
