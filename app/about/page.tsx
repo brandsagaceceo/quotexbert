@@ -7,9 +7,9 @@ export default function AboutPage() {
   return (
     <>
       <Head>
-        <title>About QuotexBert - AI Home Repair Platform Mission</title>
-        <meta name="description" content="QuotexBert connects homeowners with verified contractors using AI-powered estimates. Our mission: transparent pricing, quality work, trusted connections." />
-        <meta property="og:title" content="About QuotexBert - AI Home Repair Platform" />
+        <title>About QuoteXbert - AI Home Repair Platform Mission</title>
+        <meta name="description" content="QuoteXbert connects homeowners with verified contractors using AI-powered estimates. Our mission: transparent pricing, quality work, trusted connections." />
+        <meta property="og:title" content="About QuoteXbert - AI Home Repair Platform" />
         <meta property="og:description" content="Our mission: connecting homeowners with verified contractors using AI-powered estimates." />
         <meta property="og:image" content="/og-about.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -20,7 +20,7 @@ export default function AboutPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-              About <span className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuotexBert</span>
+              About <span className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Revolutionizing home repairs through AI-powered estimates and trusted contractor connections
@@ -35,7 +35,7 @@ export default function AboutPage() {
               We believe every homeowner deserves to know what a fair price looks like <em>before</em> contractors submit quotes.
             </p>
             <p className="text-lg text-slate-700 leading-relaxed">
-              QuotexBert uses AI to analyze your project and provide instant, accurate cost estimates based on real Toronto market data. 
+              QuoteXbert uses AI to analyze your project and provide instant, accurate cost estimates based on real Toronto market data. 
               Then we connect you with verified, reliable contractors who deliver quality work at fair prices.
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function AboutPage() {
 
           {/* Our Solution */}
           <div className="mb-12">
-            <h2 className="text-3xl font-bold mb-6 text-center text-slate-900">How QuotexBert Solves This</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center text-slate-900">How QuoteXbert Solves This</h2>
             <div className="bg-gradient-to-br from-orange-50 to-rose-50 border border-orange-200 rounded-xl p-8 shadow-lg">
               <div className="space-y-6 text-slate-700">
                 <div className="flex items-start gap-4">
@@ -110,7 +110,7 @@ export default function AboutPage() {
                   <div>
                     <h3 className="text-xl font-bold text-orange-700 mb-2">Verified, Reliable Contractors Only</h3>
                     <p className="leading-relaxed">
-                      Every contractor on QuotexBert undergoes background checks, license verification, and insurance confirmation. 
+                      Every contractor on QuoteXbert undergoes background checks, license verification, and insurance confirmation. 
                       We track response times, project completion rates, and real customer reviews. 
                       <strong> No fake reviews. No unreliable contractors. Just professionals who show up and deliver quality work.</strong>
                     </p>
@@ -134,7 +134,7 @@ export default function AboutPage() {
 
           {/* AI Can Estimate ANYTHING */}
           <div className="mb-12">
-            <h2 className="text-3xl font-bold mb-6 text-center text-slate-900">QuotexBert Can Estimate ANY Home Job</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center text-slate-900">QuoteXbert Can Estimate ANY Home Job</h2>
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-8 shadow-lg">
               <p className="text-lg text-slate-700 mb-6 text-center">
                 From <strong>snow removal</strong> to <strong>full home renovations</strong>, our AI handles it all:
@@ -191,7 +191,7 @@ export default function AboutPage() {
               </div>
               
               <p className="text-center text-slate-600 mt-6 italic">
-                If it's a home improvement project in Toronto or the GTA, QuotexBert can estimate it accurately.
+                If it's a home improvement project in Toronto or the GTA, QuoteXbert can estimate it accurately.
               </p>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold mb-8 text-center text-slate-900">Our Story</h2>
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-8 shadow-lg">
               <p className="text-slate-700 leading-relaxed mb-6">
-                QuotexBert was founded by home improvement professionals who experienced firsthand the frustration of unclear pricing and unreliable contractor connections. 
+                QuoteXbert was founded by home improvement professionals who experienced firsthand the frustration of unclear pricing and unreliable contractor connections. 
                 We watched homeowners get quoted $15,000 for a $6,000 bathroom renovation. We saw skilled contractors struggle to find quality leads. 
                 <strong> We knew there had to be a better way.</strong>
               </p>
@@ -210,7 +210,7 @@ export default function AboutPage() {
                 Our technology eliminates the guesswork from home repair pricing, giving homeowners confidence in their investment decisions.
               </p>
               <p className="text-slate-700 leading-relaxed">
-                For contractors, QuotexBert means <strong>more qualified leads, less time wasted, and fair pricing expectations from day one.</strong> 
+                For contractors, QuoteXbert means <strong>more qualified leads, less time wasted, and fair pricing expectations from day one.</strong> 
                 Everyone wins when pricing is transparent and connections are trustworthy.
               </p>
             </div>
@@ -218,7 +218,7 @@ export default function AboutPage() {
 
           {/* Credibility Boosters */}
           <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-8 text-center text-slate-900">Why Choose QuotexBert</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center text-slate-900">Why Choose QuoteXbert</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🔒</div>
@@ -262,7 +262,7 @@ export default function AboutPage() {
           <div className="bg-gradient-to-r from-rose-50 to-orange-50 border border-orange-200 rounded-xl p-8 text-center shadow-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900">Ready to Get Started?</h2>
             <p className="text-slate-600 mb-6">
-              Join thousands of homeowners and contractors who trust QuotexBert for their home improvement projects.
+              Join thousands of homeowners and contractors who trust QuoteXbert for their home improvement projects.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

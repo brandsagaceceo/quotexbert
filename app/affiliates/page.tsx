@@ -40,8 +40,8 @@ export default function AffiliatePage() {
   return (
     <>
       <Head>
-        <title>Affiliate Program - Earn 50% Commission | QuotexBert</title>
-        <meta name="description" content="Earn 50% commission referring contractors to QuotexBert. Passive income potential: $500-$5000+ monthly. Join our affiliate program today." />
+        <title>Affiliate Program - Earn 50% Commission | QuoteXbert</title>
+        <meta name="description" content="Earn 50% commission referring contractors to QuoteXbert. Passive income potential: $500-$5000+ monthly. Join our affiliate program today." />
         <meta property="og:title" content="Affiliate Program - Earn 50% Commission" />
         <meta property="og:description" content="Earn 50% commission referring contractors. Passive income potential up to $5000+ monthly." />
         <meta property="og:image" content="/og-affiliate.jpg" />
@@ -196,7 +196,7 @@ export default function AffiliatePage() {
 
           {/* CTA Section */}
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 rounded-xl p-8 text-center shadow-lg">
-            <h2 className="text-3xl font-bold mb-4 text-slate-900">Start Earning with QuotexBert Today</h2>
+            <h2 className="text-3xl font-bold mb-4 text-slate-900">Start Earning with QuoteXbert Today</h2>
             <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
               Turn your contractor network into consistent passive income. Join our affiliate program and start earning 50% commission on every referral.
             </p>
