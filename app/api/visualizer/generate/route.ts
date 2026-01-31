@@ -86,25 +86,40 @@ export async function POST(req: Request) {
     const prompt = `Transform this room image based on the following vision: ${description}. 
 Maintain the room's layout, lighting, and perspective. Make it photorealistic and natural-looking.`;
 
-    // Call OpenAI DALL-E 3 or similar AI image generation
+    // Call OpenAI DALL-E 3 for image generation
     const startTime = Date.now();
     let afterImageUrl = "";
-    let aiModel = "openai-dall-e-3";
+    let aiModel = "dall-e-3";
 
     try {
-      // For now, use a placeholder since we need OpenAI API key configured
-      // In production, this would call OpenAI API
-      const response = await fetch("https://api.openai.com/v1/images/edits", {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("OpenAI API key not configured");
+      }
+
+      // DALL-E 3 generates images from text prompts only
+      // Since we need to edit an existing image, we'll describe what the room should look like
+      const detailedPrompt = `A photorealistic interior design rendering showing: ${description}. 
+Professional photography, natural lighting, modern home interior, high quality, detailed.`;
+
+      const response = await fetch("https://api.openai.com/v1/images/generations", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "application/json"
         },
-        body: formData // Send the before image and prompt
+        body: JSON.stringify({
+          model: "dall-e-3",
+          prompt: detailedPrompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard"
+        })
       });
 
       if (!response.ok) {
-        throw new Error("AI generation failed");
+        const errorData = await response.json();
+        console.error("OpenAI API error:", errorData);
+        throw new Error(`AI generation failed: ${errorData.error?.message || 'Unknown error'}`);
       }
 
       const aiResult = await response.json();
@@ -112,9 +127,14 @@ Maintain the room's layout, lighting, and perspective. Make it photorealistic an
 
     } catch (error) {
       console.error("AI generation error:", error);
-      // Fallback: Use a demo after image for testing
-      // In production, this should return an error
-      afterImageUrl = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop";
+      // Return error to user instead of using fallback
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: error instanceof Error ? error.message : "AI generation failed. Please try again." 
+        },
+        { status: 500 }
+      );
     }
 
     const processingTime = Date.now() - startTime;
