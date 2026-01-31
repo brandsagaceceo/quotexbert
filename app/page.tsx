@@ -13,6 +13,8 @@ import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyCTA } from "@/components/StickyCTA";
 import { ReviewCaptureModal } from "@/components/ReviewCaptureModal";
+import ExampleEstimates from "@/components/ExampleEstimates";
+import TrustFAQ from "@/components/TrustFAQ";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { trackEstimateComplete, trackCTAClick } from "@/components/GoogleAnalytics";
 
@@ -93,7 +95,7 @@ export default function Home() {
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
         {/* Hero Section - 2 Column Layout - BIGGER & MORE MODERN */}
-        <section className="relative py-16 md:py-24 overflow-hidden">
+        <section id="get-estimate" className="relative py-16 md:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           <div className="absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
@@ -202,11 +204,17 @@ export default function Home() {
           </section>
         )}
 
+        {/* Example Estimates - Show Trust */}
+        <ExampleEstimates />
+
         {/* Trust Signals Section */}
         <TrustSignals />
 
         {/* How It Works */}
         <HowItWorksSection />
+
+        {/* Trust FAQ - How Pricing Works, Contractor Verification */}
+        <TrustFAQ />
 
         {/* Testimonials with Social Proof */}
         <TestimonialsSection />

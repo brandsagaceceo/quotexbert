@@ -38,6 +38,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const [projectType, setProjectType] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +126,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
     }
 
     setIsLoading(true);
+    setLoadingStage("Analyzing photos...");
 
     try {
       // Filter out example photos and convert real photos to base64
@@ -144,6 +146,8 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
       if (photoBase64.length > 0) {
         localStorage.setItem('estimate_photos', JSON.stringify(photoBase64));
       }
+
+      setLoadingStage("Checking local pricing...");
 
       const response = await fetch("/api/estimate", {
         method: "POST",
@@ -165,6 +169,11 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
         throw new Error(data.error || "Failed to generate estimate");
       }
 
+      setLoadingStage("Matching contractors...");
+      
+      // Small delay to show final stage
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       onEstimateComplete(data);
       
       // Scroll to results
@@ -178,6 +187,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
       setError(err instanceof Error ? err.message : "Failed to generate estimate");
     } finally {
       setIsLoading(false);
+      setLoadingStage("");
     }
   };
 
@@ -350,12 +360,12 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
                      focus:outline-none focus:ring-4 focus:ring-orange-300"
           >
             {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex flex-col items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Analyzing Your Project...
+                <span className="font-bold">{loadingStage}</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">

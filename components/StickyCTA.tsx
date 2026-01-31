@@ -10,7 +10,7 @@ export function StickyCTA() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
         <div className="bg-gradient-to-r from-rose-600 to-orange-600 shadow-2xl border-t-4 border-rose-700">
           <Link 
-            href="/create-lead"
+            href="/#get-estimate"
             className="flex items-center justify-center gap-3 px-6 py-4 text-white font-bold text-lg active:scale-95 transition-transform"
           >
             <Camera className="w-6 h-6" />
