@@ -153,7 +153,7 @@ export default function Home() {
                 {/* Social Proof - BIGGER */}
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
                   <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-rose-200">
-                    <span className="text-base font-bold text-slate-700">⭐ 4.8/5 Rating</span>
+                    <span className="text-base font-bold text-slate-700">⭐ 4.9/5 Rating</span>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-orange-200">
                     <span className="text-base font-bold text-slate-700">🔒 100% Secure</span>

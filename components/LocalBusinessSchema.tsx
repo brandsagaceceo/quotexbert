@@ -98,8 +98,8 @@ export function LocalBusinessSchema({ googleBusinessUrl }: LocalBusinessSchemaPr
     ] : ["https://www.quotexbert.com"],
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "127",
+      "ratingValue": "4.9",
+      "ratingCount": "43",
       "bestRating": "5",
       "worstRating": "1"
     },

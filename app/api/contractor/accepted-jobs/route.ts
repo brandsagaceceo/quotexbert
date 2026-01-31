@@ -25,7 +25,7 @@ export async function GET(req: Request) {
         }
       },
       include: {
-        job: {
+        lead: {
           include: {
             homeowner: {
               select: {
@@ -44,17 +44,16 @@ export async function GET(req: Request) {
 
     // Transform to job format
     const jobs = acceptedApplications.map(app => ({
-      id: app.job.id,
-      title: app.job.title,
-      description: app.job.description,
-      budget: app.job.budget,
-      location: app.job.location || 'Not specified',
+      id: app.lead.id,
+      title: app.lead.title,
+      description: app.lead.description,
+      budget: app.lead.budget,
+      location: 'Toronto Area',
       status: app.status,
       acceptedAt: app.updatedAt.toISOString(),
-      homeownerName: app.job.homeowner.name || app.job.homeowner.email,
-      homeownerEmail: app.job.homeowner.email,
-      category: app.job.category,
-      deadline: app.job.deadline?.toISOString(),
+      homeownerName: app.lead.homeowner.name || app.lead.homeowner.email,
+      homeownerEmail: app.lead.homeowner.email,
+      category: app.lead.category,
     }));
 
     return NextResponse.json({ success: true, jobs });

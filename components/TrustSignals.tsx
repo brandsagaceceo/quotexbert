@@ -30,7 +30,7 @@ export function TrustSignals() {
               </div>
               <div>
                 <div className="flex items-center gap-1">
-                  <span className="text-3xl font-bold text-gray-900">4.8</span>
+                  <span className="text-3xl font-bold text-gray-900">4.9</span>
                   <Star className="w-5 h-5 text-amber-400 fill-current" />
                 </div>
                 <p className="text-sm text-gray-600">Google Rating</p>
@@ -41,7 +41,7 @@ export function TrustSignals() {
                 <Star key={star} className="w-4 h-4 text-amber-400 fill-current" />
               ))}
             </div>
-            <p className="text-xs text-gray-500">Based on 127+ reviews</p>
+            <p className="text-xs text-gray-500">Based on 43 reviews</p>
           </div>
 
           {/* Verified Contractors */}
@@ -51,7 +51,7 @@ export function TrustSignals() {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-gray-900">150+</div>
+                <div className="text-3xl font-bold text-gray-900">47</div>
                 <p className="text-sm text-gray-600">Verified Contractors</p>
               </div>
             </div>
@@ -83,7 +83,7 @@ export function TrustSignals() {
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-3xl font-bold text-gray-900">2,500+</div>
+                <div className="text-3xl font-bold text-gray-900">187+</div>
                 <p className="text-sm text-gray-600">Happy Homeowners</p>
               </div>
             </div>

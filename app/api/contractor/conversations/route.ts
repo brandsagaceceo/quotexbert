@@ -25,14 +25,13 @@ export async function GET(req: Request) {
         }
       },
       include: {
-        job: {
+        lead: {
           include: {
             homeowner: {
               select: {
                 id: true,
                 name: true,
                 email: true,
-                profilePhoto: true,
               }
             },
             messages: {
@@ -47,21 +46,20 @@ export async function GET(req: Request) {
       orderBy: {
         updatedAt: 'desc'
       }
-    });
+    }) as any;
 
     // Transform to conversation format
     const conversations = acceptedJobs
-      .filter(app => app.job.messages.length > 0) // Only jobs with messages
-      .map(app => ({
-        id: `${app.job.id}-${contractorId}`,
-        jobId: app.job.id,
-        jobTitle: app.job.title,
-        homeownerName: app.job.homeowner.name || app.job.homeowner.email.split('@')[0],
-        homeownerId: app.job.homeowner.id,
-        homeownerPhoto: app.job.homeowner.profilePhoto,
-        lastMessage: app.job.messages[0]?.content || 'No messages yet',
-        lastMessageAt: app.job.messages[0]?.createdAt.toISOString() || app.updatedAt.toISOString(),
-        unreadCount: app.job.messages.filter(m => 
+      .filter((app: any) => app.lead.messages.length > 0)
+      .map((app: any) => ({
+        id: `${app.lead.id}-${contractorId}`,
+        jobId: app.lead.id,
+        jobTitle: app.lead.title,
+        homeownerName: app.lead.homeowner.name || app.lead.homeowner.email.split('@')[0],
+        homeownerId: app.lead.homeowner.id,
+        lastMessage: app.lead.messages[0]?.content || 'No messages yet',
+        lastMessageAt: app.lead.messages[0]?.createdAt.toISOString() || app.updatedAt.toISOString(),
+        unreadCount: app.lead.messages.filter((m: any) => 
           m.senderId !== contractorId && !m.isRead
         ).length,
       }));

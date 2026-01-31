@@ -75,7 +75,7 @@ export function TestimonialsSection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm mb-4">
             <Star className="w-5 h-5 text-amber-500 fill-current" />
-            <span className="text-sm font-semibold text-gray-700">4.8/5 from 127+ reviews</span>
+            <span className="text-sm font-semibold text-gray-700">4.9/5 from 43 reviews</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Trusted by Toronto Homeowners
