@@ -96,7 +96,7 @@ export default function AboutPage() {
                     <ul className="list-disc list-inside space-y-1 ml-4 text-sm">
                       <li>Real Toronto/GTA market rates (updated monthly)</li>
                       <li>Material costs and labor complexity</li>
-                      <li>100,000+ completed projects in our database</li>
+                      <li>Industry data and local pricing trends</li>
                       <li>Seasonal pricing trends and contractor availability</li>
                     </ul>
                     <p className="mt-3 leading-relaxed">
@@ -228,20 +228,20 @@ export default function AboutPage() {
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🤖</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">AI Accuracy</h3>
-                <p className="text-slate-600">Machine learning trained on 100,000+ completed projects for precise estimates.</p>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">AI-Powered Estimates</h3>
+                <p className="text-slate-600">Advanced AI technology analyzes your project to provide detailed cost breakdowns based on GTA market data.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">⭐</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Verified Reviews</h3>
-                <p className="text-slate-600">All reviews from confirmed completed projects - no fake feedback.</p>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Review System</h3>
+                <p className="text-slate-600">We're building a transparent review system to help homeowners make informed decisions.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">✅</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Background Checks</h3>
-                <p className="text-slate-600">Every contractor undergoes comprehensive verification before joining.</p>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Contractor Screening</h3>
+                <p className="text-slate-600">We aim to connect homeowners with qualified, professional contractors in the GTA.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
@@ -252,8 +252,8 @@ export default function AboutPage() {
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🛠️</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Quality Guarantee</h3>
-                <p className="text-slate-600">All work backed by our quality standards and customer satisfaction guarantee.</p>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Quality Focus</h3>
+                <p className="text-slate-600">We're committed to helping homeowners find quality contractors and get fair quotes.</p>
               </div>
             </div>
           </div>

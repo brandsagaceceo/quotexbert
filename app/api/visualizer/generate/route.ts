@@ -64,17 +64,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // Check limits
-    if (!subscription.isPaid && subscription.monthlyGenerationsUsed >= subscription.freeMonthlyLimit) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: "Monthly generation limit reached. Please upgrade to continue.",
-          code: "LIMIT_REACHED"
-        },
-        { status: 403 }
-      );
-    }
+    // Check limits - Free for signed up users, 10 for non-signed up
+    // Since user is signed in (required by auth above), unlimited free generations
+    // Only track usage for analytics, don't enforce limits for homeowners
 
     // Upload before image to blob storage
     const beforeImageBuffer = await beforeImage.arrayBuffer();

@@ -201,6 +201,17 @@ export default function AffiliatePage() {
               Turn your contractor network into consistent passive income. Join our affiliate program and start earning 50% commission on every referral.
             </p>
             
+            <div className="mb-6 text-center">
+              <a 
+                href="/affiliate-terms"
+                className="text-rose-700 hover:text-rose-800 underline font-semibold text-sm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Read Affiliate Terms & Conditions
+              </a>
+            </div>
+            
             {joined ? (
               <div className="bg-gradient-to-br from-green-50/80 to-orange-50/80 rounded-lg p-6 max-w-md mx-auto">
                 <div className="text-3xl mb-4">🎉</div>

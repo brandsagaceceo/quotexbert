@@ -280,13 +280,13 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Photo Upload Area */}
+          {/* Photo Upload Area - Big Drag & Drop */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-              <DevicePhoneMobileIcon className="w-4 h-4 text-rose-600" />
-              Upload Photos (max 5)
+            <label className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              Add Photos (Optional)
             </label>
-            <p className="text-xs text-slate-500 mb-2">💡 Tip: More photos = more accurate pricing</p>
+            <p className="text-xs text-slate-600 mb-3">💡 2-3 photos recommended for best results</p>
             
             <div
               onDragOver={handleDragOver}
@@ -294,20 +294,20 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`
-                border-2 border-dashed rounded-xl p-4 text-center cursor-pointer
-                transition-all duration-200 relative
+                border-3 border-dashed rounded-xl p-8 text-center cursor-pointer
+                transition-all duration-200 relative min-h-[120px] flex flex-col items-center justify-center
                 ${isDragging
                   ? "border-orange-500 bg-orange-50 scale-[1.02]"
-                  : "border-slate-300 hover:border-orange-400 hover:bg-slate-50"
+                  : "border-slate-300 hover:border-orange-500 hover:bg-orange-50/50"
                 }
               `}
             >
-              <CloudArrowUpIcon className="w-10 h-10 mx-auto mb-2 text-slate-400" />
-              <p className="text-sm font-semibold text-slate-700">
-                Tap to take or upload photos
+              <CloudArrowUpIcon className="w-12 h-12 mx-auto mb-3 text-orange-500" />
+              <p className="text-base font-bold text-slate-900">
+                Drag & drop photos here
               </p>
-              <p className="text-xs text-slate-500 mt-1">
-                or drag and drop here
+              <p className="text-sm text-slate-600 mt-1">
+                or click to browse
               </p>
               
               <input
@@ -357,36 +357,36 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
             )}
           </div>
 
-          {/* Description */}
+          {/* Description - Bigger and More Obvious */}
           <div>
-            <label htmlFor="description" className="block text-xs font-bold text-slate-700 mb-1">
-              Describe your project (optional)
+            <label htmlFor="description" className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+              Describe Your Project
             </label>
-            <p className="text-xs text-slate-500 mb-2">The more details, the more accurate your estimate</p>
+            <p className="text-xs text-slate-600 mb-3">💡 More details = more accurate pricing</p>
             <div className="relative">
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="E.g., Kitchen needs new cabinets and countertops..."
-                rows={3}
-                className="w-full px-3 py-2.5 pr-12 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
-                         placeholder:text-slate-400"
+                placeholder="Examples:
+• Patch a drywall hole (about 6 inches)
+• Replace bathtub + tile (small bathroom)
+• Install 6 potlights in living room"
+                rows={5}
+                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-orange-500 
+                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
+                         placeholder:text-slate-400 resize-none"
               />
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                className={`absolute right-2 top-2 p-2 rounded-lg transition-all ${
-                  isListening 
-                    ? 'bg-red-500 text-white animate-pulse' 
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-                title={isListening ? "Stop voice input" : "Use voice input"}
-              >
-                <MicrophoneIcon className="w-5 h-5" />
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={toggleVoiceInput}
+              className="mt-2 text-xs text-slate-600 hover:text-orange-600 underline flex items-center gap-1"
+            >
+              <MicrophoneIcon className="w-4 h-4" />
+              {isListening ? 'Stop voice input' : 'Prefer to talk? Use voice'}
+            </button>
             {isListening && (
               <p className="text-xs text-red-600 mt-1 font-semibold animate-pulse">
                 🎤 Listening... Speak your project description
@@ -396,10 +396,11 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Project Type */}
           <div>
-            <label htmlFor="projectType" className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="projectType" className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
               Project Type <span className="text-red-500">*</span>
             </label>
-            <p className="text-xs text-slate-500 mb-2">Helps us match you with the right contractors</p>
+            <p className="text-xs text-slate-600 mb-3">Helps us calculate accurate pricing</p>
             <select
               id="projectType"
               value={projectType}
