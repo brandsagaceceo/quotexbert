@@ -7,7 +7,7 @@ import { IPhoneFrame } from "./IPhoneFrame";
 
 interface IPhoneEstimatorMockupProps {
   onEstimateComplete: (result: any) => void;
-  userId?: string | undefined;
+  userId?: string;
 }
 
 const PROJECT_TYPES = [
