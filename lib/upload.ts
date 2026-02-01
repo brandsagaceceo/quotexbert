@@ -20,7 +20,8 @@ export async function uploadImage(
   filename: string,
   contentType: string
 ): Promise<string> {
-  const key = `portfolio/${nanoid()}-${filename}`;
+  // Use filename directly as it already includes the full path
+  const key = filename;
   
   const command = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME!,
@@ -33,8 +34,13 @@ export async function uploadImage(
   await s3Client.send(command);
   
   // Return the public URL
-  const endpoint = process.env.S3_ENDPOINT || `https://s3.${process.env.S3_REGION}.amazonaws.com`;
-  return `${endpoint}/${process.env.S3_BUCKET_NAME}/${key}`;
+  if (process.env.S3_ENDPOINT) {
+    // For custom endpoints (like R2, DigitalOcean Spaces)
+    return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/${key}`;
+  } else {
+    // For standard AWS S3
+    return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION || 'us-east-1'}.amazonaws.com/${key}`;
+  }
 }
 
 export async function uploadMultipleImages(

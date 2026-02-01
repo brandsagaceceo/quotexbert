@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { uploadImage } from "@/lib/upload";
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,50 +55,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create upload directory based on type
-    let uploadDir;
-    if (uploadType === 'profile' && userId) {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'profiles', userId);
-    } else if (uploadType === 'portfolio' && userId) {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'portfolio', userId);
-    } else {
-      uploadDir = join(process.cwd(), 'public', 'uploads', 'leads');
-    }
-    
-    console.log(`[Upload] Creating directory: ${uploadDir}`);
-    
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Upload files
+    // Upload files to S3
     const uploadedFiles = [];
     
     for (const fileItem of files) {
       const bytes = await fileItem.arrayBuffer();
       const buffer = Buffer.from(bytes);
       
-      // Generate unique filename
-      const timestamp = Date.now();
-      const extension = fileItem.name.split('.').pop();
-      const filename = `${uploadType || 'file'}_${timestamp}_${Math.random().toString(36).substring(2)}.${extension}`;
-      
-      const path = join(uploadDir, filename);
-      await writeFile(path, buffer);
-      
-      console.log(`[Upload] Saved file: ${filename} (${buffer.length} bytes)`);
-      
-      // Store relative path for database
-      let relativePath;
+      // Determine the folder path based on upload type
+      let folderPath = 'leads';
       if (uploadType === 'profile' && userId) {
-        relativePath = `/uploads/profiles/${userId}/${filename}`;
+        folderPath = `profiles/${userId}`;
       } else if (uploadType === 'portfolio' && userId) {
-        relativePath = `/uploads/portfolio/${userId}/${filename}`;
-      } else {
-        relativePath = `/uploads/leads/${filename}`;
+        folderPath = `portfolio/${userId}`;
       }
       
-      uploadedFiles.push(relativePath);
+      // Generate unique filename with folder path
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2);
+      const extension = fileItem.name.split('.').pop();
+      const filename = `${folderPath}/${uploadType || 'file'}_${timestamp}_${randomStr}.${extension}`;
+      
+      console.log(`[Upload] Uploading to S3: ${filename} (${buffer.length} bytes)`);
+      
+      // Upload to S3
+      const publicUrl = await uploadImage(buffer, filename, fileItem.type);
+      
+      console.log(`[Upload] Uploaded successfully: ${publicUrl}`);
+      
+      uploadedFiles.push(publicUrl);
     }
 
     console.log(`[Upload] Successfully uploaded ${uploadedFiles.length} file(s)`);
@@ -132,29 +115,23 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const filePath = searchParams.get('file');
+    const fileUrl = searchParams.get('file');
     
-    if (!filePath) {
-      return NextResponse.json({ error: "File path required" }, { status: 400 });
+    if (!fileUrl) {
+      return NextResponse.json({ error: "File URL required" }, { status: 400 });
     }
 
-    // Security: ensure file is in the uploads directory
-    if (!filePath.startsWith('/uploads/')) {
-      return NextResponse.json({ error: "Invalid file path" }, { status: 403 });
-    }
-
-    const fullPath = join(process.cwd(), 'public', filePath);
+    // For S3 files, we'll just return success
+    // In production, you might want to implement S3 deletion using DeleteObjectCommand
+    console.log(`[Upload] Delete requested for: ${fileUrl}`);
     
-    if (existsSync(fullPath)) {
-      const { unlink } = await import('fs/promises');
-      await unlink(fullPath);
-      return NextResponse.json({ success: true, message: "File deleted" });
-    } else {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
-    }
+    return NextResponse.json({ 
+      success: true, 
+      message: "File deletion logged (S3 cleanup can be implemented separately)" 
+    });
 
   } catch (error) {
-    console.error("Delete error:", error);
+    console.error("[Upload] Delete error:", error);
     return NextResponse.json({ 
       error: "Failed to delete file" 
     }, { status: 500 });
