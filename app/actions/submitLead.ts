@@ -4,6 +4,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { sendLeadEmail } from "@/lib/email";
+import { auth } from "@clerk/nextjs/server";
 
 // Canadian postal code regex (case-insensitive, space optional)
 const canadianPostalCodeRegex =
@@ -158,9 +159,16 @@ export async function submitLead(formData: FormData) {
     }
 
     // Get authenticated user ID from Clerk
-    // If no user is signed in, we'll need them to sign in first
-    // For now, this assumes users create leads after signing in
-    const homeownerId = "guest"; // Temporary guest ID - will be updated after sign-in
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return {
+        success: false,
+        error: "You must be signed in to create a lead",
+        blocked: true,
+        reason: "authentication",
+      };
+    }
 
     // Save lead to database
     const lead = await prisma.lead.create({
@@ -171,7 +179,7 @@ export async function submitLead(formData: FormData) {
         description: data.description,
         budget: finalBudget, // Store the budget range or user input as string
         photos: JSON.stringify(data.photos || []),
-        homeownerId: homeownerId,
+        homeownerId: userId, // Use actual authenticated user ID
         status: "open", // Set initial status to lowercase
         published: true, // Make the lead available to contractors immediately
       },

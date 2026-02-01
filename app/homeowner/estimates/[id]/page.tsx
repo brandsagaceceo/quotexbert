@@ -168,7 +168,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
     try {
       // First, save the selected items
-      await fetch(`/api/ai-estimates/${estimate.id}`, {
+      const saveResponse = await fetch(`/api/ai-estimates/${estimate.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -177,6 +177,10 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
           selectedItemIds: Array.from(selectedItems),
         }),
       });
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save selections');
+      }
 
       // Post to job board
       const response = await fetch(`/api/ai-estimates/${estimate.id}/post`, {
@@ -192,11 +196,12 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
         // Redirect to the job board or applications page
         router.push(`/homeowner/jobs/${data.lead.id}/applications`);
       } else {
-        setError(data.error || 'Failed to post to job board');
+        // Show user-friendly error messages
+        setError(data.error || 'Failed to post to job board. Please try again.');
       }
     } catch (err) {
       console.error('Error posting to job board:', err);
-      setError('Failed to post to job board');
+      setError('Failed to post to job board. Please check your connection and try again.');
     } finally {
       setPosting(false);
     }

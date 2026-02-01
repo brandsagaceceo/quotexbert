@@ -39,7 +39,7 @@ export default function PhotoUpload({
     try {
       const formData = new FormData();
       files.forEach((file, index) => {
-        formData.append(`photos-${index}`, file);
+        formData.append(`photos`, file); // Changed to match API expectation
       });
 
       const response = await fetch("/api/upload", {
@@ -53,11 +53,17 @@ export default function PhotoUpload({
       }
 
       const result = await response.json();
-      onPhotosChange([...photos, ...result.files]);
+      
+      // Handle both single file and multiple files response
+      if (result.files) {
+        onPhotosChange([...photos, ...result.files]);
+      } else if (result.url) {
+        onPhotosChange([...photos, result.url]);
+      }
       
     } catch (error) {
       console.error("Upload error:", error);
-      alert(error instanceof Error ? error.message : "Failed to upload photos");
+      alert(error instanceof Error ? error.message : "Failed to upload photos. Please try again.");
     } finally {
       setUploading(false);
     }

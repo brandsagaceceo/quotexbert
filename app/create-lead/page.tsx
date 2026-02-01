@@ -148,7 +148,8 @@ export default function CreateLeadPage() {
       const result = await submitLead(submitFormData);
       
       if (result.success) {
-        router.push(`/messages?leadId=${result.leadId}`);
+        // Redirect to the job board or homeowner jobs page to see the posted job
+        router.push(`/homeowner/jobs`);
       } else {
         console.error("Lead submission failed:", result);
         setError(result.error || "Failed to create lead");

@@ -11,14 +11,18 @@ export async function POST(
   try {
     const { id } = await params;
     
-    // Fetch the estimate with selected items
+    // Fetch the estimate with selected items and homeowner profile
     const estimate = await prisma.aIEstimate.findUnique({
       where: { id },
       include: {
         items: {
           where: { selected: true },
         },
-        homeowner: true,
+        homeowner: {
+          include: {
+            homeownerProfile: true,
+          },
+        },
       },
     });
 
@@ -31,14 +35,14 @@ export async function POST(
 
     if (!estimate.homeownerId) {
       return NextResponse.json(
-        { success: false, error: 'No homeowner associated with this estimate' },
+        { success: false, error: 'No homeowner associated with this estimate. Please sign in and try again.' },
         { status: 400 }
       );
     }
 
     if (estimate.items.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'No items selected for posting' },
+        { success: false, error: 'No items selected for posting. Please select at least one item.' },
         { status: 400 }
       );
     }
@@ -61,14 +65,50 @@ export async function POST(
     );
     const fullDescription = `${estimate.description}\n\n**Selected Items:**\n${itemDescriptions.join('\n')}`;
 
+    // Get location from homeowner profile or use Toronto default
+    // Extract city from homeowner profile for proper location tracking
+    const city = estimate.homeowner?.homeownerProfile?.city || 'Toronto';
+    
+    // Map city to postal code for the Greater Toronto Area
+    // This helps contractors find jobs in their service area
+    let zipCode = 'M5H 2N2'; // Default Toronto postal code (downtown)
+    
+    // Improved postal code mapping based on city
+    const cityPostalCodes: Record<string, string> = {
+      'Toronto': 'M5H 2N2',
+      'Mississauga': 'L5B 1M2',
+      'Brampton': 'L6Y 0P6',
+      'Markham': 'L3R 9W3',
+      'Vaughan': 'L4L 4Y7',
+      'Richmond Hill': 'L4B 3P6',
+      'Oakville': 'L6H 0H3',
+      'Burlington': 'L7R 2G5',
+      'Ajax': 'L1T 0A2',
+      'Pickering': 'L1V 1B8',
+      'Whitby': 'L1N 9B9',
+      'Oshawa': 'L1H 8L7',
+      'Scarborough': 'M1P 4P5',
+      'Etobicoke': 'M9C 1B8',
+      'North York': 'M2N 5Z7',
+    };
+    
+    // Use city-specific postal code if available
+    if (city && cityPostalCodes[city]) {
+      zipCode = cityPostalCodes[city];
+    }
+
+    // Determine category from estimate items
+    const categories = estimate.items.map(item => item.category);
+    const primaryCategory = categories[0] || 'General Contractor';
+
     // Create the lead (job post)
     const lead = await prisma.lead.create({
       data: {
         title: `Home Renovation: ${estimate.description.substring(0, 50)}${estimate.description.length > 50 ? '...' : ''}`,
         description: fullDescription,
         budget: Math.round((totalMin + totalMax) / 2).toString(), // Use average as budget
-        zipCode: '00000', // Default zipCode
-        category: 'General Contractor', // Default, can be extracted from items
+        zipCode: zipCode,
+        category: primaryCategory,
         status: 'open',
         published: true,
         homeownerId: estimate.homeownerId,

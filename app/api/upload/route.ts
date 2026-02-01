@@ -6,26 +6,28 @@ import { existsSync } from "fs";
 export async function POST(request: NextRequest) {
   try {
     const data = await request.formData();
-    const file = data.get('file') as File;
     const userId = data.get('userId') as string;
     const uploadType = data.get('type') as string; // 'profile', 'portfolio', or 'leads'
     
-    // Handle multiple files for leads (legacy support)
+    // Extract all files from FormData
     const files: File[] = [];
-    if (file) {
-      files.push(file);
-    } else {
-      // Extract files from FormData for leads
-      for (const [key, value] of data.entries()) {
-        if (key.startsWith('photos') && value instanceof File) {
-          files.push(value);
-        }
+    
+    for (const [key, value] of data.entries()) {
+      // Accept 'file', 'photos', or keys starting with 'photos'
+      if ((key === 'file' || key === 'photos' || key.startsWith('photos')) && value instanceof File) {
+        files.push(value);
       }
     }
 
     if (files.length === 0) {
-      return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
+      console.error('[Upload] No files found in FormData. Keys:', Array.from(data.keys()));
+      return NextResponse.json({ 
+        error: "No files uploaded. Please select at least one image." 
+      }, { status: 400 });
     }
+
+    console.log(`[Upload] Processing ${files.length} file(s)`);
+
 
     // Validate file types and sizes
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -40,14 +42,17 @@ export async function POST(request: NextRequest) {
 
     for (const fileItem of files) {
       if (!allowedTypes.includes(fileItem.type)) {
+        console.error(`[Upload] Invalid file type: ${fileItem.type} for ${fileItem.name}`);
         return NextResponse.json({ 
-          error: `Invalid file type: ${fileItem.type}. Allowed: JPEG, PNG, WebP` 
+          error: `Invalid file type: ${fileItem.type}. Please upload JPEG, PNG, or WebP images only.` 
         }, { status: 400 });
       }
       
       if (fileItem.size > maxSize) {
+        const sizeMB = (fileItem.size / (1024 * 1024)).toFixed(2);
+        console.error(`[Upload] File too large: ${fileItem.name} (${sizeMB}MB)`);
         return NextResponse.json({ 
-          error: `File ${fileItem.name} is too large. Maximum size is 5MB` 
+          error: `File "${fileItem.name}" is ${sizeMB}MB. Maximum size is 5MB per file.` 
         }, { status: 400 });
       }
     }
@@ -61,6 +66,8 @@ export async function POST(request: NextRequest) {
     } else {
       uploadDir = join(process.cwd(), 'public', 'uploads', 'leads');
     }
+    
+    console.log(`[Upload] Creating directory: ${uploadDir}`);
     
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
@@ -81,6 +88,8 @@ export async function POST(request: NextRequest) {
       const path = join(uploadDir, filename);
       await writeFile(path, buffer);
       
+      console.log(`[Upload] Saved file: ${filename} (${buffer.length} bytes)`);
+      
       // Store relative path for database
       let relativePath;
       if (uploadType === 'profile' && userId) {
@@ -93,6 +102,8 @@ export async function POST(request: NextRequest) {
       
       uploadedFiles.push(relativePath);
     }
+
+    console.log(`[Upload] Successfully uploaded ${uploadedFiles.length} file(s)`);
 
     // Return appropriate response based on upload type
     if (uploadType === 'profile') {
@@ -110,9 +121,10 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("[Upload] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ 
-      error: "Failed to upload files" 
+      error: `Failed to upload files: ${errorMessage}` 
     }, { status: 500 });
   }
 }
