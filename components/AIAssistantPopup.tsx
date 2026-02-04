@@ -26,13 +26,31 @@ export default function AIAssistantPopup() {
       setUserType(authUser.role === 'contractor' ? 'contractor' : 'homeowner');
     }
 
-    // Show popup after 3 seconds if first visit
+    // Check cooldown period (24 hours since last dismissal)
+    const lastDismissed = localStorage.getItem('aiAssistantLastDismissed');
+    if (lastDismissed) {
+      const hoursSinceDismissed = (Date.now() - parseInt(lastDismissed)) / (1000 * 60 * 60);
+      if (hoursSinceDismissed < 24) {
+        console.log('[AIAssistant] In cooldown period, will not auto-open');
+        return;
+      }
+    }
+
+    // Only auto-open once per session
+    const shownThisSession = sessionStorage.getItem('aiAssistantShownThisSession');
+    if (shownThisSession) {
+      console.log('[AIAssistant] Already shown this session');
+      return;
+    }
+
+    // Show popup after 3 seconds if hasn't been shown
     const hasSeenPopup = localStorage.getItem('hasSeenAIAssistant');
     if (!hasSeenPopup) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         initializeChat();
         localStorage.setItem('hasSeenAIAssistant', 'true');
+        sessionStorage.setItem('aiAssistantShownThisSession', 'true');
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -171,12 +189,15 @@ export default function AIAssistantPopup() {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
+          className="fixed right-4 z-40 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
+          style={{
+            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+          }}
           aria-label="Open AI Assistant"
         >
-          <Sparkles className="h-6 w-6 animate-pulse" />
-          <MessageCircle className="h-6 w-6" />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-bold">
+          <Sparkles className="h-5 w-5" />
+          <MessageCircle className="h-5 w-5" />
+          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-semibold text-sm">
             Need Help?
           </span>
         </button>
@@ -184,7 +205,13 @@ export default function AIAssistantPopup() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden">
+        <div 
+          className="fixed right-4 z-40 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
+          style={{
+            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+            maxHeight: 'calc(80vh - env(safe-area-inset-bottom, 0px))',
+          }}
+        >
           {/* Header */}
           <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -197,8 +224,12 @@ export default function AIAssistantPopup() {
               </div>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                localStorage.setItem('aiAssistantLastDismissed', Date.now().toString());
+              }}
               className="text-white hover:bg-white/20 p-2 rounded-full transition-all"
+              aria-label="Close assistant"
             >
               <X className="h-5 w-5" />
             </button>

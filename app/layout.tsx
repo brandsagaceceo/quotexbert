@@ -210,7 +210,13 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main-content" className="min-h-screen pb-20 md:pb-0">
+        <main 
+          id="main-content" 
+          className="min-h-screen"
+          style={{
+            paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Account for mobile bottom nav
+          }}
+        >
           {children}
         </main>
         <SiteFooter />

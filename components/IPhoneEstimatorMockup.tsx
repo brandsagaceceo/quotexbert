@@ -474,7 +474,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
           {/* Enhanced Reassurance Microcopy */}
           <div className="text-center space-y-1">
             <p className="text-xs text-slate-600 font-medium">
-              \u2713 No signup required \u2022 \u2713 No credit card \u2022 \u2713 No obligation
+              ✓ No signup required • ✓ No credit card • ✓ No obligation
             </p>
             <p className="text-xs text-slate-500">
               Contractors won't see your info until you choose to share it

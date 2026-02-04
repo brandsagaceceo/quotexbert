@@ -50,8 +50,26 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
   useEffect(() => {
     if (isDismissed) return;
 
+    // Check if user dismissed recently (within 24 hours)
+    const dismissedTime = localStorage.getItem('aiHelperDismissed');
+    if (dismissedTime) {
+      const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
+      if (hoursSinceDismissed < 24) {
+        console.log('[AIHelper] Skipping auto-open due to recent dismissal');
+        return;
+      }
+    }
+
+    // Only auto-open if hasn't been shown this session
+    const shownThisSession = sessionStorage.getItem('aiHelperShownThisSession');
+    if (shownThisSession) {
+      console.log('[AIHelper] Already shown this session');
+      return;
+    }
+
     const timer = setTimeout(() => {
       setIsVisible(true);
+      sessionStorage.setItem('aiHelperShownThisSession', 'true');
     }, delayMs);
 
     return () => clearTimeout(timer);
@@ -122,11 +140,14 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-6 left-6 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 animate-bounce group"
+        className="fixed right-4 z-40 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 group"
+        style={{
+          bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Position above mobile nav (4rem nav + 1rem gap)
+        }}
         aria-label="Open AI Helper"
       >
-        <Sparkles className="w-6 h-6" />
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+        <Sparkles className="w-5 h-5" />
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
           Help
         </span>
       </button>
@@ -134,7 +155,12 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
+    <div 
+      className="fixed right-4 z-40 w-96 max-w-[calc(100vw-2rem)] animate-slide-up"
+      style={{
+        bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Position above mobile nav
+      }}
+    >
       <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-4 flex items-center justify-between">

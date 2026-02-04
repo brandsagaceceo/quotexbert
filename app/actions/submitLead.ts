@@ -162,13 +162,46 @@ export async function submitLead(formData: FormData) {
     const { userId } = await auth();
     
     if (!userId) {
+      console.error('[submitLead] User not authenticated');
       return {
         success: false,
-        error: "You must be signed in to create a lead",
+        error: "You must be signed in to create a lead. Please sign in and try again.",
         blocked: true,
         reason: "authentication",
       };
     }
+
+    // Verify user role from database
+    const user = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { role: true, id: true }
+    });
+
+    if (!user) {
+      console.error('[submitLead] User not found in database:', userId);
+      return {
+        success: false,
+        error: "User profile not found. Please complete your profile setup.",
+        blocked: true,
+        reason: "user_not_found",
+      };
+    }
+
+    if (user.role !== 'homeowner') {
+      console.error('[submitLead] User is not a homeowner:', user.role);
+      return {
+        success: false,
+        error: "Only homeowners can create project leads. Please switch to a homeowner account.",
+        blocked: true,
+        reason: "invalid_role",
+      };
+    }
+
+    console.log('[submitLead] Creating lead for user:', user.id, 'with data:', {
+      title: data.title,
+      category: data.projectType,
+      budget: finalBudget
+    });
 
     // Save lead to database
     const lead = await prisma.lead.create({
@@ -179,11 +212,13 @@ export async function submitLead(formData: FormData) {
         description: data.description,
         budget: finalBudget, // Store the budget range or user input as string
         photos: JSON.stringify(data.photos || []),
-        homeownerId: userId, // Use actual authenticated user ID
+        homeownerId: user.id, // Use database user ID, not Clerk ID
         status: "open", // Set initial status to lowercase
         published: true, // Make the lead available to contractors immediately
       },
     });
+
+    console.log('[submitLead] Lead created successfully:', lead.id);
 
     // Connect referral to lead if affiliate exists
     if (affiliateId) {
@@ -211,12 +246,34 @@ export async function submitLead(formData: FormData) {
       success: true,
       estimate,
       leadId: lead.id,
+      message: "Your project has been posted successfully! Contractors will be notified.",
     };
   } catch (error) {
-    console.error("Failed to submit lead:", error);
+    console.error("[submitLead] Error submitting lead:", error);
+    
+    // Provide helpful error messages
+    if (error instanceof Error) {
+      if (error.message.includes('User') || error.message.includes('authentication')) {
+        return {
+          success: false,
+          error: "Authentication error. Please sign out and sign back in.",
+        };
+      }
+      if (error.message.includes('database') || error.message.includes('prisma')) {
+        return {
+          success: false,
+          error: "Database error. Please try again in a moment.",
+        };
+      }
+      return {
+        success: false,
+        error: `Failed to create lead: ${error.message}`,
+      };
+    }
+    
     return {
       success: false,
-      error: "An unexpected error occurred. Please try again.",
+      error: "An unexpected error occurred. Please try again or contact support if the problem persists.",
     };
   }
 }

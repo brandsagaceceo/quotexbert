@@ -280,6 +280,7 @@ export default function UnifiedProfilePage() {
 
   const handleSaveProfile = async () => {
     try {
+      console.log('[ProfilePage] Saving profile with data:', editData);
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -294,11 +295,30 @@ export default function UnifiedProfilePage() {
         // API returns { success: true, profile: updatedUser }
         const updatedProfile = body?.profile ?? body;
         console.debug('[ProfilePage] Save response body:', body);
+        console.log('[ProfilePage] Profile saved successfully:', updatedProfile);
         setProfile(updatedProfile);
         setIsEditing(false);
+        
+        // Show success message
+        alert('Profile updated successfully!');
+        
+        // Refetch profile to ensure data is in sync
+        setTimeout(async () => {
+          const refetchResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
+          if (refetchResponse.ok) {
+            const refetchedProfile = await refetchResponse.json();
+            console.log('[ProfilePage] Refetched profile:', refetchedProfile);
+            setProfile(refetchedProfile);
+          }
+        }, 500);
+      } else {
+        const errorData = await response.json();
+        console.error('[ProfilePage] Profile save failed:', errorData);
+        throw new Error(errorData.error || 'Failed to save profile');
       }
     } catch (error) {
-      console.error("Error saving profile:", error);
+      console.error("[ProfilePage] Error saving profile:", error);
+      alert(`Failed to save profile: ${error instanceof Error ? error.message : 'Please try again'}`);
     }
   };
 
@@ -614,15 +634,21 @@ export default function UnifiedProfilePage() {
               <div className="flex-1 pb-6">
                 <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
                   <div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">{displayName}</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
                     <p className="text-rose-700 font-semibold text-lg capitalize mb-3">
                       {profile?.trade || authUser.role}
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-slate-600">
                       {profile?.city && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4 text-rose-600" />
-                          <span>{profile.city}</span>
+                        <div className="flex items-center gap-1 min-w-0">
+                          <MapPin className="h-4 w-4 text-rose-600 flex-shrink-0" />
+                          <span className="truncate">{profile.city}</span>
+                        </div>
+                      )}
+                      {profile?.email && (
+                        <div className="flex items-center gap-1 min-w-0 max-w-full">
+                          <Mail className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                          <span className="truncate text-sm">{profile.email}</span>
                         </div>
                       )}
                       {isContractor && profile?.verified && (
@@ -644,7 +670,7 @@ export default function UnifiedProfilePage() {
       <div className="h-24 md:h-20"></div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-200 sticky z-10" style={{ top: 'var(--header-height, 0px)' }}>
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8 overflow-x-auto">
             {(isContractor 

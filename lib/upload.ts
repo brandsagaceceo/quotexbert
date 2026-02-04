@@ -20,26 +20,44 @@ export async function uploadImage(
   filename: string,
   contentType: string
 ): Promise<string> {
+  // Validate S3 configuration
+  const bucketName = process.env.S3_BUCKET_NAME;
+  const accessKeyId = process.env.S3_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+
+  if (!bucketName) {
+    throw new Error('S3_BUCKET_NAME environment variable is not configured. Please contact support.');
+  }
+
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error('S3 credentials are not configured. Please contact support.');
+  }
+
   // Use filename directly as it already includes the full path
   const key = filename;
   
   const command = new PutObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME!,
+    Bucket: bucketName,
     Key: key,
     Body: file,
     ContentType: contentType,
     ACL: "public-read",
   });
 
-  await s3Client.send(command);
+  try {
+    await s3Client.send(command);
+  } catch (error) {
+    console.error('[Upload] S3 upload failed:', error);
+    throw new Error(`Failed to upload to storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
   
   // Return the public URL
   if (process.env.S3_ENDPOINT) {
     // For custom endpoints (like R2, DigitalOcean Spaces)
-    return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/${key}`;
+    return `${process.env.S3_ENDPOINT}/${bucketName}/${key}`;
   } else {
     // For standard AWS S3
-    return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION || 'us-east-1'}.amazonaws.com/${key}`;
+    return `https://${bucketName}.s3.${process.env.S3_REGION || 'us-east-1'}.amazonaws.com/${key}`;
   }
 }
 

@@ -104,7 +104,12 @@ export default function MobileBottomNav() {
   const navItems = authUser.role === "homeowner" ? homeownerNavItems : contractorNavItems;
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+    <div 
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
       <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {
           const Icon = item.icon;
