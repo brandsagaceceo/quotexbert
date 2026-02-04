@@ -146,22 +146,40 @@ interface LeadEmailPayload {
 
 export async function sendLeadEmail(payload: LeadEmailPayload) {
   const fromEmail = process.env.FROM_EMAIL || "leads@quotexbert.com";
-  const toEmail = process.env.TO_EMAIL || "owner@quotexbert.com";
+  const toEmail = "quotexbert@gmail.com"; // Always send to quotexbert@gmail.com
 
   const emailContent = {
     from: fromEmail,
     to: toEmail,
-    subject: `New quotexbert lead - ${payload.projectType}`,
+    subject: `New QuoteXbert Lead - ${payload.projectType}`,
     html: `
-      <h2>New Lead Submitted</h2>
-      <p><strong>Project Type:</strong> ${payload.projectType}</p>
-      <p><strong>Postal Code:</strong> ${payload.postalCode}</p>
-      <p><strong>Description:</strong> ${payload.description}</p>
-      <p><strong>Estimated Value:</strong> ${payload.estimate}</p>
-      <p><strong>Source:</strong> ${payload.source || "web"}</p>
-      ${payload.affiliateId ? `<p><strong>Affiliate ID:</strong> ${payload.affiliateId}</p>` : ""}
-      <hr>
-      <p><em>Submitted via quotexbert.com</em></p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc2626;">New Lead Submitted</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Project Type:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.projectType}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Postal Code:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.postalCode}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Description:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.description}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Estimated Value:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.estimate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Source:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.source || "web"}</td>
+          </tr>
+          ${payload.affiliateId ? `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Affiliate ID:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.affiliateId}</td></tr>` : ""}
+        </table>
+        <p style="margin-top: 20px; color: #666; font-size: 14px;">Submitted via quotexbert.com on ${new Date().toLocaleString()}</p>
+      </div>
     `,
   };
 
@@ -175,9 +193,10 @@ export async function sendLeadEmail(payload: LeadEmailPayload) {
 
   try {
     await resend.emails.send(emailContent);
+    console.log('[LEAD EMAIL] Sent to quotexbert@gmail.com');
     return { success: true };
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error("Failed to send lead email:", error);
     return { success: false, error };
   }
 }

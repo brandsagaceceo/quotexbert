@@ -96,7 +96,7 @@ export default function BlogPage() {
       readTime: 9,
       category: "Roofing",
       tags: ["toronto roofing", "roof replacement", "GTA roofers", "ontario winter"],
-      imageUrl: "https://images.unsplash.com/photo-1625428408967-ed4a21ef0d95?w=800&h=500&fit=crop&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&h=500&fit=crop&q=80",
       seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
       seoDescription: "Expert Toronto roofing advice. Learn when to repair vs replace, costs, winter damage prevention, and finding qualified Ontario roofers."
     },
@@ -110,7 +110,7 @@ export default function BlogPage() {
       readTime: 8,
       category: "Flooring",
       tags: ["toronto flooring", "hardwood floors", "GTA contractors", "flooring costs"],
-      imageUrl: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=500&fit=crop",
       seoTitle: "Hardwood Flooring Toronto 2025 | Installation Guide & Costs",
       seoDescription: "Complete guide to hardwood flooring in Toronto. Types, costs, installation tips, and finding qualified GTA flooring contractors.",
       isDIY: true
@@ -139,7 +139,7 @@ export default function BlogPage() {
       readTime: 10,
       category: "Outdoor",
       tags: ["toronto deck", "outdoor living", "GTA contractors", "deck design"],
-      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=500&fit=crop",
+      imageUrl: "https://images.unsplash.com/photo-1600585152915-d208bec867a1?w=800&h=500&fit=crop",
       seoTitle: "Deck Building Toronto 2025 | Design Ideas, Materials & Costs",
       seoDescription: "Build your dream Toronto deck. Design ideas, material options, permit requirements, and finding qualified GTA deck contractors.",
       isDIY: true

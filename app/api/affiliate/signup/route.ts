@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
+
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,26 +16,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send email notification to quotexpert@gmail.com
-    // In production, integrate with an email service like SendGrid, Resend, or AWS SES
-    
-    // For now, we'll just log it and return success
     console.log(`[AFFILIATE SIGNUP] New affiliate signup: ${email}`);
     
-    // TODO: Integrate with email service
-    // Example with Resend:
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({
-    //   from: 'noreply@quotexbert.com',
-    //   to: 'quotexpert@gmail.com',
-    //   subject: 'New Affiliate Program Signup',
-    //   html: `<p>New affiliate signup from: ${email}</p>`
-    // });
-
-    // Store in database (you can add this to your Prisma schema)
-    // await prisma.affiliateSignup.create({
-    //   data: { email, createdAt: new Date() }
-    // });
+    // Send email notification to quotexbert@gmail.com
+    if (resend) {
+      try {
+        await resend.emails.send({
+          from: 'QuoteXbert <no-reply@quotexbert.com>',
+          to: 'quotexbert@gmail.com',
+          subject: '🎉 New Affiliate Program Signup',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #dc2626;">New Affiliate Signup!</h2>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Signed up:</strong> ${new Date().toLocaleString()}</p>
+              <hr style="margin: 20px 0;">
+              <p style="color: #666; font-size: 14px;">Log in to the admin panel to approve this affiliate.</p>
+            </div>
+          `
+        });
+        console.log('[AFFILIATE SIGNUP] Email sent to quotexbert@gmail.com');
+      } catch (emailError) {
+        console.error('[AFFILIATE SIGNUP] Failed to send email:', emailError);
+      }
+    } else {
+      console.warn('[AFFILIATE SIGNUP] RESEND_API_KEY not configured, email not sent');
+    }
 
     return NextResponse.json({
       success: true,
