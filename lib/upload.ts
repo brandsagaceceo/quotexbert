@@ -6,6 +6,21 @@ export async function uploadImage(
   filename: string,
   contentType: string
 ): Promise<string> {
+  // Check if Vercel Blob token is configured
+  const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!hasToken) {
+    console.warn('[Upload] BLOB_READ_WRITE_TOKEN not configured. Using placeholder URL for development.');
+    console.warn('[Upload] To enable uploads:');
+    console.warn('[Upload] 1. Go to https://vercel.com/ → Your Project → Storage');
+    console.warn('[Upload] 2. Click "Create Database" → Select "Blob"');
+    console.warn('[Upload] 3. Vercel will automatically add BLOB_READ_WRITE_TOKEN');
+    
+    // Return a placeholder Unsplash image for development
+    const placeholderId = Math.floor(Math.random() * 1000);
+    return `https://images.unsplash.com/photo-${placeholderId}?w=800&h=600&fit=crop`;
+  }
+
   try {
     // Upload to Vercel Blob
     const blob = await put(filename, file, {
