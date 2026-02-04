@@ -171,20 +171,31 @@ export async function submitLead(formData: FormData) {
       };
     }
 
-    // Verify user role from database
-    const user = await prisma.user.findUnique({
+    // Verify user exists in database, create if not
+    let user = await prisma.user.findUnique({
       where: { clerkUserId: userId },
-      select: { role: true, id: true }
+      select: { role: true, id: true, email: true, name: true }
     });
 
     if (!user) {
-      console.error('[submitLead] User not found in database:', userId);
-      return {
-        success: false,
-        error: "User profile not found. Please complete your profile setup.",
-        blocked: true,
-        reason: "user_not_found",
-      };
+      console.log('[submitLead] User not found in database, creating user:', userId);
+      
+      // Get user info from Clerk
+      const { clerkClient } = await import('@clerk/nextjs/server');
+      const clerkUser = await clerkClient().users.getUser(userId);
+      
+      // Create user in database
+      user = await prisma.user.create({
+        data: {
+          clerkUserId: userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
+          role: 'homeowner', // Default to homeowner for lead creation
+        },
+        select: { role: true, id: true, email: true, name: true }
+      });
+      
+      console.log('[submitLead] User created successfully:', user.id);
     }
 
     if (user.role !== 'homeowner') {
