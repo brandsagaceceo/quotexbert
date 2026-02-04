@@ -209,45 +209,46 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden w-full">
       {/* Header */}
-      <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-6 text-white">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">Your AI Estimate</h2>
-            <p className="text-rose-100 text-sm">Generated in seconds • Based on GTA pricing</p>
+      <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-4 sm:p-6 text-white">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Your AI Estimate</h2>
+            <p className="text-rose-100 text-xs sm:text-sm">Generated in seconds • Based on GTA pricing</p>
           </div>
-          <div className={`px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-sm`}>
-            {getConfidenceLabel(data.confidence)} ({Math.round(data.confidence * 100)}%)
+          <div className={`px-3 sm:px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}>
+            {Math.round(data.confidence * 100)}%
           </div>
         </div>
         
         {/* Historical Data Trust Signal */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-          <div className="flex items-center gap-2 text-sm">
-            <CheckCircleIcon className="w-5 h-5" />
-            <span className="font-semibold">
-              Based on {Math.floor(Math.random() * 500) + 200} similar projects in the GTA
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-3 border border-white/20">
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span className="font-semibold break-words">
+              Based on {Math.floor(Math.random() * 500) + 200} similar GTA projects
             </span>
           </div>
-          <p className="text-xs text-rose-100 mt-1">
-            Our AI analyzed real contractor quotes from Toronto, Scarborough, Durham, and surrounding areas
+          <p className="text-xs text-rose-100 mt-1 break-words">
+            AI analyzed real contractor quotes from Toronto area
           </p>
         </div>
       </div>
 
-      <div className="p-6 md:p-8 space-y-8">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
         {/* Summary */}
         <div>
-          <h3 className="text-xl font-bold text-slate-900 mb-3">Project Summary</h3>
-          <p className="text-slate-700 leading-relaxed">{data.summary}</p>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">Project Summary</h3>
+          <p className="text-sm sm:text-base text-slate-700 leading-relaxed break-words">{data.summary}</p>
         </div>
 
         {/* Total Cost - Prominent */}
-        <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl p-6 border-2 border-orange-200">
+        <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl p-4 sm:p-6 border-2 border-orange-200">
           <div className="text-center">
-            <p className="text-sm font-semibold text-slate-600 mb-2">Estimated Total Cost</p>
-            <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1">
+            <p className="text-xs sm:text-sm font-semibold text-slate-600 mb-2">Estimated Total Cost</p>
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1 break-words px-2">
               {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
             </div>
             <p className="text-xs text-slate-500">CAD, including HST estimate</p>
@@ -284,27 +285,84 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
           </ul>
         </div>
 
-        {/* Line Items Table */}
+        {/* Line Items - Mobile Responsive */}
         <div>
-          <h3 className="text-xl font-bold text-slate-900 mb-4">Cost Breakdown</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4">Cost Breakdown</h3>
+          
+          {/* Mobile Card View */}
+          <div className="block sm:hidden space-y-3">
+            {data.line_items.map((item, index) => (
+              <div key={index} className="bg-slate-50 rounded-lg p-3 border border-slate-200">
+                <div className="font-semibold text-slate-900 mb-2 break-words">{item.name}</div>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Qty:</span>
+                    <span className="font-medium">{item.qty} {item.unit}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Materials:</span>
+                    <span className="font-medium">{formatCurrency(item.material_cost)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Labor:</span>
+                    <span className="font-medium">{formatCurrency(item.labor_cost)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-slate-900 text-sm pt-1 border-t border-slate-300">
+                    <span>Total:</span>
+                    <span>{formatCurrency(item.material_cost + item.labor_cost)}</span>
+                  </div>
+                </div>
+                {item.notes && <div className="text-xs text-slate-500 mt-2 break-words">{item.notes}</div>}
+              </div>
+            ))}
+            
+            {/* Mobile Totals */}
+            <div className="bg-slate-100 rounded-lg p-3 border-2 border-slate-300 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-700">Subtotal:</span>
+                <span className="font-semibold">{formatCurrency(data.totals.subtotal)}</span>
+              </div>
+              {data.totals.permit_or_fees > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-slate-700">Permits & Fees:</span>
+                  <span className="font-semibold">{formatCurrency(data.totals.permit_or_fees)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-slate-700">Overhead & Profit:</span>
+                <span className="font-semibold">{formatCurrency(data.totals.overhead_profit)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-700">HST (13%):</span>
+                <span className="font-semibold">{formatCurrency(data.totals.tax_estimate)}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t-2 border-slate-900 text-base font-bold">
+                <span>Total:</span>
+                <span className="text-rose-700">{formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Desktop Table View */}
+          <div className="hidden sm:block overflow-x-auto -mx-4 sm:mx-0">
+            <div className="inline-block min-w-full align-middle">
+            <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b-2 border-slate-300">
-                  <th className="text-left py-3 px-2 font-bold text-slate-900">Item</th>
-                  <th className="text-center py-3 px-2 font-bold text-slate-900">Qty</th>
-                  <th className="text-right py-3 px-2 font-bold text-slate-900">Materials</th>
-                  <th className="text-right py-3 px-2 font-bold text-slate-900">Labor</th>
-                  <th className="text-right py-3 px-2 font-bold text-slate-900">Total</th>
+                  <th className="text-left py-3 px-2 font-bold text-slate-900 min-w-0">Item</th>
+                  <th className="text-center py-3 px-2 font-bold text-slate-900 whitespace-nowrap">Qty</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900 whitespace-nowrap">Materials</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900 whitespace-nowrap">Labor</th>
+                  <th className="text-right py-3 px-2 font-bold text-slate-900 whitespace-nowrap">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {data.line_items.map((item, index) => (
                   <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
-                    <td className="py-3 px-2">
-                      <div>
-                        <div className="font-semibold text-slate-900">{item.name}</div>
-                        {item.notes && <div className="text-xs text-slate-500 mt-1">{item.notes}</div>}
+                    <td className="py-3 px-2 min-w-0">
+                      <div className="min-w-0">
+                        <div className="font-semibold text-slate-900 break-words">{item.name}</div>
+                        {item.notes && <div className="text-xs text-slate-500 mt-1 break-words">{item.notes}</div>}
                       </div>
                     </td>
                     <td className="text-center py-3 px-2 text-slate-700">
@@ -351,6 +409,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -416,23 +475,23 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 pb-safe">
           <button
             onClick={onGetContractorBids}
-            className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                     hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl
-                     transition-all transform hover:scale-[1.02] shadow-lg"
+            className="w-full sm:flex-1 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
+                     hover:to-orange-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
+                     transition-all transform hover:scale-[1.02] shadow-lg text-sm sm:text-base"
           >
             Get 3 Contractor Bids
           </button>
           <button
             onClick={onSaveEstimate}
-            className="flex-1 bg-white border-2 border-slate-300 hover:border-orange-500 
-                     text-slate-900 font-bold py-4 px-6 rounded-xl
-                     transition-all flex items-center justify-center gap-2"
+            className="w-full sm:flex-1 bg-white border-2 border-slate-300 hover:border-orange-500 
+                     text-slate-900 font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
+                     transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <EnvelopeIcon className="w-5 h-5" />
-            Save / Email Estimate
+            <EnvelopeIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="truncate">Save / Email Estimate</span>
           </button>
         </div>
 
@@ -464,6 +523,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

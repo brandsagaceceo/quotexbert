@@ -8,6 +8,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import DevStatus from "./_components/DevStatus";
 import ProactiveAIHelper from "@/components/ProactiveAIHelper";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { OverflowDebugger } from "@/components/OverflowDebugger";
 import "./globals.css";
 import "../styles/mobile.css";
 
@@ -223,6 +224,7 @@ export default function RootLayout({
         <MobileBottomNav />
         <ProactiveAIHelper delayMs={5000} />
         <DevStatus />
+        <OverflowDebugger />
       </body>
     </html>
   );

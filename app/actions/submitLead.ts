@@ -4,7 +4,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { sendLeadEmail } from "@/lib/email";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 // Canadian postal code regex (case-insensitive, space optional)
 const canadianPostalCodeRegex =
@@ -181,8 +181,8 @@ export async function submitLead(formData: FormData) {
       console.log('[submitLead] User not found in database, creating user:', userId);
       
       // Get user info from Clerk
-      const { clerkClient } = await import('@clerk/nextjs/server');
-      const clerkUser = await clerkClient().users.getUser(userId);
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(userId);
       
       // Create user in database
       user = await prisma.user.create({

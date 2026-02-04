@@ -32,6 +32,8 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -40,6 +42,14 @@ body {
   font-family: system-ui, Inter, Manrope, sans-serif;
   line-height: 1.75;
   cursor: default;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ensure all elements use border-box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 /* Interactive cursor */
@@ -128,6 +138,21 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* Safe Area Insets for Mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Prevent overflow on all containers */
+.container-safe {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Background Grid Pattern */

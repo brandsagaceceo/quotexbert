@@ -194,14 +194,12 @@ export default function Home() {
 
         {/* Estimate Results */}
         {estimateResult && (
-          <section id="estimate-results" className="py-12 bg-white">
-            <div className="max-w-5xl mx-auto px-4">
-              <EstimateResults
-                data={estimateResult}
-                onGetContractorBids={handleGetContractorBids}
-                onSaveEstimate={handleSaveEstimate}
-              />
-            </div>
+          <section id="estimate-results" className="py-8 sm:py-12 bg-white w-full overflow-hidden">
+            <EstimateResults
+              data={estimateResult}
+              onGetContractorBids={handleGetContractorBids}
+              onSaveEstimate={handleSaveEstimate}
+            />
           </section>
         )}
 
