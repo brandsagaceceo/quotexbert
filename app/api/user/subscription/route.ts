@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getEffectiveSubscription, getSubscriptionFeatures } from "@/lib/subscription-utils";
 
 export async function GET(request: Request) {
   try {
@@ -13,14 +14,17 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get user subscription data
+    // Get user data
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         subscriptionPlan: true,
         subscriptionStatus: true,
         selectedCategories: true,
-        stripeSubscriptionId: true
+        stripeSubscriptionId: true,
+        proOverrideEnabled: true,
+        proOverrideTier: true,
+        proOverrideExpiresAt: true,
       }
     });
 
@@ -31,7 +35,19 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(user);
+    // Get effective subscription (respects manual overrides)
+    const effectiveSub = await getEffectiveSubscription(userId);
+    const features = await getSubscriptionFeatures(userId);
+
+    return NextResponse.json({
+      ...user,
+      // Include effective subscription data
+      effectiveSubscription: effectiveSub,
+      subscriptionFeatures: features.features,
+      // For backwards compatibility, override plan/status with effective values
+      subscriptionPlan: effectiveSub.tier || user.subscriptionPlan,
+      subscriptionStatus: effectiveSub.status || user.subscriptionStatus,
+    });
   } catch (error) {
     console.error("Error fetching subscription:", error);
     return NextResponse.json(

@@ -29,6 +29,18 @@ model User {
   subscriptionCurrentPeriodEnd   DateTime?
   selectedCategories   String?  @default("[]") // JSON array of category IDs contractor selected
   
+  // Manual subscription override (for COMP accounts, testing, etc.)
+  proOverrideEnabled   Boolean? @default(false) // If true, override takes precedence
+  proOverrideTier      String?  // 'FREE' | 'HANDYMAN' | 'RENOVATION' | 'GENERAL' (highest tier)
+  proOverrideExpiresAt DateTime? // Null means no expiration
+  proOverrideReason    String?  // Explanation for the override (e.g., "internal testing", "partnership")
+  proOverrideSetBy     String?  // Admin email who set the override
+  proOverrideSetAt     DateTime? // When the override was set
+  
+  // Clerk integration
+  clerkUserId          String?  @unique
+  isActive             Boolean  @default(true)
+  
   // Relations
   contractorProfile    ContractorProfile?
   homeownerProfile     HomeownerProfile?
