@@ -153,6 +153,15 @@ export default function PhotoUploadFixed({
             ? { ...p, uploading: false, uploadedUrl } 
             : p
         ));
+        
+        // Track Clarity event for successful photo upload
+        if (typeof window !== 'undefined' && (window as any).clarity) {
+          (window as any).clarity('event', 'photo_upload_success', {
+            photoIndex: i + 1,
+            totalPhotos: items.length,
+            hasPreview: true
+          });
+        }
 
       } catch (error) {
         console.error("Upload error for", item.file.name, error);

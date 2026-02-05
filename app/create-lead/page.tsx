@@ -127,7 +127,9 @@ export default function CreateLeadPage() {
     if (user.role !== "homeowner") {
       setError("Only homeowners can create leads");
       return;
-    }Clear previous errors
+    }
+
+    // Clear previous errors
     setError("");
     setFieldErrors({});
     setSuccessMessage("");
@@ -145,13 +147,34 @@ export default function CreateLeadPage() {
       return;
     }
 
-    setIsSubmitting(true
     setIsSubmitting(true);
     setError("");
 
     try {
       const submitFormData = new FormData();
-      susetSuccessMessage("Your project has been posted successfully! Redirecting...");
+      submitFormData.append("title", formData.title);
+      submitFormData.append("projectType", formData.category);
+      submitFormData.append("description", formData.description);
+      submitFormData.append("budget", formData.budget);
+      submitFormData.append("postalCode", formData.zipCode);
+      submitFormData.append("photos", JSON.stringify(photos));
+      // Pass the user ID to ensure server action has it
+      submitFormData.append("userId", user.id);
+      
+      const result = await submitLead(submitFormData);
+
+      if (result.success) {
+        setSuccessMessage("Your project has been posted successfully! Redirecting...");
+        
+        // Track Clarity event for successful lead creation
+        if (typeof window !== 'undefined' && (window as any).clarity) {
+          (window as any).clarity('event', 'lead_created_success', {
+            hasPhotos: photos.length > 0,
+            photoCount: photos.length,
+            hasDescription: formData.description.length > 0,
+            requestId: result.requestId
+          });
+        }
         
         // Clear form
         setFormData({
@@ -170,11 +193,38 @@ export default function CreateLeadPage() {
       } else {
         console.error("Lead submission failed:", result);
         
-        // Parse structured error if available
-        if (result.error) {
-          setError(result.error);
-        } else {
-          setError("Failed to create lead. Please try again.");
+        // Track Clarity event for lead creation errors
+        if (typeof window !== 'undefined' && (window as any).clarity) {
+          (window as any).clarity('event', 'lead_creation_error', {
+            errorCode: result.code || 'UNKNOWN',
+            errorMessage: result.error,
+            requestId: result.requestId,
+            hasFieldErrors: !!(result.fieldErrors && Object.keys(result.fieldErrors).length > 0),
+            fieldErrorCount: result.fieldErrors ? Object.keys(result.fieldErrors).length : 0
+          });
+        }
+        
+        // Handle field-specific errors
+        if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+          setFieldErrors(result.fieldErrors);
+        }
+        
+        // Display error message with requestId for support
+        let errorMessage = result.error || "Failed to create lead. Please try again.";
+        if (result.requestId) {
+          errorMessage += ` (Request ID: ${result.requestId})`;
+        }
+        
+        setError(errorMessage);
+        
+        // Log to console for debugging
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Lead creation failed:', {
+            error: result.error,
+            code: result.code,
+            requestId: result.requestId,
+            fieldErrors: result.fieldErrors
+          });
         }
       }
     } catch (error) {
@@ -183,26 +233,17 @@ export default function CreateLeadPage() {
       // Provide helpful error messages
       if (error instanceof Error) {
         if (error.message.includes('authentication') || error.message.includes('sign in')) {
-          setError("Session expired. Please sign in again.");
+          setError("Session expired. Please refresh the page or sign in again.");
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
           setError("Network error. Please check your connection and try again.");
+        } else if (error.message.includes('clerk') || error.message.includes('user')) {
+          setError("Authentication error. Please refresh the page and try again.");
         } else {
           setError(`Error: ${error.message}`);
         }
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        setError("An unexpected error occurred. Please refresh the page and try again.");
       }
-      
-      if (result.success) {
-        // Redirect to the job board or homeowner jobs page to see the posted job
-        router.push(`/homeowner/jobs`);
-      } else {
-        console.error("Lead submission failed:", result);
-        setError(result.error || "Failed to create lead");
-      }
-    } catch (error) {
-      console.error("Error creating lead:", error);
-      setError(`An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -466,10 +507,31 @@ export default function CreateLeadPage() {
               <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <p className="text-red-800 font-medium">{error}</p>
-                    {error.includes("sign in") && (
-                      <Link href="/sign-in" className="text-sm text-red-700 underline hover:no-underline mt-1 inline-block">
+                    {error.includes("Request ID:") && (
+                      <p className="text-xs text-red-700 mt-2 font-mono bg-red-100 px-2 py-1 rounded inline-block">
+                        Save this ID for support
+                      </p>
+                    )}
+                    {(error.includes("session") || error.includes("Session") || error.includes("authentication") || error.includes("Authentication")) && (
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="text-sm text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors"
+                        >
+                          Refresh Page
+                        </button>
+                        <Link 
+                          href="/sign-in" 
+                          className="text-sm text-red-700 bg-white border border-red-300 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors inline-block"
+                        >
+                          Sign In Again
+                        </Link>
+                      </div>
+                    )}
+                    {error.includes("sign in") && !error.includes("session") && !error.includes("Session") && (
+                      <Link href="/sign-in" className="text-sm text-red-700 underline hover:no-underline mt-2 inline-block">
                         Sign in now
                       </Link>
                     )}

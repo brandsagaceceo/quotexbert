@@ -130,18 +130,32 @@ export async function submitLead(formData: FormData) {
     const validation = leadSchema.safeParse(rawData);
     if (!validation.success) {
       const firstError = validation.error.issues[0];
-      console.error(`[submitLead:${requestId}] Validation failed:`, firstError);
+      const fieldErrors = validation.error.issues.reduce((acc, issue) => {
+        const field = issue.path[0];
+        if (field) acc[field as string] = issue.message;
+        return acc;
+      }, {} as Record<string, string>);
+      
+      console.error(`[submitLead:${requestId}] Validation failed:`, {
+        firstError,
+        allErrors: validation.error.issues,
+        fieldErrors,
+        rawData: {
+          title: rawData.title,
+          projectType: rawData.projectType,
+          postalCode: rawData.postalCode,
+          descriptionLength: rawData.description?.length || 0,
+        }
+      });
       
       return {
         success: false,
-        error: firstError?.message || "Validation failed",
-        fieldErrors: validation.error.issues.reduce((acc, issue) => {
-          const field = issue.path[0];
-          if (field) acc[field as string] = issue.message;
-          return acc;
-        }, {} as Record<string, string>),
+        error: firstError?.message || "Validation failed. Please check your input.",
+        code: 'VALIDATION_ERROR',
+        fieldErrors,
         blocked: true,
         reason: "validation",
+        requestId,
       };
     }
 
@@ -188,14 +202,18 @@ export async function submitLead(formData: FormData) {
     const { userId } = await auth();
     
     if (!userId) {
-      console.error(`[submitLead:${requestId}] User not authenticated`);
+      console.error(`[submitLead:${requestId}] User not authenticated - Clerk session missing`);
       return {
         success: false,
-        error: "You must be signed in to create a lead. Please sign in and try again.",
+        error: "Your session has expired. Please refresh the page and sign in again.",
+        code: 'SESSION_EXPIRED',
         blocked: true,
         reason: "authentication",
+        requestId,
       };
     }
+
+    console.log(`[submitLead:${requestId}] Authenticated user: ${userId}`);
 
     // Verify user exists in database, create if not
     let user = await prisma.user.findUnique({
@@ -211,6 +229,12 @@ export async function submitLead(formData: FormData) {
         const client = await clerkClient();
         const clerkUser = await client.users.getUser(userId);
         
+        console.log(`[submitLead:${requestId}] Retrieved Clerk user:`, {
+          userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress,
+          hasEmail: !!clerkUser.emailAddresses[0]?.emailAddress
+        });
+        
         // Create user in database
         user = await prisma.user.create({
           data: {
@@ -224,10 +248,15 @@ export async function submitLead(formData: FormData) {
         
         console.log(`[submitLead:${requestId}] User created successfully: ${user.id}`);
       } catch (userCreationError) {
-        console.error(`[submitLead:${requestId}] Failed to create user:`, userCreationError);
+        console.error(`[submitLead:${requestId}] Failed to create user:`, {
+          error: userCreationError,
+          userId,
+          errorMessage: userCreationError instanceof Error ? userCreationError.message : String(userCreationError)
+        });
         return {
           success: false,
-          error: "Failed to create user account. Please try signing out and signing back in.",
+          error: "Unable to create your account in our database. Please try signing out and signing back in, or contact support.",
+          code: 'USER_CREATION_FAILED',
           requestId,
         };
       }
@@ -264,21 +293,51 @@ export async function submitLead(formData: FormData) {
       
       console.log(`[submitLead:${requestId}] Lead created successfully: ${lead.id}`);
     } catch (dbError) {
-      console.error(`[submitLead:${requestId}] Database error creating lead:`, dbError);
+      console.error(`[submitLead:${requestId}] Database error creating lead:`, {
+        error: dbError,
+        errorName: dbError instanceof Error ? dbError.name : 'Unknown',
+        errorMessage: dbError instanceof Error ? dbError.message : String(dbError),
+        stack: dbError instanceof Error ? dbError.stack : undefined,
+        leadData: {
+          title: data.title,
+          category: data.projectType,
+          zipCode: data.postalCode,
+          homeownerId: user.id,
+        }
+      });
       
       // Provide specific error messages
       if (dbError instanceof Error) {
+        // Check for specific Prisma errors
         if (dbError.message.includes('Unique constraint')) {
           return {
             success: false,
             error: "A lead with these details already exists. Please modify your submission.",
+            code: 'DUPLICATE_LEAD',
             requestId,
           };
         }
         if (dbError.message.includes('Foreign key constraint')) {
           return {
             success: false,
-            error: "Database relationship error. Please try again or contact support.",
+            error: "User account validation error. Please sign out and sign back in, then try again.",
+            code: 'FK_CONSTRAINT',
+            requestId,
+          };
+        }
+        if (dbError.message.includes('Invalid') || dbError.message.includes('validation')) {
+          return {
+            success: false,
+            error: `Validation error: ${dbError.message}`,
+            code: 'VALIDATION_ERROR',
+            requestId,
+          };
+        }
+        if (dbError.message.includes('connect') || dbError.message.includes('timeout')) {
+          return {
+            success: false,
+            error: "Database connection error. Please try again in a moment.",
+            code: 'DB_CONNECTION',
             requestId,
           };
         }
@@ -286,7 +345,8 @@ export async function submitLead(formData: FormData) {
       
       return {
         success: false,
-        error: "Database error while saving your project. Please try again in a moment.",
+        error: "Unable to save your project. Please try again or contact support with request ID: " + requestId,
+        code: 'DB_ERROR',
         requestId,
       };
     }
@@ -332,7 +392,12 @@ export async function submitLead(formData: FormData) {
       requestId,
     };
   } catch (error) {
-    console.error(`[submitLead:${requestId}] Unexpected error:`, error);
+    console.error(`[submitLead:${requestId}] Unexpected error:`, {
+      error,
+      errorName: error instanceof Error ? error.name : 'Unknown',
+      errorMessage: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     
     // Provide helpful error messages
     if (error instanceof Error) {
@@ -340,6 +405,7 @@ export async function submitLead(formData: FormData) {
         return {
           success: false,
           error: "Authentication error. Please sign out and sign back in.",
+          code: 'AUTH_ERROR',
           requestId,
         };
       }
@@ -347,6 +413,7 @@ export async function submitLead(formData: FormData) {
         return {
           success: false,
           error: "Network error. Please check your connection and try again.",
+          code: 'NETWORK_ERROR',
           requestId,
         };
       }
@@ -354,6 +421,7 @@ export async function submitLead(formData: FormData) {
         return {
           success: false,
           error: "Request timed out. Please try again.",
+          code: 'TIMEOUT',
           requestId,
         };
       }
@@ -361,13 +429,15 @@ export async function submitLead(formData: FormData) {
       return {
         success: false,
         error: `Failed to create lead: ${error.message}`,
+        code: 'UNKNOWN_ERROR',
         requestId,
       };
     }
     
     return {
       success: false,
-      error: "An unexpected error occurred. Please try again or contact support if the problem persists.",
+      error: "An unexpected error occurred. Please contact support with request ID: " + requestId,
+      code: 'UNKNOWN_ERROR',
       requestId,
     };
   }

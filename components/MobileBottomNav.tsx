@@ -108,7 +108,8 @@ export default function MobileBottomNav() {
       className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
+        '--bottom-nav-height': '64px',
+      } as React.CSSProperties}
     >
       <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {

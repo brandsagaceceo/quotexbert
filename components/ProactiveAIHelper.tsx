@@ -3,6 +3,37 @@
 import { useState, useEffect } from "react";
 import { X, Sparkles, MessageCircle, ArrowRight } from "lucide-react";
 
+// Detect if keyboard is open on mobile
+function useKeyboardVisible() {
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+
+    const handleResize = () => {
+      const viewport = window.visualViewport;
+      if (!viewport) return;
+      
+      // Keyboard is likely open if viewport height is significantly smaller than window
+      const isOpen = viewport.height < window.innerHeight - 150;
+      setIsKeyboardVisible(isOpen);
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    window.visualViewport.addEventListener('scroll', handleResize);
+    handleResize();
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.removeEventListener('scroll', handleResize);
+      }
+    };
+  }, []);
+
+  return isKeyboardVisible;
+}
+
 interface AIHelperProps {
   delayMs?: number;
 }
@@ -12,6 +43,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
   const [isDismissed, setIsDismissed] = useState(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [clickCount, setClickCount] = useState(0);
+  const isKeyboardVisible = useKeyboardVisible();
 
   const helpfulTips = [
     {
@@ -136,13 +168,27 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     setIsVisible(false);
   };
 
+  // Hide when keyboard is visible to prevent overlap with inputs
+  if (isKeyboardVisible) {
+    return null;
+  }
+
   if (!isVisible) {
     return (
       <button
-        onClick={() => setIsVisible(true)}
-        className="fixed right-4 z-40 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 group"
+        onClick={() => {
+          setIsVisible(true);
+          // Track Clarity event to monitor Help button accessibility
+          if (typeof window !== 'undefined' && (window as any).clarity) {
+            (window as any).clarity('event', 'help_button_opened', {
+              isKeyboardVisible,
+              position: 'above_bottom_nav'
+            });
+          }
+        }}
+        className="fixed right-3 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 group pointer-events-auto"
         style={{
-          bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Position above mobile nav (4rem nav + 1rem gap)
+          bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 12px)',
         }}
         aria-label="Open AI Helper"
       >
@@ -156,9 +202,9 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
 
   return (
     <div 
-      className="fixed right-4 z-40 w-96 max-w-[calc(100vw-2rem)] animate-slide-up"
+      className="fixed right-3 z-50 w-96 max-w-[calc(100vw-2rem)] animate-slide-up pointer-events-auto"
       style={{
-        bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Position above mobile nav
+        bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 12px)',
       }}
     >
       <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden">
