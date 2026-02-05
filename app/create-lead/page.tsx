@@ -207,12 +207,25 @@ export default function CreateLeadPage() {
         // Handle field-specific errors
         if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
           setFieldErrors(result.fieldErrors);
+          
+          // Build detailed error message from field errors
+          const fieldErrorMessages = Object.entries(result.fieldErrors)
+            .map(([field, msg]) => {
+              const fieldName = field === 'postalCode' ? 'Postal Code' : 
+                               field === 'projectType' ? 'Project Type' :
+                               field.charAt(0).toUpperCase() + field.slice(1);
+              return `${fieldName}: ${msg}`;
+            })
+            .join('; ');
+          
+          errorMessage = fieldErrorMessages;
+        } else {
+          errorMessage = result.error || "Failed to create lead. Please try again.";
         }
         
         // Display error message with requestId for support
-        let errorMessage = result.error || "Failed to create lead. Please try again.";
         if (result.requestId) {
-          errorMessage += ` (Request ID: ${result.requestId})`;
+          errorMessage += `\n\nSave this ID for support: ${result.requestId}`;
         }
         
         setError(errorMessage);
