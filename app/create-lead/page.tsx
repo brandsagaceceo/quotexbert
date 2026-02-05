@@ -144,12 +144,6 @@ export default function CreateLeadPage() {
 
     setIsSubmitting(true);
     setError("");
-      setError("Please fill in all required fields");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError("");
 
     try {
       const submitFormData = new FormData();
