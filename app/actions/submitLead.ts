@@ -229,36 +229,51 @@ export async function submitLead(formData: FormData) {
         const client = await clerkClient();
         const clerkUser = await client.users.getUser(userId);
         
-        console.log(`[submitLead:${requestId}] Retrieved Clerk user:`, {
-          userId,
-          email: clerkUser.emailAddresses[0]?.emailAddress,
-          hasEmail: !!clerkUser.emailAddresses[0]?.emailAddress
-        });
+        const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@temp.quotexbert.ca`;
+        const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User';
         
-        // Create user in database
-        user = await prisma.user.create({
-          data: {
+        console.log(`[submitLead:${requestId}] Creating user with email: ${email}, name: ${name}`);
+        
+        // Use upsert to handle race conditions
+        user = await prisma.user.upsert({
+          where: { clerkUserId: userId },
+          update: {
+            email,
+            name,
+          },
+          create: {
             clerkUserId: userId,
-            email: clerkUser.emailAddresses[0]?.emailAddress || '',
-            name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
-            role: 'homeowner', // Default to homeowner for lead creation
+            email,
+            name,
+            role: 'homeowner',
           },
           select: { role: true, id: true, email: true, name: true }
         });
         
-        console.log(`[submitLead:${requestId}] User created successfully: ${user.id}`);
-      } catch (userCreationError) {
+        console.log(`[submitLead:${requestId}] User created/updated successfully: ${user.id}`);
+      } catch (userCreationError: any) {
         console.error(`[submitLead:${requestId}] Failed to create user:`, {
           error: userCreationError,
           userId,
-          errorMessage: userCreationError instanceof Error ? userCreationError.message : String(userCreationError)
+          errorMessage: userCreationError?.message,
+          errorCode: userCreationError?.code,
+          errorMeta: userCreationError?.meta
         });
-        return {
-          success: false,
-          error: "Unable to create your account in our database. Please try signing out and signing back in, or contact support.",
-          code: 'USER_CREATION_FAILED',
-          requestId,
-        };
+        
+        // Try one more time to fetch the user in case it was created by another request
+        user = await prisma.user.findUnique({
+          where: { clerkUserId: userId },
+          select: { role: true, id: true, email: true, name: true }
+        });
+        
+        if (!user) {
+          return {
+            success: false,
+            error: "Unable to create your account in our database. Please contact support with this ID.",
+            code: 'USER_CREATION_FAILED',
+            requestId,
+          };
+        }
       }
     }
 

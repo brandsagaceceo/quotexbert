@@ -124,11 +124,6 @@ export default function CreateLeadPage() {
       return;
     }
 
-    if (user.role !== "homeowner") {
-      setError("Only homeowners can create leads");
-      return;
-    }
-
     // Clear previous errors
     setError("");
     setFieldErrors({});
@@ -143,6 +138,12 @@ export default function CreateLeadPage() {
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
       setError("Please fill in all required fields");
       return;
     }
