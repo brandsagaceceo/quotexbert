@@ -1,13 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   ChatBubbleLeftRightIcon,
   MagnifyingGlassIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  EllipsisVerticalIcon,
+  PhoneIcon,
+  VideoCameraIcon,
+  PaperClipIcon,
+  FaceSmileIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline';
 
 interface Conversation {
@@ -68,6 +74,11 @@ export default function ConversationsPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (user) {
@@ -85,6 +96,10 @@ export default function ConversationsPage() {
       return () => clearInterval(interval);
     }
   }, [selectedConversation]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const fetchConversations = async () => {
     if (!user) return;
@@ -108,14 +123,6 @@ export default function ConversationsPage() {
       if (response.ok) {
         const data = await response.json();
         setMessages(data);
-        
-        // Mark messages as read
-        const unreadMessages = data.filter((msg: Message) => 
-          msg.receiverId === user?.id
-        );
-        if (unreadMessages.length > 0) {
-          // You can add a mark as read API call here
-        }
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -127,6 +134,7 @@ export default function ConversationsPage() {
     if (!newMessage.trim() || !selectedConversation || !user) return;
 
     setSending(true);
+    
     try {
       const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`, {
         method: 'POST',
@@ -141,7 +149,7 @@ export default function ConversationsPage() {
       if (response.ok) {
         setNewMessage('');
         fetchMessages(selectedConversation.id);
-        fetchConversations(); // Refresh to update last message
+        fetchConversations();
       } else {
         const error = await response.json();
         alert(`Failed to send message: ${error.error}`);
@@ -166,30 +174,66 @@ export default function ConversationsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 flex items-center justify-center">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md">
-          <h2 className="text-2xl font-bold mb-4">Sign In Required</h2>
-          <p className="text-gray-600 mb-6">Please sign in to view your conversations.</p>
-          <Link href="/sign-in" className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 text-white text-center py-3 rounded-lg font-semibold">
-            Sign In
-          </Link>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+          <div className="text-center">
+            <ChatBubbleLeftRightIcon className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h2>
+            <p className="text-gray-600 mb-6">Please sign in to view your conversations.</p>
+            <Link 
+              href="/sign-in" 
+              className="inline-block w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all"
+            >
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-8">
-          Messages
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="h-screen flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ChatBubbleLeftRightIcon className="w-8 h-8 text-blue-600" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Messages
+              </h1>
+            </div>
+            <Link 
+              href="/profile"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Back to Profile
+            </Link>
+          </div>
+        </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-3 h-[calc(100vh-200px)]">
-            {/* Conversations List */}
-            <div className="lg:col-span-1 border-r border-gray-200 flex flex-col">
-              <div className="p-4 border-b border-gray-200">
+        {/* Main Content */}
+        <div className="flex-1 max-w-7xl mx-auto w-full overflow-hidden">
+          <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-0">
+            {/* Conversations Sidebar */}
+            <div className="bg-white border-r border-gray-200 flex flex-col h-full">
+              {/* Search */}
+              <div className="p-4 border-b border-gray-200">{/* Search */}
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search conversations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Conversations List */}
+              <div className="flex-1 overflow-y-auto">
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -209,9 +253,11 @@ export default function ConversationsPage() {
                   </div>
                 ) : filteredConversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                    <ChatBubbleLeftRightIcon className="w-16 h-16 text-gray-400 mb-4" />
-                    <p className="text-gray-600 font-medium">No conversations yet</p>
-                    <p className="text-sm text-gray-500 mt-2">
+                    <div className="bg-blue-50 rounded-full p-6 mb-4">
+                      <ChatBubbleLeftRightIcon className="w-12 h-12 text-blue-600" />
+                    </div>
+                    <p className="text-gray-900 font-semibold mb-2">No conversations yet</p>
+                    <p className="text-sm text-gray-500">
                       {user.role === 'contractor' 
                         ? 'Accept a job to start messaging homeowners'
                         : 'Post a job to start receiving quotes'}
@@ -263,77 +309,122 @@ export default function ConversationsPage() {
             <div className="lg:col-span-2 flex flex-col">
               {selectedConversation ? (
                 <>
-                  {/* Header */}
-                  <div className="p-4 border-b border-gray-200 bg-white">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white font-semibold">
-                        {selectedConversation.otherParticipant.name?.[0] || selectedConversation.otherParticipant.email[0].toUpperCase()}
+                  {/* Chat Header */}
+                  <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            {selectedConversation.otherParticipant.name?.[0] || selectedConversation.otherParticipant.email[0].toUpperCase()}
+                          </div>
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        <div>
+                          <h2 className="font-bold text-gray-900 text-lg">
+                            {selectedConversation.otherParticipant.name || selectedConversation.otherParticipant.email}
+                          </h2>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <p className="text-xs text-gray-600">
+                              Active now • {selectedConversation.job.title}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <h2 className="font-semibold text-gray-900">
-                          {selectedConversation.otherParticipant.name || selectedConversation.otherParticipant.email}
-                        </h2>
-                        <p className="text-sm text-gray-600">
-                          {selectedConversation.job.title}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 hover:bg-white rounded-xl transition-colors">
+                          <PhoneIcon className="w-5 h-5 text-gray-600" />
+                        </button>
+                        <button className="p-2 hover:bg-white rounded-xl transition-colors">
+                          <VideoCameraIcon className="w-5 h-5 text-gray-600" />
+                        </button>
+                        <button className="p-2 hover:bg-white rounded-xl transition-colors">
+                          <EllipsisVerticalIcon className="w-5 h-5 text-gray-600" />
+                        </button>
                       </div>
                     </div>
                   </div>
 
                   {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {messages.map((message) => {
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50/50 to-white">
+                    {messages.map((message, index) => {
                       const isOwn = message.senderId === user.id;
+                      const showAvatar = index === 0 || messages[index - 1].senderId !== message.senderId;
+                      
                       return (
                         <div
                           key={message.id}
-                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                          className={`flex items-end gap-2 ${
+isOwn ? 'justify-end' : 'justify-start'}`}
                         >
+                          {!isOwn && showAvatar && (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                              {message.sender.name?.[0] || message.sender.email[0].toUpperCase()}
+                            </div>
+                          )}
+                          {!isOwn && !showAvatar && <div className="w-8" />}
+                          
                           <div className={`max-w-[70%] ${isOwn ? 'order-2' : 'order-1'}`}>
                             <div
-                              className={`rounded-2xl px-4 py-2 ${
+                              className={`rounded-2xl px-4 py-3 ${
                                 isOwn
-                                  ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white'
-                                  : 'bg-gray-100 text-gray-900'
+                                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                                  : 'bg-white border border-gray-200 text-gray-900 shadow-sm'
                               }`}
                             >
-                              <p className="break-words">{message.content}</p>
+                              <p className="break-words leading-relaxed">{message.content}</p>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 px-2">
-                              {new Date(message.createdAt).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </p>
+                            <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                              <span className="text-xs text-gray-500">
+                                {new Date(message.createdAt).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                              {isOwn && (
+                                <CheckIcon className="w-4 h-4 text-blue-600" />
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
                     })}
+                    <div ref={messagesEndRef} />
                   </div>
 
-                  {/* Input */}
-                  <form onSubmit={sendMessage} className="p-4 border-t border-gray-200 bg-white">
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type your message..."
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        disabled={sending}
-                      />
+                  {/* Input Area */}
+                  <form onSubmit={sendMessage} className="p-4 bg-white border-t border-gray-200">
+                    <div className="flex items-end gap-2">
+                      <button
+                        type="button"
+                        className="p-3 hover:bg-gray-100 rounded-xl transition-colors">
+                        <PaperClipIcon className="w-5 h-5 text-gray-600" />
+                      </button>
+                      <div className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+                        <input
+                          type="text"
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          placeholder="Type your message..."
+                          className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+                          disabled={sending}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="p-3 hover:bg-gray-100 rounded-xl transition-colors"
+                      >
+                        <FaceSmileIcon className="w-5 h-5 text-gray-600" />
+                      </button>
                       <button
                         type="submit"
                         disabled={!newMessage.trim() || sending}
-                        className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all"
                       >
                         {sending ? (
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         ) : (
-                          <>
-                            <PaperAirplaneIcon className="w-5 h-5" />
-                            Send
-                          </>
+                          <PaperAirplaneIcon className="w-5 h-5" />
                         )}
                       </button>
                     </div>
@@ -342,12 +433,14 @@ export default function ConversationsPage() {
               ) : (
                 <div className="flex-1 flex items-center justify-center text-center p-8">
                   <div>
-                    <ChatBubbleLeftRightIcon className="w-20 h-20 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-full p-8 mb-6 inline-block">
+                      <ChatBubbleLeftRightIcon className="w-20 h-20 text-blue-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       Select a conversation
                     </h3>
-                    <p className="text-gray-600">
-                      Choose a conversation from the list to start messaging
+                    <p className="text-gray-600 max-w-sm mx-auto">
+                      Choose a conversation from the sidebar to start messaging
                     </p>
                   </div>
                 </div>
