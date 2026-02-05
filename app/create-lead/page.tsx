@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PhotoUpload from "@/components/PhotoUpload";
+import PhotoUploadFixed from "@/components/PhotoUploadFixed";
 import { submitLead } from "@/app/actions/submitLead";
 import { CATEGORY_GROUPS } from "@/lib/categories";
+import { Sparkles, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function CreateLeadPage() {
   const { authUser: user } = useAuth();
@@ -21,6 +22,8 @@ export default function CreateLeadPage() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Function to determine category from description
   const detectCategoryFromDescription = (description: string): string => {
@@ -124,28 +127,71 @@ export default function CreateLeadPage() {
     if (user.role !== "homeowner") {
       setError("Only homeowners can create leads");
       return;
-    }
+    }Clear previous errors
+    setError("");
+    setFieldErrors({});
+    setSuccessMessage("");
 
     // Validate required fields
-    if (!formData.title || !formData.category || !formData.description || !formData.zipCode) {
+    const errors: Record<string, string> = {};
+    if (!formData.title.trim()) errors.title = "Project title is required";
+    if (!formData.category) errors.category = "Please select a category";
+    if (!formData.description.trim()) errors.description = "Project description is required";
+    if (!formData.zipCode.trim()) errors.zipCode = "Postal code is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       setError("Please fill in all required fields");
       return;
     }
 
+    setIsSubmitting(true
     setIsSubmitting(true);
     setError("");
 
     try {
       const submitFormData = new FormData();
-      submitFormData.append("postalCode", formData.zipCode);
-      submitFormData.append("projectType", formData.category);
-      submitFormData.append("title", formData.title);
-      submitFormData.append("description", formData.description);
-      submitFormData.append("budget", formData.budget);
-      submitFormData.append("photos", JSON.stringify(photos));
-      submitFormData.append("website", ""); // Honeypot field
-
-      const result = await submitLead(submitFormData);
+      susetSuccessMessage("Your project has been posted successfully! Redirecting...");
+        
+        // Clear form
+        setFormData({
+          title: "",
+          description: "",
+          category: "",
+          budget: "",
+          zipCode: ""
+        });
+        setPhotos([]);
+        
+        // Redirect after showing success message
+        setTimeout(() => {
+          router.push(`/homeowner/jobs`);
+        }, 1500);
+      } else {
+        console.error("Lead submission failed:", result);
+        
+        // Parse structured error if available
+        if (result.error) {
+          setError(result.error);
+        } else {
+          setError("Failed to create lead. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      
+      // Provide helpful error messages
+      if (error instanceof Error) {
+        if (error.message.includes('authentication') || error.message.includes('sign in')) {
+          setError("Session expired. Please sign in again.");
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          setError("Network error. Please check your connection and try again.");
+        } else {
+          setError(`Error: ${error.message}`);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
       
       if (result.success) {
         // Redirect to the job board or homeowner jobs page to see the posted job
@@ -195,46 +241,96 @@ export default function CreateLeadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-burgundy-600 to-teal-600 bg-clip-text text-transparent mb-4">
-            Create Your Project
-          </h1>
-          <p className="text-xl text-gray-600">
-            Tell contractors about your project and get matched with qualified professionals
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-orange-50 pb-safe">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-3 rounded-xl">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+                Post Your Project
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
+                Get matched with verified contractors
+              </p>
+            </div>
+          </div>
+          
+          {/* Value Props */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">100% Free to Post</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">Verified Contractors</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <span className="text-sm text-gray-700">Multiple Quotes</span>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Project Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                Project Title
+              <label htmlFor="title" className="block text-sm font-semibold text-gray-800 mb-2">
+                Project Title <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, title: e.target.value });
+                  if (fieldErrors.title) {
+                    setFieldErrors(prev => ({ ...prev, title: "" }));
+                  }
+                }}
                 placeholder="e.g., Kitchen Cabinet Installation"
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                  fieldErrors.title 
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
+                    : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                }`}
                 required
+                disabled={isSubmitting}
               />
+              {fieldErrors.title && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {fieldErrors.title}
+                </p>
+              )}
             </div>
 
             {/* Category */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Project Category
+              <label htmlFor="category" className="block text-sm font-semibold text-gray-800 mb-2">
+                Project Category <span className="text-rose-500">*</span>
               </label>
               <select
                 id="category"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                onChange={(e) => {
+                  setFormData({ ...formData, category: e.target.value });
+                  if (fieldErrors.category) {
+                    setFieldErrors(prev => ({ ...prev, category: "" }));
+                  }
+                }}
+                className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 focus:outline-none focus:ring-2 transition-all ${
+                  fieldErrors.category 
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
+                    : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                }`}
                 required
+                disabled={isSubmitting}
               >
                 <option value="">Select a category</option>
                 {CATEGORY_GROUPS.map((group) => (
@@ -247,63 +343,107 @@ export default function CreateLeadPage() {
                   </optgroup>
                 ))}
               </select>
+              {fieldErrors.category && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {fieldErrors.category}
+                </p>
+              )}
             </div>
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Project Description
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-800 mb-2">
+                Project Description <span className="text-rose-500">*</span>
               </label>
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, description: e.target.value });
+                  if (fieldErrors.description) {
+                    setFieldErrors(prev => ({ ...prev, description: "" }));
+                  }
+                }}
                 placeholder="Describe your project in detail. Include specifics about what work needs to be done, materials, timeline, etc."
                 rows={6}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
+                className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all resize-none ${
+                  fieldErrors.description 
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
+                    : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                }`}
                 required
+                disabled={isSubmitting}
               />
+              {fieldErrors.description && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {fieldErrors.description}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-gray-500">
+                {formData.description.length}/1000 characters
+              </p>
             </div>
 
-            {/* Budget */}
-            <div>
-              <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
-                Estimated Budget (CAD)
-              </label>
-              <input
-                type="text"
-                id="budget"
-                value={formData.budget}
-                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                placeholder="$5,000 - $10,000"
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
-                required
-              />
-            </div>
+            {/* Budget and Postal Code Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Budget */}
+              <div>
+                <label htmlFor="budget" className="block text-sm font-semibold text-gray-800 mb-2">
+                  Estimated Budget
+                </label>
+                <input
+                  type="text"
+                  id="budget"
+                  value={formData.budget}
+                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  placeholder="$5,000 - $10,000"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all"
+                  disabled={isSubmitting}
+                />
+              </div>
 
-            {/* Postal Code */}
-            <div>
-              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
-                Postal Code
-              </label>
-              <input
-                type="text"
-                id="zipCode"
-                value={formData.zipCode}
-                onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.toUpperCase() })}
-                placeholder="K1A 0A6"
-                pattern="[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d"
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-burgundy-500 focus:ring-2 focus:ring-burgundy-200"
-                required
-              />
+              {/* Postal Code */}
+              <div>
+                <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-800 mb-2">
+                  Postal Code <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="zipCode"
+                  value={formData.zipCode}
+                  onChange={(e) => {
+                    setFormData({ ...formData, zipCode: e.target.value.toUpperCase() });
+                    if (fieldErrors.zipCode) {
+                      setFieldErrors(prev => ({ ...prev, zipCode: "" }));
+                    }
+                  }}
+                  placeholder="K1A 0A6"
+                  pattern="[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d"
+                  className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                    fieldErrors.zipCode 
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
+                      : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                  }`}
+                  required
+                  disabled={isSubmitting}
+                />
+                {fieldErrors.zipCode && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {fieldErrors.zipCode}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Photo Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Project Photos
+              <label className="block text-sm font-semibold text-gray-800 mb-3">
+                Project Photos <span className="text-gray-500 font-normal">(Optional)</span>
               </label>
-              <PhotoUpload
+              <PhotoUploadFixed
                 photos={photos}
                 onPhotosChange={setPhotos}
                 maxPhotos={8}
@@ -311,32 +451,85 @@ export default function CreateLeadPage() {
               />
             </div>
 
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                  <p className="text-green-800 font-medium">{successMessage}</p>
+                </div>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-800">{error}</p>
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-800 font-medium">{error}</p>
+                    {error.includes("sign in") && (
+                      <Link href="/sign-in" className="text-sm text-red-700 underline hover:no-underline mt-1 inline-block">
+                        Sign in now
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Submit Button */}
-            <div className="flex gap-4 pt-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-3 sm:py-4 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all border border-gray-200"
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-burgundy-600 to-teal-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-burgundy-700 hover:to-teal-700 transition-colors disabled:opacity-50"
+                disabled={isSubmitting || successMessage !== ""}
+                className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white py-3 sm:py-4 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-rose-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isSubmitting ? "Creating Lead..." : "Create Lead"}
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Creating Lead...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    <span>Post Project</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Why Post on QuoteXbert */}
+        <div className="mt-6 sm:mt-8 bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-100">
+          <h3 className="font-bold text-gray-900 mb-4">Why Post on QuoteXbert? 🎉</h3>
+          <ul className="space-y-2 text-sm text-gray-700">
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 font-bold">✓</span>
+              <span><strong>Free for Homeowners:</strong> Post unlimited projects at no cost</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 font-bold">✓</span>
+              <span><strong>Verified Contractors:</strong> All contractors are background-checked and rated</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 font-bold">✓</span>
+              <span><strong>Multiple Quotes:</strong> Compare bids from qualified professionals</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-green-500 font-bold">✓</span>
+              <span><strong>AI-Powered:</strong> Get instant estimates and visualizations</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

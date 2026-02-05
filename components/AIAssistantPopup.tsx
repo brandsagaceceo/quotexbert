@@ -182,7 +182,7 @@ export default function AIAssistantPopup() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Hidden on keyboard open */}
       {!isOpen && (
         <button
           onClick={() => {
@@ -191,7 +191,7 @@ export default function AIAssistantPopup() {
           }}
           className="fixed right-4 z-40 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
           style={{
-            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 12px)',
           }}
           aria-label="Open AI Assistant"
         >
@@ -206,10 +206,10 @@ export default function AIAssistantPopup() {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="fixed right-4 z-40 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
+          className="fixed right-4 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
-            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))',
-            maxHeight: 'calc(80vh - env(safe-area-inset-bottom, 0px))',
+            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 12px)',
+            maxHeight: 'calc(70vh - env(safe-area-inset-bottom, 0px))',
           }}
         >
           {/* Header */}

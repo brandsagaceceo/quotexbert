@@ -73,7 +73,11 @@ function generateEstimate(
 }
 
 export async function submitLead(formData: FormData) {
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  
   try {
+    console.log(`[submitLead:${requestId}] Starting lead submission`);
+    
     // Get IP and user agent
     const headersList = await headers();
     const forwardedFor = headersList.get("x-forwarded-for");
@@ -94,8 +98,15 @@ export async function submitLead(formData: FormData) {
       affiliateCode: formData.get("affiliateCode") as string, // Affiliate tracking
     };
 
+    console.log(`[submitLead:${requestId}] Raw data:`, {
+      title: rawData.title,
+      category: rawData.projectType,
+      photosCount: rawData.photos.length
+    });
+
     // Check honeypot
     if (rawData.website && rawData.website.trim() !== "") {
+      console.warn(`[submitLead:${requestId}] Honeypot triggered`);
       return {
         success: false,
         error: "Spam detected",
@@ -106,6 +117,7 @@ export async function submitLead(formData: FormData) {
 
     // Rate limiting
     if (!checkRateLimit(ip)) {
+      console.warn(`[submitLead:${requestId}] Rate limit exceeded for IP: ${ip}`);
       return {
         success: false,
         error: "Too many requests. Please try again later.",
@@ -117,9 +129,17 @@ export async function submitLead(formData: FormData) {
     // Validate input
     const validation = leadSchema.safeParse(rawData);
     if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      console.error(`[submitLead:${requestId}] Validation failed:`, firstError);
+      
       return {
         success: false,
-        error: validation.error.issues[0]?.message || "Validation failed",
+        error: firstError?.message || "Validation failed",
+        fieldErrors: validation.error.issues.reduce((acc, issue) => {
+          const field = issue.path[0];
+          if (field) acc[field as string] = issue.message;
+          return acc;
+        }, {} as Record<string, string>),
         blocked: true,
         reason: "validation",
       };
@@ -140,21 +160,27 @@ export async function submitLead(formData: FormData) {
     // Handle affiliate tracking
     let affiliateId: string | null = null;
     if (rawData.affiliateCode) {
-      const affiliate = await prisma.affiliate.findUnique({
-        where: { referralCode: rawData.affiliateCode },
-      });
-
-      if (affiliate) {
-        affiliateId = affiliate.id;
-
-        // Create referral
-        await prisma.referral.create({
-          data: {
-            affiliateId: affiliate.id,
-            visitorIp: ip,
-            userAgent: userAgent?.slice(0, 100),
-          },
+      try {
+        const affiliate = await prisma.affiliate.findUnique({
+          where: { referralCode: rawData.affiliateCode },
         });
+
+        if (affiliate) {
+          affiliateId = affiliate.id;
+
+          // Create referral
+          await prisma.referral.create({
+            data: {
+              affiliateId: affiliate.id,
+              visitorIp: ip,
+              userAgent: userAgent?.slice(0, 100),
+            },
+          });
+          console.log(`[submitLead:${requestId}] Affiliate tracked: ${affiliateId}`);
+        }
+      } catch (affiliateError) {
+        console.error(`[submitLead:${requestId}] Affiliate tracking error:`, affiliateError);
+        // Don't fail the request if affiliate tracking fails
       }
     }
 
@@ -162,7 +188,7 @@ export async function submitLead(formData: FormData) {
     const { userId } = await auth();
     
     if (!userId) {
-      console.error('[submitLead] User not authenticated');
+      console.error(`[submitLead:${requestId}] User not authenticated`);
       return {
         success: false,
         error: "You must be signed in to create a lead. Please sign in and try again.",
@@ -178,28 +204,37 @@ export async function submitLead(formData: FormData) {
     });
 
     if (!user) {
-      console.log('[submitLead] User not found in database, creating user:', userId);
+      console.log(`[submitLead:${requestId}] User not found in database, creating user: ${userId}`);
       
-      // Get user info from Clerk
-      const client = await clerkClient();
-      const clerkUser = await client.users.getUser(userId);
-      
-      // Create user in database
-      user = await prisma.user.create({
-        data: {
-          clerkUserId: userId,
-          email: clerkUser.emailAddresses[0]?.emailAddress || '',
-          name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
-          role: 'homeowner', // Default to homeowner for lead creation
-        },
-        select: { role: true, id: true, email: true, name: true }
-      });
-      
-      console.log('[submitLead] User created successfully:', user.id);
+      try {
+        // Get user info from Clerk
+        const client = await clerkClient();
+        const clerkUser = await client.users.getUser(userId);
+        
+        // Create user in database
+        user = await prisma.user.create({
+          data: {
+            clerkUserId: userId,
+            email: clerkUser.emailAddresses[0]?.emailAddress || '',
+            name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
+            role: 'homeowner', // Default to homeowner for lead creation
+          },
+          select: { role: true, id: true, email: true, name: true }
+        });
+        
+        console.log(`[submitLead:${requestId}] User created successfully: ${user.id}`);
+      } catch (userCreationError) {
+        console.error(`[submitLead:${requestId}] Failed to create user:`, userCreationError);
+        return {
+          success: false,
+          error: "Failed to create user account. Please try signing out and signing back in.",
+          requestId,
+        };
+      }
     }
 
     if (user.role !== 'homeowner') {
-      console.error('[submitLead] User is not a homeowner:', user.role);
+      console.error(`[submitLead:${requestId}] User is not a homeowner: ${user.role}`);
       return {
         success: false,
         error: "Only homeowners can create project leads. Please switch to a homeowner account.",
@@ -208,59 +243,96 @@ export async function submitLead(formData: FormData) {
       };
     }
 
-    console.log('[submitLead] Creating lead for user:', user.id, 'with data:', {
-      title: data.title,
-      category: data.projectType,
-      budget: finalBudget
-    });
+    console.log(`[submitLead:${requestId}] Creating lead for user: ${user.id}`);
 
     // Save lead to database
-    const lead = await prisma.lead.create({
-      data: {
-        title: data.title, // Use the actual title from the form
-        zipCode: data.postalCode,
-        category: data.projectType,
-        description: data.description,
-        budget: finalBudget, // Store the budget range or user input as string
-        photos: JSON.stringify(data.photos || []),
-        homeownerId: user.id, // Use database user ID, not Clerk ID
-        status: "open", // Set initial status to lowercase
-        published: true, // Make the lead available to contractors immediately
-      },
-    });
-
-    console.log('[submitLead] Lead created successfully:', lead.id);
-
-    // Connect referral to lead if affiliate exists
-    if (affiliateId) {
-      await prisma.referral.updateMany({
-        where: {
-          affiliateId: affiliateId,
-          leadId: null,
-        },
+    let lead;
+    try {
+      lead = await prisma.lead.create({
         data: {
-          leadId: lead.id,
+          title: data.title,
+          zipCode: data.postalCode,
+          category: data.projectType,
+          description: data.description,
+          budget: finalBudget,
+          photos: JSON.stringify(data.photos || []),
+          homeownerId: user.id,
+          status: "open",
+          published: true,
         },
       });
+      
+      console.log(`[submitLead:${requestId}] Lead created successfully: ${lead.id}`);
+    } catch (dbError) {
+      console.error(`[submitLead:${requestId}] Database error creating lead:`, dbError);
+      
+      // Provide specific error messages
+      if (dbError instanceof Error) {
+        if (dbError.message.includes('Unique constraint')) {
+          return {
+            success: false,
+            error: "A lead with these details already exists. Please modify your submission.",
+            requestId,
+          };
+        }
+        if (dbError.message.includes('Foreign key constraint')) {
+          return {
+            success: false,
+            error: "Database relationship error. Please try again or contact support.",
+            requestId,
+          };
+        }
+      }
+      
+      return {
+        success: false,
+        error: "Database error while saving your project. Please try again in a moment.",
+        requestId,
+      };
+    }
+
+    // Connect referral to lead if affiliate exists
+    if (affiliateId && lead) {
+      try {
+        await prisma.referral.updateMany({
+          where: {
+            affiliateId: affiliateId,
+            leadId: null,
+          },
+          data: {
+            leadId: lead.id,
+          },
+        });
+      } catch (referralError) {
+        console.error(`[submitLead:${requestId}] Referral update error:`, referralError);
+        // Don't fail the request if referral update fails
+      }
     }
 
     // Send email notification
-    await sendLeadEmail({
-      postalCode: data.postalCode,
-      projectType: data.projectType,
-      description: data.description,
-      estimate,
-      source: rawData.affiliateCode ? "affiliate" : "web",
-    });
+    try {
+      await sendLeadEmail({
+        postalCode: data.postalCode,
+        projectType: data.projectType,
+        description: data.description,
+        estimate,
+        source: rawData.affiliateCode ? "affiliate" : "web",
+      });
+      console.log(`[submitLead:${requestId}] Email notification sent`);
+    } catch (emailError) {
+      console.error(`[submitLead:${requestId}] Email notification error:`, emailError);
+      // Don't fail the request if email fails
+    }
 
     return {
       success: true,
       estimate,
       leadId: lead.id,
       message: "Your project has been posted successfully! Contractors will be notified.",
+      requestId,
     };
   } catch (error) {
-    console.error("[submitLead] Error submitting lead:", error);
+    console.error(`[submitLead:${requestId}] Unexpected error:`, error);
     
     // Provide helpful error messages
     if (error instanceof Error) {
@@ -268,23 +340,35 @@ export async function submitLead(formData: FormData) {
         return {
           success: false,
           error: "Authentication error. Please sign out and sign back in.",
+          requestId,
         };
       }
-      if (error.message.includes('database') || error.message.includes('prisma')) {
+      if (error.message.includes('network') || error.message.includes('fetch')) {
         return {
           success: false,
-          error: "Database error. Please try again in a moment.",
+          error: "Network error. Please check your connection and try again.",
+          requestId,
         };
       }
+      if (error.message.includes('timeout')) {
+        return {
+          success: false,
+          error: "Request timed out. Please try again.",
+          requestId,
+        };
+      }
+      
       return {
         success: false,
         error: `Failed to create lead: ${error.message}`,
+        requestId,
       };
     }
     
     return {
       success: false,
       error: "An unexpected error occurred. Please try again or contact support if the problem persists.",
+      requestId,
     };
   }
 }
