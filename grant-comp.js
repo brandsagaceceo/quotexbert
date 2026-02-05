@@ -5,8 +5,6 @@
  * Usage: node grant-comp.js
  */
 
-const fetch = require('node:fetch');
-
 const API_URL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const EMAIL = 'brandsagaceo@gmail.com';

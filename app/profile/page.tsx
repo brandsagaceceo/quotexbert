@@ -670,7 +670,7 @@ export default function UnifiedProfilePage() {
       <div className="h-24 md:h-20"></div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky z-10" style={{ top: 'var(--header-height, 0px)' }}>
+      <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
         <div className="container mx-auto px-4">
           <nav className="flex space-x-8 overflow-x-auto">
             {(isContractor 
