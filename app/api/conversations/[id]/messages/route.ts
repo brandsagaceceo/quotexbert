@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendEmailNotification } from "@/lib/email-notifications";
 
 export async function GET(
   request: NextRequest,
@@ -43,6 +44,118 @@ export async function GET(
     console.error("Error fetching conversation messages:", error);
     return NextResponse.json(
       { error: "Failed to fetch messages" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const resolvedParams = await params;
+    const conversationId = resolvedParams.id;
+    const body = await request.json();
+    
+    const { senderId, receiverId, content, type = 'text' } = body;
+
+    if (!senderId || !receiverId || !content) {
+      return NextResponse.json(
+        { error: "Missing required fields: senderId, receiverId, content" },
+        { status: 400 }
+      );
+    }
+
+    // Get conversation to validate and determine roles
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        homeowner: true,
+        contractor: true,
+        job: true
+      }
+    });
+
+    if (!conversation) {
+      return NextResponse.json(
+        { error: "Conversation not found" },
+        { status: 404 }
+      );
+    }
+
+    // Verify sender is part of conversation
+    if (senderId !== conversation.homeownerId && senderId !== conversation.contractorId) {
+      return NextResponse.json(
+        { error: "Sender not part of this conversation" },
+        { status: 403 }
+      );
+    }
+
+    // Determine roles
+    const senderRole = senderId === conversation.homeownerId ? 'homeowner' : 'contractor';
+    const receiverRole = receiverId === conversation.homeownerId ? 'homeowner' : 'contractor';
+
+    // Create message
+    const message = await prisma.conversationMessage.create({
+      data: {
+        conversationId,
+        senderId,
+        senderRole,
+        receiverId,
+        receiverRole,
+        content,
+        type
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true
+          }
+        },
+        receiver: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true
+          }
+        }
+      }
+    });
+
+    // Update conversation lastMessageAt
+    await prisma.conversation.update({
+      where: { id: conversationId },
+      data: { lastMessageAt: new Date() }
+    });
+
+    // Send email notification to receiver
+    try {
+      await sendEmailNotification({
+        type: 'message_received',
+        toEmail: message.receiver.email || '',
+        data: {
+          senderName: message.sender.name || message.sender.email,
+          jobTitle: conversation.job.title,
+          messagePreview: content.substring(0, 100),
+          conversationId
+        }
+      });
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError);
+      // Don't fail the request if email fails
+    }
+
+    return NextResponse.json(message, { status: 201 });
+
+  } catch (error) {
+    console.error("Error creating message:", error);
+    return NextResponse.json(
+      { error: "Failed to create message" },
       { status: 500 }
     );
   }

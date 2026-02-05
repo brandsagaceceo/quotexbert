@@ -308,6 +308,19 @@ export const sendNotificationEmail = async ({ to, type, data }: EmailParams): Pr
   }
 };
 
+// Wrapper function for API routes
+export const sendEmailNotification = async ({
+  type,
+  toEmail,
+  data
+}: {
+  type: NotificationType;
+  toEmail: string;
+  data: Record<string, any>;
+}): Promise<boolean> => {
+  return sendNotificationEmail({ to: toEmail, type, data });
+};
+
 // Batch email sending for notifications to multiple users
 export const sendBulkNotifications = async (
   recipients: Array<{ email: string; data: Record<string, any> }>,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendEmailNotification } from '@/lib/email-notifications';
 
 // GET - Fetch homeowner's jobs with applications
 export async function GET(request: NextRequest) {
@@ -60,6 +61,49 @@ export async function POST(request: NextRequest) {
         homeownerId: homeownerId
       }
     });
+
+    // Find contractors subscribed to this category and send notifications
+    try {
+      const contractors = await prisma.user.findMany({
+        where: {
+          role: 'contractor',
+          subscriptions: {
+            some: {
+              category: category,
+              status: 'active',
+              canClaimLeads: true
+            }
+          }
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true
+        }
+      });
+
+      // Send email notifications to all subscribed contractors
+      const notificationPromises = contractors.map(contractor =>
+        sendEmailNotification({
+          type: 'job_posted',
+          toEmail: contractor.email,
+          data: {
+            jobTitle: title,
+            jobId: job.id,
+            location: zipCode,
+            budget: budget,
+            category: category,
+            description: description
+          }
+        })
+      );
+
+      await Promise.allSettled(notificationPromises);
+      console.log(`📧 Sent ${contractors.length} job notification emails for new job: ${title}`);
+    } catch (emailError) {
+      console.error('Error sending job notifications:', emailError);
+      // Don't fail job creation if notifications fail
+    }
 
     return NextResponse.json(job);
   } catch (error) {

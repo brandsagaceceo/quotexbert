@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
 import { canAccessLead as canAccessLeadGod } from "@/lib/god-access";
+import { sendEmailNotification } from "@/lib/email-notifications";
 
 export async function POST(
   request: NextRequest,
@@ -161,6 +162,24 @@ export async function POST(
         relatedType: "job"
       }
     });
+
+    // Send email notification to homeowner
+    try {
+      await sendEmailNotification({
+        type: 'quote_received', // Using quote_received template as closest match
+        toEmail: currentLead.homeowner.email,
+        data: {
+          jobTitle: currentLead.title,
+          contractorName: contractor.name || contractor.email,
+          quoteAmount: 'TBD',
+          timeline: 'To be discussed',
+          quoteDetails: message || 'The contractor is ready to discuss your project details.',
+          quoteId: acceptance.id
+        }
+      });
+    } catch (emailError) {
+      console.error('Failed to send email to homeowner:', emailError);
+    }
 
     // Create notification for contractor
     await prisma.notification.create({

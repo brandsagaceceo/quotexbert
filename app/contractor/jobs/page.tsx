@@ -7,6 +7,8 @@ import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
 import { canAcceptJob, isGodUser } from "@/lib/god-access";
+import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
+import { ToastContainer, type Toast } from "@/components/ToastNotification";
 
 interface JobFilters {
   category?: string;
@@ -27,10 +29,21 @@ export default function ContractorJobsPage() {
   const [filters, setFilters] = useState<JobFilters>({});
   const [showFilters, setShowFilters] = useState(false);
   const [showOnboardingPopup, setShowOnboardingPopup] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
   const { authUser: user, isSignedIn } = useAuth();
   const router = useRouter();
 
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+
+  // Add toast notification
+  const addToast = (toast: Omit<Toast, 'id'>) => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    setToasts(prev => [...prev, { ...toast, id }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -153,6 +166,38 @@ export default function ContractorJobsPage() {
       setLoading(false);
     }
   };
+
+  // Real-time job notifications
+  useJobNotifications({
+    userId: user?.id,
+    enabled: isSignedIn && !!user,
+    pollInterval: 15000, // Check every 15 seconds
+    onNewJob: (job: Job) => {
+      // Refresh jobs list
+      fetchJobs();
+      
+      // Show toast notification
+      addToast({
+        title: '🎉 New Job Available!',
+        message: `${job.title} - ${job.budget} in ${job.location}`,
+        type: 'success',
+        duration: 10000,
+        action: {
+          label: 'View Job',
+          onClick: () => {
+            // Scroll to the job
+            const element = document.getElementById(`job-${job.id}`);
+            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Highlight briefly
+            element?.classList.add('ring-4', 'ring-green-500');
+            setTimeout(() => {
+              element?.classList.remove('ring-4', 'ring-green-500');
+            }, 3000);
+          }
+        }
+      });
+    }
+  });
 
   const acceptJob = async (jobId: string, acceptanceData?: {message?: string}) => {
     setAccepting(jobId);
@@ -413,7 +458,11 @@ export default function ContractorJobsPage() {
         ) : (
           <div className="grid gap-6">
             {filteredJobs.map((job) => (
-              <div key={job.id} className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
+              <div 
+                key={job.id} 
+                id={`job-${job.id}`}
+                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50 transition-all duration-300"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
@@ -604,6 +653,9 @@ export default function ContractorJobsPage() {
         onClose={() => setShowOnboardingPopup(false)}
         contractorName={user?.name}
       />
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
   );
 }
