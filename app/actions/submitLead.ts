@@ -224,39 +224,43 @@ export async function submitLead(formData: FormData) {
     if (!user) {
       console.log(`[submitLead:${requestId}] User not found in database, creating user: ${userId}`);
       
+      // Get user info from Clerk
+      const client = await clerkClient();
+      let clerkUser;
       try {
-        // Get user info from Clerk
-        const client = await clerkClient();
-        const clerkUser = await client.users.getUser(userId);
-        
-        const primaryEmail = clerkUser.emailAddresses.find(e => e.id === clerkUser.primaryEmailAddressId);
-        const email = primaryEmail?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
-        
-        if (!email) {
-          console.error(`[submitLead:${requestId}] No email found for Clerk user:`, {
-            userId,
-            emailAddresses: clerkUser.emailAddresses.length,
-            primaryEmailAddressId: clerkUser.primaryEmailAddressId
-          });
-          return {
-            success: false,
-            error: "Your account is missing an email address. Please add an email in your account settings and try again.",
-            code: 'NO_EMAIL',
-            requestId,
-          };
-        }
-        
-        const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || clerkUser.username || 'User';
-        
-        console.log(`[submitLead:${requestId}] Creating user with email: ${email}, name: ${name}`);
-        
-        // Use upsert to handle race conditions
+        clerkUser = await client.users.getUser(userId);
+      } catch (clerkError) {
+        console.error(`[submitLead:${requestId}] Failed to fetch Clerk user:`, clerkError);
+        return {
+          success: false,
+          error: "Authentication error. Please sign out and sign back in.",
+          code: 'CLERK_ERROR',
+          requestId,
+        };
+      }
+      
+      const primaryEmail = clerkUser.emailAddresses.find(e => e.id === clerkUser.primaryEmailAddressId);
+      const email = primaryEmail?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
+      
+      if (!email) {
+        console.error(`[submitLead:${requestId}] No email found for Clerk user`);
+        return {
+          success: false,
+          error: "Your account is missing an email address. Please add an email and try again.",
+          code: 'NO_EMAIL',
+          requestId,
+        };
+      }
+      
+      const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || clerkUser.username || 'User';
+      
+      console.log(`[submitLead:${requestId}] Creating user with email: ${email}`);
+      
+      // Try upsert first
+      try {
         user = await prisma.user.upsert({
           where: { clerkUserId: userId },
-          update: {
-            email,
-            name,
-          },
+          update: { email, name },
           create: {
             clerkUserId: userId,
             email,
@@ -265,33 +269,43 @@ export async function submitLead(formData: FormData) {
           },
           select: { role: true, id: true, email: true, name: true }
         });
+        console.log(`[submitLead:${requestId}] User created: ${user.id}`);
+      } catch (upsertError: any) {
+        console.error(`[submitLead:${requestId}] Upsert failed, trying to find existing user:`, upsertError?.message);
         
-        console.log(`[submitLead:${requestId}] User created/updated successfully: ${user.id}`);
-      } catch (userCreationError: any) {
-        console.error(`[submitLead:${requestId}] Failed to create user:`, {
-          error: userCreationError,
-          userId,
-          errorMessage: userCreationError?.message,
-          errorCode: userCreationError?.code,
-          errorMeta: userCreationError?.meta
-        });
-        
-        // Try one more time to fetch the user in case it was created by another request
+        // Maybe user was just created by webhook, try to find them
         user = await prisma.user.findUnique({
           where: { clerkUserId: userId },
           select: { role: true, id: true, email: true, name: true }
         });
         
         if (!user) {
+          // Last resort - try finding by email
+          user = await prisma.user.findUnique({
+            where: { email },
+            select: { role: true, id: true, email: true, name: true }
+          });
+          
+          if (user) {
+            console.log(`[submitLead:${requestId}] Found user by email, updating clerkUserId`);
+            // Update the user's clerkUserId
+            user = await prisma.user.update({
+              where: { email },
+              data: { clerkUserId: userId },
+              select: { role: true, id: true, email: true, name: true }
+            });
+          }
+        }
+        
+        if (!user) {
+          console.error(`[submitLead:${requestId}] All user creation attempts failed`);
           return {
             success: false,
-            error: "Database error creating your account. Please refresh the page and try again.",
+            error: "Unable to create your account. Please contact support.",
             code: 'USER_CREATION_FAILED',
             requestId,
           };
         }
-        
-        console.log(`[submitLead:${requestId}] User found on retry: ${user.id}`);
       }
     }
 
