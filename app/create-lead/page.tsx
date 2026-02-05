@@ -205,6 +205,8 @@ export default function CreateLeadPage() {
         }
         
         // Handle field-specific errors
+        let errorMessage: string;
+        
         if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
           setFieldErrors(result.fieldErrors);
           
