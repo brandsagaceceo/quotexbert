@@ -229,8 +229,24 @@ export async function submitLead(formData: FormData) {
         const client = await clerkClient();
         const clerkUser = await client.users.getUser(userId);
         
-        const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@temp.quotexbert.ca`;
-        const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User';
+        const primaryEmail = clerkUser.emailAddresses.find(e => e.id === clerkUser.primaryEmailAddressId);
+        const email = primaryEmail?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
+        
+        if (!email) {
+          console.error(`[submitLead:${requestId}] No email found for Clerk user:`, {
+            userId,
+            emailAddresses: clerkUser.emailAddresses.length,
+            primaryEmailAddressId: clerkUser.primaryEmailAddressId
+          });
+          return {
+            success: false,
+            error: "Your account is missing an email address. Please add an email in your account settings and try again.",
+            code: 'NO_EMAIL',
+            requestId,
+          };
+        }
+        
+        const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || clerkUser.username || 'User';
         
         console.log(`[submitLead:${requestId}] Creating user with email: ${email}, name: ${name}`);
         
@@ -269,11 +285,13 @@ export async function submitLead(formData: FormData) {
         if (!user) {
           return {
             success: false,
-            error: "Unable to create your account in our database. Please contact support with this ID.",
+            error: "Database error creating your account. Please refresh the page and try again.",
             code: 'USER_CREATION_FAILED',
             requestId,
           };
         }
+        
+        console.log(`[submitLead:${requestId}] User found on retry: ${user.id}`);
       }
     }
 
