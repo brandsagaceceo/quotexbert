@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useMessageNotifications } from '@/lib/hooks/useMessageNotifications';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -15,7 +16,8 @@ import {
   FaceSmileIcon,
   CheckIcon,
   XMarkIcon,
-  PhotoIcon
+  PhotoIcon,
+  BellIcon
 } from '@heroicons/react/24/outline';
 
 interface Conversation {
@@ -79,8 +81,20 @@ export default function ConversationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previousMessageCount, setPreviousMessageCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Initialize message notifications
+  const { 
+    notifyNewMessage, 
+    notificationPermission, 
+    requestNotificationPermission 
+  } = useMessageNotifications({
+    enabled: true,
+    soundEnabled: true,
+    browserNotificationsEnabled: true
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -128,6 +142,21 @@ export default function ConversationsPage() {
       const response = await fetch(`/api/conversations/${conversationId}/messages`);
       if (response.ok) {
         const data = await response.json();
+        
+        // Check for new messages and notify
+        if (data.length > previousMessageCount && previousMessageCount > 0 && user) {
+          const newMessages = data.slice(previousMessageCount);
+          const lastNewMessage = newMessages[newMessages.length - 1];
+          
+          // Only notify if the new message is from the other person
+          if (lastNewMessage && lastNewMessage.senderId !== user.id) {
+            const senderName = lastNewMessage.sender?.name || 'Someone';
+            const messagePreview = lastNewMessage.content.substring(0, 100);
+            notifyNewMessage(senderName, messagePreview, conversationId);
+          }
+        }
+        
+        setPreviousMessageCount(data.length);
         setMessages(data);
       }
     } catch (error) {
@@ -142,10 +171,13 @@ export default function ConversationsPage() {
     setSending(true);
     setSendError(null);
     
+    const messageContent = newMessage.trim();
+    const tempId = `temp-${Date.now()}`;
+    
     // Optimistic UI - add message immediately
     const optimisticMessage = {
-      id: `temp-${Date.now()}`,
-      content: newMessage.trim(),
+      id: tempId,
+      content: messageContent,
       senderId: user.id,
       senderRole: user.role,
       receiverId: selectedConversation.otherParticipant.id,
@@ -158,35 +190,47 @@ export default function ConversationsPage() {
       }
     };
     setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage('');
     
     try {
+      console.log('[Conversations] Sending message:', {
+        conversationId: selectedConversation.id,
+        senderId: user.id,
+        receiverId: selectedConversation.otherParticipant.id,
+        content: messageContent
+      });
+
       const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           senderId: user.id,
           receiverId: selectedConversation.otherParticipant.id,
-          content: newMessage.trim()
+          content: messageContent
         })
       });
 
-      if (response.ok) {
-        setNewMessage('');
-        setImagePreview(null);
-        setImageFile(null);
-        fetchMessages(selectedConversation.id);
-        fetchConversations();
-      } else {
+      if (!response.ok) {
         const error = await response.json();
+        console.error('[Conversations] Send message failed:', error);
         setSendError(error.error || 'Failed to send message');
         // Remove optimistic message on failure
-        setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
+        setMessages(prev => prev.filter(m => m.id !== tempId));
+        setNewMessage(messageContent); // Restore message content
+      } else {
+        console.log('[Conversations] Message sent successfully');
+        setImagePreview(null);
+        setImageFile(null);
+        // Fetch fresh messages to get the real message ID
+        fetchMessages(selectedConversation.id);
+        fetchConversations();
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('[Conversations] Error sending message:', error);
       setSendError('Network error. Please check your connection and try again.');
       // Remove optimistic message on failure
-      setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      setNewMessage(messageContent); // Restore message content
     } finally {
       setSending(false);
     }
@@ -250,16 +294,28 @@ export default function ConversationsPage() {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ChatBubbleLeftRightIcon className="w-8 h-8 text-rose-700" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
-                Messages
-              </h1>
+              <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
             </div>
-            <Link 
-              href="/profile"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Back to Profile
-            </Link>
+            
+            <div className="flex items-center gap-3">
+              {/* Notification Permission Banner */}
+              {notificationPermission === 'default' && (
+                <button
+                  onClick={requestNotificationPermission}
+                  className="flex items-center gap-2 bg-rose-100 text-rose-800 px-4 py-2 rounded-lg hover:bg-rose-200 transition-colors text-sm font-medium"
+                >
+                  <BellIcon className="w-5 h-5" />
+                  Enable Notifications
+                </button>
+              )}
+              
+              <Link 
+                href="/profile"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Back to Profile
+              </Link>
+            </div>
           </div>
         </div>
 

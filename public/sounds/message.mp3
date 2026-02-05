@@ -1,0 +1,6 @@
+// This is a placeholder - you'll need to add an actual message notification sound file
+// You can download free notification sounds from:
+// - https://notificationsounds.com/
+// - https://pixabay.com/sound-effects/
+// 
+// For now, we'll use Web Audio API to generate a sound
