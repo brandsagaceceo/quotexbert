@@ -476,7 +476,8 @@ export default function CreateLeadPage() {
                     }
                   }}
                   placeholder="K1A 0A6"
-                  pattern="[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d"
+                  pattern="[A-Za-z]\d[A-Za-z][ \-]?\d[A-Za-z]\d"
+                  title="Canadian postal code format: A1A 1A1 or A1A-1A1"
                   className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
                     fieldErrors.zipCode 
                       ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
