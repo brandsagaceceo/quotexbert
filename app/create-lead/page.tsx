@@ -292,19 +292,19 @@ export default function CreateLeadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-orange-50 pb-safe">
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-50 to-amber-50 pb-safe">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-3 rounded-xl">
+            <div className="bg-gradient-to-br from-rose-700 via-rose-600 to-orange-600 p-3 rounded-xl shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 bg-clip-text text-transparent">
                 Post Your Project
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
+              <p className="text-sm sm:text-base text-rose-800 font-medium mt-1">
                 Get matched with verified contractors
               </p>
             </div>
@@ -312,22 +312,22 @@ export default function CreateLeadPage() {
           
           {/* Value Props */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">100% Free to Post</span>
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-md border-2 border-rose-200">
+              <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+              <span className="text-sm font-semibold text-gray-800">100% Free to Post</span>
             </div>
-            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">Verified Contractors</span>
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-md border-2 border-rose-200">
+              <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+              <span className="text-sm font-semibold text-gray-800">Verified Contractors</span>
             </div>
-            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-rose-100">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <span className="text-sm text-gray-700">Multiple Quotes</span>
+            <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-md border-2 border-rose-200">
+              <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+              <span className="text-sm font-semibold text-gray-800">Multiple Quotes</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-2xl border-2 border-rose-200 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Project Title */}
             <div>
