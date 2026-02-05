@@ -92,10 +92,10 @@ export async function submitLead(formData: FormData) {
       projectType: formData.get("projectType") as string,
       title: formData.get("title") as string,
       description: formData.get("description") as string,
-      budget: formData.get("budget") as string,
+      budget: (formData.get("budget") as string) || undefined,
       photos: formData.get("photos") ? JSON.parse(formData.get("photos") as string) : [],
-      website: formData.get("website") as string, // Honeypot
-      affiliateCode: formData.get("affiliateCode") as string, // Affiliate tracking
+      website: (formData.get("website") as string) || undefined, // Honeypot
+      affiliateCode: (formData.get("affiliateCode") as string) || undefined, // Affiliate tracking
     };
 
     console.log(`[submitLead:${requestId}] Raw data:`, {
