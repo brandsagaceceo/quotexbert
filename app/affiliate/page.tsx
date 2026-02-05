@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -257,12 +257,12 @@ export default function AffiliatePage() {
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
               <div className="text-6xl mb-4">🎁</div>
               <h3 className="text-2xl font-black text-gray-900 mb-2">Performance Bonuses</h3>
-              <div className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent mb-2">
                 Extra
               </div>
               <p className="text-gray-600 text-sm mb-4">Quarterly rewards for top performers</p>
-              <div className="bg-purple-100 rounded-lg p-3">
-                <p className="text-purple-800 font-bold">Up to $1,000</p>
+              <div className="bg-rose-100 rounded-lg p-3">
+                <p className="text-rose-900 font-bold">Up to $1,000</p>
               </div>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function AffiliatePage() {
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">Example Earnings Calculator</h3>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+              <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border-2 border-rose-200">
                 <h4 className="font-bold text-gray-900 mb-4">Scenario A: Real Estate Agent</h4>
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex justify-between">
@@ -413,8 +413,8 @@ export default function AffiliatePage() {
         </div>
 
         {/* Real World Examples */}
-        <div className="mb-20 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-12 border-4 border-blue-200">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <div className="mb-20 bg-gradient-to-br from-rose-50 to-orange-50 rounded-3xl p-12 border-4 border-rose-200">
+          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
             Real-World Examples
           </h2>
           <p className="text-center text-gray-700 text-lg mb-12">See how affiliates are earning with QuoteXbert</p>
@@ -518,7 +518,7 @@ export default function AffiliatePage() {
               </div>
             </div>
             
-            <div className="flex items-start gap-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+            <div className="flex items-start gap-6 bg-gradient-to-r from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
               <div className="text-4xl">📅</div>
               <div className="flex-1">
                 <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Schedule</h3>
@@ -534,7 +534,7 @@ export default function AffiliatePage() {
               </div>
             </div>
             
-            <div className="flex items-start gap-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+            <div className="flex items-start gap-6 bg-gradient-to-r from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
               <div className="text-4xl">💳</div>
               <div className="flex-1">
                 <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Methods</h3>
@@ -655,3 +655,4 @@ export default function AffiliatePage() {
     </div>
   );
 }
+

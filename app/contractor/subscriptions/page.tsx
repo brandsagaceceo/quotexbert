@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -406,9 +406,9 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200">
+                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
                   <div className="flex items-start gap-4">
-                    <div className="bg-blue-500 rounded-full p-3 flex-shrink-0">
+                    <div className="bg-rose-700 rounded-full p-3 flex-shrink-0">
                       <span className="text-3xl">🎯</span>
                     </div>
                     <div>
@@ -420,9 +420,9 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
                   <div className="flex items-start gap-4">
-                    <div className="bg-purple-500 rounded-full p-3 flex-shrink-0">
+                    <div className="bg-rose-500 rounded-full p-3 flex-shrink-0">
                       <span className="text-3xl">📬</span>
                     </div>
                     <div>
@@ -683,58 +683,58 @@ export default function SubscriptionsPage() {
 
                 {/* General Contractor Tier */}
                 <div className="group relative">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-purple-400 via-indigo-500 to-blue-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
-                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-purple-400">
+                  <div className="absolute -inset-1 bg-gradient-to-br from-rose-400 via-orange-600 to-rose-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
+                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-rose-400">
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
+                      <span className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         PRO
                       </span>
                     </div>
                     
                     <div className="text-center mt-4">
-                      <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
+                      <div className="w-24 h-24 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
                         <span className="text-white text-4xl">👷</span>
                       </div>
                       
                       <h3 className="text-3xl font-black text-gray-900 mb-3">General Contractor</h3>
                       
                       <div className="mb-4">
-                        <span className="text-6xl font-black bg-gradient-to-r from-purple-500 to-indigo-700 bg-clip-text text-transparent">$149</span>
+                        <span className="text-6xl font-black bg-gradient-to-r from-rose-500 to-orange-700 bg-clip-text text-transparent">$149</span>
                         <span className="text-gray-600 font-bold text-xl">/month</span>
                       </div>
                       
-                      <div className="bg-purple-50 rounded-2xl p-4 mb-6 border-2 border-purple-200">
-                        <p className="text-sm font-black text-purple-800 mb-2">Access to ALL 10+ Categories</p>
-                        <p className="text-xs text-purple-700">Complete access for full-service contractors</p>
+                      <div className="bg-rose-50 rounded-2xl p-4 mb-6 border-2 border-rose-200">
+                        <p className="text-sm font-black text-rose-900 mb-2">Access to ALL 10+ Categories</p>
+                        <p className="text-xs text-rose-800">Complete access for full-service contractors</p>
                       </div>
                       
                       <ul className="text-left space-y-3 mb-8">
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">ALL job categories included</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Top priority in search results</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Premium contractor badge</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Featured homepage placement</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Dedicated account manager</span>
                         </li>
                         <li className="flex items-start gap-2">
-                          <span className="text-purple-600 text-xl">✓</span>
+                          <span className="text-rose-700 text-xl">✓</span>
                           <span className="text-sm font-semibold text-gray-700">Everything in Renovation Xbert</span>
                         </li>
                       </ul>
@@ -743,7 +743,7 @@ export default function SubscriptionsPage() {
                         onClick={() => handleTierSubscription('general')}
                         disabled={checkoutLoading !== null}
                         className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 bg-[length:200%_100%]"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-orange-600 to-rose-500 bg-[length:200%_100%]"></div>
                         <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
                           {checkoutLoading === 'general' ? (
                             <>
@@ -790,7 +790,7 @@ export default function SubscriptionsPage() {
 
           {/* Summary Cards - Compact */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-rose-700">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-gray-600 uppercase">Active Subscriptions</p>
@@ -920,55 +920,55 @@ export default function SubscriptionsPage() {
                         <td className="py-4 px-4 font-semibold">Job Categories</td>
                         <td className="text-center py-4 px-4 font-black text-green-600">3 Categories</td>
                         <td className="text-center py-4 px-4 bg-orange-50 font-black text-orange-600">6 Categories</td>
-                        <td className="text-center py-4 px-4 font-black text-purple-600">ALL 10+ Categories</td>
+                        <td className="text-center py-4 px-4 font-black text-rose-700">ALL 10+ Categories</td>
                       </tr>
                       <tr className="border-b border-gray-200 bg-gray-50">
                         <td className="py-4 px-4 font-semibold">Job Applications</td>
                         <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200">
                         <td className="py-4 px-4 font-semibold">Direct Messaging</td>
                         <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200 bg-gray-50">
                         <td className="py-4 px-4 font-semibold">Profile Directory</td>
                         <td className="text-center py-4 px-4"><span className="text-2xl text-green-600">✓</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200">
                         <td className="py-4 px-4 font-semibold">Priority in Search</td>
                         <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200 bg-gray-50">
                         <td className="py-4 px-4 font-semibold">Featured Badge</td>
                         <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200">
                         <td className="py-4 px-4 font-semibold">Portfolio Showcase</td>
                         <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-2xl text-orange-600">✓</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="border-b border-gray-200 bg-gray-50">
                         <td className="py-4 px-4 font-semibold">Homepage Placement</td>
                         <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50"><span className="text-gray-400">—</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                       <tr className="bg-gray-50">
                         <td className="py-4 px-4 font-semibold">Account Manager</td>
                         <td className="text-center py-4 px-4"><span className="text-gray-400">—</span></td>
                         <td className="text-center py-4 px-4 bg-orange-50 rounded-b-xl"><span className="text-gray-400">—</span></td>
-                        <td className="text-center py-4 px-4"><span className="text-2xl text-purple-600">✓</span></td>
+                        <td className="text-center py-4 px-4"><span className="text-2xl text-rose-700">✓</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -1054,3 +1054,4 @@ export default function SubscriptionsPage() {
     </Elements>
   );
 }
+

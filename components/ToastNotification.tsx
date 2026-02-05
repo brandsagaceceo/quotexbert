@@ -31,14 +31,14 @@ export function ToastNotification({ toast, onClose }: ToastNotificationProps) {
   }, [toast, onClose]);
 
   const bgColor = {
-    info: 'bg-blue-50 border-blue-500',
+    info: 'bg-rose-50 border-rose-700',
     success: 'bg-green-50 border-green-500',
     warning: 'bg-amber-50 border-amber-500',
     error: 'bg-red-50 border-red-500'
   }[toast.type || 'info'];
 
   const textColor = {
-    info: 'text-blue-900',
+    info: 'text-rose-950',
     success: 'text-green-900',
     warning: 'text-amber-900',
     error: 'text-red-900'

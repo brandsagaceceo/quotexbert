@@ -19,6 +19,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.clerk.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'oaidalleapiprodscus.blob.core.windows.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.blob.core.windows.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.vercel-storage.com',
       }
     ],
   },

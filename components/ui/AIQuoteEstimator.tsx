@@ -374,7 +374,7 @@ export function AIQuoteEstimator() {
           </div>
 
           {/* AI Visualization Section */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl shadow-xl border-2 border-purple-200 p-8">
+          <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-3xl shadow-xl border-2 border-purple-200 p-8">
             <div className="flex items-center gap-3 mb-6">
               <Wand2 className="w-8 h-8 text-purple-600" />
               <div>
@@ -387,7 +387,7 @@ export function AIQuoteEstimator() {
               <button
                 onClick={handleGenerateVisualization}
                 disabled={generatingViz}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
                 {generatingViz ? (
                   <>
@@ -422,7 +422,7 @@ export function AIQuoteEstimator() {
                     {generatingViz ? "Generating..." : "Generate New Vision"}
                   </button>
                   <button
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                     📸 Post with This Photo
                   </button>

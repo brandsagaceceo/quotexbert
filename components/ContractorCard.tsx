@@ -152,7 +152,7 @@ export function ContractorListItem({
     <div 
       className={`bg-gray-800 rounded-lg p-4 cursor-pointer transition-all ${
         selected 
-          ? "border-2 border-blue-500 bg-blue-900/20" 
+          ? "border-2 border-rose-700 bg-blue-900/20" 
           : "border border-gray-700 hover:border-gray-600"
       }`}
       onClick={handleClick}
@@ -206,7 +206,7 @@ export function ContractorListItem({
             href={`/contractors/${contractor.userId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center"
+            className="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center"
             onClick={(e) => e.stopPropagation()}
           >
             View Profile

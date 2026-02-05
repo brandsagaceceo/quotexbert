@@ -221,7 +221,7 @@ export default function ContractorSearchPage() {
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-700"></div>
       </div>
     );
   }
@@ -269,7 +269,7 @@ export default function ContractorSearchPage() {
                 <h2 className="text-lg font-bold text-gray-900">Filters</h2>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden text-blue-600 hover:text-blue-700"
+                  className="lg:hidden text-rose-700 hover:text-rose-900"
                 >
                   ✕
                 </button>
@@ -372,7 +372,7 @@ export default function ContractorSearchPage() {
                       type="checkbox"
                       checked={filters.verified}
                       onChange={(e) => setFilters(prev => ({ ...prev, verified: e.target.checked }))}
-                      className="text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="text-rose-700 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <span className="ml-2 text-sm text-gray-700">Verified only</span>
                   </label>
@@ -381,7 +381,7 @@ export default function ContractorSearchPage() {
                 {/* Clear Filters */}
                 <button
                   onClick={clearFilters}
-                  className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="w-full text-sm text-rose-700 hover:text-rose-900 font-medium"
                 >
                   Clear all filters
                 </button>
@@ -429,7 +429,7 @@ export default function ContractorSearchPage() {
                                 <Award className="h-4 w-4 md:h-5 md:w-5 text-green-600 flex-shrink-0" />
                               )}
                             </div>
-                            <p className="text-blue-600 font-medium text-sm md:text-base">{contractor.trade}</p>
+                            <p className="text-rose-700 font-medium text-sm md:text-base">{contractor.trade}</p>
                             {contractor.city && (
                               <div className="flex items-center text-gray-600 text-xs md:text-sm mt-1">
                                 <MapPin className="h-3 w-3 md:h-4 md:w-4 mr-1 flex-shrink-0" />
@@ -487,7 +487,7 @@ export default function ContractorSearchPage() {
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                         <button
                           onClick={() => handleContact(contractor)}
-                          className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center text-sm md:text-base font-medium"
+                          className="flex-1 bg-rose-700 text-white py-3 px-4 rounded-lg hover:bg-rose-800 flex items-center justify-center text-sm md:text-base font-medium"
                         >
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Contact

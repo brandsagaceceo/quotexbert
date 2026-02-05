@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -111,7 +111,15 @@ export default function VisualizerPage() {
       const data = await response.json();
 
       if (data.success) {
-        setAfterImage(data.data.afterImageUrl);
+        console.log("Generation successful:", data.data);
+        const afterUrl = data.data.afterImageUrl;
+        
+        if (!afterUrl) {
+          setError("No after image generated. Please try again.");
+          return;
+        }
+        
+        setAfterImage(afterUrl);
         setGenerationId(data.data.generationId);
         setShowQuoteModal(true);
         fetchUsage(); // Refresh usage count
@@ -213,13 +221,13 @@ export default function VisualizerPage() {
           </Link>
 
           <div className="inline-block mb-4">
-            <div className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-full font-bold shadow-lg">
+            <div className="flex items-center gap-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-full font-bold shadow-lg">
               <span className="text-2xl">✨</span>
               <span>AI HOME VISUALIZER</span>
             </div>
           </div>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-rose-900 via-pink-700 to-purple-900 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-rose-900 via-pink-700 to-rose-950 bg-clip-text text-transparent mb-4">
             Visualize Your Dream Space
             <br />
             With AI Magic
@@ -235,9 +243,9 @@ export default function VisualizerPage() {
           {isSignedIn && usage && (
             <div className="mt-6 inline-block">
               {usage.isPaidSubscriber ? (
-                <div className="bg-gradient-to-r from-purple-100 to-pink-100 border-2 border-purple-300 px-6 py-3 rounded-full">
-                  <span className="font-black text-purple-900">♾️ UNLIMITED</span>
-                  <span className="text-purple-700 ml-2">• Pro Member</span>
+                <div className="bg-gradient-to-r from-rose-100 to-orange-100 border-2 border-rose-300 px-6 py-3 rounded-full">
+                  <span className="font-black text-rose-950">♾️ UNLIMITED</span>
+                  <span className="text-rose-800 ml-2">• Pro Member</span>
                 </div>
               ) : (
                 <div className="bg-gradient-to-r from-rose-100 to-orange-100 border-2 border-rose-300 px-6 py-3 rounded-full">
@@ -359,7 +367,7 @@ export default function VisualizerPage() {
               <button
                 onClick={handleGenerate}
                 disabled={loading || !beforeImage || !description.trim()}
-                className="w-full mt-6 bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 text-white py-5 rounded-2xl font-black text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                className="w-full mt-6 bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 text-white py-5 rounded-2xl font-black text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
                 {loading ? (
                   <>
@@ -425,7 +433,7 @@ export default function VisualizerPage() {
               </div>
 
               {/* Pro Testimonials */}
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl shadow-xl p-8 border-2 border-purple-200">
+              <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-3xl shadow-xl p-8 border-2 border-rose-200">
                 <h3 className="text-2xl font-black text-gray-900 mb-4">💬 Pro Users Love It</h3>
                 <div className="space-y-4">
                   <div className="bg-white rounded-xl p-4 shadow">
@@ -549,3 +557,4 @@ export default function VisualizerPage() {
     </div>
   );
 }
+

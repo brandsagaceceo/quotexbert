@@ -114,7 +114,7 @@ export default function ContractorPortfolioPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-700 mx-auto mb-4"></div>
           <p>Loading your portfolio...</p>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function ContractorPortfolioPage() {
       <div className="grid md:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{portfolioItems.length}</div>
+            <div className="text-2xl font-bold text-rose-700">{portfolioItems.length}</div>
             <div className="text-sm text-gray-600">Total Projects</div>
           </CardContent>
         </Card>
@@ -341,7 +341,7 @@ function PortfolioCard({
         {item.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {item.tags.map((tag, index) => (
-              <span key={index} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+              <span key={index} className="text-xs bg-rose-100 text-rose-900 px-2 py-1 rounded-full">
                 #{tag}
               </span>
             ))}

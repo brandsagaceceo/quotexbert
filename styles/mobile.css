@@ -1,6 +1,27 @@
 /* Mobile-first responsive design utilities and enhancements */
 
-/* Enhanced touch targets for mobile */
+:root {
+  --header-height: 64px;
+  --bottom-nav-height: 72px;
+  --floating-action-offset: 12px;
+}
+
+/* Prevent horizontal overflow */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Fix for flex children causing overflow */
+.flex > * {
+  min-width: 0;
+}
+
+/* Enhanced touch targets for mobile (minimum 44x44px for accessibility) */
 .touch-target {
   min-height: 44px;
   min-width: 44px;

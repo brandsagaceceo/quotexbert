@@ -257,7 +257,7 @@ export default async function LocalServicePage({ params }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-50 py-16">
+      <section className="bg-gradient-to-br from-rose-50 to-orange-50 py-16">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
             <Link href="/" className="hover:text-blue-600">Home</Link>
@@ -277,7 +277,7 @@ export default async function LocalServicePage({ params }: Props) {
 
           <div className="flex flex-wrap items-center gap-6 mb-8">
             <div className="flex items-center gap-2">
-              <MapPinIcon className="w-5 h-5 text-blue-600" />
+              <MapPinIcon className="w-5 h-5 text-rose-700" />
               <span className="text-gray-700">{cityData.name}, ON</span>
             </div>
             <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export default async function LocalServicePage({ params }: Props) {
 
           <a
             href="/#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Free Instant Estimate
           </a>
@@ -333,7 +333,7 @@ export default async function LocalServicePage({ params }: Props) {
                 <div className="text-gray-600">Starting From</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-black text-blue-600 mb-2">
+                <div className="text-4xl font-black text-rose-700 mb-2">
                   ${Math.round((serviceData.priceRange.low + serviceData.priceRange.high) / 2).toLocaleString()}
                 </div>
                 <div className="text-gray-600">Average Cost</div>
@@ -374,7 +374,7 @@ export default async function LocalServicePage({ params }: Props) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-600">
+      <section className="py-16 bg-gradient-to-r from-rose-700 to-orange-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
             Ready to Get Your Free Estimate?
@@ -384,7 +384,7 @@ export default async function LocalServicePage({ params }: Props) {
           </p>
           <a
             href="/#get-estimate"
-            className="inline-block px-10 py-5 bg-white text-blue-600 text-xl font-bold rounded-xl shadow-2xl hover:bg-gray-100 hover:scale-105 transition-all duration-200"
+            className="inline-block px-10 py-5 bg-white text-rose-700 text-xl font-bold rounded-xl shadow-2xl hover:bg-gray-100 hover:scale-105 transition-all duration-200"
           >
             📸 Get Instant Free Quote
           </a>

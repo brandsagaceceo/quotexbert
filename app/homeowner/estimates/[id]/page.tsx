@@ -211,7 +211,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading estimate...</p>
         </div>
       </div>
@@ -226,7 +226,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={() => router.push('/homeowner/estimates')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700"
           >
             Back to Estimates
           </button>
@@ -259,7 +259,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           {/* AI Badge */}
           {estimate.aiPowered && (
-            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mb-4">
+            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-rose-100 text-rose-800 mb-4">
               <Sparkles className="w-4 h-4 mr-1" />
               AI-Powered Estimate
             </div>
@@ -286,7 +286,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Confidence</p>
-              <p className="text-2xl font-bold text-blue-600">{Math.round(estimate.confidence * 100)}%</p>
+              <p className="text-2xl font-bold text-rose-700">{Math.round(estimate.confidence * 100)}%</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Status</p>
@@ -334,14 +334,14 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
               <div className="flex gap-2">
                 <button
                   onClick={selectAll}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-rose-700 hover:text-rose-900 font-medium"
                 >
                   Select All
                 </button>
                 <span className="text-gray-400">|</span>
                 <button
                   onClick={deselectAll}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-rose-700 hover:text-rose-900 font-medium"
                 >
                   Deselect All
                 </button>
@@ -355,7 +355,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                 key={item.id}
                 className={`p-4 border rounded-lg transition-all ${
                   selectedItems.has(item.id)
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-rose-500 bg-rose-50'
                     : 'border-gray-200 hover:border-gray-300'
                 } ${isPosted ? 'opacity-75' : 'cursor-pointer'}`}
                 onClick={() => !isPosted && toggleItemSelection(item.id)}
@@ -366,7 +366,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                       <div
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                           selectedItems.has(item.id)
-                            ? 'bg-blue-600 border-blue-600'
+                            ? 'bg-rose-600 border-rose-600'
                             : 'border-gray-300'
                         }`}
                       >
@@ -437,7 +437,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                   className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 ${
                     selectedItems.size === 0 || posting
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-rose-600 text-white hover:bg-rose-700'
                   }`}
                 >
                   <Send className="w-5 h-5" />

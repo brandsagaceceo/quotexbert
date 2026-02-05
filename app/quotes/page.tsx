@@ -110,7 +110,7 @@ export default function QuotesPage() {
                     ${quote.totalCost.toLocaleString()}
                   </p>
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    quote.status === 'SENT' ? 'bg-blue-100 text-blue-800' :
+                    quote.status === 'SENT' ? 'bg-rose-100 text-rose-900' :
                     quote.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
                     quote.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
                     'bg-gray-100 text-gray-800'
@@ -124,7 +124,7 @@ export default function QuotesPage() {
               
               <div className="flex justify-between items-center text-sm text-gray-500">
                 <span>Created: {new Date(quote.createdAt).toLocaleDateString()}</span>
-                <button className="text-blue-600 hover:text-blue-800 font-medium">
+                <button className="text-rose-700 hover:text-rose-900 font-medium">
                   View Details
                 </button>
               </div>

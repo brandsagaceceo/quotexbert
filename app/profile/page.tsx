@@ -465,9 +465,9 @@ export default function UnifiedProfilePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-orange-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-rose-700 mx-auto mb-6"></div>
           <p className="text-xl font-semibold text-slate-800 mb-2">Loading your profile...</p>
           <p className="text-sm text-slate-600">This should only take a moment</p>
         </div>
@@ -484,7 +484,7 @@ export default function UnifiedProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-700 mx-auto mb-4"></div>
           <p className="text-gray-600">Setting up profile... (loading data)</p>
           <p className="text-xs text-gray-400 mt-2">Debug: authUser={authUser?.email}, isLoading={String(isLoading)}</p>
         </div>
@@ -498,13 +498,13 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50" style={{ paddingTop: 'var(--header-height, 96px)' }}>
       {/* Persistent Edit/Save Button - Top Right */}
       <div className="fixed top-24 right-6 md:top-28 md:right-8 z-50">
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl text-sm md:text-base"
+            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl text-sm md:text-base"
           >
             <Edit3 className="h-3 w-3 md:h-4 md:w-4" />
             <span className="hidden sm:inline">Edit Profile</span>
@@ -541,7 +541,7 @@ export default function UnifiedProfilePage() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
+            <div className="w-full h-full bg-gradient-to-r from-rose-700 via-orange-600 to-red-700">
               {/* Default cover with pattern */}
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
@@ -576,7 +576,7 @@ export default function UnifiedProfilePage() {
               onClick={() => document.getElementById('coverPhotoInput')?.click()}
               className="bg-white/95 backdrop-blur-sm text-slate-900 px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold border border-white/20"
             >
-              <Camera className="h-5 w-5 text-blue-600" />
+              <Camera className="h-5 w-5 text-rose-700" />
               Change Cover
             </button>
           </div>
@@ -588,7 +588,7 @@ export default function UnifiedProfilePage() {
             <div className="flex flex-col md:flex-row md:items-end gap-6">
               {/* Profile Picture */}
               <div className="relative group flex-shrink-0">
-                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-blue-100 to-purple-100">
+                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -596,7 +596,7 @@ export default function UnifiedProfilePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
                       <User className="h-20 w-20 text-white" />
                     </div>
                   )}
@@ -635,13 +635,13 @@ export default function UnifiedProfilePage() {
                 <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
                   <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
-                    <p className="text-blue-700 font-semibold text-lg capitalize mb-3">
+                    <p className="text-rose-900 font-semibold text-lg capitalize mb-3">
                       {profile?.trade || authUser.role}
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-slate-600">
                       {profile?.city && (
                         <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <MapPin className="h-4 w-4 text-rose-700 flex-shrink-0" />
                           <span className="truncate">{profile.city}</span>
                         </div>
                       )}
@@ -682,7 +682,7 @@ export default function UnifiedProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium text-sm capitalize whitespace-nowrap ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
+                    ? 'border-rose-700 text-rose-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
@@ -708,7 +708,7 @@ export default function UnifiedProfilePage() {
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-slate-900">About</h2>
                     {isEditing && (
-                      <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-3 py-1 rounded-full">Editing Mode</span>
+                      <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
                     )}
                   </div>
                   {isEditing ? (
@@ -730,7 +730,7 @@ export default function UnifiedProfilePage() {
                 {isContractor && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Briefcase className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                      <Briefcase className="h-8 w-8 text-rose-700 mx-auto mb-2" />
                       <div className="text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
                       <div className="text-sm text-gray-600">Completed Jobs</div>
                     </div>
@@ -755,7 +755,7 @@ export default function UnifiedProfilePage() {
                   <h2 className="text-2xl font-bold text-slate-900">Portfolio</h2>
                   <button 
                     onClick={() => setShowPortfolioForm(true)}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-3 rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                    className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-3 rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                   >
                     <Plus className="h-5 w-5" />
                     Add Project
@@ -789,7 +789,7 @@ export default function UnifiedProfilePage() {
                           
                           {/* Project Type Badge */}
                           <div className="absolute top-4 left-4">
-                            <span className="inline-flex items-center gap-1 bg-white/95 backdrop-blur-sm text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                            <span className="inline-flex items-center gap-1 bg-white/95 backdrop-blur-sm text-rose-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                               {item.projectType}
                             </span>
                           </div>
@@ -798,7 +798,7 @@ export default function UnifiedProfilePage() {
                           <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <button
                               onClick={() => setEditingPortfolioItem(item)}
-                              className="bg-white/95 backdrop-blur-sm text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition-colors shadow-lg"
+                              className="bg-white/95 backdrop-blur-sm text-rose-700 p-2 rounded-full hover:bg-rose-700 hover:text-white transition-colors shadow-lg"
                             >
                               <Edit className="h-4 w-4" />
                             </button>
@@ -837,8 +837,8 @@ export default function UnifiedProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mb-6">
-                      <Camera className="h-10 w-10 text-blue-600" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-6">
+                      <Camera className="h-10 w-10 text-rose-700" />
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 mb-3">Showcase Your Best Work</h3>
                     <p className="text-slate-600 mb-6 max-w-md mx-auto">
@@ -848,7 +848,7 @@ export default function UnifiedProfilePage() {
                     </p>
                     <button 
                       onClick={() => setShowPortfolioForm(true)}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
+                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
                     >
                       <Camera className="h-5 w-5" />
                       Add Your First {isContractor ? "Project" : "Estimate"}
@@ -893,8 +893,8 @@ export default function UnifiedProfilePage() {
 
                 {maxCategories === 0 ? (
                   <div className="text-center py-12">
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 max-w-md mx-auto">
+                      <div className="w-16 h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Briefcase className="h-8 w-8 text-white" />
                       </div>
                       <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Subscription</h3>
@@ -903,7 +903,7 @@ export default function UnifiedProfilePage() {
                       </p>
                       <Link
                         href="/contractor/subscriptions"
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
                       >
                         View Subscription Tiers
                         <span className="text-xl">→</span>
@@ -988,9 +988,9 @@ export default function UnifiedProfilePage() {
                                         }
                                       }}
                                       disabled={selectedCategories.length >= maxCategories}
-                                      className="text-left p-4 border-2 border-slate-200 rounded-lg hover:border-rose-500 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                                      className="text-left p-4 border-2 border-slate-200 rounded-lg hover:border-rose-500 hover:bg-rose-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                                     >
-                                      <div className="font-medium text-slate-900 group-hover:text-blue-600">
+                                      <div className="font-medium text-slate-900 group-hover:text-rose-700">
                                         {category.name}
                                       </div>
                                       <div className="text-sm text-slate-500 mt-1">
@@ -1007,7 +1007,7 @@ export default function UnifiedProfilePage() {
                     )}
 
                     {selectedCategories.length >= maxCategories && (
-                      <div className="mt-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                      <div className="mt-8 p-6 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl border-2 border-rose-200">
                         <h3 className="text-lg font-bold text-slate-900 mb-2">
                           🎉 All category slots filled!
                         </h3>
@@ -1016,7 +1016,7 @@ export default function UnifiedProfilePage() {
                         </p>
                         <Link
                           href="/contractor/subscriptions"
-                          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
                         >
                           Upgrade Your Subscription
                           <span className="text-xl">→</span>
@@ -1080,7 +1080,7 @@ export default function UnifiedProfilePage() {
                       <div key={estimate.id} className="border-2 border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50">
                         <div className="flex items-center gap-2 mb-2">
                           {estimate.aiPowered && (
-                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700">
+                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gradient-to-r from-rose-100 to-orange-100 text-rose-900">
                               ✨ AI
                             </span>
                           )}
@@ -1091,8 +1091,8 @@ export default function UnifiedProfilePage() {
                           )}
                         </div>
                         <p className="text-slate-700 text-sm mb-3 line-clamp-2">{estimate.description}</p>
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-100">
-                          <div className="text-lg font-bold text-blue-700">
+                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-3 border border-rose-100">
+                          <div className="text-lg font-bold text-rose-900">
                             ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
                           </div>
                           <div className="text-xs text-slate-600">{estimate.confidence}% confidence</div>
@@ -1100,7 +1100,7 @@ export default function UnifiedProfilePage() {
                         <div className="mt-3 flex gap-2">
                           <button
                             onClick={() => window.location.href = '/create-lead'}
-                            className="flex-1 text-xs bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition-colors"
+                            className="flex-1 text-xs bg-rose-700 text-white py-2 px-3 rounded-lg hover:bg-rose-800 transition-colors"
                           >
                             Post Job
                           </button>
@@ -1120,11 +1120,11 @@ export default function UnifiedProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+                  <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
                     <div className="text-6xl mb-4">🤖</div>
                     <h3 className="text-xl font-bold text-slate-900 mb-2">No AI Estimates Yet</h3>
                     <p className="text-slate-600 mb-4">Get instant cost estimates for your renovation projects</p>
-                    <a href="/" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                    <a href="/" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
                       Get Free Estimate
                     </a>
                   </div>
@@ -1135,12 +1135,12 @@ export default function UnifiedProfilePage() {
             {activeTab === 'visualizations' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Visualizations</h2>
-                <div className="text-center py-12 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+                <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
                   <div className="text-6xl mb-4">🎨</div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Visualize Your Dream Space</h3>
                   <p className="text-slate-600 mb-4">See AI-generated before/after visualizations of your renovation ideas</p>
                   <div className="flex gap-3 justify-center">
-                    <a href="/visualizer" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                    <a href="/visualizer" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
                       Try AI Visualizer
                     </a>
                     <a href="/visualizer-library" className="inline-block bg-white text-slate-700 border-2 border-slate-200 font-bold py-3 px-6 rounded-lg hover:border-slate-300 transition-all">
@@ -1166,7 +1166,7 @@ export default function UnifiedProfilePage() {
                               <span>•</span>
                               <span className={`font-semibold ${
                                 job.status === 'open' ? 'text-green-600' : 
-                                job.status === 'assigned' ? 'text-blue-600' : 'text-slate-600'
+                                job.status === 'assigned' ? 'text-rose-700' : 'text-slate-600'
                               }`}>
                                 {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                               </span>
@@ -1178,7 +1178,7 @@ export default function UnifiedProfilePage() {
                         </div>
                         <a
                           href={`/homeowner/jobs/${job.id}`}
-                          className="inline-block text-sm bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                          className="inline-block text-sm bg-rose-700 text-white py-2 px-4 rounded-lg hover:bg-rose-800 transition-colors"
                         >
                           View Applications
                         </a>
@@ -1186,11 +1186,11 @@ export default function UnifiedProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
+                  <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
                     <div className="text-6xl mb-4">📝</div>
                     <h3 className="text-xl font-bold text-slate-900 mb-2">No Posted Jobs Yet</h3>
                     <p className="text-slate-600 mb-4">Post a job to get quotes from verified contractors</p>
-                    <a href="/create-lead" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                    <a href="/create-lead" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
                       Post a Job
                     </a>
                   </div>
@@ -1205,7 +1205,7 @@ export default function UnifiedProfilePage() {
                   <div className="text-6xl mb-4">⭐</div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Save Your Favorite Contractors</h3>
                   <p className="text-slate-600 mb-4">Keep track of contractors you want to work with</p>
-                  <a href="/contractors" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                  <a href="/contractors" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
                     Browse Contractors
                   </a>
                 </div>
@@ -1224,7 +1224,7 @@ export default function UnifiedProfilePage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               {estimate.aiPowered && (
-                                <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-200">
+                                <span className="inline-flex items-center gap-1 bg-gradient-to-r from-rose-100 to-orange-100 text-rose-900 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
                                   ✨ AI-Powered
                                 </span>
                               )}
@@ -1234,7 +1234,7 @@ export default function UnifiedProfilePage() {
                                 </span>
                               )}
                               {estimate.imageCount > 0 && (
-                                <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                <span className="inline-flex items-center gap-1 bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1 rounded-full">
                                   📸 {estimate.imageCount} {estimate.imageCount === 1 ? 'Photo' : 'Photos'}
                                 </span>
                               )}
@@ -1271,7 +1271,7 @@ export default function UnifiedProfilePage() {
                           </button>
                         </div>
 
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-blue-100 mb-4">
+                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-6 border-2 border-rose-100 mb-4">
                           <div className="flex items-baseline justify-center gap-3 mb-2">
                             <span className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
                               ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
@@ -1297,7 +1297,7 @@ export default function UnifiedProfilePage() {
                             <ul className="space-y-2">
                               {estimate.factors.map((factor, index) => (
                                 <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
-                                  <span className="text-blue-600 mt-1">•</span>
+                                  <span className="text-rose-700 mt-1">•</span>
                                   <span>{factor}</span>
                                 </li>
                               ))}
@@ -1308,7 +1308,7 @@ export default function UnifiedProfilePage() {
                         <div className="mt-6 pt-4 border-t border-slate-200">
                           <Link
                             href={`/?estimate=${estimate.id}`}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
                           >
                             Post Job & Get Quotes
                           </Link>
@@ -1318,8 +1318,8 @@ export default function UnifiedProfilePage() {
                   </div>
                 ) : (
                   <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mb-6">
-                      <DollarSign className="h-10 w-10 text-blue-600" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-6">
+                      <DollarSign className="h-10 w-10 text-rose-700" />
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 mb-3">No Saved Quotes Yet</h3>
                     <p className="text-slate-600 mb-6 max-w-md mx-auto">
@@ -1327,7 +1327,7 @@ export default function UnifiedProfilePage() {
                     </p>
                     <Link
                       href="/"
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
+                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
                     >
                       Get Your First Quote
                     </Link>
@@ -1341,7 +1341,7 @@ export default function UnifiedProfilePage() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-slate-900">Contact Information</h2>
                   {isEditing && (
-                    <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-3 py-1 rounded-full">Editing Mode</span>
+                    <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
                   )}
                 </div>
                 
@@ -1403,7 +1403,7 @@ export default function UnifiedProfilePage() {
                   ) : (
                     <>
                       <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl flex items-center justify-center">
                           <Mail className="h-6 w-6 text-white" />
                         </div>
                         <div className="ml-4">
@@ -1413,7 +1413,7 @@ export default function UnifiedProfilePage() {
                       </div>
                       {profile?.phone ? (
                         <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl flex items-center justify-center">
                             <Phone className="h-6 w-6 text-white" />
                           </div>
                           <div className="ml-4">
@@ -1429,12 +1429,12 @@ export default function UnifiedProfilePage() {
                       )}
                       {profile?.website ? (
                         <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl flex items-center justify-center">
                             <Globe className="h-6 w-6 text-white" />
                           </div>
                           <div className="ml-4 flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-500 uppercase">Website</p>
-                            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-blue-600 hover:text-blue-700 hover:underline truncate block">
+                            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-rose-700 hover:text-rose-900 hover:underline truncate block">
                               {profile.website}
                             </a>
                           </div>
@@ -1447,7 +1447,7 @@ export default function UnifiedProfilePage() {
                       )}
                       {profile?.city ? (
                         <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                          <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl flex items-center justify-center">
                             <MapPin className="h-6 w-6 text-white" />
                           </div>
                           <div className="ml-4">
@@ -1475,7 +1475,7 @@ export default function UnifiedProfilePage() {
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Location</h3>
                 <div className="flex items-center text-gray-700">
-                  <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+                  <MapPin className="h-5 w-5 mr-2 text-rose-700" />
                   <span>{profile.city}</span>
                 </div>
               </div>
@@ -1726,7 +1726,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
                     />
                     <label
                       htmlFor="portfolioImageUpload"
-                      className="cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700"
+                      className="cursor-pointer bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700"
                     >
                       {uploading ? 'Uploading...' : 'Upload Photo'}
                     </label>
@@ -1745,7 +1745,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700"
+                className="px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700"
               >
                 {initialData ? 'Update Project' : 'Add Project'}
               </button>
@@ -1756,3 +1756,4 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
     </div>
   );
 }
+

@@ -197,12 +197,12 @@ export default function PaymentModal({
           )}
 
           {/* Demo Notice */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 mb-6">
             <div className="flex items-start space-x-2">
-              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-rose-700 mt-0.5" />
               <div>
-                <p className="text-sm text-blue-800 font-medium">Demo Mode</p>
-                <p className="text-xs text-blue-600">This is a demonstration. No real payment will be processed.</p>
+                <p className="text-sm text-rose-900 font-medium">Demo Mode</p>
+                <p className="text-xs text-rose-700">This is a demonstration. No real payment will be processed.</p>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { X, CheckCircle, TrendingUp, Users } from "lucide-react";
@@ -30,7 +30,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
         "Portfolio showcase",
         "Customer reviews"
       ],
-      color: "from-blue-600 to-blue-700",
+      color: "from-rose-600 to-orange-600",
       recommended: false
     },
     {
@@ -70,7 +70,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
         "Dedicated account manager",
         "Custom branding"
       ],
-      color: "from-purple-600 to-indigo-700",
+      color: "from-rose-700 to-orange-700",
       recommended: false
     }
   ];
@@ -111,21 +111,21 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
             </div>
 
             <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-rose-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h3 className="font-bold text-lg text-blue-900 mb-2">Grow Your Business</h3>
-              <p className="text-blue-700 text-sm">
+              <h3 className="font-bold text-lg text-rose-950 mb-2">Grow Your Business</h3>
+              <p className="text-rose-900 text-sm">
                 Consistent stream of projects to keep your schedule full year-round
               </p>
             </div>
 
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl">
-              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-6 bg-gradient-to-br from-rose-50 to-orange-100 rounded-2xl">
+              <div className="w-16 h-16 bg-rose-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h3 className="font-bold text-lg text-purple-900 mb-2">Simple & Transparent</h3>
-              <p className="text-purple-700 text-sm">
+              <h3 className="font-bold text-lg text-rose-950 mb-2">Simple & Transparent</h3>
+              <p className="text-rose-800 text-sm">
                 One flat monthly rate. No hidden fees or commission on projects
               </p>
             </div>
@@ -249,3 +249,4 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
     </div>
   );
 }
+

@@ -340,11 +340,11 @@ export default function MaterialOptimizer() {
           </div>
 
           {/* Toronto-Specific Advice */}
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+          <div className="bg-rose-50 border-2 border-rose-200 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-rose-950 mb-2 flex items-center gap-2">
               🍁 Toronto/GTA Climate Considerations
             </h3>
-            <p className="text-blue-800">{result.torontoSpecificAdvice}</p>
+            <p className="text-rose-900">{result.torontoSpecificAdvice}</p>
           </div>
 
           {/* Material Recommendations */}

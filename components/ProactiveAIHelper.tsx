@@ -89,11 +89,16 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
       return;
     }
 
-    // Check if user dismissed recently (within 7 days - increased from 24 hours)
+    // Check if shown this session
+    if (sessionStorage.getItem('aiHelperShownThisSession')) {
+      return;
+    }
+
+    // Check if user dismissed recently (within 24 hours)
     const dismissedTime = localStorage.getItem('aiHelperDismissed');
     if (dismissedTime) {
-      const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) {
+      const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
+      if (hoursSinceDismissed < 24) {
         console.log('[AIHelper] Skipping auto-open due to recent dismissal');
         return;
       }

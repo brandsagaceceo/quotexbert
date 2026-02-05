@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -69,14 +69,14 @@ export default function AdminDashboard() {
       description: "Create and manage blog posts for SEO",
       href: "/admin/blog",
       icon: Cog6ToothIcon,
-      color: "from-indigo-500 to-indigo-600"
+      color: "from-orange-600 to-orange-600"
     },
     {
       title: "Lead Pricing",
       description: "Configure lead pricing and categories",
       href: "/admin/lead-pricing",
       icon: CurrencyDollarIcon,
-      color: "from-purple-500 to-purple-600"
+      color: "from-rose-500 to-rose-700"
     },
     {
       title: "Analytics & Insights",
@@ -130,10 +130,10 @@ export default function AdminDashboard() {
             <div className="bg-gradient-to-br from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-600 text-sm font-medium">Total Leads</p>
-                  <p className="text-3xl font-bold text-blue-900">{stats.totalLeads}</p>
+                  <p className="text-rose-700 text-sm font-medium">Total Leads</p>
+                  <p className="text-3xl font-bold text-rose-950">{stats.totalLeads}</p>
                 </div>
-                <BriefcaseIcon className="h-8 w-8 text-blue-600" />
+                <BriefcaseIcon className="h-8 w-8 text-rose-700" />
               </div>
             </div>
 
@@ -147,13 +147,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50/80 to-purple-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-rose-50/80 to-rose-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-600 text-sm font-medium">Total Users</p>
-                  <p className="text-3xl font-bold text-purple-900">{stats.totalUsers}</p>
+                  <p className="text-rose-700 text-sm font-medium">Total Users</p>
+                  <p className="text-3xl font-bold text-rose-950">{stats.totalUsers}</p>
                 </div>
-                <UserGroupIcon className="h-8 w-8 text-purple-600" />
+                <UserGroupIcon className="h-8 w-8 text-rose-700" />
               </div>
             </div>
 
@@ -219,3 +219,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

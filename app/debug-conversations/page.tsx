@@ -83,7 +83,7 @@ export default function DebugConversations() {
       )}
       
       {authUser && (
-        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+        <div className="bg-rose-100 border border-blue-400 text-rose-900 px-4 py-3 rounded mb-4">
           <p><strong>Logged in as:</strong> {authUser.name} ({authUser.email})</p>
           <p><strong>Role:</strong> {authUser.role}</p>
           <p><strong>User ID:</strong> {authUser.id}</p>

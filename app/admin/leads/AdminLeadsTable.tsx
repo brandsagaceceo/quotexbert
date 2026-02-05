@@ -26,7 +26,7 @@ function getStatusBadge(status: string) {
   const statusMap = {
     open: "bg-green-100 text-green-800",
     claimed: "bg-yellow-100 text-yellow-800",
-    assigned: "bg-blue-100 text-blue-800",
+    assigned: "bg-rose-100 text-rose-900",
     closed: "bg-gray-100 text-gray-800",
   };
 

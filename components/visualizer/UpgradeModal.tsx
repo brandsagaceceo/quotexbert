@@ -65,14 +65,14 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
         {/* Content */}
         <div className="p-8">
           {/* Upgrade Offer */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 mb-6 border-2 border-purple-200">
+          <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 mb-6 border-2 border-purple-200">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-3xl font-black text-gray-900 mb-2">AI Visualizer Pro</h3>
                 <p className="text-gray-600 font-semibold">Unlimited AI room transformations</p>
               </div>
               <div className="text-right">
-                <div className="text-5xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <div className="text-5xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
                   $6.99
                 </div>
                 <div className="text-sm font-semibold text-gray-600">/month CAD</div>

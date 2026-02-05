@@ -163,7 +163,7 @@ export default function SimpleDebugPage() {
           <div className="space-y-2">
             <button
               onClick={() => window.open("/messages", "_blank")}
-              className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600"
+              className="w-full bg-rose-700 text-white p-3 rounded hover:bg-rose-700"
             >
               📨 Open Full Messages Page
             </button>

@@ -330,16 +330,16 @@ export default function AdminLeadPricingPage() {
         </div>
 
         {/* Quick Setup */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-blue-900 mb-4">
+        <div className="mt-8 bg-rose-50 rounded-xl p-6 border border-rose-200">
+          <h3 className="text-lg font-semibold text-rose-950 mb-4">
             💡 Quick Setup Suggestions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h4 className="font-medium text-blue-800 mb-2">
+              <h4 className="font-medium text-rose-900 mb-2">
                 Common Trade Pricing:
               </h4>
-              <ul className="space-y-1 text-blue-700">
+              <ul className="space-y-1 text-rose-900">
                 <li>• Plumbing: $12.00 - $15.00</li>
                 <li>• Electrical: $15.00 - $20.00</li>
                 <li>• Painting: $8.00 - $12.00</li>
@@ -347,8 +347,8 @@ export default function AdminLeadPricingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-blue-800 mb-2">Pro Tips:</h4>
-              <ul className="space-y-1 text-blue-700">
+              <h4 className="font-medium text-rose-900 mb-2">Pro Tips:</h4>
+              <ul className="space-y-1 text-rose-900">
                 <li>• Use "default" city for general pricing</li>
                 <li>• Higher prices for specialized trades</li>
                 <li>• City-specific pricing for competitive markets</li>

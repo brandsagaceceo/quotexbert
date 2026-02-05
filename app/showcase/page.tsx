@@ -138,7 +138,7 @@ export default function ShowcasePage() {
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <div className={`text-3xl font-bold mb-2 ${
-                stat.color === 'blue' ? 'text-blue-600' :
+                stat.color === 'blue' ? 'text-rose-700' :
                 stat.color === 'green' ? 'text-green-600' :
                 stat.color === 'purple' ? 'text-purple-600' :
                 'text-orange-600'
@@ -214,7 +214,7 @@ export default function ShowcasePage() {
                       <div className="font-medium text-gray-900">View All Jobs</div>
                       <div className="text-sm text-gray-600 mt-1">Contractors can browse all 106+ leads without restrictions</div>
                     </div>
-                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <div className="p-4 bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg">
                       <div className="font-medium text-gray-900">Apply with Subscription</div>
                       <div className="text-sm text-gray-600 mt-1">Job applications require category-specific subscriptions</div>
                     </div>
@@ -239,7 +239,7 @@ export default function ShowcasePage() {
                       <div className="font-medium text-gray-900 mb-2">Previous: Teal & Blue</div>
                       <div className="flex gap-2">
                         <div className="w-8 h-8 bg-teal-500 rounded"></div>
-                        <div className="w-8 h-8 bg-blue-500 rounded"></div>
+                        <div className="w-8 h-8 bg-rose-700 rounded"></div>
                         <div className="w-8 h-8 bg-cyan-500 rounded"></div>
                       </div>
                     </div>
@@ -274,9 +274,9 @@ export default function ShowcasePage() {
             <div>
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Comprehensive Job System</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-blue-50 p-6 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-3">106+ Job Leads</h4>
-                  <p className="text-blue-700 text-sm">Comprehensive leads across all 70+ categories including appliances, construction, electrical, HVAC, plumbing, and more.</p>
+                <div className="bg-rose-50 p-6 rounded-lg">
+                  <h4 className="font-semibold text-rose-950 mb-3">106+ Job Leads</h4>
+                  <p className="text-rose-900 text-sm">Comprehensive leads across all 70+ categories including appliances, construction, electrical, HVAC, plumbing, and more.</p>
                 </div>
                 <div className="bg-green-50 p-6 rounded-lg">
                   <h4 className="font-semibold text-green-900 mb-3">Realistic Data</h4>
@@ -348,8 +348,8 @@ export default function ShowcasePage() {
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">How It Works</h4>
                   <div className="space-y-4">
                     <div className="flex items-start">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
-                        <span className="text-blue-600 font-semibold text-sm">1</span>
+                      <div className="w-8 h-8 bg-rose-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                        <span className="text-rose-700 font-semibold text-sm">1</span>
                       </div>
                       <div>
                         <div className="font-medium text-gray-900">View All Jobs</div>
@@ -396,7 +396,7 @@ export default function ShowcasePage() {
                       <button className="mt-2 bg-gray-400 text-white px-4 py-2 rounded text-sm opacity-50 cursor-not-allowed">
                         Subscription Required
                       </button>
-                      <Link href="/contractor/subscriptions" className="block mt-1 text-xs text-blue-600 hover:underline">
+                      <Link href="/contractor/subscriptions" className="block mt-1 text-xs text-rose-700 hover:underline">
                         Subscribe to this category
                       </Link>
                     </div>
@@ -434,9 +434,9 @@ export default function ShowcasePage() {
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-4">Demo Users</h4>
                   <div className="space-y-3">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <div className="font-medium text-blue-900">Demo Homeowner</div>
-                      <div className="text-sm text-blue-700">Complete homeowner profile with city and contact info</div>
+                    <div className="p-3 bg-rose-50 rounded-lg">
+                      <div className="font-medium text-rose-950">Demo Homeowner</div>
+                      <div className="text-sm text-rose-900">Complete homeowner profile with city and contact info</div>
                     </div>
                     <div className="p-3 bg-green-50 rounded-lg">
                       <div className="font-medium text-green-900">Demo Contractor</div>

@@ -68,7 +68,7 @@ export default function ExampleEstimates() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="inline-block mb-4 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+          <div className="inline-block mb-4 px-4 py-2 bg-rose-100 text-rose-900 rounded-full text-sm font-bold">
             SEE HOW IT WORKS
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
@@ -88,8 +88,8 @@ export default function ExampleEstimates() {
                 onClick={() => setSelectedExample(example)}
                 className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 ${
                   selectedExample.id === example.id
-                    ? 'bg-white border-blue-500 shadow-xl scale-105'
-                    : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-lg'
+                    ? 'bg-white border-rose-700 shadow-xl scale-105'
+                    : 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-lg'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -103,7 +103,7 @@ export default function ExampleEstimates() {
                       {example.title}
                     </h3>
                     <p className="text-sm text-slate-500 mb-2">📍 {example.location}</p>
-                    <div className="text-xl font-bold text-blue-600">
+                    <div className="text-xl font-bold text-rose-700">
                       ${example.costLow.toLocaleString()} - ${example.costHigh.toLocaleString()}
                     </div>
                   </div>
@@ -116,7 +116,7 @@ export default function ExampleEstimates() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 text-white">
+              <div className="bg-gradient-to-r from-rose-700 to-orange-600 px-8 py-6 text-white">
                 <h3 className="text-2xl font-bold mb-2">{selectedExample.title}</h3>
                 <p className="text-blue-100">📍 {selectedExample.location}</p>
               </div>
@@ -136,8 +136,8 @@ export default function ExampleEstimates() {
                     </div>
                     <div className="text-sm text-slate-600 mt-1">High Estimate</div>
                   </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-3xl font-black text-blue-700">
+                  <div className="text-center p-4 bg-rose-50 rounded-lg">
+                    <div className="text-3xl font-black text-rose-900">
                       {selectedExample.proCount}
                     </div>
                     <div className="text-sm text-slate-600 mt-1">Pros Available</div>
@@ -147,7 +147,7 @@ export default function ExampleEstimates() {
                 {/* Quick Stats */}
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2 text-slate-700">
-                    <WrenchScrewdriverIcon className="w-5 h-5 text-blue-600" />
+                    <WrenchScrewdriverIcon className="w-5 h-5 text-rose-700" />
                     <span className="font-semibold">Materials:</span> {selectedExample.materials}
                   </div>
                   <div className="flex items-center gap-2 text-slate-700">
@@ -171,16 +171,16 @@ export default function ExampleEstimates() {
                       className="flex justify-between items-center p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                     >
                       <span className="text-slate-700 font-medium">{item.name}</span>
-                      <span className="text-blue-600 font-bold">{item.cost}</span>
+                      <span className="text-rose-700 font-bold">{item.cost}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Trust Badge */}
-                <div className="mt-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <div className="mt-8 p-4 bg-rose-50 border-l-4 border-rose-700 rounded">
                   <p className="text-sm text-slate-700">
                     <strong>✓ AI-Generated Estimate</strong> • Based on 1,000+ real Toronto/GTA quotes • 
-                    <span className="text-blue-600 font-semibold"> Get yours in 30 seconds</span>
+                    <span className="text-rose-700 font-semibold"> Get yours in 30 seconds</span>
                   </p>
                 </div>
               </div>
@@ -192,7 +192,7 @@ export default function ExampleEstimates() {
         <div className="text-center mt-12">
           <a
             href="#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Your Free Estimate Now
           </a>

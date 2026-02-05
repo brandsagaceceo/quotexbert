@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -109,7 +109,7 @@ export default function AdminBlogPage() {
       case "draft":
         return "bg-yellow-100 text-yellow-800";
       case "scheduled":
-        return "bg-blue-100 text-blue-800";
+        return "bg-rose-100 text-rose-900";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -149,8 +149,8 @@ export default function AdminBlogPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gradient-to-br from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-blue-600 text-sm font-medium">Total Posts</h3>
-            <p className="text-3xl font-bold text-blue-900">{posts.length}</p>
+            <h3 className="text-rose-700 text-sm font-medium">Total Posts</h3>
+            <p className="text-3xl font-bold text-rose-950">{posts.length}</p>
           </div>
           <div className="bg-gradient-to-br from-green-50/80 to-green-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
             <h3 className="text-green-600 text-sm font-medium">Published</h3>
@@ -164,9 +164,9 @@ export default function AdminBlogPage() {
               {posts.filter(p => p.status === "draft").length}
             </p>
           </div>
-          <div className="bg-gradient-to-br from-purple-50/80 to-purple-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-purple-600 text-sm font-medium">Total Views</h3>
-            <p className="text-3xl font-bold text-purple-900">
+          <div className="bg-gradient-to-br from-rose-50/80 to-rose-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+            <h3 className="text-rose-700 text-sm font-medium">Total Views</h3>
+            <p className="text-3xl font-bold text-rose-950">
               {posts.reduce((sum, p) => sum + p.views, 0).toLocaleString()}
             </p>
           </div>
@@ -263,7 +263,7 @@ export default function AdminBlogPage() {
                         <Link 
                           href={`/blog/${post.slug}`}
                           target="_blank"
-                          className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+                          className="p-2 text-rose-700 hover:text-rose-900 hover:bg-rose-100 rounded-lg transition-colors"
                           title="View Post"
                         >
                           <EyeIcon className="h-4 w-4" />
@@ -290,7 +290,7 @@ export default function AdminBlogPage() {
         </div>
 
         {/* SEO Tips */}
-        <div className="mt-12 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm rounded-xl p-8 shadow-lg">
+        <div className="mt-12 bg-gradient-to-br from-blue-50/80 to-orange-50/80 backdrop-blur-sm rounded-xl p-8 shadow-lg">
           <h3 className="text-2xl font-semibold text-slate-900 mb-6">SEO Best Practices for Your Blog</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -319,3 +319,4 @@ export default function AdminBlogPage() {
     </div>
   );
 }
+

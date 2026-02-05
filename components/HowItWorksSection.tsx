@@ -18,7 +18,7 @@ const steps = [
     icon: CpuChipIcon,
     title: "Get Your Estimate",
     description: "We check your project against 1,000+ real Toronto jobs and give you detailed costs with line items.",
-    color: "from-purple-500 to-pink-500",
+    color: "from-rose-700 to-orange-600",
   },
   {
     icon: UserGroupIcon,

@@ -153,7 +153,7 @@ export default function AdminVerificationPage() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value as any)}
-                className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Contractors</option>
                 <option value="verified">Verified Only</option>
@@ -162,7 +162,7 @@ export default function AdminVerificationPage() {
               
               <button
                 onClick={fetchContractors}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                className="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Refresh
               </button>

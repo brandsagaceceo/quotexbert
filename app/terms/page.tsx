@@ -108,7 +108,7 @@ export default function TermsOfServicePage() {
             </ul>
             <p className="text-gray-700">
               For refund requests, contact{' '}
-              <a href="mailto:billing@quotexbert.com" className="text-blue-600 hover:underline">
+              <a href="mailto:billing@quotexbert.com" className="text-rose-700 hover:underline">
                 billing@quotexbert.com
               </a>{' '}
               within 30 days of the transaction.
@@ -193,7 +193,7 @@ export default function TermsOfServicePage() {
             <h3 className="text-xl font-semibold text-gray-800 mb-3">10.1 Informal Resolution</h3>
             <p className="text-gray-700 mb-4">
               Before filing a claim, you agree to contact us at{' '}
-              <a href="mailto:disputes@quotexbert.com" className="text-blue-600 hover:underline">
+              <a href="mailto:disputes@quotexbert.com" className="text-rose-700 hover:underline">
                 disputes@quotexbert.com
               </a>{' '}
               to attempt informal resolution.
@@ -242,15 +242,15 @@ export default function TermsOfServicePage() {
             </p>
             <div className="bg-gray-50 p-6 rounded-lg">
               <p className="text-gray-700 mb-2"><strong>QuoteXbert</strong></p>
-              <p className="text-gray-700 mb-2">Email: <a href="mailto:legal@quotexbert.com" className="text-blue-600 hover:underline">legal@quotexbert.com</a></p>
-              <p className="text-gray-700 mb-2">Support: <a href="mailto:support@quotexbert.com" className="text-blue-600 hover:underline">support@quotexbert.com</a></p>
+              <p className="text-gray-700 mb-2">Email: <a href="mailto:legal@quotexbert.com" className="text-rose-700 hover:underline">legal@quotexbert.com</a></p>
+              <p className="text-gray-700 mb-2">Support: <a href="mailto:support@quotexbert.com" className="text-rose-700 hover:underline">support@quotexbert.com</a></p>
               <p className="text-gray-700">Serving the Greater Toronto Area, Canada</p>
             </div>
           </section>
 
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-8">
-            <p className="text-blue-900 font-semibold mb-2">Important Notice</p>
-            <p className="text-blue-800">
+          <div className="bg-rose-50 border-l-4 border-rose-700 p-6 my-8">
+            <p className="text-rose-950 font-semibold mb-2">Important Notice</p>
+            <p className="text-rose-900">
               By using QuoteXbert, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy.
             </p>
           </div>

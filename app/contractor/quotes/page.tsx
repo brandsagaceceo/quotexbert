@@ -241,7 +241,7 @@ export default function QuoteManagementPage() {
             </p>
             <button
               onClick={() => router.push('/messages')}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+              className="bg-rose-700 text-white px-6 py-2 rounded-md hover:bg-rose-800"
             >
               Go to Messages
             </button>
@@ -260,7 +260,7 @@ export default function QuoteManagementPage() {
                       key={quote.id}
                       onClick={() => setSelectedQuote(quote)}
                       className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                        selectedQuote?.id === quote.id ? 'bg-blue-50' : ''
+                        selectedQuote?.id === quote.id ? 'bg-rose-50' : ''
                       }`}
                     >
                       <div className="flex justify-between items-start">
@@ -272,7 +272,7 @@ export default function QuoteManagementPage() {
                             ${quote.totalCost.toLocaleString()}
                           </p>
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                            quote.status === 'SENT' ? 'bg-blue-100 text-blue-800' :
+                            quote.status === 'SENT' ? 'bg-rose-100 text-rose-900' :
                             quote.status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
                             quote.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
                             'bg-gray-100 text-gray-800'
@@ -313,7 +313,7 @@ export default function QuoteManagementPage() {
                         {!editing && selectedQuote.status === 'draft' && (
                           <button
                             onClick={() => setEditing(true)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                            className="bg-rose-700 text-white px-4 py-2 rounded-md hover:bg-rose-800"
                           >
                             Edit Quote
                           </button>
@@ -353,9 +353,9 @@ export default function QuoteManagementPage() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">Quote Summary</h3>
                       <div className="grid grid-cols-3 gap-4">
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <p className="text-sm text-blue-600 font-medium">Labor Cost</p>
-                          <p className="text-2xl font-bold text-blue-900">
+                        <div className="bg-rose-50 p-4 rounded-lg">
+                          <p className="text-sm text-rose-700 font-medium">Labor Cost</p>
+                          <p className="text-2xl font-bold text-rose-950">
                             ${selectedQuote.laborCost.toLocaleString()}
                           </p>
                         </div>
@@ -415,7 +415,7 @@ export default function QuoteManagementPage() {
                         {editing && (
                           <button
                             onClick={addItem}
-                            className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 text-sm"
+                            className="bg-rose-700 text-white px-3 py-1 rounded-md hover:bg-rose-800 text-sm"
                           >
                             Add Item
                           </button>
@@ -474,7 +474,7 @@ export default function QuoteManagementPage() {
                                     </select>
                                   ) : (
                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                      item.category === 'labor' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                                      item.category === 'labor' ? 'bg-rose-100 text-rose-900' : 'bg-green-100 text-green-800'
                                     }`}>
                                       {item.category}
                                     </span>

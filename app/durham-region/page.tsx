@@ -190,7 +190,7 @@ export default function DurhamRegionPage() {
             </div>
 
             <div className="text-center space-y-4">
-              <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
+              <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
                 <Clock className="w-10 h-10 text-indigo-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900">Fast & Accurate Estimates</h3>

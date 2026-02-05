@@ -43,7 +43,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      accepted: 'bg-blue-100 text-blue-700 border-blue-200',
+      accepted: 'bg-rose-100 text-rose-900 border-rose-200',
       in_progress: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       completed: 'bg-green-100 text-green-700 border-green-200',
       cancelled: 'bg-red-100 text-red-700 border-red-200',
@@ -166,14 +166,14 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700">
-                  <Clock className="h-5 w-5 text-blue-600" />
+                  <Clock className="h-5 w-5 text-rose-700" />
                   <div>
                     <div className="text-xs text-gray-500">Accepted</div>
                     <div className="font-bold text-sm">{new Date(job.acceptedAt).toLocaleDateString()}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-gray-700">
-                  <CheckCircle2 className="h-5 w-5 text-purple-600" />
+                  <CheckCircle2 className="h-5 w-5 text-rose-700" />
                   <div>
                     <div className="text-xs text-gray-500">Category</div>
                     <div className="font-bold text-sm">{job.category}</div>
@@ -189,7 +189,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
                 <div className="flex gap-2">
                   <Link
                     href={`/conversations/${job.id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center gap-2"
+                    className="bg-rose-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-rose-800 transition-all flex items-center gap-2"
                   >
                     <MessageCircle className="h-4 w-4" />
                     Message

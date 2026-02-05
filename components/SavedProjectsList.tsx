@@ -201,7 +201,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
 
                 {/* AI Estimate */}
                 {project.aiEstimate && (
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 mb-3 border border-purple-200">
+                  <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-3 mb-3 border border-purple-200">
                     <div className="text-xs font-semibold text-purple-700 mb-1">
                       AI Estimate
                     </div>

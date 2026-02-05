@@ -197,7 +197,7 @@ export default function ProfileEditorPage() {
                 value={formData.companyName}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                 placeholder="Your company or business name"
               />
             </div>
@@ -213,7 +213,7 @@ export default function ProfileEditorPage() {
                 value={formData.trade}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="">Select your trade</option>
                 {TRADES.map(trade => (
@@ -235,7 +235,7 @@ export default function ProfileEditorPage() {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                 placeholder="Tell potential clients about your experience, specialties, and what sets you apart..."
               />
             </div>
@@ -252,7 +252,7 @@ export default function ProfileEditorPage() {
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                   placeholder="Your primary service city"
                 />
               </div>
@@ -269,7 +269,7 @@ export default function ProfileEditorPage() {
                   onChange={handleInputChange}
                   min="1"
                   max="500"
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function ProfileEditorPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                   placeholder="Your business phone number"
                 />
               </div>
@@ -301,7 +301,7 @@ export default function ProfileEditorPage() {
                   name="website"
                   value={formData.website}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                   placeholder="https://your-website.com"
                 />
               </div>
@@ -339,7 +339,7 @@ export default function ProfileEditorPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                className="bg-rose-700 hover:bg-rose-800 disabled:bg-blue-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
               >
                 {saving ? "Saving..." : "Save Profile"}
               </button>

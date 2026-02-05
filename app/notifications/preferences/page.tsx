@@ -119,7 +119,7 @@ export default function NotificationPreferencesPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-700"></div>
       </div>
     );
   }
@@ -159,7 +159,7 @@ export default function NotificationPreferencesPage() {
           <div className={`mb-6 p-4 rounded-lg flex items-center ${
             saveStatus === 'saved' ? 'bg-green-50 text-green-700' :
             saveStatus === 'error' ? 'bg-red-50 text-red-700' :
-            'bg-blue-50 text-blue-700'
+            'bg-rose-50 text-rose-900'
           }`}>
             {saveStatus === 'saved' && <Check className="h-5 w-5 mr-2" />}
             <span className="text-sm">
@@ -180,7 +180,7 @@ export default function NotificationPreferencesPage() {
             <button
               onClick={() => testEmailNotification('welcome')}
               disabled={isLoading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+              className="bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-800 disabled:opacity-50 text-sm font-medium"
             >
               {isLoading ? 'Sending...' : 'Send Test Email'}
             </button>
@@ -231,7 +231,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('welcomeEmails', !preferences.welcomeEmails)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.welcomeEmails ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.welcomeEmails ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -251,7 +251,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('paymentNotifications', !preferences.paymentNotifications)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.paymentNotifications ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.paymentNotifications ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -267,7 +267,7 @@ export default function NotificationPreferencesPage() {
             {/* Activity Notifications */}
             <div className="border-t border-gray-200 pt-8">
               <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
-                <Briefcase className="h-5 w-5 mr-2 text-blue-600" />
+                <Briefcase className="h-5 w-5 mr-2 text-rose-700" />
                 Activity Notifications
               </h3>
               <p className="text-sm text-gray-500 mb-6">Stay updated on your projects, quotes, and messages.</p>
@@ -282,7 +282,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('jobNotifications', !preferences.jobNotifications)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.jobNotifications ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.jobNotifications ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -302,7 +302,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('messageNotifications', !preferences.messageNotifications)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.messageNotifications ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.messageNotifications ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -322,7 +322,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('reviewReminders', !preferences.reviewReminders)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.reviewReminders ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.reviewReminders ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -353,7 +353,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('marketingEmails', !preferences.marketingEmails)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.marketingEmails ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.marketingEmails ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -373,7 +373,7 @@ export default function NotificationPreferencesPage() {
                     onClick={() => updatePreference('subscriptionReminders', !preferences.subscriptionReminders)}
                     disabled={saveStatus === 'saving'}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.subscriptionReminders ? 'bg-blue-600' : 'bg-gray-200'
+                      preferences.subscriptionReminders ? 'bg-rose-700' : 'bg-gray-200'
                     }`}
                   >
                     <span

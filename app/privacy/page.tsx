@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Payment Processing</h2>
             <p className="text-gray-700 mb-4">
               All payment transactions are processed securely through <strong>Stripe</strong>, a PCI-DSS compliant payment processor. We do not store your full credit card details on our servers. Stripe's privacy policy can be found at{' '}
-              <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+              <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-rose-700 hover:underline">
                 stripe.com/privacy
               </a>.
             </p>
@@ -130,7 +130,7 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p className="text-gray-700">
               To exercise these rights, contact us at{' '}
-              <a href="mailto:privacy@quotexbert.com" className="text-blue-600 hover:underline">
+              <a href="mailto:privacy@quotexbert.com" className="text-rose-700 hover:underline">
                 privacy@quotexbert.com
               </a>
             </p>
@@ -164,8 +164,8 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="bg-gray-50 p-6 rounded-lg">
               <p className="text-gray-700 mb-2"><strong>QuoteXbert</strong></p>
-              <p className="text-gray-700 mb-2">Email: <a href="mailto:privacy@quotexbert.com" className="text-blue-600 hover:underline">privacy@quotexbert.com</a></p>
-              <p className="text-gray-700 mb-2">Support: <a href="mailto:support@quotexbert.com" className="text-blue-600 hover:underline">support@quotexbert.com</a></p>
+              <p className="text-gray-700 mb-2">Email: <a href="mailto:privacy@quotexbert.com" className="text-rose-700 hover:underline">privacy@quotexbert.com</a></p>
+              <p className="text-gray-700 mb-2">Support: <a href="mailto:support@quotexbert.com" className="text-rose-700 hover:underline">support@quotexbert.com</a></p>
               <p className="text-gray-700">Serving the Greater Toronto Area, Canada</p>
             </div>
           </section>

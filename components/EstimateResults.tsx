@@ -209,13 +209,13 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden w-full">
+    <div className="w-full max-w-full px-4 sm:px-6 lg:px-8">
+    <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden w-full max-w-3xl mx-auto">
       {/* Header */}
       <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-4 sm:p-6 text-white">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Your AI Estimate</h2>
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 overflow-wrap-anywhere">Your AI Estimate</h2>
             <p className="text-rose-100 text-xs sm:text-sm">Generated in seconds • Based on GTA pricing</p>
           </div>
           <div className={`px-3 sm:px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}>
@@ -227,11 +227,11 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-3 border border-white/20">
           <div className="flex items-center gap-2 text-xs sm:text-sm">
             <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            <span className="font-semibold break-words">
+            <span className="font-semibold overflow-wrap-anywhere">
               Based on {Math.floor(Math.random() * 500) + 200} similar GTA projects
             </span>
           </div>
-          <p className="text-xs text-rose-100 mt-1 break-words">
+          <p className="text-xs text-rose-100 mt-1 overflow-wrap-anywhere">
             AI analyzed real contractor quotes from Toronto area
           </p>
         </div>
@@ -241,7 +241,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         {/* Summary */}
         <div>
           <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">Project Summary</h3>
-          <p className="text-sm sm:text-base text-slate-700 leading-relaxed break-words">{data.summary}</p>
+          <p className="text-sm sm:text-base text-slate-700 leading-relaxed overflow-wrap-anywhere word-break-break-word">{data.summary}</p>
         </div>
 
         {/* Total Cost - Prominent */}
@@ -256,9 +256,9 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         </div>
 
         {/* Timeline */}
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
           <div className="flex items-center gap-2 mb-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <h4 className="font-bold text-slate-900">Estimated Timeline</h4>
@@ -433,12 +433,12 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
 
         {/* Questions to Confirm */}
         {data.questions_to_confirm.length > 0 && (
-          <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
+          <div className="bg-rose-50 rounded-xl p-5 border border-rose-200">
             <h3 className="text-lg font-bold text-slate-900 mb-3">Questions for a More Accurate Estimate</h3>
             <ul className="space-y-2 text-sm text-slate-700">
               {data.questions_to_confirm.map((question, index) => (
                 <li key={index} className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-0.5">?</span>
+                  <span className="text-rose-700 font-bold mt-0.5">?</span>
                   <span>{question}</span>
                 </li>
               ))}

@@ -209,7 +209,7 @@ export default function PortfolioManagementPage() {
             <h1 className="text-3xl font-bold text-white">Portfolio Management</h1>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-rose-700 hover:bg-rose-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               {showForm ? "Cancel" : "Add New Item"}
             </button>
@@ -238,7 +238,7 @@ export default function PortfolioManagementPage() {
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                     placeholder="Project title (e.g., 'Kitchen Renovation', 'Bathroom Remodel')"
                   />
                 </div>
@@ -253,7 +253,7 @@ export default function PortfolioManagementPage() {
                     value={formData.caption}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
                     placeholder="Brief description of the project, materials used, challenges overcome..."
                   />
                 </div>
@@ -268,7 +268,7 @@ export default function PortfolioManagementPage() {
                     accept="image/*"
                     onChange={handleFileChange}
                     required
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-rose-700 file:text-white hover:file:bg-blue-700"
                   />
                   <p className="text-sm text-gray-400 mt-1">
                     Max file size: 5MB. Supported formats: JPG, PNG, WebP
@@ -279,7 +279,7 @@ export default function PortfolioManagementPage() {
                   <button
                     type="submit"
                     disabled={uploading}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                    className="bg-rose-700 hover:bg-rose-800 disabled:bg-blue-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
                   >
                     {uploading ? "Uploading..." : "Add to Portfolio"}
                   </button>
@@ -310,7 +310,7 @@ export default function PortfolioManagementPage() {
               </p>
               <button
                 onClick={() => setShowForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                className="bg-rose-700 hover:bg-rose-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 Add Your First Item
               </button>

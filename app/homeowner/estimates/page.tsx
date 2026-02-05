@@ -85,7 +85,7 @@ export default function HomeownerEstimatesPage() {
     }
     if (estimate.status === 'saved') {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-900">
           <CheckCircle className="w-3 h-3 mr-1" />
           Saved
         </span>
@@ -116,7 +116,7 @@ export default function HomeownerEstimatesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading your estimates...</p>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function HomeownerEstimatesPage() {
           <p className="text-red-600">{error}</p>
           <button
             onClick={fetchEstimates}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="mt-4 px-4 py-2 bg-rose-700 text-white rounded-lg hover:bg-rose-800"
           >
             Try Again
           </button>
@@ -154,7 +154,7 @@ export default function HomeownerEstimatesPage() {
         <div className="mb-6">
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-rose-700 text-white rounded-lg hover:bg-rose-800 transition-colors"
           >
             + Get New Estimate
           </button>
@@ -170,7 +170,7 @@ export default function HomeownerEstimatesPage() {
             </p>
             <button
               onClick={() => router.push('/')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-rose-700 text-white rounded-lg hover:bg-rose-800 transition-colors"
             >
               Get Your First Estimate
             </button>
@@ -200,7 +200,7 @@ export default function HomeownerEstimatesPage() {
 
                   {/* Items Count */}
                   <div className="flex items-center text-gray-600 mb-3">
-                    <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                    <FileText className="w-5 h-5 mr-2 text-rose-700" />
                     <span>{estimate.items.length} items</span>
                     {estimate.items.some((item) => item.selected) && (
                       <span className="ml-2 text-green-600">
@@ -237,7 +237,7 @@ export default function HomeownerEstimatesPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className="bg-rose-700 h-2 rounded-full"
                         style={{ width: `${estimate.confidence * 100}%` }}
                       ></div>
                     </div>
@@ -245,7 +245,7 @@ export default function HomeownerEstimatesPage() {
                 </div>
 
                 <div className="px-6 py-3 bg-gray-50 rounded-b-lg">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                  <button className="text-rose-700 hover:text-rose-900 font-medium text-sm">
                     View Details →
                   </button>
                 </div>

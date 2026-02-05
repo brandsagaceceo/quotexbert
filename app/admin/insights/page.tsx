@@ -86,7 +86,7 @@ export default function InsightsPage() {
             <p className="text-red-600 mb-4">Error loading analytics: {error}</p>
             <button 
               onClick={fetchAnalytics}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+              className="bg-rose-700 hover:bg-rose-700 text-white px-4 py-2 rounded"
             >
               Retry
             </button>
@@ -203,13 +203,13 @@ export default function InsightsPage() {
               const timestamp = new Date(event.timestamp).toLocaleString();
               
               return (
-                <div key={index} className="border-l-2 border-blue-500 pl-4 py-2">
+                <div key={index} className="border-l-2 border-rose-700 pl-4 py-2">
                   <p className="text-sm font-medium">{description}</p>
                   <p className="text-xs text-gray-500">{timestamp}</p>
                   {Object.keys(event.properties).length > 0 && (
                     <div className="mt-1 flex flex-wrap gap-1">
                       {Object.entries(event.properties).slice(0, 3).map(([key, value]) => (
-                        <span key={key} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        <span key={key} className="bg-rose-100 text-rose-900 px-2 py-1 rounded text-xs">
                           {key}: {String(value).slice(0, 20)}
                         </span>
                       ))}

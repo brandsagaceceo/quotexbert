@@ -293,6 +293,48 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
           where: { id: subscription.id },
           data: { leadsThisMonth: 0 }
         });
+
+        // AFFILIATE COMMISSION: 20% recurring lifetime
+        try {
+          const user = await prisma.user.findUnique({
+            where: { id: subscription.contractorId },
+            select: { referredByAffiliateId: true }
+          });
+
+          if (user?.referredByAffiliateId) {
+            const commissionAmount = Math.round((invoice.amount_paid * 0.20) / 100 * 100) / 100; // 20% in dollars
+
+            // Create commission record (prevent duplicates with unique stripeInvoiceId)
+            await prisma.$executeRaw`
+              INSERT INTO "AffiliateCommission" (
+                "id", 
+                "affiliateId", 
+                "userId", 
+                "stripeInvoiceId", 
+                "amount", 
+                "status",
+                "createdAt",
+                "updatedAt"
+              )
+              VALUES (
+                'comm_' || substr(md5(random()::text), 1, 16),
+                ${user.referredByAffiliateId},
+                ${subscription.contractorId},
+                ${invoice.id},
+                ${commissionAmount},
+                'unpaid',
+                NOW(),
+                NOW()
+              )
+              ON CONFLICT ("stripeInvoiceId") DO NOTHING
+            `.catch(err => console.error('[Affiliate] Commission insert error:', err));
+
+            console.log(`[Affiliate] Created $${commissionAmount} commission for invoice ${invoice.id}`);
+          }
+        } catch (affiliateError) {
+          console.error('[Affiliate] Error creating commission:', affiliateError);
+          // Don't fail the main webhook if affiliate tracking fails
+        }
       }
     }
 

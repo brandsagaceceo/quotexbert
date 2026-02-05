@@ -37,7 +37,7 @@ export default function AffiliateTermsPage() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Commission Structure</h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 my-4">
+            <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 my-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Current Commission Rates</h3>
               <ul className="space-y-2 text-gray-700">
                 <li><strong>Homeowner Signups:</strong> $15 per qualified lead (homeowner posts a job)</li>
@@ -166,18 +166,18 @@ export default function AffiliateTermsPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Contact</h2>
             <p className="text-gray-700">
-              Questions about the affiliate program? Contact us at <a href="mailto:affiliates@quotexbert.com" className="text-blue-600 hover:underline">affiliates@quotexbert.com</a>
+              Questions about the affiliate program? Contact us at <a href="mailto:affiliates@quotexbert.com" className="text-rose-700 hover:underline">affiliates@quotexbert.com</a>
             </p>
           </section>
 
-          <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+          <div className="mt-12 p-6 bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200 rounded-lg">
             <h3 className="text-xl font-bold text-gray-900 mb-3">Ready to Join?</h3>
             <p className="text-gray-700 mb-4">
               Start earning commissions by referring homeowners and contractors to QuoteXbert!
             </p>
             <a 
               href="/affiliate-signup" 
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+              className="inline-block bg-rose-700 hover:bg-rose-800 text-white font-semibold px-6 py-3 rounded-lg transition"
             >
               Apply for Affiliate Program
             </a>

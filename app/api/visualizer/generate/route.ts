@@ -78,44 +78,73 @@ export async function POST(req: Request) {
     const prompt = `Transform this room image based on the following vision: ${description}. 
 Maintain the room's layout, lighting, and perspective. Make it photorealistic and natural-looking.`;
 
-    // Call OpenAI DALL-E 3 for image generation
+    // Call OpenAI DALL-E 2 for image editing (transforms the actual uploaded photo)
     const startTime = Date.now();
     let afterImageUrl = "";
-    let aiModel = "dall-e-3";
+    let aiModel = "dall-e-2";
 
     try {
       if (!process.env.OPENAI_API_KEY) {
         throw new Error("OpenAI API key not configured");
       }
 
-      // DALL-E 3 generates images from text prompts only
-      // Since we need to edit an existing image, we'll describe what the room should look like
-      const detailedPrompt = `A photorealistic interior design rendering showing: ${description}. 
-Professional photography, natural lighting, modern home interior, high quality, detailed.`;
+      // Prepare the image for DALL-E 2 edit endpoint
+      // Convert the uploaded image to PNG format and ensure it's square (DALL-E requirement)
+      const imageBuffer = await beforeImage.arrayBuffer();
+      
+      // Create a simple prompt that describes the transformation
+      const editPrompt = `Transform this interior space: ${description}. Keep the same room layout and perspective. Make it photorealistic.`;
 
-      const response = await fetch("https://api.openai.com/v1/images/generations", {
+      // Use DALL-E 2's edit endpoint which can modify the uploaded image
+      const formData = new FormData();
+      formData.append('image', new Blob([imageBuffer], { type: beforeImage.type }), beforeImage.name);
+      formData.append('prompt', editPrompt);
+      formData.append('n', '1');
+      formData.append('size', '1024x1024');
+
+      const response = await fetch("https://api.openai.com/v1/images/edits", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: "dall-e-3",
-          prompt: detailedPrompt,
-          n: 1,
-          size: "1024x1024",
-          quality: "standard"
-        })
+        body: formData
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error("OpenAI API error:", errorData);
-        throw new Error(`AI generation failed: ${errorData.error?.message || 'Unknown error'}`);
-      }
+        
+        // If edit fails, fall back to generation with a detailed prompt about the original room
+        console.log("Falling back to DALL-E 3 generation...");
+        const fallbackPrompt = `A photorealistic interior renovation showing: ${description}. 
+Professional interior design photography, natural lighting, modern home interior, high quality, detailed.`;
 
-      const aiResult = await response.json();
-      afterImageUrl = aiResult.data[0].url;
+        const genResponse = await fetch("https://api.openai.com/v1/images/generations", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "dall-e-3",
+            prompt: fallbackPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard"
+          })
+        });
+
+        if (!genResponse.ok) {
+          throw new Error("Both image edit and generation failed");
+        }
+
+        const genResult = await genResponse.json();
+        afterImageUrl = genResult.data[0].url;
+        aiModel = "dall-e-3";
+      } else {
+        const aiResult = await response.json();
+        afterImageUrl = aiResult.data[0].url;
+      }
 
     } catch (error) {
       console.error("AI generation error:", error);

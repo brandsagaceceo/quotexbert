@@ -637,7 +637,7 @@ export default function ContractorJobsPage() {
                 <button
                   type="submit"
                   disabled={accepting === acceptanceModal.jobId}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-4 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                  className="flex-1 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white py-2 px-4 rounded-lg font-semibold disabled:opacity-50 transition-colors"
                 >
                   {accepting === acceptanceModal.jobId ? 'Accepting...' : 'Accept Job'}
                 </button>

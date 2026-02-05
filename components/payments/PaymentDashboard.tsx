@@ -72,7 +72,7 @@ export default function PaymentDashboard({ userId, role }: PaymentDashboardProps
   const getStatusBadge = (status: string) => {
     const styles = {
       pending: 'bg-yellow-100 text-yellow-800',
-      escrowed: 'bg-blue-100 text-blue-800',
+      escrowed: 'bg-rose-100 text-rose-900',
       released: 'bg-green-100 text-green-800',
       refunded: 'bg-gray-100 text-gray-800',
       failed: 'bg-red-100 text-red-800'
@@ -96,7 +96,7 @@ export default function PaymentDashboard({ userId, role }: PaymentDashboardProps
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-700"></div>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function PaymentDashboard({ userId, role }: PaymentDashboardProps
             </div>
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900">In Escrow</h3>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-rose-700">
                 {summary?.escrowedPayments || 0}
               </p>
               <p className="text-sm text-gray-500 mt-1">
@@ -148,7 +148,7 @@ export default function PaymentDashboard({ userId, role }: PaymentDashboardProps
             </div>
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900">Pending</h3>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-rose-700">
                 ${summary?.totalPending?.toLocaleString() || '0'}
               </p>
               <p className="text-sm text-gray-500 mt-1">

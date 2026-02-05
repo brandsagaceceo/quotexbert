@@ -60,7 +60,7 @@ export default function TrustFAQ() {
           {TRUST_FAQS.map((faq) => (
             <div
               key={faq.id}
-              className="bg-slate-50 border-2 border-slate-200 rounded-xl overflow-hidden hover:border-blue-300 transition-colors"
+              className="bg-slate-50 border-2 border-slate-200 rounded-xl overflow-hidden hover:border-rose-300 transition-colors"
             >
               <button
                 onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
@@ -89,7 +89,7 @@ export default function TrustFAQ() {
         </div>
 
         {/* CTA */}
-        <div className="mt-12 text-center p-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-200">
+        <div className="mt-12 text-center p-8 bg-gradient-to-r from-rose-50 to-orange-50 rounded-2xl border-2 border-rose-200">
           <h3 className="text-2xl font-bold text-slate-900 mb-3">
             Ready to get your estimate?
           </h3>
@@ -98,7 +98,7 @@ export default function TrustFAQ() {
           </p>
           <a
             href="#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Free Estimate Now
           </a>

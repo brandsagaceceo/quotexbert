@@ -63,7 +63,7 @@ export function TrustSignals() {
           {/* GTA Coverage */}
           <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full p-3">
+              <div className="bg-gradient-to-br from-rose-600 to-orange-500 rounded-full p-3">
                 <MapPin className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -107,8 +107,8 @@ export function TrustSignals() {
             </div>
 
             <div className="flex flex-col md:flex-row items-center gap-4">
-              <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl p-4">
-                <MapPin className="w-8 h-8 text-indigo-600" />
+              <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-xl p-4">
+                <MapPin className="w-8 h-8 text-rose-700" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Local Experts</h3>

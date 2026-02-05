@@ -159,7 +159,7 @@ function PaymentForm({ quoteId, amount, projectTitle, onSuccess, onError }: Paym
             <button
               type="button"
               onClick={() => setShowNewCard(true)}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+              className="mt-2 text-sm text-rose-700 hover:text-rose-900"
             >
               Use a different card
             </button>
@@ -191,7 +191,7 @@ function PaymentForm({ quoteId, amount, projectTitle, onSuccess, onError }: Paym
               <button
                 type="button"
                 onClick={() => setShowNewCard(false)}
-                className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                className="mt-2 text-sm text-rose-700 hover:text-rose-900"
               >
                 Use saved payment method
               </button>
@@ -206,7 +206,7 @@ function PaymentForm({ quoteId, amount, projectTitle, onSuccess, onError }: Paym
           className={`w-full py-3 px-4 rounded-md font-medium ${
             processing
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+              : 'bg-rose-700 hover:bg-rose-800 text-white'
           }`}
         >
           {processing ? 'Processing...' : `Pay $${amount.toLocaleString()}`}

@@ -12,7 +12,13 @@ interface BeforeAfterSliderProps {
 export function BeforeAfterSlider({ beforeImage, afterImage, className = "" }: BeforeAfterSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("BeforeAfterSlider props:", { beforeImage, afterImage });
+  }, [beforeImage, afterImage]);
 
   const handleMove = (clientX: number) => {
     if (!containerRef.current) return;
@@ -54,16 +60,29 @@ export function BeforeAfterSlider({ beforeImage, afterImage, className = "" }: B
     >
       {/* After Image (Background) */}
       <div className="absolute inset-0">
-        <Image
-          src={afterImage}
-          alt="After renovation"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute top-4 right-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
-          ✨ After
-        </div>
+        {afterImage ? (
+          <>
+            <Image
+              src={afterImage}
+              alt="After renovation"
+              fill
+              className="object-cover"
+              priority
+              unoptimized={afterImage.startsWith('http')}
+              onError={() => {
+                console.error("Failed to load after image:", afterImage);
+                setImageError(true);
+              }}
+            />
+            <div className="absolute top-4 right-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+              ✨ After
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <p className="text-gray-500">Loading after image...</p>
+          </div>
+        )}
       </div>
 
       {/* Before Image (Foreground with clip) */}

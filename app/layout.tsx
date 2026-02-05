@@ -215,7 +215,8 @@ export default function RootLayout({
           id="main-content" 
           className="min-h-screen"
           style={{
-            paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))', // Account for mobile bottom nav
+            paddingTop: 'var(--header-height, 64px)',
+            paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px))',
           }}
         >
           {children}

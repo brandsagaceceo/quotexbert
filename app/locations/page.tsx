@@ -65,11 +65,11 @@ export default function LocationsPage() {
                 className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center mb-4">
-                  <MapPin className="h-6 w-6 text-blue-600 mr-3" />
+                  <MapPin className="h-6 w-6 text-rose-700 mr-3" />
                   <h3 className="text-xl font-bold text-slate-900">{location.name}</h3>
                 </div>
                 <p className="text-slate-600 mb-4">{location.description}</p>
-                <p className="text-sm font-semibold text-blue-600">{location.stats}</p>
+                <p className="text-sm font-semibold text-rose-700">{location.stats}</p>
               </div>
             ))}
           </div>
@@ -106,7 +106,7 @@ export default function LocationsPage() {
           
           <div className="grid md:grid-cols-2 gap-8">
             <div className="flex gap-4">
-              <Zap className="h-8 w-8 text-blue-600 flex-shrink-0" />
+              <Zap className="h-8 w-8 text-rose-700 flex-shrink-0" />
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Instant AI Estimates</h3>
                 <p className="text-slate-600">
@@ -116,7 +116,7 @@ export default function LocationsPage() {
             </div>
             
             <div className="flex gap-4">
-              <Users className="h-8 w-8 text-blue-600 flex-shrink-0" />
+              <Users className="h-8 w-8 text-rose-700 flex-shrink-0" />
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Verified Contractors</h3>
                 <p className="text-slate-600">
@@ -136,7 +136,7 @@ export default function LocationsPage() {
             </div>
 
             <div className="flex gap-4">
-              <MapPin className="h-8 w-8 text-blue-600 flex-shrink-0" />
+              <MapPin className="h-8 w-8 text-rose-700 flex-shrink-0" />
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Local Expertise</h3>
                 <p className="text-slate-600">
@@ -157,7 +157,7 @@ export default function LocationsPage() {
           </p>
           <Link 
             href="/create-lead"
-            className="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors"
+            className="inline-block bg-white text-rose-700 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors"
           >
             Get Free Estimates
           </Link>

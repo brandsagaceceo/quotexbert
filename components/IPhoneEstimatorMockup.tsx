@@ -274,8 +274,8 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className="bg-green-50 text-green-700 px-2 py-1 rounded-full font-semibold">✓ No signup required</span>
-            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-semibold">✓ 100% free</span>
-            <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded-full font-semibold">✓ No spam</span>
+            <span className="bg-rose-50 text-rose-900 px-2 py-1 rounded-full font-semibold">✓ 100% free</span>
+            <span className="bg-rose-50 text-rose-700 px-2 py-1 rounded-full font-semibold">✓ No spam</span>
           </div>
         </div>
 
@@ -328,7 +328,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
                 {photos.map(photo => (
                   <div key={photo.id} className="relative group">
                     {photo.isExample && (
-                      <div className="absolute top-0 left-0 bg-blue-500 text-white text-[9px] font-bold px-1 py-0.5 rounded-br z-10">
+                      <div className="absolute top-0 left-0 bg-rose-700 text-white text-[9px] font-bold px-1 py-0.5 rounded-br z-10">
                         Example
                       </div>
                     )}

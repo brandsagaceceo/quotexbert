@@ -183,7 +183,7 @@ export default function CreateLeadPage() {
         
         // Redirect after showing success message
         setTimeout(() => {
-          router.push(`/homeowner/jobs`);
+          router.push(`/profile`);
         }, 1500);
       } else {
         console.error("Lead submission failed:", result);

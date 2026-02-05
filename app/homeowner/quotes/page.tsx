@@ -116,7 +116,7 @@ export default function HomeownerQuotesPage() {
   const getStatusBadge = (status: string) => {
     const styles = {
       draft: 'bg-gray-100 text-gray-800',
-      sent: 'bg-blue-100 text-blue-800',
+      sent: 'bg-rose-100 text-rose-900',
       accepted: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       expired: 'bg-yellow-100 text-yellow-800'
@@ -146,7 +146,7 @@ export default function HomeownerQuotesPage() {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
           <p className="text-gray-600 mb-4">This page is only accessible to homeowners.</p>
-          <Link href="/sign-in" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href="/sign-in" className="bg-rose-700 text-white px-4 py-2 rounded-lg hover:bg-rose-800">
             Sign In
           </Link>
         </div>
@@ -158,7 +158,7 @@ export default function HomeownerQuotesPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-700 mx-auto mb-4"></div>
           <div>Loading quotes...</div>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function HomeownerQuotesPage() {
             </p>
             <Link
               href="/create-lead"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-rose-700 text-white px-6 py-2 rounded-lg hover:bg-rose-800 transition-colors"
             >
               Post a Project
             </Link>
@@ -243,7 +243,7 @@ export default function HomeownerQuotesPage() {
                     <div className="flex justify-between items-center">
                       <button
                         onClick={() => setSelectedQuote(quote)}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-rose-700 hover:text-rose-900 font-medium"
                       >
                         View Details
                       </button>
@@ -404,7 +404,7 @@ export default function HomeownerQuotesPage() {
                 {selectedQuote.aiAnalysis && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">AI Analysis</h3>
-                    <div className="bg-blue-50 rounded-lg p-4">
+                    <div className="bg-rose-50 rounded-lg p-4">
                       <p className="text-gray-700 whitespace-pre-line">{selectedQuote.aiAnalysis}</p>
                       <div className="mt-2 text-sm text-gray-600">
                         Confidence Score: {Math.round(selectedQuote.confidenceScore * 100)}%

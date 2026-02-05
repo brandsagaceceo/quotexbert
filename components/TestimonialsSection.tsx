@@ -149,7 +149,7 @@ export function TestimonialsSection() {
               <div className="text-sm text-gray-600">Total Projects</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-indigo-600 mb-2">&lt;3min</div>
+              <div className="text-4xl font-bold text-rose-700 mb-2">&lt;3min</div>
               <div className="text-sm text-gray-600">Avg. Estimate Time</div>
             </div>
           </div>
