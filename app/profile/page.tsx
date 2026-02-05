@@ -264,6 +264,18 @@ export default function UnifiedProfilePage() {
           } catch (error) {
             console.log("[ProfilePage] Saved estimates not available yet");
           }
+
+          // Fetch posted jobs/leads for homeowners
+          try {
+            const jobsResponse = await fetch(`/api/homeowner/jobs?homeownerId=${authUser.id}`);
+            if (jobsResponse.ok) {
+              const jobsData = await jobsResponse.json();
+              console.log("[ProfilePage] Loaded homeowner jobs:", jobsData);
+              setJobs(jobsData || []);
+            }
+          } catch (error) {
+            console.log("[ProfilePage] Posted jobs not available yet");
+          }
         }
         
         console.log("[ProfilePage] Setting isLoading to false");
