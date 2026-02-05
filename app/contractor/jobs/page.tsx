@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
+import { canAcceptJob, isGodUser } from "@/lib/god-access";
 
 interface JobFilters {
   category?: string;
@@ -171,7 +172,10 @@ export default function ContractorJobsPage() {
       sub.canClaimLeads
     );
 
-    if (!isSubscribed) {
+    // God users can accept ANY job without subscription
+    const hasAccess = canAcceptJob(user?.email, isSubscribed);
+
+    if (!hasAccess) {
       alert(`You must be subscribed to the "${job.category}" category to accept jobs. Please visit your subscriptions page to subscribe.`);
       setAccepting(null);
       return;
@@ -498,7 +502,10 @@ export default function ContractorJobsPage() {
                         sub.canClaimLeads
                       );
                       
-                      return isSubscribed ? (
+                      // God users can accept without subscription
+                      const hasAccess = canAcceptJob(user?.email, isSubscribed);
+                      
+                      return hasAccess ? (
                         <button 
                           onClick={() => openAcceptanceModal(job.id, job.title)}
                           disabled={accepting === job.id}

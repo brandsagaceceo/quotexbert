@@ -70,7 +70,7 @@ export default function AIAssistantPopup() {
               { label: '👷 Browse Contractors', href: '/contractors', variant: 'secondary' },
             ]
           : [
-              { label: '📋 Browse Jobs', href: '/jobs', variant: 'primary' },
+              { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'primary' },
               { label: '💼 My Profile', href: '/profile', variant: 'secondary' },
               { label: '📖 View Terms', href: '#', variant: 'secondary' },
             ]
@@ -160,7 +160,7 @@ export default function AIAssistantPopup() {
           : "To post a job for contractors to bid on, first get an AI quote so you know what's fair. Then post your project details and verified contractors will send you proposals.",
         actions: userType === 'contractor'
           ? [
-              { label: '📋 Browse Jobs', href: '/jobs', variant: 'primary' },
+              { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'primary' },
               { label: '⚙️ Update Categories', href: '/profile?tab=categories', variant: 'secondary' },
             ]
           : [{ label: '📸 Get Quote First', href: '/#instant-quote', variant: 'primary' }]

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCategoryById } from "@/lib/categories";
+import { canAccessLead as canAccessLeadGod, isGodUser } from "@/lib/god-access";
 
 /**
  * Check if a contractor has an active subscription for a specific category
@@ -48,6 +49,16 @@ export async function getActiveSubscriptionCategories(contractorId: string): Pro
  * Check if a contractor can access a specific lead based on their subscriptions
  */
 export async function canAccessLead(contractorId: string, leadCategory: string): Promise<boolean> {
+  // Check if user is God user (admin override)
+  const user = await prisma.user.findUnique({
+    where: { id: contractorId },
+    select: { email: true }
+  });
+  
+  if (canAccessLeadGod(user?.email)) {
+    return true; // God users can access ANY lead
+  }
+  
   return await hasActiveSubscription(contractorId, leadCategory);
 }
 

@@ -70,7 +70,7 @@ export default function MessagesTab({ contractorId }: { contractorId: string }) 
           Once you accept jobs, you'll be able to chat with homeowners here.
         </p>
         <Link 
-          href="/jobs"
+          href="/contractor/jobs"
           className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
         >
           Browse Jobs

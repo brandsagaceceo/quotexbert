@@ -129,7 +129,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
           </p>
           {filter === 'all' && (
             <Link 
-              href="/jobs"
+              href="/contractor/jobs"
               className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
             >
               Browse Jobs
@@ -195,10 +195,10 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
                     Message
                   </Link>
                   <Link
-                    href={`/jobs/${job.id}`}
+                    href={`/contractor/jobs`}
                     className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-all"
                   >
-                    View Details
+                    Browse More
                   </Link>
                 </div>
               </div>

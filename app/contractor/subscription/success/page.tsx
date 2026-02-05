@@ -121,7 +121,7 @@ export default function SubscriptionSuccess() {
             </Link>
             
             <Link
-              href="/jobs"
+              href="/contractor/jobs"
               className="inline-flex items-center justify-center gap-2 bg-white border-2 border-rose-600 text-rose-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-rose-50 transition-all duration-200"
             >
               Browse Jobs

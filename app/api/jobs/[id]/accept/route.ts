@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
+import { canAccessLead as canAccessLeadGod } from "@/lib/god-access";
 
 export async function POST(
   request: NextRequest,
