@@ -8,6 +8,7 @@ import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
+import OverflowDetector from "@/components/dev/OverflowDetector";
 import {
   User,
   MapPin,
@@ -511,31 +512,30 @@ export default function UnifiedProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50" style={{ paddingTop: 'var(--header-height, 96px)' }}>
-      {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed top-24 right-6 md:top-28 md:right-8 z-50">
+      {/* Desktop Edit/Save Button - Top Right (hidden on mobile) */}
+      <div className="hidden md:block fixed top-28 right-8 z-50">
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl text-sm md:text-base"
+            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl"
           >
-            <Edit3 className="h-3 w-3 md:h-4 md:w-4" />
-            <span className="hidden sm:inline">Edit Profile</span>
-            <span className="sm:hidden">Edit</span>
+            <Edit3 className="h-4 w-4" />
+            <span>Edit Profile</span>
           </button>
         ) : (
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2">
             <button
               onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-2 shadow-xl"
             >
-              <Save className="h-3 w-3 md:h-4 md:w-4" />
+              <Save className="h-4 w-4" />
               Save
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="bg-slate-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
+              className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-2 shadow-xl"
             >
-              <X className="h-3 w-3 md:h-4 md:w-4" />
+              <X className="h-4 w-4" />
               Cancel
             </button>
           </div>
@@ -645,6 +645,35 @@ export default function UnifiedProfilePage() {
               {/* Profile Info */}
               <div className="flex-1 pb-6">
                 <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
+                  {/* Mobile Edit/Save Buttons - Inline in header card */}
+                  <div className="md:hidden flex justify-end gap-2 mb-4">
+                    {!isEditing ? (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2 text-sm"
+                      >
+                        <Edit3 className="h-3.5 w-3.5" />
+                        <span>Edit</span>
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleSaveProfile}
+                          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg flex items-center gap-2 text-sm"
+                        >
+                          <Save className="h-3.5 w-3.5" />
+                          <span>Save</span>
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(false)}
+                          className="bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-slate-700 flex items-center gap-2 text-sm"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                          <span>Cancel</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                   <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
                     <p className="text-rose-900 font-semibold text-lg capitalize mb-3">
@@ -681,10 +710,37 @@ export default function UnifiedProfilePage() {
       {/* Spacer for overlapping profile card */}
       <div className="h-24 md:h-20"></div>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs - Mobile Optimized */}
       <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
-        <div className="container mx-auto px-4">
-          <nav className="flex space-x-8 overflow-x-auto">
+        <div className="container mx-auto">
+          {/* Mobile: Scrollable pill tabs */}
+          <nav className="md:hidden flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide" style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}>
+            {(isContractor 
+              ? ['overview', 'portfolio', 'jobs'] 
+              : ['overview', 'projects', 'estimates', 'jobs']
+            ).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full font-medium text-sm capitalize whitespace-nowrap transition-all min-h-[44px] ${
+                  activeTab === tab
+                    ? 'bg-rose-700 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {tab === 'projects' ? 'My Projects' : 
+                 tab === 'estimates' ? 'AI Estimates' : 
+                 tab}
+              </button>
+            ))}
+          </nav>
+
+          {/* Desktop: Full tab bar */}
+          <nav className="hidden md:flex space-x-8 px-4 overflow-x-auto">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
@@ -709,7 +765,9 @@ export default function UnifiedProfilePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" style={{
+        paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 16px)'
+      }}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
@@ -1514,6 +1572,9 @@ export default function UnifiedProfilePage() {
           initialData={editingPortfolioItem}
         />
       )}
+
+      {/* Development QA Tool - Only visible in dev mode */}
+      <OverflowDetector />
     </div>
   );
 }

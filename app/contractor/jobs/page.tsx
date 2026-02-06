@@ -621,6 +621,7 @@ export default function ContractorJobsPage() {
                     <li>• You'll be added to this job (max 3 contractors)</li>
                     <li>• A conversation will start with the homeowner</li>
                     <li>• You can send quotes and discuss details through messages</li>
+                    <li>• <strong>📞 Homeowner's phone number will be revealed after acceptance</strong></li>
                     <li>• The homeowner will choose their preferred contractor</li>
                   </ul>
                 </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Clock, MapPin, DollarSign, MessageCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock, MapPin, DollarSign, MessageCircle, AlertCircle, Phone } from 'lucide-react';
 
 interface AcceptedJob {
   id: string;
@@ -14,6 +14,8 @@ interface AcceptedJob {
   acceptedAt: string;
   homeownerName: string;
   homeownerEmail: string;
+  homeownerPhone?: string | null;
+  homeownerId: string;
   category: string;
   deadline?: string;
 }
@@ -182,23 +184,41 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div>
-                  <div className="text-xs text-gray-500">Homeowner</div>
-                  <div className="font-semibold text-gray-900">{job.homeownerName}</div>
+                <div className="space-y-2">
+                  <div>
+                    <div className="text-xs text-gray-500">Homeowner</div>
+                    <div className="font-semibold text-gray-900">{job.homeownerName}</div>
+                  </div>
+                  {job.homeownerPhone && (
+                    <div className="flex items-center gap-2 text-green-700 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">
+                      <Phone className="h-4 w-4" />
+                      <a href={`tel:${job.homeownerPhone}`} className="font-semibold hover:underline">
+                        {job.homeownerPhone}
+                      </a>
+                    </div>
+                  )}
+                  {!job.homeownerPhone && (
+                    <div className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                      📞 Phone not provided by homeowner
+                    </div>
+                  )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {job.homeownerPhone && (
+                    <a
+                      href={`tel:${job.homeownerPhone}`}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call Now
+                    </a>
+                  )}
                   <Link
                     href={`/conversations/${job.id}`}
-                    className="bg-rose-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-rose-800 transition-all flex items-center gap-2"
+                    className="bg-rose-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-rose-800 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <MessageCircle className="h-4 w-4" />
                     Message
-                  </Link>
-                  <Link
-                    href={`/contractor/jobs`}
-                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-all"
-                  >
-                    Browse More
                   </Link>
                 </div>
               </div>

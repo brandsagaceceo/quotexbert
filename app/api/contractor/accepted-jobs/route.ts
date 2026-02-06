@@ -42,7 +42,23 @@ export async function GET(req: Request) {
       }
     });
 
-    // Transform to job format
+    // Fetch homeowner profiles to get phone numbers
+    const homeownerIds = acceptedApplications.map(app => app.lead.homeowner.id);
+    const homeownerProfiles = await prisma.homeownerProfile.findMany({
+      where: {
+        userId: {
+          in: homeownerIds
+        }
+      },
+      select: {
+        userId: true,
+        phone: true
+      }
+    });
+
+    const phoneMap = new Map(homeownerProfiles.map(profile => [profile.userId, profile.phone]));
+
+    // Transform to job format with phone numbers (only visible after acceptance)
     const jobs = acceptedApplications.map(app => ({
       id: app.lead.id,
       title: app.lead.title,
@@ -53,6 +69,8 @@ export async function GET(req: Request) {
       acceptedAt: app.updatedAt.toISOString(),
       homeownerName: app.lead.homeowner.name || app.lead.homeowner.email,
       homeownerEmail: app.lead.homeowner.email,
+      homeownerPhone: phoneMap.get(app.lead.homeowner.id) || null, // Phone revealed after acceptance
+      homeownerId: app.lead.homeowner.id,
       category: app.lead.category,
     }));
 
