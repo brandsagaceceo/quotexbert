@@ -605,7 +605,7 @@ export default function UnifiedProfilePage() {
       </div>
       
       {/* Profile Identity Section - Normal Flow */}
-      <div className="relative" style={{ marginTop: '-60px', zIndex: 10 }}>
+      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-6" style={{ marginTop: '-60px', zIndex: 10 }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
             {/* Profile Picture - Only avatar overlaps */}
