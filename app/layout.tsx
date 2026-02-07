@@ -7,8 +7,10 @@ import SiteFooter from "./_components/site-footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import DevStatus from "./_components/DevStatus";
 import ProactiveAIHelper from "@/components/ProactiveAIHelper";
+import AIAssistantPopup from "@/components/AIAssistantPopup";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { OverflowDebugger } from "@/components/OverflowDebugger";
+import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 import "../styles/mobile.css";
 
@@ -197,35 +199,37 @@ export default function RootLayout({
       <body
         className={`${interSans.variable} ${interMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
       >
-        {/* Google Analytics & Tag Manager */}
-        <GoogleAnalytics 
-          GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-          GTM_ID={process.env.NEXT_PUBLIC_GTM_ID}
-        />
-        
-        {/* Skip to content link for accessibility */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-md z-50 focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main 
-          id="main-content" 
-          className="min-h-screen"
-          style={{
-            paddingTop: 'var(--header-height, 64px)',
-            paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px))',
-          }}
-        >
-          {children}
-        </main>
-        <SiteFooter />
-        <MobileBottomNav />
-        <ProactiveAIHelper delayMs={5000} />
-        <DevStatus />
-        <OverflowDebugger />
+        <ToastProvider>
+          {/* Google Analytics & Tag Manager */}
+          <GoogleAnalytics 
+            GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+            GTM_ID={process.env.NEXT_PUBLIC_GTM_ID}
+          />
+          
+          {/* Skip to content link for accessibility */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white px-4 py-2 rounded-md z-50 focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+          >
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main 
+            id="main-content" 
+            className="min-h-screen"
+            style={{
+              paddingTop: 'var(--header-height, 64px)',
+              paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px))',
+            }}
+          >
+            {children}
+          </main>
+          <SiteFooter />
+          <MobileBottomNav />
+          <AIAssistantPopup />
+          <DevStatus />
+          <OverflowDebugger />
+        </ToastProvider>
       </body>
     </html>
   );

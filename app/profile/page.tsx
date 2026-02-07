@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
@@ -96,6 +97,7 @@ interface SavedEstimate {
 export default function UnifiedProfilePage() {
   const { isSignedIn, authUser, authLoading } = useAuth();
   const router = useRouter();
+  const toast = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
@@ -344,13 +346,13 @@ export default function UnifiedProfilePage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      toast.error('Please select an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+      toast.error('File size must be less than 5MB');
       return;
     }
 
@@ -386,21 +388,17 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        // Refetch profile to ensure data is in sync
-        const profileResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          setProfile(profileData);
-        } else {
-          setProfile(prev => prev ? { ...prev, profilePhoto: uploadResult.url } : null);
-        }
-        alert('Profile picture updated successfully!');
+        toast.success('Profile picture updated successfully!');
+        // Force page reload to ensure image updates everywhere
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         throw new Error('Failed to update profile');
       }
     } catch (error) {
       console.error('Error uploading profile picture:', error);
-      alert(`Failed to upload profile picture: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to upload: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsUploading(false);
     }
@@ -636,7 +634,7 @@ export default function UnifiedProfilePage() {
           <nav className="flex space-x-8 overflow-x-auto">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
+              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
@@ -649,7 +647,7 @@ export default function UnifiedProfilePage() {
               >
                 {tab === 'projects' ? 'My Projects' : 
                  tab === 'estimates' ? 'AI Estimates' : 
-                 tab === 'visualizations' ? 'AI Visualizations' : 
+                 tab === 'quotes' ? 'AI Quotes' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
                  tab}
@@ -1094,19 +1092,16 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
-            {activeTab === 'visualizations' && !isContractor && (
+            {activeTab === 'quotes' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Visualizations</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Quote Generator</h2>
                 <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
-                  <div className="text-6xl mb-4">🎨</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Visualize Your Dream Space</h3>
-                  <p className="text-slate-600 mb-4">See AI-generated before/after visualizations of your renovation ideas</p>
+                  <div className="text-6xl mb-4">📄</div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Generate Professional Quotes Instantly</h3>
+                  <p className="text-slate-600 mb-4">Create detailed, legally-formatted contracts and quotes in seconds</p>
                   <div className="flex gap-3 justify-center">
-                    <a href="/visualizer" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
-                      Try AI Visualizer
-                    </a>
-                    <a href="/visualizer-library" className="inline-block bg-white text-slate-700 border-2 border-slate-200 font-bold py-3 px-6 rounded-lg hover:border-slate-300 transition-all">
-                      Browse Gallery
+                    <a href="/ai-quote" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Generate Free Quote
                     </a>
                   </div>
                 </div>

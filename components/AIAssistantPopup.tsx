@@ -66,7 +66,7 @@ export default function AIAssistantPopup() {
         ? userType === 'homeowner'
           ? [
               { label: '📸 Get Instant Quote', href: '/#instant-quote', variant: 'primary' },
-              { label: '🎨 AI Visualizer', href: '/visualizer', variant: 'secondary' },
+              { label: '📄 AI Quote Generator', href: '/ai-quote', variant: 'secondary' },
               { label: '👷 Browse Contractors', href: '/contractors', variant: 'secondary' },
             ]
           : [
@@ -86,10 +86,10 @@ export default function AIAssistantPopup() {
     if (href === '#homeowner') {
       const msg: Message = {
         role: 'assistant',
-        content: "Perfect! As a homeowner, I can help you:\n\n✨ Get instant AI-powered quotes by uploading photos\n🎨 Visualize renovations with AI before you start\n👷 Connect with verified contractors\n💰 100% free - no hidden fees!\n\nReady to get started?",
+        content: "Perfect! As a homeowner, I can help you:\n\n✨ Get instant AI-powered quotes by uploading photos\n📄 Generate professional contracts instantly\n👷 Connect with verified contractors\n💰 100% free - no hidden fees!\n\nReady to get started?",
         actions: [
           { label: '📸 Upload Photos for Quote', href: '/#instant-quote', variant: 'primary' },
-          { label: '🎨 Try AI Visualizer', href: '/visualizer', variant: 'secondary' },
+          { label: '📄 Generate Free Contract', href: '/ai-quote', variant: 'secondary' },
           { label: '📖 Read Blog Tips', href: '/blog', variant: 'secondary' },
         ]
       };
@@ -146,11 +146,11 @@ export default function AIAssistantPopup() {
           { label: '📸 Get Quote First', href: '/#instant-quote', variant: 'secondary' },
         ]
       };
-    } else if (lowerInput.includes('visualize') || lowerInput.includes('design') || lowerInput.includes('look')) {
+    } else if (lowerInput.includes('contract') || lowerInput.includes('proposal') || lowerInput.includes('quote')) {
       response = {
         role: 'assistant',
-        content: "Try our AI Visualizer! Upload a photo of your room and describe your vision. Our AI will show you what it will look like - perfect for planning renovations!",
-        actions: [{ label: '🎨 Try AI Visualizer', href: '/visualizer', variant: 'primary' }]
+        content: "Generate a professional, legally-formatted contract instantly! Just enter your project details and our AI creates a complete contract you can edit, print, or download.",
+        actions: [{ label: '📄 Generate Free Contract', href: '/ai-quote', variant: 'primary' }]
       };
     } else if (lowerInput.includes('job') || lowerInput.includes('work') || lowerInput.includes('lead')) {
       response = {
@@ -168,10 +168,10 @@ export default function AIAssistantPopup() {
     } else {
       response = {
         role: 'assistant',
-        content: "I can help you with:\n\n• Getting instant AI quotes\n• Visualizing renovations\n• Finding contractors\n• Understanding costs\n• Posting jobs\n\nWhat would you like to do?",
+        content: "I can help you with:\n\n• Getting instant AI quotes\n• Generating professional contracts\n• Finding contractors\n• Understanding costs\n• Posting jobs\n\nWhat would you like to do?",
         actions: [
           { label: '📸 Get Instant Quote', href: '/#instant-quote', variant: 'primary' },
-          { label: '🎨 AI Visualizer', href: '/visualizer', variant: 'secondary' },
+          { label: '📄 Generate Contract', href: '/ai-quote', variant: 'secondary' },
         ]
       };
     }

@@ -61,11 +61,11 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
       action: () => window.location.href = '/create-lead'
     },
     {
-      title: "Want to visualize your space?",
-      message: "Use our AI Room Visualizer to see how your renovation will look before you start!",
-      icon: "✨",
-      cta: "Try Visualizer",
-      action: () => window.location.href = '/visualizer'
+      title: "Need a professional quote?",
+      message: "Use our Free AI Quote Generator to create detailed contracts and quotes in seconds!",
+      icon: "📄",
+      cta: "Generate Quote",
+      action: () => window.location.href = '/ai-quote'
     },
     {
       title: "Questions about costs?",
@@ -320,10 +320,10 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
                 Get Estimate
               </button>
               <button
-                onClick={() => window.location.href = '/visualizer'}
+                onClick={() => window.location.href = '/ai-quote'}
                 className="text-xs bg-white hover:bg-orange-50 text-orange-700 font-semibold px-3 py-1.5 rounded-full border border-orange-300 transition-all hover:border-orange-400"
               >
-                AI Visualizer
+                AI Quote
               </button>
               <button
                 onClick={() => window.location.href = '/blog'}
@@ -338,7 +338,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
         {/* Footer - Sticky and always visible */}
         <div className="sticky bottom-0 bg-rose-100 px-3 md:px-4 py-2 text-center border-t border-rose-200">
           <p className="text-xs text-rose-700">
-            💡 <span className="font-semibold">Pro tip:</span> Try our AI Room Visualizer to see your renovation before you start!
+            💡 <span className="font-semibold">Pro tip:</span> Try our Free AI Quote Generator to create professional contracts instantly!
           </p>
         </div>
 

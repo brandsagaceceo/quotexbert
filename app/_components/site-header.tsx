@@ -16,7 +16,7 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/visualizer", label: "AI Visualizer", highlight: true },
+    { href: "/ai-quote", label: "Free AI Quote", highlight: true },
     { href: "/blog", label: "Blog" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
