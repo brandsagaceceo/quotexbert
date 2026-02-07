@@ -8,6 +8,7 @@ import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
+import ActivityTimeline from "@/components/ActivityTimeline";
 import OverflowDetector from "@/components/dev/OverflowDetector";
 import {
   User,
@@ -698,6 +699,14 @@ export default function UnifiedProfilePage() {
                           <span className="font-medium">Verified Contractor</span>
                         </div>
                       )}
+                      <Link
+                        href={`/contractors/${authUser.id}`}
+                        target="_blank"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                      >
+                        <Globe className="h-4 w-4" />
+                        <span>View Public Profile</span>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -720,8 +729,8 @@ export default function UnifiedProfilePage() {
             msOverflowStyle: 'none'
           }}>
             {(isContractor 
-              ? ['overview', 'portfolio', 'jobs'] 
-              : ['overview', 'projects', 'estimates', 'jobs']
+              ? ['overview', 'portfolio', 'activity', 'jobs'] 
+              : ['overview', 'projects', 'activity', 'jobs']
             ).map((tab) => (
               <button
                 key={tab}
@@ -742,8 +751,8 @@ export default function UnifiedProfilePage() {
           {/* Desktop: Full tab bar */}
           <nav className="hidden md:flex space-x-8 px-4 overflow-x-auto">
             {(isContractor 
-              ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
+              ? ['overview', 'portfolio', 'activity', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
+              : ['overview', 'projects', 'activity', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
@@ -937,6 +946,10 @@ export default function UnifiedProfilePage() {
 
                 <AcceptedJobsList contractorId={authUser?.id || ''} />
               </div>
+            )}
+
+            {activeTab === 'activity' && (
+              <ActivityTimeline userId={authUser?.id || ''} isContractor={isContractor} />
             )}
 
             {activeTab === 'messages' && isContractor && (
