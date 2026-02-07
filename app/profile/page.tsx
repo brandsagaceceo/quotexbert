@@ -542,73 +542,11 @@ export default function UnifiedProfilePage() {
         )}
       </div>
 
-      {/* Cover Photo Section */}
-      <div 
-        className="relative overflow-hidden" 
-        style={{ 
-          height: 'clamp(180px, 22vh, 280px)', 
-          zIndex: 0, 
-          marginTop: 'calc(-1 * var(--header-height, 64px))' 
-        }}
-      >
-        {/* Cover Photo */}
-        <div className="absolute inset-0 overflow-hidden">
-          {profile?.coverPhoto ? (
-            <img 
-              src={profile.coverPhoto} 
-              alt="Cover" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-r from-rose-700 via-orange-600 to-red-700">
-              {/* Default cover with pattern */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-              }}></div>
-            </div>
-          )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"></div>
-        </div>
-
-        {/* Cover Photo Edit Button */}
-        {isEditing && (
-          <div className="absolute top-4 right-4 z-10">
-            <input
-              type="file"
-              id="coverPhotoInput"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    const base64String = reader.result as string;
-                    setProfile(prev => prev ? { ...prev, coverPhoto: base64String } : prev);
-                  };
-                  reader.readAsDataURL(file);
-                }
-              }}
-              className="hidden"
-            />
-            <button
-              onClick={() => document.getElementById('coverPhotoInput')?.click()}
-              className="bg-white/95 backdrop-blur-sm text-slate-900 px-4 py-2 md:px-5 md:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold text-sm border border-white/20"
-            >
-              <Camera className="h-4 w-4 md:h-5 md:w-5 text-rose-700" />
-              <span className="hidden sm:inline">Change Cover</span>
-              <span className="sm:hidden">Edit</span>
-            </button>
-          </div>
-        )}
-
-      </div>
-      
-      {/* Profile Identity Section - Normal Flow */}
-      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-6" style={{ marginTop: '-60px', zIndex: 10 }}>
+      {/* Profile Identity Section */}
+      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 32px)' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            {/* Profile Picture - Only avatar overlaps */}
+            {/* Profile Picture */}
             <div className="relative group flex-shrink-0">
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
@@ -652,8 +590,8 @@ export default function UnifiedProfilePage() {
                 </div>
               </div>
 
-            {/* Profile Info Card - White background card below avatar */}
-            <div className="flex-1" style={{ marginTop: '12px' }}>
+            {/* Profile Info Card */}
+            <div className="flex-1">
               <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 border border-slate-200">
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
