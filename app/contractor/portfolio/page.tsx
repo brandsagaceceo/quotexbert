@@ -181,6 +181,7 @@ export default function ContractorPortfolioPage() {
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* Portfolio Feed */}
