@@ -3,6 +3,7 @@
 import { useState, useRef, ChangeEvent } from "react";
 import Image from "next/image";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import PhotoFeedbackHelper from "@/components/PhotoFeedbackHelper";
 
 interface InstantQuoteCardProps {
   onEstimateComplete: (result: any) => void;
@@ -242,6 +243,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
               ))}
             </div>
           )}
+          
+          {/* NEW: AI Photo Feedback - Non-blocking suggestion */}
+          <PhotoFeedbackHelper photoCount={photos.length} />
         </div>
 
         {/* Description */}

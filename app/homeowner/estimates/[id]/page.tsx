@@ -10,6 +10,10 @@ import {
   AlertCircle,
   Sparkles,
 } from 'lucide-react';
+import ExplainQuoteModal from '@/components/ExplainQuoteModal';
+import PriceConfidenceIndicator from '@/components/PriceConfidenceIndicator';
+import LocalTrustMicrocopy from '@/components/LocalTrustMicrocopy';
+import SkeletonLoader from '@/components/SkeletonLoader';
 
 interface EstimateItem {
   id: string;
@@ -209,10 +213,12 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading estimate...</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-4">
+            <div className="h-8 bg-gray-200 rounded w-32 mb-4 animate-pulse"></div>
+          </div>
+          <SkeletonLoader type="estimate" />
         </div>
       </div>
     );
@@ -283,6 +289,18 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
               <p className="text-2xl font-bold text-gray-900">
                 ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
               </p>
+              <PriceConfidenceIndicator 
+                photoCount={0}
+                category=""
+                description={estimate.description}
+              />
+              <LocalTrustMicrocopy 
+                location="GTA"
+                category=""
+              />
+              <div className="mt-2">
+                <ExplainQuoteModal estimate={estimate} />
+              </div>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">Confidence</p>

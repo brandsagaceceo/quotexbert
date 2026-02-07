@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, MessageCircle, Sparkles, Home, Briefcase, Send } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -19,6 +19,8 @@ export default function AIAssistantPopup() {
   const [inputValue, setInputValue] = useState('');
   const [userType, setUserType] = useState<'homeowner' | 'contractor' | null>(null);
   const [showTerms, setShowTerms] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Determine user type
@@ -55,6 +57,34 @@ export default function AIAssistantPopup() {
       return () => clearTimeout(timer);
     }
   }, [isSignedIn, authUser]);
+
+  // NEW: Auto-hide when near bottom CTAs or forms
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!buttonRef.current) return;
+      
+      const viewportHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      
+      // Hide if near bottom (within 200px) on mobile
+      if (window.innerWidth < 768) {
+        const nearBottom = scrollY + viewportHeight > docHeight - 200;
+        setIsHidden(nearBottom);
+      } else {
+        setIsHidden(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+    handleScroll(); // Check initial position
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
 
   const initializeChat = () => {
     const welcomeMessage: Message = {
@@ -182,14 +212,17 @@ export default function AIAssistantPopup() {
 
   return (
     <>
-      {/* Floating Button - Hidden on keyboard open */}
+      {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
       {!isOpen && (
         <button
+          ref={buttonRef}
           onClick={() => {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className="fixed right-4 z-40 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group"
+          className={`fixed right-4 z-40 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group ${
+            isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
           style={{
             bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 12px)',
           }}
