@@ -40,43 +40,11 @@ body {
   background: var(--ink-100);
   color: var(--ink-900);
   font-family: system-ui, Inter, Manrope, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.75;
   cursor: default;
   width: 100%;
   overflow-x: hidden;
   position: relative;
-}
-
-/* Enhanced readability with larger base sizes */
-p, li, span {
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-h1 {
-  font-size: 2.5rem;
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-h2 {
-  font-size: 2rem;
-  line-height: 1.3;
-  font-weight: 600;
-}
-
-h3 {
-  font-size: 1.5rem;
-  line-height: 1.4;
-  font-weight: 600;
-}
-
-button, a {
-  font-size: 1rem;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
 }
 
 /* Ensure all elements use border-box sizing */
