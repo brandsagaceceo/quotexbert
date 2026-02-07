@@ -543,7 +543,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative h-64 md:h-80 mb-8 overflow-visible">
+      <div className="relative h-40 md:h-56 overflow-hidden">
         {/* Cover Photo */}
         <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
@@ -586,21 +586,22 @@ export default function UnifiedProfilePage() {
             />
             <button
               onClick={() => document.getElementById('coverPhotoInput')?.click()}
-              className="bg-white/95 backdrop-blur-sm text-slate-900 px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold border border-white/20"
+              className="bg-white/95 backdrop-blur-sm text-slate-900 px-4 py-2 md:px-5 md:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold text-sm border border-white/20"
             >
-              <Camera className="h-5 w-5 text-rose-700" />
-              Change Cover
+              <Camera className="h-4 w-4 md:h-5 md:w-5 text-rose-700" />
+              <span className="hidden sm:inline">Change Cover</span>
+              <span className="sm:hidden">Edit</span>
             </button>
           </div>
         )}
 
         {/* Profile Info Container - Improved positioning */}
-        <div className="absolute -bottom-16 left-0 right-0">
+        <div className="absolute -bottom-12 left-0 right-0 z-10">
           <div className="container mx-auto px-4 md:px-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-6">
+            <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
               {/* Profile Picture */}
               <div className="relative group flex-shrink-0">
-                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -609,7 +610,7 @@ export default function UnifiedProfilePage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
-                      <User className="h-20 w-20 text-white" />
+                      <User className="h-12 w-12 md:h-16 md:w-16 text-white" />
                     </div>
                   )}
                   
@@ -629,11 +630,11 @@ export default function UnifiedProfilePage() {
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:bg-black/80"
                       >
                         {isUploading ? (
-                          <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
+                          <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-4 border-white border-t-transparent"></div>
                         ) : (
                           <>
-                            <Camera className="h-10 w-10 text-white mb-2" />
-                            <span className="text-white text-sm font-bold">Change Photo</span>
+                            <Camera className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                            <span className="text-white text-xs md:text-sm font-bold">Change</span>
                           </>
                         )}
                       </button>
@@ -643,11 +644,11 @@ export default function UnifiedProfilePage() {
               </div>
 
               {/* Profile Info */}
-              <div className="flex-1 pb-6">
-                <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
+              <div className="flex-1">
+                <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 border border-slate-200">
                   <div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
-                    <p className="text-rose-900 font-semibold text-lg capitalize mb-3">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
+                    <p className="text-rose-900 font-semibold text-base md:text-lg capitalize mb-2">
                       {profile?.trade || authUser.role}
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-slate-600">
@@ -679,7 +680,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Spacer for overlapping profile card */}
-      <div className="h-24 md:h-20"></div>
+      <div className="h-16"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
