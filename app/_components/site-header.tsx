@@ -30,8 +30,8 @@ export default function SiteHeader() {
       <div className="container mx-auto">
         <div className="flex justify-between items-center h-24 px-4">
           {/* Brand - BIGGER & MORE PROMINENT */}
-          <div className="flex-shrink-0 transform transition-transform hover:scale-110">
-            <Logo size="xl" showText={true} />
+          <div className="flex-shrink-0 transform transition-transform hover:scale-105">
+            <Logo size="responsive-header" showText={true} />
           </div>
 
           {/* Desktop Navigation - BIGGER & MORE MODERN */}

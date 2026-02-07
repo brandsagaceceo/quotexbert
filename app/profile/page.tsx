@@ -512,59 +512,18 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50">
-      {/* Desktop Edit/Save Button - Top Right (hidden on mobile) */}
-      <div className="hidden md:block fixed top-28 right-8 z-50">
-        {!isEditing ? (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl"
-          >
-            <Edit3 className="h-4 w-4" />
-            <span>Edit Profile</span>
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-2 shadow-xl"
-            >
-              <Save className="h-4 w-4" />
-              Save
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="bg-slate-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-2 shadow-xl"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
+    <div className="min-h-screen bg-white">
       {/* Cover Photo Section */}
-      <div className="relative h-64 md:h-80 mb-8 overflow-visible" style={{ marginTop: 'var(--header-height, 96px)' }}>
-        {/* Cover Photo */}
-        <div className="absolute inset-0 overflow-hidden">
-          {profile?.coverPhoto ? (
-            <img 
-              src={profile.coverPhoto} 
-              alt="Cover" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-r from-rose-700 via-orange-600 to-red-700">
-              {/* Default cover with pattern */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-              }}></div>
-            </div>
-          )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"></div>
-        </div>
-
+      <div className="relative h-72 md:h-96 overflow-hidden" style={{ marginTop: 'var(--header-height, 96px)' }}>
+        {profile?.coverPhoto ? (
+          <img 
+            src={profile.coverPhoto} 
+            alt="Cover" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700"></div>
+        )}
         {/* Cover Photo Edit Button */}
         {isEditing && (
           <div className="absolute top-4 right-4 z-10">
@@ -587,241 +546,226 @@ export default function UnifiedProfilePage() {
             />
             <button
               onClick={() => document.getElementById('coverPhotoInput')?.click()}
-              className="bg-white/95 backdrop-blur-sm text-slate-900 px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl hover:scale-105 font-semibold border border-white/20"
+              className="bg-white text-slate-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg font-medium text-sm"
             >
-              <Camera className="h-5 w-5 text-rose-700" />
-              Change Cover
+              <Camera className="h-4 w-4" />
+              Edit Cover
             </button>
           </div>
         )}
+      </div>
 
-        {/* Profile Info Container - Improved positioning */}
-        <div className="absolute -bottom-16 left-0 right-0">
-          <div className="container mx-auto px-4 md:px-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-6">
-              {/* Profile Picture */}
-              <div className="relative group flex-shrink-0">
-                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
-                  {profile?.profilePhoto ? (
-                    <img 
-                      src={profile.profilePhoto} 
-                      alt={displayName}
-                      className="w-full h-full object-cover"
+      {/* Profile Hero - Facebook Style */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 -mt-16 md:-mt-24 pb-4">
+            {/* LEFT: Avatar */}
+            <div className="relative group flex-shrink-0">
+              <div className="relative w-32 h-32 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-rose-100 to-orange-100">
+                {profile?.profilePhoto ? (
+                  <img 
+                    src={profile.profilePhoto} 
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-400 to-slate-500">
+                    <User className="h-16 w-16 md:h-20 md:w-20 text-white" />
+                  </div>
+                )}
+                
+                {/* Edit overlay */}
+                {isEditing && (
+                  <>
+                    <input
+                      type="file"
+                      id="profilePhotoInput"
+                      accept="image/*"
+                      onChange={handleProfilePictureUpload}
+                      className="hidden"
                     />
+                    <button
+                      onClick={() => document.getElementById('profilePhotoInput')?.click()}
+                      disabled={isUploading}
+                      className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                    >
+                      {isUploading ? (
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+                      ) : (
+                        <Camera className="h-8 w-8 text-white" />
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* CENTER: Name, Trade, Location, Verified Badge */}
+            <div className="flex-1 pb-2">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">{displayName}</h1>
+                  <p className="text-slate-600 text-base md:text-lg font-medium capitalize mb-2">
+                    {profile?.trade || authUser.role}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                    {profile?.city && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4 text-slate-400" />
+                        <span>{profile.city}</span>
+                      </div>
+                    )}
+                    {isContractor && profile?.verified && (
+                      <div className="flex items-center gap-1 text-blue-600">
+                        <Award className="h-4 w-4" />
+                        <span className="font-medium">Verified</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* RIGHT: Action Buttons (Desktop) */}
+                <div className="hidden md:flex items-center gap-2">
+                  {!isEditing ? (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      Edit Profile
+                    </button>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
-                      <User className="h-20 w-20 text-white" />
-                    </div>
-                  )}
-                  
-                  {/* Edit overlay */}
-                  {isEditing && (
                     <>
-                      <input
-                        type="file"
-                        id="profilePhotoInput"
-                        accept="image/*"
-                        onChange={handleProfilePictureUpload}
-                        className="hidden"
-                      />
                       <button
-                        onClick={() => document.getElementById('profilePhotoInput')?.click()}
-                        disabled={isUploading}
-                        className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:bg-black/80"
+                        onClick={handleSaveProfile}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
                       >
-                        {isUploading ? (
-                          <div className="animate-spin rounded-full h-10 w-10 border-4 border-white border-t-transparent"></div>
-                        ) : (
-                          <>
-                            <Camera className="h-10 w-10 text-white mb-2" />
-                            <span className="text-white text-sm font-bold">Change Photo</span>
-                          </>
-                        )}
+                        <Save className="h-4 w-4" />
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+                      >
+                        Cancel
                       </button>
                     </>
                   )}
-                </div>
-              </div>
-
-              {/* Profile Info */}
-              <div className="flex-1 pb-6">
-                <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-slate-200">
-                  {/* Mobile Edit/Save Buttons - Inline in header card */}
-                  <div className="md:hidden flex justify-end gap-2 mb-4">
-                    {!isEditing ? (
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2 text-sm"
-                      >
-                        <Edit3 className="h-3.5 w-3.5" />
-                        <span>Edit</span>
-                      </button>
-                    ) : (
-                      <>
-                        <button
-                          onClick={handleSaveProfile}
-                          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg flex items-center gap-2 text-sm"
-                        >
-                          <Save className="h-3.5 w-3.5" />
-                          <span>Save</span>
-                        </button>
-                        <button
-                          onClick={() => setIsEditing(false)}
-                          className="bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-slate-700 flex items-center gap-2 text-sm"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          <span>Cancel</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
-                    <p className="text-rose-900 font-semibold text-lg capitalize mb-3">
-                      {profile?.trade || authUser.role}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-4 text-slate-600">
-                      {profile?.city && (
-                        <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-4 w-4 text-rose-700 flex-shrink-0" />
-                          <span className="truncate">{profile.city}</span>
-                        </div>
-                      )}
-                      {profile?.email && (
-                        <div className="flex items-center gap-1 min-w-0 max-w-full">
-                          <Mail className="h-4 w-4 text-slate-400 flex-shrink-0" />
-                          <span className="truncate text-sm">{profile.email}</span>
-                        </div>
-                      )}
-                      {isContractor && profile?.verified && (
-                        <div className="flex items-center gap-1 text-green-600">
-                          <Award className="h-4 w-4" />
-                          <span className="font-medium">Verified Contractor</span>
-                        </div>
-                      )}
-                      <Link
-                        href={`/contractors/${authUser.id}`}
-                        target="_blank"
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium text-sm"
-                      >
-                        <Globe className="h-4 w-4" />
-                        <span>View Public Profile</span>
-                      </Link>
-                    </div>
-                  </div>
+                  <Link
+                    href={`/contractors/${authUser.id}`}
+                    target="_blank"
+                    className="text-slate-600 hover:text-slate-900 px-3 py-2 transition-colors"
+                    title="View Public Profile"
+                  >
+                    <Globe className="h-5 w-5" />
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Mobile Action Buttons */}
+          <div className="md:hidden flex gap-2 pb-4">
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex-1 bg-slate-200 text-slate-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <Edit3 className="h-4 w-4" />
+                Edit Profile
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleSaveProfile}
+                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium text-sm"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+            <Link
+              href={`/contractors/${authUser.id}`}
+              target="_blank"
+              className="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg flex items-center justify-center"
+            >
+              <Globe className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Spacer for overlapping profile card */}
-      <div className="h-24 md:h-20"></div>
-
-      {/* Navigation Tabs - Mobile Optimized */}
-      <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
+      {/* Navigation Tabs - Simplified to 4 tabs */}
+      <div className="bg-white border-b sticky" style={{ top: 'var(--header-height, 96px)', zIndex: 30 }}>
         <div className="container mx-auto">
-          {/* Mobile: Scrollable pill tabs */}
-          <nav className="md:hidden flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide" style={{
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}>
-            {(isContractor 
-              ? ['overview', 'portfolio', 'activity', 'jobs'] 
-              : ['overview', 'projects', 'activity', 'jobs']
-            ).map((tab) => (
+          <nav className="flex gap-1 px-4 overflow-x-auto scrollbar-hide">
+            {['overview', 'portfolio', 'reviews', 'activity'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full font-medium text-sm capitalize whitespace-nowrap transition-all min-h-[44px] ${
+                className={`px-4 py-3 font-medium text-sm capitalize whitespace-nowrap border-b-2 transition-colors min-h-[44px] ${
                   activeTab === tab
-                    ? 'bg-rose-700 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                 }`}
               >
-                {tab === 'projects' ? 'My Projects' : 
-                 tab === 'estimates' ? 'AI Estimates' : 
-                 tab}
-              </button>
-            ))}
-          </nav>
-
-          {/* Desktop: Full tab bar */}
-          <nav className="hidden md:flex space-x-8 px-4 overflow-x-auto">
-            {(isContractor 
-              ? ['overview', 'portfolio', 'activity', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'activity', 'estimates', 'visualizations', 'jobs', 'favorites', 'contact']
-            ).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize whitespace-nowrap ${
-                  activeTab === tab
-                    ? 'border-rose-700 text-rose-700'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {tab === 'projects' ? 'My Projects' : 
-                 tab === 'estimates' ? 'AI Estimates' : 
-                 tab === 'visualizations' ? 'AI Visualizations' : 
-                 tab === 'accepted-jobs' ? 'Accepted Jobs' : 
-                 tab}
+                {tab}
               </button>
             ))}
           </nav>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8" style={{
+      {/* Main Content Area - With Sidebar Layout */}
+      <div className="container mx-auto px-4 py-6" style={{
         paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 16px)'
       }}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - 2 columns */}
+          <div className="lg:col-span-2 space-y-4">
             {activeTab === 'overview' && (
               <>
-                {/* Bio Section */}
-                <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-slate-900">About</h2>
-                    {isEditing && (
-                      <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
-                    )}
-                  </div>
+                {/* About Section */}
+                <div className="bg-white rounded-lg border p-6">
+                  <h2 className="text-lg font-bold text-slate-900 mb-3">About</h2>
                   {isEditing ? (
                     <textarea
                       value={editData.bio}
                       onChange={(e) => setEditData({...editData, bio: e.target.value})}
-                      className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
-                      rows={5}
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      rows={4}
                       placeholder="Tell people about your experience, specialties, and what makes you unique..."
                     />
                   ) : (
-                    <p className="text-slate-600 leading-relaxed text-base">
+                    <p className="text-slate-600 leading-relaxed">
                       {profile?.bio || "No bio added yet. Click Edit Profile to add information about your experience and services."}
                     </p>
                   )}
                 </div>
 
-                {/* Stats Cards */}
+                {/* Key Stats - Inline */}
                 {isContractor && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Briefcase className="h-8 w-8 text-rose-700 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
-                      <div className="text-sm text-gray-600">Completed Jobs</div>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
-                      <div className="text-sm text-gray-600">Average Rating</div>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
-                      <div className="text-sm text-gray-600">Reviews</div>
+                  <div className="bg-white rounded-lg border p-6">
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-slate-900">{profile?.completedJobs || 0}</div>
+                        <div className="text-sm text-slate-600">Jobs Completed</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-slate-900">{profile?.avgRating ? profile.avgRating.toFixed(1) : '0.0'}</div>
+                        <div className="text-sm text-slate-600">Avg Rating</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-slate-900">{profile?.reviewCount || 0}</div>
+                        <div className="text-sm text-slate-600">Reviews</div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -950,6 +894,16 @@ export default function UnifiedProfilePage() {
 
             {activeTab === 'activity' && (
               <ActivityTimeline userId={authUser?.id || ''} isContractor={isContractor} />
+            )}
+
+            {activeTab === 'reviews' && (
+              <div className="bg-white rounded-lg border p-6">
+                <h2 className="text-lg font-bold text-slate-900 mb-4">Reviews</h2>
+                <div className="text-center py-12 text-slate-500">
+                  <Star className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                  <p>Reviews feature coming soon</p>
+                </div>
+              </div>
             )}
 
             {activeTab === 'messages' && isContractor && (
@@ -1551,16 +1505,99 @@ export default function UnifiedProfilePage() {
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Location */}
-            {profile?.city && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Location</h3>
-                <div className="flex items-center text-gray-700">
-                  <MapPin className="h-5 w-5 mr-2 text-rose-700" />
-                  <span>{profile.city}</span>
-                </div>
+          {/* Sidebar - Desktop only, stacks below on mobile */}
+          <div className="lg:block space-y-4">
+            {/* Contact Card */}
+            <div className="bg-white rounded-lg border p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Contact</h3>
+              <div className="space-y-3">
+                {profile?.phone ? (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Phone className="h-4 w-4 text-slate-400" />
+                    <span className="text-slate-700">{profile.phone}</span>
+                  </div>
+                ) : isEditing && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                    <input
+                      type="tel"
+                      value={editData.phone}
+                      onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                      className="w-full p-2 border rounded-lg text-sm"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                )}
+                {profile?.email && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Mail className="h-4 w-4 text-slate-400" />
+                    <span className="text-slate-700 truncate">{profile.email}</span>
+                  </div>
+                )}
+                {profile?.website ? (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Globe className="h-4 w-4 text-slate-400" />
+                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
+                      {profile.website.replace(/^https?:\/\//, '')}
+                    </a>
+                  </div>
+                ) : isEditing && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Website</label>
+                    <input
+                      type="url"
+                      value={editData.website}
+                      onChange={(e) => setEditData({...editData, website: e.target.value})}
+                      className="w-full p-2 border rounded-lg text-sm"
+                      placeholder="https://yourwebsite.com"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Location Card */}
+            {(profile?.city || isEditing) && (
+              <div className="bg-white rounded-lg border p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Location</h3>
+                {isEditing ? (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                    <input
+                      type="text"
+                      value={editData.city}
+                      onChange={(e) => setEditData({...editData, city: e.target.value})}
+                      className="w-full p-2 border rounded-lg text-sm"
+                      placeholder="Toronto"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <MapPin className="h-4 w-4 text-slate-400" />
+                    <span>{profile?.city}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Trade/Specialty Card */}
+            {(profile?.trade || isEditing) && (
+              <div className="bg-white rounded-lg border p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Specialty</h3>
+                {isEditing ? (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Trade/Specialty</label>
+                    <input
+                      type="text"
+                      value={editData.trade}
+                      onChange={(e) => setEditData({...editData, trade: e.target.value})}
+                      className="w-full p-2 border rounded-lg text-sm"
+                      placeholder="e.g., General Contractor"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-700 capitalize">{profile?.trade}</p>
+                )}
               </div>
             )}
           </div>

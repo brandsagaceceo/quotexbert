@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface LogoProps {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "responsive-header";
   showText?: boolean;
   href?: string;
   className?: string;
@@ -14,7 +14,10 @@ const sizeMap = {
   sm: { width: 32, height: 32, textSize: "text-lg" },
   md: { width: 48, height: 48, textSize: "text-2xl" },
   lg: { width: 64, height: 64, textSize: "text-3xl" },
-  xl: { width: 80, height: 80, textSize: "text-4xl" }
+  xl: { width: 80, height: 80, textSize: "text-4xl" },
+  "2xl": { width: 120, height: 120, textSize: "text-5xl" },
+  "3xl": { width: 150, height: 150, textSize: "text-6xl" },
+  "responsive-header": { width: 150, height: 150, textSize: "text-[2rem] sm:text-[2.5rem] md:text-[3rem]" }
 };
 
 export default function Logo({ 
