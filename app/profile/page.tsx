@@ -510,7 +510,7 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50">
+    <div className="min-h-screen bg-white">
       {/* Persistent Edit/Save Button - Top Right */}
       <div className="fixed right-6 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 8px)' }}>
         {!isEditing ? (
@@ -543,7 +543,14 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative overflow-hidden" style={{ height: 'clamp(180px, 22vh, 280px)', zIndex: 0 }}>
+      <div 
+        className="relative overflow-hidden" 
+        style={{ 
+          height: 'clamp(180px, 22vh, 280px)', 
+          zIndex: 0, 
+          marginTop: 'calc(-1 * var(--header-height, 64px))' 
+        }}
+      >
         {/* Cover Photo */}
         <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
