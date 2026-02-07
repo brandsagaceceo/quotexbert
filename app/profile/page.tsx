@@ -268,13 +268,17 @@ export default function UnifiedProfilePage() {
           // Fetch posted jobs/leads for homeowners
           try {
             const jobsResponse = await fetch(`/api/homeowner/jobs?homeownerId=${authUser.id}`);
+            console.log("[ProfilePage] Jobs API response status:", jobsResponse.status);
             if (jobsResponse.ok) {
               const jobsData = await jobsResponse.json();
               console.log("[ProfilePage] Loaded homeowner jobs:", jobsData);
+              console.log("[ProfilePage] Number of jobs:", jobsData?.length || 0);
               setJobs(jobsData || []);
+            } else {
+              console.error("[ProfilePage] Jobs API error:", jobsResponse.statusText);
             }
           } catch (error) {
-            console.log("[ProfilePage] Posted jobs not available yet");
+            console.error("[ProfilePage] Error fetching posted jobs:", error);
           }
         }
         
@@ -505,6 +509,7 @@ export default function UnifiedProfilePage() {
   }
 
   console.log("[ProfilePage RENDER] Rendering main profile, profile:", profile);
+  console.log("[ProfilePage RENDER] Jobs state:", jobs, "Count:", jobs.length);
 
   const displayName = profile?.companyName || profile?.name || authUser.email;
   const isContractor = authUser.role === 'contractor';
@@ -646,6 +651,7 @@ export default function UnifiedProfilePage() {
                  tab === 'estimates' ? 'AI Estimates' : 
                  tab === 'visualizations' ? 'AI Visualizations' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
+                 tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
                  tab}
               </button>
             ))}
@@ -1133,7 +1139,7 @@ export default function UnifiedProfilePage() {
                           </div>
                         </div>
                         <a
-                          href={`/homeowner/jobs/${job.id}`}
+                          href={`/homeowner/jobs/${job.id}/applications`}
                           className="inline-block text-sm bg-rose-700 text-white py-2 px-4 rounded-lg hover:bg-rose-800 transition-colors"
                         >
                           View Applications
