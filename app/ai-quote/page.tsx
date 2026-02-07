@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { FileText, Download, Printer, Edit3, Check, Sparkles } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { FileText, Download, Printer, Edit3, Check, Sparkles, Mic, MicOff } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/components/ToastProvider';
 
@@ -10,6 +10,8 @@ export default function AIQuotePage() {
   const [loading, setLoading] = useState(false);
   const [generatedQuote, setGeneratedQuote] = useState('');
   const [editing, setEditing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -23,6 +25,76 @@ export default function AIQuotePage() {
     clientEmail: '',
     clientPhone: ''
   });
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        
+        recognitionRef.current.onresult = (event: any) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          if (finalTranscript) {
+            setFormData(prev => ({
+              ...prev,
+              description: prev.description + finalTranscript
+            }));
+          }
+        };
+        
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsRecording(false);
+          if (event.error === 'not-allowed') {
+            toast.error('Microphone access denied. Please enable microphone permissions.');
+          } else {
+            toast.error('Voice input error. Please try again.');
+          }
+        };
+        
+        recognitionRef.current.onend = () => {
+          setIsRecording(false);
+        };
+      }
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [toast]);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast.error('Voice input is not supported in your browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+    
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      toast.success('Voice input stopped');
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+      toast.success('Voice input started - speak now!');
+    }
+  };
 
   const generateQuote = async () => {
     if (!formData.projectType || !formData.description || !formData.companyName) {
@@ -147,15 +219,39 @@ export default function AIQuotePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Project Description *
+                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center justify-between">
+                  <span>Project Description *</span>
+                  <button
+                    type="button"
+                    onClick={toggleVoiceInput}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                      isRecording 
+                        ? 'bg-red-600 text-white animate-pulse shadow-lg' 
+                        : 'bg-rose-100 text-rose-700 hover:bg-rose-200'
+                    }`}
+                    title={isRecording ? 'Stop voice input' : 'Start voice input'}
+                  >
+                    {isRecording ? (
+                      <>
+                        <MicOff className="w-4 h-4" />
+                        <span>Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4" />
+                        <span>Voice</span>
+                      </>
+                    )}
+                  </button>
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   rows={4}
-                  placeholder="E.g., Complete kitchen renovation including new cabinets, countertops, appliances..."
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+                  placeholder="E.g., Complete kitchen renovation including new cabinets, countertops, appliances... (Click Voice button to dictate)"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 ${
+                    isRecording ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-300'
+                  }`}
                 />
               </div>
 
