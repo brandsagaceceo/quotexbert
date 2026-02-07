@@ -435,6 +435,7 @@ export default function HomeownerQuotesPage() {
               </div>
             </div>
           </div>
+        </div>
         )}
       </div>
     </div>
