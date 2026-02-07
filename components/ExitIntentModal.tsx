@@ -55,14 +55,15 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
       
       {/* Modal */}
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
       <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl max-w-lg w-full p-8 md:p-10 transform animate-scale-in">
         {/* Close button */}
         <button

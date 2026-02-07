@@ -33,14 +33,15 @@ export function ReviewCaptureModal({ isOpen, onClose, googleReviewUrl }: ReviewC
   };
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`fixed inset-0 z-50 overflow-y-auto transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={handleClose}
       />
       
       {/* Modal */}
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
       <div className={`relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all duration-300 ${isVisible ? 'scale-100' : 'scale-95'}`}>
         {/* Close button */}
         <button

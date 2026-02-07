@@ -76,7 +76,8 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
       <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-6 rounded-t-3xl">

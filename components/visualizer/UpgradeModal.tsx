@@ -37,7 +37,8 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
         {/* Header */}
         <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 p-8 text-white rounded-t-3xl overflow-hidden">

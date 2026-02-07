@@ -230,7 +230,8 @@ export default function PaymentModal({
   onClose 
 }: PaymentFormProps & { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
       <div className="relative">
         <button
           onClick={onClose}

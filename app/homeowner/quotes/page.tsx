@@ -276,8 +276,9 @@ export default function HomeownerQuotesPage() {
 
         {/* Quote Details Modal */}
         {selectedQuote && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+            <div className="min-h-full flex items-center justify-center p-4 py-8">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-start">
                   <h2 className="text-2xl font-bold text-gray-900">
