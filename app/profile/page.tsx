@@ -512,7 +512,7 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       {/* Cover Photo Section */}
       <div className="relative h-72 md:h-96 overflow-hidden" style={{ marginTop: 'var(--header-height, 96px)' }}>
         {profile?.coverPhoto ? (
@@ -522,7 +522,7 @@ export default function UnifiedProfilePage() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700"></div>
+          <div className="w-full h-full bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600"></div>
         )}
         {/* Cover Photo Edit Button */}
         {isEditing && (
@@ -546,7 +546,7 @@ export default function UnifiedProfilePage() {
             />
             <button
               onClick={() => document.getElementById('coverPhotoInput')?.click()}
-              className="bg-white text-slate-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg font-medium text-sm"
+              className="bg-white/95 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl font-medium text-sm border border-white/50"
             >
               <Camera className="h-4 w-4" />
               Edit Cover
@@ -569,7 +569,7 @@ export default function UnifiedProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-400 to-slate-500">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
                     <User className="h-16 w-16 md:h-20 md:w-20 text-white" />
                   </div>
                 )}
@@ -616,7 +616,7 @@ export default function UnifiedProfilePage() {
                       </div>
                     )}
                     {isContractor && profile?.verified && (
-                      <div className="flex items-center gap-1 text-blue-600">
+                      <div className="flex items-center gap-1 text-green-600">
                         <Award className="h-4 w-4" />
                         <span className="font-medium">Verified</span>
                       </div>
@@ -629,7 +629,7 @@ export default function UnifiedProfilePage() {
                   {!isEditing ? (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+                      className="bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 shadow-md"
                     >
                       <Edit3 className="h-4 w-4" />
                       Edit Profile
@@ -638,7 +638,7 @@ export default function UnifiedProfilePage() {
                     <>
                       <button
                         onClick={handleSaveProfile}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 shadow-md"
                       >
                         <Save className="h-4 w-4" />
                         Save
@@ -669,7 +669,7 @@ export default function UnifiedProfilePage() {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex-1 bg-slate-200 text-slate-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 shadow-md"
               >
                 <Edit3 className="h-4 w-4" />
                 Edit Profile
@@ -678,7 +678,7 @@ export default function UnifiedProfilePage() {
               <>
                 <button
                   onClick={handleSaveProfile}
-                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 shadow-md"
                 >
                   <Save className="h-4 w-4" />
                   Save
@@ -712,8 +712,8 @@ export default function UnifiedProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-3 font-medium text-sm capitalize whitespace-nowrap border-b-2 transition-colors min-h-[44px] ${
                   activeTab === tab
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                    ? 'border-rose-700 text-rose-700'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-rose-200'
                 }`}
               >
                 {tab}
