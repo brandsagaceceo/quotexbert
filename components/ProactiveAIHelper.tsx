@@ -89,6 +89,12 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
       return;
     }
 
+    // NEVER auto-open on /profile page to avoid overlap with profile content
+    if (typeof window !== 'undefined' && window.location.pathname === '/profile') {
+      console.log('[AIHelper] Skipping auto-open on /profile page');
+      return;
+    }
+
     // Check if shown this session
     if (sessionStorage.getItem('aiHelperShownThisSession')) {
       return;
@@ -191,6 +197,11 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     return null;
   }
 
+  // Safety check for currentTip (should never be undefined in practice)
+  if (!currentTip) {
+    return null;
+  }
+
   if (!isVisible) {
     return (
       <button
@@ -220,12 +231,16 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
 
   return (
     <div 
-      className="fixed right-2 md:right-3 z-50 w-[calc(100vw-1rem)] sm:w-96 max-w-[400px] animate-slide-up pointer-events-auto"
+      className="fixed z-50 pointer-events-auto"
       style={{
-        bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 12px)',
+        right: '16px',
+        top: 'calc(var(--header-height, 72px) + 12px)',
+        bottom: 'calc(env(safe-area-inset-bottom) + 12px)',
+        width: 'min(420px, calc(100vw - 32px))',
+        maxHeight: 'calc(100dvh - var(--header-height, 72px) - env(safe-area-inset-bottom) - 24px)',
       }}
     >
-      <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden">
+      <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden h-full flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 md:p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
@@ -257,8 +272,8 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-4 md:p-6">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="text-center mb-3 md:mb-4">
             <div className="text-3xl md:text-5xl mb-2 md:mb-3 animate-bounce">{currentTip.icon}</div>
             <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">
@@ -320,15 +335,15 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
           </div>
         </div>
 
-        {/* Footer - Hidden on mobile */}
-        <div className="bg-rose-100 px-3 md:px-4 py-2 text-center hidden sm:block">
+        {/* Footer - Sticky and always visible */}
+        <div className="sticky bottom-0 bg-rose-100 px-3 md:px-4 py-2 text-center border-t border-rose-200">
           <p className="text-xs text-rose-700">
             💡 <span className="font-semibold">Pro tip:</span> Try our AI Room Visualizer to see your renovation before you start!
           </p>
         </div>
 
-        {/* Don't show again option */}
-        <div className="bg-gray-100 px-3 py-2 text-center border-t border-gray-200">
+        {/* Don't show again option - Sticky */}
+        <div className="sticky bottom-0 bg-gray-100 px-3 py-2 text-center border-t border-gray-200">
           <button
             onClick={handlePermanentDismiss}
             className="text-xs text-gray-600 hover:text-gray-800 underline transition-colors"

@@ -510,9 +510,9 @@ export default function UnifiedProfilePage() {
   const isContractor = authUser.role === 'contractor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50" style={{ paddingTop: 'var(--header-height, 96px)' }}>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50">
       {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed top-24 right-6 md:top-28 md:right-8 z-50">
+      <div className="fixed right-6 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 8px)' }}>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
@@ -543,7 +543,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Cover Photo Section */}
-      <div className="relative h-40 md:h-56 overflow-hidden">
+      <div className="relative overflow-hidden" style={{ height: 'clamp(180px, 22vh, 280px)', zIndex: 0 }}>
         {/* Cover Photo */}
         <div className="absolute inset-0 overflow-hidden">
           {profile?.coverPhoto ? (
@@ -595,12 +595,14 @@ export default function UnifiedProfilePage() {
           </div>
         )}
 
-        {/* Profile Info Container - Improved positioning */}
-        <div className="absolute -bottom-12 left-0 right-0 z-10">
-          <div className="container mx-auto px-4 md:px-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-              {/* Profile Picture */}
-              <div className="relative group flex-shrink-0">
+      </div>
+      
+      {/* Profile Identity Section - Normal Flow */}
+      <div className="relative" style={{ marginTop: '-60px', zIndex: 10 }}>
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+            {/* Profile Picture - Only avatar overlaps */}
+            <div className="relative group flex-shrink-0">
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
@@ -643,9 +645,9 @@ export default function UnifiedProfilePage() {
                 </div>
               </div>
 
-              {/* Profile Info */}
-              <div className="flex-1">
-                <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 border border-slate-200">
+            {/* Profile Info Card - White background card below avatar */}
+            <div className="flex-1" style={{ marginTop: '12px' }}>
+              <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 border border-slate-200">
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
                     <p className="text-rose-900 font-semibold text-base md:text-lg capitalize mb-2">
@@ -677,10 +679,6 @@ export default function UnifiedProfilePage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Spacer for overlapping profile card */}
-      <div className="h-16"></div>
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
