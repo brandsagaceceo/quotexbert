@@ -39,9 +39,9 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm animate-fadeIn">
       <div className="min-h-full flex items-center justify-center p-4 py-8">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
-        {/* Header */}
-        <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 p-8 text-white rounded-t-3xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
+          {/* Header */}
+          <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 p-8 text-white rounded-t-3xl overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
           
           <button
@@ -61,10 +61,10 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
               Used {generationsUsed} of {generationsLimit} free AI generations this month
             </p>
           </div>
-        </div>
+          </div>
 
-        {/* Content */}
-        <div className="p-8">
+          {/* Content */}
+          <div className="p-8">
           {/* Upgrade Offer */}
           <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 mb-6 border-2 border-purple-200">
             <div className="flex items-center justify-between mb-6">
@@ -182,6 +182,7 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
 
           <div className="text-center text-sm text-gray-500">
             Secure payment powered by Stripe • Cancel anytime
+          </div>
           </div>
         </div>
       </div>
