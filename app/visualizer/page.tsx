@@ -298,6 +298,7 @@ export default function VisualizerPage() {
                     <p className="text-xl font-bold text-gray-900 mb-2">Click to upload room photo</p>
                     <p className="text-gray-600">or drag and drop</p>
                     <p className="text-sm text-gray-500 mt-2">PNG, JPG up to 10MB</p>
+                    <p className="text-xs text-rose-600 font-semibold mt-3">💡 Tip: Square images work best for accurate transformations</p>
                   </div>
                 )}
               </div>
@@ -320,7 +321,7 @@ export default function VisualizerPage() {
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="e.g., Paint the walls light gray, add hardwood flooring, modern minimalist style with plants..."
+                      placeholder="e.g., Change the wall color to white, keep everything else the same..."
                       rows={5}
                       className="w-full px-4 py-4 pr-14 border-2 border-gray-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all resize-none text-base"
                     />
@@ -350,7 +351,7 @@ export default function VisualizerPage() {
                     {isRecording ? (
                       <span className="text-red-600 font-bold">🔴 Recording... Click microphone to stop</span>
                     ) : (
-                      <span>💡 Type or click the 🎤 microphone to describe what you want</span>
+                      <span>💡 Be specific! Say what changes you want while keeping the rest the same.</span>
                     )}
                   </p>
                 </div>
@@ -359,7 +360,8 @@ export default function VisualizerPage() {
               {/* Error */}
               {error && (
                 <div className="mt-4 bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-700">
-                  {error}
+                  <strong>Error:</strong> {error}
+                  <p className="text-sm mt-2">Try uploading a square image (same width and height) in PNG format for best results.</p>
                 </div>
               )}
 
