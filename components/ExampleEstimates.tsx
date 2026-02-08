@@ -8,7 +8,6 @@ const EXAMPLE_ESTIMATES = [
     id: 1,
     title: "Drywall Hole Repair",
     location: "Toronto, ON",
-    image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=300&fit=crop",
     costLow: 180,
     costHigh: 350,
     materials: "$40 - $80",
@@ -26,7 +25,6 @@ const EXAMPLE_ESTIMATES = [
     id: 2,
     title: "Kitchen Faucet Installation",
     location: "Scarborough, ON",
-    image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400&h=300&fit=crop",
     costLow: 250,
     costHigh: 450,
     materials: "$80 - $200",
@@ -44,7 +42,6 @@ const EXAMPLE_ESTIMATES = [
     id: 3,
     title: "Basement Pot Lights (8 lights)",
     location: "Ajax, ON",
-    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&h=300&fit=crop",
     costLow: 920,
     costHigh: 1450,
     materials: "$320 - $650",
@@ -93,11 +90,6 @@ export default function ExampleEstimates() {
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <img
-                    src={example.image}
-                    alt={example.title}
-                    className="w-20 h-20 rounded-lg object-cover"
-                  />
                   <div className="flex-1">
                     <h3 className="font-bold text-lg text-slate-900 mb-1">
                       {example.title}

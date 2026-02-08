@@ -82,9 +82,28 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // Send email notifications to all subscribed contractors
-      const notificationPromises = contractors.map(contractor =>
-        sendEmailNotification({
+      // Create in-app notifications and send emails to all subscribed contractors
+      const notificationPromises = contractors.map(async (contractor) => {
+        // Create in-app notification
+        await prisma.notification.create({
+          data: {
+            userId: contractor.id,
+            type: 'LEAD_MATCHED',
+            title: `New ${category} job available`,
+            message: `${title} - ${budget} in ${zipCode}`,
+            payload: {
+              jobId: job.id,
+              jobTitle: title,
+              location: zipCode,
+              budget: budget,
+              category: category
+            },
+            read: false
+          }
+        }).catch(err => console.error('Failed to create notification:', err));
+
+        // Send email notification
+        return sendEmailNotification({
           type: 'job_posted',
           toEmail: contractor.email,
           data: {
@@ -95,11 +114,11 @@ export async function POST(request: NextRequest) {
             category: category,
             description: description
           }
-        })
-      );
+        });
+      });
 
       await Promise.allSettled(notificationPromises);
-      console.log(`📧 Sent ${contractors.length} job notification emails for new job: ${title}`);
+      console.log(`📧 Sent ${contractors.length} job notifications (email + in-app) for new job: ${title}`);
     } catch (emailError) {
       console.error('Error sending job notifications:', emailError);
       // Don't fail job creation if notifications fail

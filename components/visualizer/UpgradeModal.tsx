@@ -155,7 +155,7 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
             </div>
             <div className="flex items-center gap-1 text-yellow-500 mb-2">
               <span>⭐⭐⭐⭐⭐</span>
-              <span className="text-gray-700 font-semibold ml-2">4.9/5 Rating</span>
+              <span className="text-gray-700 font-semibold ml-2">5.0/5 Rating</span>
             </div>
             <p className="text-gray-700 italic">"This tool helped me visualize my renovation before spending thousands. Worth every penny!" - Sarah M.</p>
           </div>

@@ -30,7 +30,7 @@ export function TrustSignals() {
               </div>
               <div>
                 <div className="flex items-center gap-1">
-                  <span className="text-3xl font-bold text-gray-900">4.9</span>
+                  <span className="text-3xl font-bold text-gray-900">5.0</span>
                   <Star className="w-5 h-5 text-amber-400 fill-current" />
                 </div>
                 <p className="text-sm text-gray-600">Google Rating</p>
@@ -41,7 +41,6 @@ export function TrustSignals() {
                 <Star key={star} className="w-4 h-4 text-amber-400 fill-current" />
               ))}
             </div>
-            <p className="text-xs text-gray-500">Based on 43 reviews</p>
           </div>
 
           {/* Verified Contractors */}

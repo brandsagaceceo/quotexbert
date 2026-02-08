@@ -95,7 +95,7 @@ export default function Home() {
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
         {/* Hero Section - 2 Column Layout - BIGGER & MORE MODERN */}
-        <section id="get-estimate" className="relative py-16 md:py-24 overflow-hidden">
+        <section id="get-estimate" className="relative py-16 md:py-24 overflow-hidden -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+4rem)] md:pt-[calc(var(--header-height,64px)+6rem)]">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           <div className="absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
@@ -170,7 +170,7 @@ export default function Home() {
                 {/* Social Proof - BIGGER */}
                 <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
                   <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-rose-200">
-                    <span className="text-base font-bold text-slate-700">⭐ 4.9/5 Rating</span>
+                    <span className="text-base font-bold text-slate-700">⭐ 5.0/5 Rating</span>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-orange-200">
                     <span className="text-base font-bold text-slate-700">🔒 100% Secure</span>

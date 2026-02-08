@@ -133,6 +133,27 @@ export async function POST(
       data: { lastMessageAt: new Date() }
     });
 
+    // Create in-app notification for receiver
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: receiverId,
+          type: 'NEW_MESSAGE',
+          title: `New message from ${message.sender.name || 'User'}`,
+          message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+          payload: {
+            conversationId,
+            messageId: message.id,
+            senderId,
+            senderName: message.sender.name || message.sender.email
+          },
+          read: false
+        }
+      });
+    } catch (notificationError) {
+      console.error('Failed to create in-app notification:', notificationError);
+    }
+
     // Send email notification to receiver
     try {
       await sendEmailNotification({
