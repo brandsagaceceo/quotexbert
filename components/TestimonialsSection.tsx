@@ -137,7 +137,7 @@ export function TestimonialsSection() {
               <div className="text-sm text-gray-600">Happy Homeowners</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-orange-600 mb-2">4.8★</div>
+              <div className="text-4xl font-bold text-orange-600 mb-2">5.0★</div>
               <div className="text-sm text-gray-600">Average Rating</div>
             </div>
             <div>

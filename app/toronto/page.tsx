@@ -67,7 +67,7 @@ export default function TorontoPage() {
             <div className="flex flex-wrap justify-center gap-6 pt-4">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-amber-500 fill-current" />
-                <span className="font-semibold">4.8/5 Rating</span>
+                <span className="font-semibold">5.0/5 Rating</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-emerald-500" />

@@ -417,7 +417,7 @@ export default function BlogPage() {
           }),
         }}
       />
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px))]">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 text-white py-16">
           <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between gap-8">

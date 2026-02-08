@@ -48,8 +48,8 @@ export default function AffiliatePage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
-        <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+3rem)]">
+        <div className="max-w-7xl mx-auto px-4 pb-16">
           {/* Hero Section with Image */}
           <div className="text-center mb-16">
             <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-full font-bold shadow-lg">

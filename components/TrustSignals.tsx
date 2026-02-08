@@ -121,7 +121,7 @@ export function TrustSignals() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 mb-1">Top Rated</h3>
-                <p className="text-sm text-gray-600">4.8+ average customer rating</p>
+                <p className="text-sm text-gray-600">5.0+ average customer rating</p>
               </div>
             </div>
           </div>
