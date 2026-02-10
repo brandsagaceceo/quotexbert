@@ -54,25 +54,78 @@ export async function POST(
         body: message,
       },
       include: {
-        fromUser: true,
-        toUser: true,
+        fromUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            contractorProfile: {
+              select: { companyName: true }
+            },
+            homeownerProfile: {
+              select: { name: true }
+            }
+          }
+        },
+        toUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            contractorProfile: {
+              select: { companyName: true }
+            },
+            homeownerProfile: {
+              select: { name: true }
+            }
+          }
+        },
       },
     });
 
-    // Create notification for the recipient
+    // Get sender name for notification
+    const senderName = newMessage.fromUser.contractorProfile?.companyName || 
+                      newMessage.fromUser.homeownerProfile?.name || 
+                      newMessage.fromUser.name || 
+                      newMessage.fromUser.email;
+
+    // Create in-app notification for the recipient
     await prisma.notification.create({
       data: {
         userId: toUserId,
-        type: "new_message",
-        title: "New Message",
-        message: `You have a new message from ${newMessage.fromUser.email}`,
+        type: "NEW_MESSAGE",
+        title: `New message from ${senderName}`,
+        message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
         payload: {
           messageId: newMessage.id,
-          fromUserName: newMessage.fromUser.email,
+          threadId,
+          fromUserId,
+          senderName,
           preview: message.substring(0, 100),
-        }
+        },
+        read: false
       }
     });
+
+    // Send email notification to recipient
+    try {
+      const { sendNewMessageEmail } = await import('@/lib/email');
+      await sendNewMessageEmail(
+        {
+          id: newMessage.toUser.id,
+          email: newMessage.toUser.email,
+          name: newMessage.toUser.contractorProfile?.companyName || newMessage.toUser.homeownerProfile?.name || newMessage.toUser.name
+        },
+        {
+          name: senderName
+        },
+        message.substring(0, 100),
+        threadId
+      );
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError);
+      // Don't fail the request if email fails
+    }
 
     // Track analytics
     await logEventServer("message_sent", fromUserId, {

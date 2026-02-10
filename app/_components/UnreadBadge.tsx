@@ -10,10 +10,14 @@ export function UnreadBadge({ count, className = "" }: UnreadBadgeProps) {
     <span 
       className={`
         inline-flex items-center justify-center 
-        min-w-[18px] h-[18px] 
-        text-xs font-medium text-white 
-        bg-red-500 rounded-full 
-        px-1
+        min-w-[22px] h-[22px] 
+        text-xs font-bold text-white 
+        bg-gradient-to-br from-red-500 to-red-600 
+        rounded-full 
+        px-1.5
+        shadow-lg shadow-red-500/50
+        animate-pulse
+        ring-2 ring-white
         ${className}
       `}
     >

@@ -1,16 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { sendNewMessageEmail } from "@/lib/email";
 
-// First let's add the sendEmail function to lib/email.ts
+// Email data interface
 interface EmailData {
   to: string;
   subject: string;
   html: string;
 }
 
-// Temporary sendEmail function until we add it to email.ts
+// Send email using Resend service
 async function sendEmail({ to, subject, html }: EmailData) {
-  console.log(`📧 Email would be sent to ${to}: ${subject}`);
-  // TODO: Implement with Resend or other email service
+  console.log(`📧 Sending email to ${to}: ${subject}`);
+  // Note: For message notifications, we use sendNewMessageEmail
+  // For other types, we can extend this function
 }
 
 export type NotificationType = 
@@ -65,7 +67,9 @@ export class NotificationService {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
+          id: true,
           email: true,
+          name: true,
           contractorProfile: {
             select: {
               companyName: true
@@ -83,13 +87,17 @@ export class NotificationService {
         throw new Error("User not found");
       }
 
+      // Create better title and message based on type
+      let title = payload.title || `New ${type.replace('_', ' ')}`;
+      let message = payload.message || `You have a new ${type.replace('_', ' ').toLowerCase()}`;
+
       // Create database notification
       const notification = await prisma.notification.create({
         data: {
           userId,
           type,
-          title: `New ${type.replace('_', ' ')}`,
-          message: `You have a new ${type.replace('_', ' ').toLowerCase()}`,
+          title,
+          message,
           payload: payload as any,
           read: false
         }
@@ -168,14 +176,33 @@ export class NotificationService {
     payload: NotificationPayload
   ) {
     try {
-      const emailData = this.getEmailTemplate(type, payload, user);
-      
-      if (emailData) {
-        await sendEmail({
-          to: user.email,
-          subject: emailData.subject,
-          html: emailData.html
-        });
+      // For NEW_MESSAGE type, use the proper email service
+      if (type === 'NEW_MESSAGE' && payload.messageId) {
+        await sendNewMessageEmail(
+          {
+            id: user.id,
+            email: user.email,
+            name: user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || null
+          },
+          {
+            name: payload.senderName || 'A user'
+          },
+          payload.message || 'You have a new message',
+          payload.threadId || payload.conversationId || payload.messageId
+        );
+        console.log(`📧 Sent email notification to ${user.email} for new message`);
+      } else {
+        // For other notification types, use the template-based email
+        const emailData = this.getEmailTemplate(type, payload, user);
+        
+        if (emailData) {
+          await sendEmail({
+            to: user.email,
+            subject: emailData.subject,
+            html: emailData.html
+          });
+          console.log(`📧 Sent email notification to ${user.email} for ${type}`);
+        }
       }
     } catch (error) {
       console.error("Failed to send email notification:", error);
@@ -568,11 +595,12 @@ export const notifications = {
       payload: { ...payload, actionUrl: `/messages` }
     }),
 
-  newMessage: (userId: string, payload: { messageId: string; title: string; message: string; senderName: string }) =>
+  newMessage: (userId: string, payload: { messageId: string; title: string; message: string; senderName: string; threadId?: string }) =>
     NotificationService.create({
       userId,
       type: "NEW_MESSAGE",
-      payload
+      payload,
+      sendEmail: true  // Ensure email is always sent for messages
     }),
 
   paymentReceived: (userId: string, payload: { amount: number; leadId: string; title: string }) =>

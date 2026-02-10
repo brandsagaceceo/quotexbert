@@ -162,6 +162,8 @@ export async function POST(
         type: 'message_received',
         toEmail: message.receiver.email || '',
         data: {
+          recipientId: receiverId,
+          recipientName: message.receiver.name || null,
           senderName: message.sender.name || message.sender.email,
           jobTitle: conversation.job?.title || 'Job Conversation',
           messagePreview: content.substring(0, 100),
@@ -169,6 +171,7 @@ export async function POST(
           conversationUrl
         }
       });
+      console.log(`📧 Email notification sent to ${message.receiver.email}`);
     } catch (emailError) {
       console.error('Failed to send email notification:', emailError);
       // Don't fail the request if email fails

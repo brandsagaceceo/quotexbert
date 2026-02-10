@@ -110,60 +110,74 @@ export async function POST(request: NextRequest) {
 // Handle checkout session completed (new tier-based subscriptions)
 async function handleCheckoutSessionCompleted(session: any) {
   try {
-    console.log("Checkout session completed:", session.id);
+    console.log("[STRIPE WEBHOOK] Checkout session completed:", session.id);
     
     const contractorId = session.metadata?.contractorId;
     const tier = session.metadata?.tier;
     const categoryCount = parseInt(session.metadata?.categoryCount || "0");
     
     if (!contractorId || !tier) {
-      console.error("Missing contractor ID or tier in checkout session metadata");
+      console.error("[STRIPE WEBHOOK] Missing contractor ID or tier in checkout session metadata");
       return;
     }
 
-    // Map tier to pricing
-    const tierPricing: Record<string, { name: string; price: number }> = {
-      handyman: { name: 'Handyman', price: 49 },
-      renovation: { name: 'Renovation Xbert', price: 99 },
-      general: { name: 'General Contractor', price: 149 }
+    // Map tier to pricing (lowercase from Stripe metadata)
+    const tierPricing: Record<string, { name: string; price: number; normalizedTier: string }> = {
+      handyman: { name: 'Handyman', price: 49, normalizedTier: 'HANDYMAN' },
+      renovation: { name: 'Renovation Xbert', price: 99, normalizedTier: 'RENOVATION' },
+      general: { name: 'General Contractor', price: 149, normalizedTier: 'GENERAL' }
     };
 
-    const tierInfo = tierPricing[tier];
+    const tierInfo = tierPricing[tier.toLowerCase()];
     
     if (!tierInfo) {
-      console.error(`Unknown tier: ${tier}`);
+      console.error(`[STRIPE WEBHOOK] Unknown tier: ${tier}`);
       return;
     }
 
-    // Update user record with subscription info
-    const stripeSubscriptionId = session.subscription as string;
-    
+    // Get subscription details if available
+    let currentPeriodEnd = null;
+    if (session.subscription) {
+      try {
+        const { stripe } = await import('@/lib/stripe');
+        const subscriptionDetails = await stripe.subscriptions.retrieve(session.subscription as string);
+        currentPeriodEnd = new Date(subscriptionDetails.current_period_end * 1000);
+        console.log(`[STRIPE WEBHOOK] Retrieved subscription period end: ${currentPeriodEnd}`);
+      } catch (subError) {
+        console.error("[STRIPE WEBHOOK] Failed to retrieve subscription details:", subError);
+      }
+    }
+
+    // Update user record with subscription entitlements
     await prisma.user.update({
       where: { id: contractorId },
       data: {
         stripeCustomerId: session.customer as string,
-        stripeSubscriptionId,
-        subscriptionPlan: tier,
+        stripeSubscriptionId: session.subscription as string,
+        subscriptionPlan: tierInfo.normalizedTier, // Store normalized uppercase tier
         subscriptionStatus: 'active',
-        subscriptionInterval: 'month'
+        subscriptionInterval: 'month',
+        subscriptionCurrentPeriodEnd: currentPeriodEnd
       }
     });
+
+    console.log(`[STRIPE WEBHOOK] Updated user ${contractorId} with tier ${tierInfo.normalizedTier} (status: active)`);
 
     // Create notification
     await prisma.notification.create({
       data: {
         userId: contractorId,
         type: 'SUBSCRIPTION_CREATED',
-        title: 'Subscription Activated!',
+        title: 'Subscription Activated! 🎉',
         message: `Your ${tierInfo.name} subscription is now active! You can now select up to ${categoryCount} categories to receive leads from.`,
         read: false
       }
     });
 
-    console.log(`Successfully activated ${tier} subscription for contractor ${contractorId}`);
+    console.log(`[STRIPE WEBHOOK] Successfully activated ${tierInfo.normalizedTier} subscription for contractor ${contractorId}`);
 
   } catch (error) {
-    console.error("Error handling checkout session completed:", error);
+    console.error("[STRIPE WEBHOOK] Error handling checkout session completed:", error);
   }
 }
 
@@ -258,9 +272,10 @@ async function handleSubscriptionCreated(subscription: any) {
 // Handle subscription updated
 async function handleSubscriptionUpdated(subscription: any) {
   try {
-    console.log("Subscription updated:", subscription.id);
+    console.log("[STRIPE WEBHOOK] Subscription updated:", subscription.id);
     
-    // Update the subscription record in our database
+    // Update both ContractorSubscription and User tables
+    // First update the legacy ContractorSubscription table if exists
     await prisma.contractorSubscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
@@ -273,8 +288,19 @@ async function handleSubscriptionUpdated(subscription: any) {
       }
     });
 
+    // Update the User table with tier-based subscription info
+    await prisma.user.updateMany({
+      where: { stripeSubscriptionId: subscription.id },
+      data: {
+        subscriptionStatus: subscription.status,
+        subscriptionCurrentPeriodEnd: new Date(subscription.current_period_end * 1000)
+      }
+    });
+
+    console.log(`[STRIPE WEBHOOK] Updated subscription status to ${subscription.status}`);
+
   } catch (error) {
-    console.error("Error handling subscription updated:", error);
+    console.error("[STRIPE WEBHOOK] Error handling subscription updated:", error);
   }
 }
 

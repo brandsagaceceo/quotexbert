@@ -144,6 +144,7 @@ export async function POST(request: NextRequest) {
         fromUser: {
           select: {
             id: true,
+            name: true,
             email: true,
             role: true,
             contractorProfile: {
@@ -181,13 +182,16 @@ export async function POST(request: NextRequest) {
     // Send notification to recipient using our new service
     const senderName = newMessage.fromUser.contractorProfile?.companyName || 
                       newMessage.fromUser.homeownerProfile?.name || 
+                      newMessage.fromUser.name ||
                       'User';
 
+    // Create in-app and email notification
     await notifications.newMessage(toUserId, {
       messageId: newMessage.id,
       title: newMessage.thread.lead?.title || 'Message',
       message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
-      senderName
+      senderName,
+      threadId: actualThreadId
     });
 
     return NextResponse.json(newMessage, { status: 201 });

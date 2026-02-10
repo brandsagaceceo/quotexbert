@@ -60,6 +60,17 @@ export async function POST(req: Request) {
 
     console.log(`[CLERK WEBHOOK] New user created: ${email}`);
 
+    // Send welcome email to the user
+    if (email) {
+      try {
+        const { sendWelcomeEmail } = await import('@/lib/email');
+        await sendWelcomeEmail({ id, email, name });
+        console.log(`[CLERK WEBHOOK] Welcome email sent to ${email}`);
+      } catch (welcomeError) {
+        console.error('[CLERK WEBHOOK] Failed to send welcome email:', welcomeError);
+      }
+    }
+
     // Send email notification to quotexbert@gmail.com
     if (resend && email) {
       try {

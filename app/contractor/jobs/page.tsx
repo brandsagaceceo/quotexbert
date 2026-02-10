@@ -205,7 +205,12 @@ export default function ContractorJobsPage() {
     // Find the job to check its category
     const job = jobs.find(j => j.id === jobId);
     if (!job) {
-      alert('Job not found');
+      addToast({
+        title: 'Error',
+        message: 'Job not found',
+        type: 'error',
+        duration: 5000
+      });
       setAccepting(null);
       return;
     }
@@ -221,13 +226,27 @@ export default function ContractorJobsPage() {
     const hasAccess = canAcceptJob(user?.email, isSubscribed);
 
     if (!hasAccess) {
-      alert(`You must be subscribed to the "${job.category}" category to accept jobs. Please visit your subscriptions page to subscribe.`);
+      addToast({
+        title: 'Subscription Required',
+        message: `You must be subscribed to the "${job.category}" category to accept jobs.`,
+        type: 'warning',
+        duration: 6000,
+        action: {
+          label: 'View Subscriptions',
+          onClick: () => router.push('/contractor/subscriptions')
+        }
+      });
       setAccepting(null);
       return;
     }
 
     if (!user?.id) {
-      alert("Please sign in to accept jobs.");
+      addToast({
+        title: 'Authentication Required',
+        message: 'Please sign in to accept jobs',
+        type: 'warning',
+        duration: 5000
+      });
       setAccepting(null);
       return;
     }
@@ -251,20 +270,36 @@ export default function ContractorJobsPage() {
         fetchJobs();
         setAcceptanceModal(null);
         
+        // Show success toast
+        addToast({
+          title: '✅ Job Accepted Successfully!',
+          message: 'You can now send quotes through messages. Redirecting to conversation...',
+          type: 'success',
+          duration: 4000
+        });
+        
         // Redirect to messages page with specific thread
         const redirectUrl = result.redirectUrl || '/messages';
         setTimeout(() => {
           router.push(redirectUrl);
-        }, 1000);
-        
-        alert(result.message || 'Job accepted successfully! Redirecting to conversation with homeowner...');
+        }, 1500);
       } else {
         console.error('Job acceptance failed:', result);
-        alert(`Failed to accept job: ${result.error || 'Unknown error'}`);
+        addToast({
+          title: 'Failed to Accept Job',
+          message: result.error || 'An unknown error occurred. Please try again.',
+          type: 'error',
+          duration: 6000
+        });
       }
     } catch (error) {
       console.error('Error accepting job:', error);
-      alert('Error accepting job');
+      addToast({
+        title: 'Error',
+        message: 'Failed to accept job. Please check your connection and try again.',
+        type: 'error',
+        duration: 5000
+      });
     } finally {
       setAccepting(null);
     }
