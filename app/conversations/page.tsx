@@ -127,16 +127,24 @@ export default function ConversationsPage() {
   }, [messages]);
 
   const fetchConversations = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('[Conversations] No user, skipping fetch');
+      return;
+    }
     
     try {
+      console.log('[Conversations] Fetching conversations for user:', user.id);
       const response = await fetch(`/api/conversations?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('[Conversations] Loaded conversations:', data.length);
         setConversations(data);
+      } else {
+        const error = await response.json();
+        console.error('[Conversations] Failed to fetch conversations:', error);
       }
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      console.error('[Conversations] Error fetching conversations:', error);
     } finally {
       setLoading(false);
     }
@@ -171,7 +179,15 @@ export default function ConversationsPage() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && !imageFile) || !selectedConversation || !user) return;
+    if ((!newMessage.trim() && !imageFile) || !selectedConversation || !user) {
+      console.log('[Conversations] Cannot send - missing requirements:', {
+        hasMessage: !!newMessage.trim(),
+        hasImage: !!imageFile,
+        hasConversation: !!selectedConversation,
+        hasUser: !!user
+      });
+      return;
+    }
 
     setSending(true);
     setSendError(null);
@@ -179,14 +195,18 @@ export default function ConversationsPage() {
     const messageContent = newMessage.trim();
     const tempId = `temp-${Date.now()}`;
     
+    // Determine sender role (homeowner or contractor) based on conversation participants
+    const senderRole = user.id === selectedConversation.homeowner.id ? 'homeowner' : 'contractor';
+    const receiverRole = selectedConversation.otherParticipant.id === selectedConversation.homeowner.id ? 'homeowner' : 'contractor';
+    
     // Optimistic UI - add message immediately
     const optimisticMessage = {
       id: tempId,
       content: messageContent,
       senderId: user.id,
-      senderRole: user.role,
+      senderRole: senderRole,
       receiverId: selectedConversation.otherParticipant.id,
-      receiverRole: selectedConversation.otherParticipant.id === selectedConversation.homeowner.id ? 'homeowner' : 'contractor',
+      receiverRole: receiverRole,
       createdAt: new Date().toISOString(),
       sender: {
         id: user.id,
@@ -201,7 +221,9 @@ export default function ConversationsPage() {
       console.log('[Conversations] Sending message:', {
         conversationId: selectedConversation.id,
         senderId: user.id,
+        senderRole: senderRole,
         receiverId: selectedConversation.otherParticipant.id,
+        receiverRole: receiverRole,
         content: messageContent
       });
 
@@ -218,16 +240,24 @@ export default function ConversationsPage() {
       if (!response.ok) {
         const error = await response.json();
         console.error('[Conversations] Send message failed:', error);
-        setSendError(error.error || 'Failed to send message');
+        setSendError(error.error || 'Failed to send message. Please try again.');
         // Remove optimistic message on failure
         setMessages(prev => prev.filter(m => m.id !== tempId));
         setNewMessage(messageContent); // Restore message content
       } else {
-        console.log('[Conversations] Message sent successfully');
+        const sentMessage = await response.json();
+        console.log('[Conversations] Message sent successfully:', sentMessage);
         setImagePreview(null);
         setImageFile(null);
-        // Fetch fresh messages to get the real message ID
-        fetchMessages(selectedConversation.id);
+        // Replace optimistic message with real one
+        setMessages(prev => prev.map(m => m.id === tempId ? {
+          ...sentMessage,
+          sender: {
+            id: user.id,
+            name: user.name || user.email,
+            email: user.email
+          }
+        } : m));
         fetchConversations();
       }
     } catch (error) {
