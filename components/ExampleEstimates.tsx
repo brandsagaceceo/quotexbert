@@ -83,19 +83,19 @@ export default function ExampleEstimates() {
               <button
                 key={example.id}
                 onClick={() => setSelectedExample(example)}
-                className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 ${
+                className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 overflow-hidden ${
                   selectedExample.id === example.id
                     ? 'bg-white border-rose-700 shadow-xl scale-105'
                     : 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-lg'
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg text-slate-900 mb-1">
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-lg text-slate-900 mb-1 break-words">
                       {example.title}
                     </h3>
-                    <p className="text-sm text-slate-500 mb-2">📍 {example.location}</p>
-                    <div className="text-xl font-bold text-rose-700">
+                    <p className="text-sm text-slate-500 mb-2 truncate">📍 {example.location}</p>
+                    <div className="text-xl font-bold text-rose-700 break-words">
                       ${example.costLow.toLocaleString()} - ${example.costHigh.toLocaleString()}
                     </div>
                   </div>

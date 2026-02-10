@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -6,6 +7,45 @@ const resend = process.env.RESEND_API_KEY
 
 const fromEmail = process.env.MAIL_FROM || "Quotexbert <no-reply@quotexbert.com>";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://quotexbert.com";
+
+// Email event logging (NO SECRETS)
+async function logEmailEvent(
+  type: string,
+  to: string,
+  userId?: string,
+  relatedJobId?: string,
+  relatedMessageId?: string,
+  status: 'sent' | 'failed' = 'sent',
+  error?: string
+) {
+  try {
+    await prisma.$executeRaw`
+      INSERT INTO "EmailEvent" (
+        "id",
+        "type",
+        "to",
+        "userId",
+        "relatedJobId",
+        "relatedMessageId",
+        "status",
+        "error",
+        "createdAt"
+      ) VALUES (
+        'email_' || substr(md5(random()::text), 1, 16),
+        ${type},
+        ${to},
+        ${userId},
+        ${relatedJobId},
+        ${relatedMessageId},
+        ${status},
+        ${error},
+        NOW()
+      )
+    `;
+  } catch (err) {
+    console.error('[EMAIL] Failed to log email event:', err);
+  }
+}
 
 interface LeadEmailPayload {
   postalCode: string;
@@ -142,6 +182,153 @@ interface LeadEmailPayload {
   estimate: string;
   source?: string;
   affiliateId?: string;
+}
+
+// Welcome Email
+export async function sendWelcomeEmail(user: { id: string; email: string; name?: string | null }) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping welcome email');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: user.email,
+      subject: 'Welcome to QuoteXbert! 🎉',
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0;">Welcome to QuoteXbert!</h1>
+              </div>
+              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
+                <h2>Hi ${user.name || 'there'}! 👋</h2>
+                <p>Thanks for joining QuoteXbert - your AI-powered home renovation platform!</p>
+                <p><strong>What you can do now:</strong></p>
+                <ul>
+                  <li>✨ Get instant AI estimates by uploading photos</li>
+                  <li>👷 Connect with verified contractors</li>
+                  <li>💰 Compare quotes and save money</li>
+                  <li>📄 Generate professional contracts</li>
+                </ul>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${baseUrl}" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Get Started</a>
+                </div>
+                <p style="color: #6b7280; font-size: 14px;">Need help? Reply to this email or visit our support page.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    await logEmailEvent('welcome', user.email, user.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Welcome email sent to ${user.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('welcome', user.email, user.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send welcome email:', error);
+    return { success: false, error };
+  }
+}
+
+// New Job Email (for matching contractors)
+export async function sendNewJobEmail(
+  contractor: { id: string; email: string; name?: string | null },
+  job: { id: string; title: string; category: string; description: string; budget?: string | null }
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping job notification');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  // Check if user has notifications enabled
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: contractor.id },
+      select: { email: true } // Add notificationsEnabled field to schema if needed
+    });
+
+    if (!user) {
+      return { success: false, error: 'User not found' };
+    }
+
+    await resend.emails.send({
+      from: fromEmail,
+      to: contractor.email,
+      subject: `New ${job.category} Job Available! 🔔`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0;">New Job Match!</h1>
+              </div>
+              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
+                <h2>Hi ${contractor.name || 'there'}! 👷</h2>
+                <p>A new job matching your services just posted:</p>
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9f1239;">
+                  <h3 style="margin-top: 0;">${job.title}</h3>
+                  <p><strong>Category:</strong> ${job.category}</p>
+                  <p><strong>Description:</strong> ${job.description.substring(0, 150)}${job.description.length > 150 ? '...' : ''}</p>
+                  ${job.budget ? `<p><strong>Budget:</strong> ${job.budget}</p>` : ''}
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Job Details</a>
+                </div>
+                <p style="color: #6b7280; font-size: 12px;">You're receiving this because you're subscribed to ${job.category} jobs.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'sent');
+    console.log(`[EMAIL] Job notification sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send job notification:', error);
+    return { success: false, error };
+  }
+}
+
+// New Message Email
+export async function sendNewMessageEmail(
+  recipient: { id: string; email: string; name?: string | null },
+  sender: { name?: string | null },
+  messagePreview: string,
+  threadId: string
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping message notification');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: recipient.email,
+      subject: `New message from ${sender.name || 'a user'} 💬`,
+      html: createMessageReceivedTemplate(messagePreview, threadId)
+    });
+
+    await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'sent');
+    console.log(`[EMAIL] Message notification sent to ${recipient.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send message notification:', error);
+    return { success: false, error };
+  }
 }
 
 export async function sendLeadEmail(payload: LeadEmailPayload) {

@@ -279,29 +279,72 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
   }
 };
 
-// Main function to send emails
+// Main function to send emails using Resend
 export const sendNotificationEmail = async ({ to, type, data }: EmailParams): Promise<boolean> => {
   try {
-    // Skip sending emails in development/demo mode
-    if (process.env.NODE_ENV !== 'production' || !process.env.EMAIL_USER) {
-      console.log('📧 Email notification (demo mode):', { to, type, data });
-      return true;
+    // Import Resend email functions (avoiding circular dependency by importing inline)
+    const { sendNewJobEmail, sendNewMessageEmail, sendLeadEmail } = await import('@/lib/email');
+    
+    // Route to appropriate email function based on type
+    switch (type) {
+      case 'job_posted':
+        // Use the new sendNewJobEmail function
+        const jobResult = await sendNewJobEmail(
+          {
+            id: data.contractorId || '',
+            email: to,
+            name: data.contractorName || null
+          },
+          {
+            id: data.jobId || 'unknown',
+            title: data.jobTitle || 'New Job',
+            description: data.description || '',
+            category: data.category || 'General',
+            budget: data.budget?.toString() || null
+          }
+        );
+        return jobResult.success;
+        
+      case 'message_received':
+        // Use the new sendNewMessageEmail function
+        const messageResult = await sendNewMessageEmail(
+          {
+            id: data.recipientId || '',
+            email: to,
+            name: data.recipientName || null
+          },
+          {
+            name: data.senderName || null
+          },
+          data.messagePreview || 'You have a new message',
+          data.conversationId || ''
+        );
+        return messageResult.success;
+        
+      case 'lead_available':
+        // Use the existing sendLeadEmail function
+        await sendLeadEmail({
+          projectType: data.projectType || 'General Project',
+          postalCode: data.postalCode || 'N/A',
+          description: data.description || 'No description',
+          estimate: data.estimate || 'TBD',
+          source: data.source || 'web',
+          affiliateId: data.affiliateId
+        });
+        return true;
+        
+      case 'welcome':
+      case 'quote_received':
+      case 'quote_accepted':
+      case 'payment_received':
+      case 'job_completed':
+      case 'review_received':
+      case 'subscription_reminder':
+      default:
+        // For other types, log and return true (implement as needed)
+        console.log('📧 Email notification type not yet implemented with Resend:', { to, type, data });
+        return true;
     }
-
-    const transporter = createTransporter();
-    const template = getEmailTemplate(type, data);
-
-    const mailOptions = {
-      from: `"QuoteXbert" <${process.env.EMAIL_USER}>`,
-      to,
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log('📧 Email sent successfully:', { to, type });
-    return true;
   } catch (error) {
     console.error('❌ Email send error:', error);
     return false;

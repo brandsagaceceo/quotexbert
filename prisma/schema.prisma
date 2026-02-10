@@ -915,3 +915,57 @@ model VisualizerGeneration {
   @@index([createdAt])
   @@map("visualizer_generations")
 }
+
+// ============================================
+// EMAIL TRACKING & AFFILIATE LEADS
+// ============================================
+
+// Tracks all emails sent by the system
+model EmailEvent {
+  id               String   @id @default(cuid())
+  type             String   // 'welcome' | 'new_job' | 'new_message' | 'lead_capture' | 'affiliate_lead'
+  to               String   // Recipient email
+  userId           String?  // Related user ID if applicable
+  relatedJobId     String?  // Related job ID if applicable
+  relatedMessageId String?  // Related message ID if applicable
+  status           String   // 'sent' | 'failed'
+  error            String?  // Error message if failed
+  createdAt        DateTime @default(now())
+  
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("email_events")
+}
+
+// Stores affiliate lead submissions
+model AffiliateLead {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  refCode     String?  // Affiliate referral code
+  landingUrl  String?  // Which landing page they came from
+  ip          String?  // IP address for spam prevention
+  userAgent   String?  // Browser user agent
+  createdAt   DateTime @default(now())
+  
+  @@index([email])
+  @@index([refCode])
+  @@index([createdAt])
+  @@map("affiliate_leads")
+}
+
+// Logs all Stripe webhook events for debugging
+model StripeWebhookLog {
+  id        String   @id @default(cuid())
+  type      String   // Event type (checkout.session.completed, invoice.payment_succeeded, etc.)
+  eventId   String   @unique // Stripe event ID for deduplication
+  data      String?  // JSON payload (optional, can be large)
+  processed Boolean  @default(false)
+  error     String?  // Error message if processing failed
+  createdAt DateTime @default(now())
+  
+  @@index([type])
+  @@index([createdAt])
+  @@index([processed])
+  @@map("stripe_webhook_logs")
+}

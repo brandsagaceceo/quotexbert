@@ -156,14 +156,17 @@ export async function POST(
 
     // Send email notification to receiver
     try {
+      const conversationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://quotexbert.com'}/messages/${conversationId}`;
+      
       await sendEmailNotification({
         type: 'message_received',
         toEmail: message.receiver.email || '',
         data: {
           senderName: message.sender.name || message.sender.email,
-          jobTitle: conversation.job.title,
+          jobTitle: conversation.job?.title || 'Job Conversation',
           messagePreview: content.substring(0, 100),
-          conversationId
+          conversationId,
+          conversationUrl
         }
       });
     } catch (emailError) {
