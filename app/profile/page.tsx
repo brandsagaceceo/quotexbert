@@ -515,43 +515,43 @@ export default function UnifiedProfilePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed right-6 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 8px)' }}>
+      <div className="fixed right-3 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 4px)' }}>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 shadow-xl text-sm md:text-base"
+            className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-1.5 md:gap-2 shadow-lg text-xs md:text-base"
           >
             <Edit3 className="h-3 w-3 md:h-4 md:w-4" />
             <span className="hidden sm:inline">Edit Profile</span>
             <span className="sm:hidden">Edit</span>
           </button>
         ) : (
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-1.5 md:gap-2">
             <button
               onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-1.5 shadow-lg text-xs md:text-base"
             >
               <Save className="h-3 w-3 md:h-4 md:w-4" />
-              Save
+              <span className="hidden sm:inline">Save</span>
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              className="bg-slate-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-2 shadow-xl text-sm md:text-base"
+              className="bg-slate-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:bg-slate-700 flex items-center justify-center gap-1.5 shadow-lg text-xs md:text-base"
             >
               <X className="h-3 w-3 md:h-4 md:w-4" />
-              Cancel
+              <span className="hidden sm:inline">Cancel</span>
             </button>
           </div>
         )}
       </div>
 
       {/* Profile Identity Section */}
-      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 32px)' }}>
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-6 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
+        <div className="container mx-auto px-3 md:px-8">
+          <div className="flex flex-col md:flex-row md:items-end gap-3 md:gap-6">
             {/* Profile Picture */}
             <div className="relative group flex-shrink-0">
-                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -595,28 +595,28 @@ export default function UnifiedProfilePage() {
 
             {/* Profile Info Card */}
             <div className="flex-1">
-              <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 border border-slate-200">
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-3 md:p-6 border border-slate-200">
                   <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
-                    <p className="text-rose-900 font-semibold text-base md:text-lg capitalize mb-2">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
+                    <p className="text-rose-900 font-semibold text-sm md:text-base lg:text-lg capitalize mb-2">
                       {profile?.trade || authUser.role}
                     </p>
-                    <div className="flex flex-wrap items-center gap-4 text-slate-600">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-slate-600 text-xs md:text-sm">
                       {profile?.city && (
                         <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-4 w-4 text-rose-700 flex-shrink-0" />
+                          <MapPin className="h-3 w-3 md:h-4 md:w-4 text-rose-700 flex-shrink-0" />
                           <span className="truncate">{profile.city}</span>
                         </div>
                       )}
                       {profile?.email && (
                         <div className="flex items-center gap-1 min-w-0 max-w-full">
-                          <Mail className="h-4 w-4 text-slate-400 flex-shrink-0" />
-                          <span className="truncate text-sm">{profile.email}</span>
+                          <Mail className="h-3 w-3 md:h-4 md:w-4 text-slate-400 flex-shrink-0" />
+                          <span className="truncate text-xs md:text-sm">{profile.email}</span>
                         </div>
                       )}
                       {isContractor && profile?.verified && (
                         <div className="flex items-center gap-1 text-green-600">
-                          <Award className="h-4 w-4" />
+                          <Award className="h-3 w-3 md:h-4 md:w-4" />
                           <span className="font-medium">Verified Contractor</span>
                         </div>
                       )}
@@ -629,9 +629,9 @@ export default function UnifiedProfilePage() {
         </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 96px)' }}>
-        <div className="container mx-auto px-4">
-          <nav className="flex space-x-8 overflow-x-auto">
+      <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
+        <div className="container mx-auto px-2 md:px-4">
+          <nav className="flex space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
@@ -639,7 +639,7 @@ export default function UnifiedProfilePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 border-b-2 font-medium text-sm capitalize whitespace-nowrap ${
+                className={`py-2.5 md:py-4 px-1 md:px-2 border-b-2 font-medium text-xs md:text-sm capitalize whitespace-nowrap ${
                   activeTab === tab
                     ? 'border-rose-700 text-rose-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -657,16 +657,16 @@ export default function UnifiedProfilePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {activeTab === 'overview' && (
               <>
                 {/* Bio Section */}
-                <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-slate-900">About</h2>
+                <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">About</h2>
                     {isEditing && (
                       <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
                     )}
@@ -675,12 +675,12 @@ export default function UnifiedProfilePage() {
                     <textarea
                       value={editData.bio}
                       onChange={(e) => setEditData({...editData, bio: e.target.value})}
-                      className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                      className="w-full p-3 md:p-4 border-2 border-rose-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm md:text-base"
                       rows={5}
                       placeholder="Tell people about your experience, specialties, and what makes you unique..."
                     />
                   ) : (
-                    <p className="text-slate-600 leading-relaxed text-base">
+                    <p className="text-slate-600 leading-relaxed text-sm md:text-base">
                       {profile?.bio || "No bio added yet. Click Edit Profile to add information about your experience and services."}
                     </p>
                   )}
@@ -688,21 +688,21 @@ export default function UnifiedProfilePage() {
 
                 {/* Stats Cards */}
                 {isContractor && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Briefcase className="h-8 w-8 text-rose-700 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
-                      <div className="text-sm text-gray-600">Completed Jobs</div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
+                      <Briefcase className="h-6 w-6 md:h-8 md:w-8 text-rose-700 mx-auto mb-2" />
+                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
+                      <div className="text-xs md:text-sm text-gray-600">Completed Jobs</div>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
-                      <div className="text-sm text-gray-600">Average Rating</div>
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
+                      <Star className="h-6 w-6 md:h-8 md:w-8 text-yellow-500 mx-auto mb-2" />
+                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
+                      <div className="text-xs md:text-sm text-gray-600">Average Rating</div>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                      <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
-                      <div className="text-sm text-gray-600">Reviews</div>
+                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
+                      <Award className="h-6 w-6 md:h-8 md:w-8 text-green-600 mx-auto mb-2" />
+                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
+                      <div className="text-xs md:text-sm text-gray-600">Reviews</div>
                     </div>
                   </div>
                 )}
@@ -710,15 +710,16 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'portfolio' && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900">Portfolio</h2>
+              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
+                <div className="flex justify-between items-center mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">Portfolio</h2>
                   <button 
                     onClick={() => setShowPortfolioForm(true)}
-                    className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-3 rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                    className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-3 md:px-4 lg:px-5 py-2 md:py-2.5 lg:py-3 rounded-lg md:rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-1.5 md:gap-2 font-semibold shadow-md md:shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-xs md:text-sm lg:text-base"
                   >
-                    <Plus className="h-5 w-5" />
-                    Add Project
+                    <Plus className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5" />
+                    <span className="hidden sm:inline">Add Project</span>
+                    <span className="sm:hidden">Add</span>
                   </button>
                 </div>
                 
@@ -796,21 +797,21 @@ export default function UnifiedProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-6">
-                      <Camera className="h-10 w-10 text-rose-700" />
+                  <div className="text-center py-8 md:py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-xl md:rounded-2xl border-2 border-dashed border-slate-300">
+                    <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-4 md:mb-6">
+                      <Camera className="h-8 w-8 md:h-10 md:w-10 text-rose-700" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">Showcase Your Best Work</h3>
-                    <p className="text-slate-600 mb-6 max-w-md mx-auto">
+                    <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-2 md:mb-3 px-4">Showcase Your Best Work</h3>
+                    <p className="text-sm md:text-base text-slate-600 mb-4 md:mb-6 max-w-md mx-auto px-4">
                       {isContractor 
                         ? "Add photos and details of completed projects to attract more clients"
                         : "Share AI estimates and past projects you're proud of"}
                     </p>
                     <button 
                       onClick={() => setShowPortfolioForm(true)}
-                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
+                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2 text-sm md:text-base"
                     >
-                      <Camera className="h-5 w-5" />
+                      <Camera className="h-4 w-4 md:h-5 md:w-5" />
                       Add Your First {isContractor ? "Project" : "Estimate"}
                     </button>
                   </div>
@@ -819,10 +820,10 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'accepted-jobs' && isContractor && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Accepted Jobs</h2>
-                  <p className="text-slate-600">Jobs you've accepted and are currently working on or have completed.</p>
+              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-2">Accepted Jobs</h2>
+                  <p className="text-sm md:text-base text-slate-600">Jobs you've accepted and are currently working on or have completed.</p>
                 </div>
 
                 <AcceptedJobsList contractorId={authUser?.id || ''} />
@@ -830,10 +831,10 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'messages' && isContractor && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Messages</h2>
-                  <p className="text-slate-600">Chat with homeowners about your accepted jobs.</p>
+              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-2">Messages</h2>
+                  <p className="text-sm md:text-base text-slate-600">Chat with homeowners about your accepted jobs.</p>
                 </div>
 
                 <MessagesTab contractorId={authUser?.id || ''} />
@@ -841,10 +842,10 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'categories' && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">My Categories</h2>
-                  <p className="text-slate-600">
+              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
+                <div className="mb-4 md:mb-6">
+                  <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-2">My Categories</h2>
+                  <p className="text-sm md:text-base text-slate-600">
                     {maxCategories > 0 
                       ? `Select up to ${maxCategories} categories to receive leads from. You've selected ${selectedCategories.length}/${maxCategories}.`
                       : "Subscribe to a tier to start selecting categories and receiving leads."}
@@ -852,21 +853,21 @@ export default function UnifiedProfilePage() {
                 </div>
 
                 {maxCategories === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Briefcase className="h-8 w-8 text-white" />
+                  <div className="text-center py-8 md:py-12">
+                    <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl md:rounded-2xl p-6 md:p-8 max-w-md mx-auto">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                        <Briefcase className="h-6 w-6 md:h-8 md:w-8 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-2">No Active Subscription</h3>
-                      <p className="text-slate-600 mb-6">
+                      <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2">No Active Subscription</h3>
+                      <p className="text-sm md:text-base text-slate-600 mb-4 md:mb-6">
                         Subscribe to a tier to unlock category selection and start receiving leads.
                       </p>
                       <Link
                         href="/contractor/subscriptions"
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all text-sm md:text-base"
                       >
                         View Subscription Tiers
-                        <span className="text-xl">→</span>
+                        <span className="text-lg md:text-xl">→</span>
                       </Link>
                     </div>
                   </div>

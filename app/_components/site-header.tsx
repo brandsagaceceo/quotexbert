@@ -25,10 +25,10 @@ export default function SiteHeader() {
   return (
     <header 
       className="sticky top-0 z-40 bg-gradient-to-r from-white via-rose-50/30 to-orange-50/30 backdrop-blur-xl"
-      style={{ '--header-height': '96px' } as React.CSSProperties}
+      style={{ '--header-height': '64px' } as React.CSSProperties}
     >
       <div className="container mx-auto">
-        <div className="flex justify-between items-center h-24 px-4">
+        <div className="flex justify-between items-center h-16 md:h-20 px-3 md:px-4">
           {/* Brand - BIGGER & MORE PROMINENT */}
           <div className="flex-shrink-0 transform transition-transform hover:scale-105">
             <Logo size="responsive-header" showText={true} />
@@ -42,8 +42,8 @@ export default function SiteHeader() {
                 href={link.href}
                 className={`${
                   link.highlight 
-                    ? 'bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white px-5 py-3 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-110 ring-2 ring-orange-400 ring-offset-2 text-base animate-pulse-glow' 
-                    : 'text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl font-semibold text-base'
+                    ? 'bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white px-4 py-2.5 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-2 text-sm animate-pulse-glow' 
+                    : 'text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl font-semibold text-sm'
                 } transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2`}
               >
                 {link.highlight && '✨ '}{link.label}
@@ -52,7 +52,7 @@ export default function SiteHeader() {
           </nav>
 
           {/* Right Side Actions - BIGGER & MORE PROMINENT */}
-          <div className="hidden lg:flex items-center space-x-3">
+          <div className="hidden lg:flex items-center space-x-2">
             {/* Authentication */}
             {isSignedIn && user ? (
               <>
@@ -60,14 +60,14 @@ export default function SiteHeader() {
                 {user.role === 'homeowner' ? (
                   <Link
                     href="/create-lead"
-                    className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white px-7 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 ring-2 ring-orange-400 ring-offset-2"
+                    className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-2"
                   >
                     🏗️ Post Your Project
                   </Link>
                 ) : (
                   <Link
                     href="/contractor/jobs"
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-7 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 ring-2 ring-green-400 ring-offset-2"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ring-2 ring-green-400 ring-offset-2"
                   >
                     💼 See Jobs in Your Area
                   </Link>
@@ -76,7 +76,7 @@ export default function SiteHeader() {
                 {/* Messages with badge - BIGGER */}
                 <Link
                   href="/messages"
-                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200 relative inline-flex items-center"
+                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 relative inline-flex items-center"
                 >
                   Messages
                   <UnreadBadge count={unreadCount} className="ml-2" />
@@ -86,13 +86,13 @@ export default function SiteHeader() {
                 <div className="flex items-center space-x-2">
                   <Link
                     href="/profile"
-                    className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                    className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
                   >
                     Profile
                   </Link>
                   <button
                     onClick={() => signOut()}
-                    className="text-gray-700 hover:text-red-700 hover:bg-red-50 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                    className="text-gray-700 hover:text-red-700 hover:bg-red-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
                   >
                     Sign Out
                   </button>
@@ -102,13 +102,13 @@ export default function SiteHeader() {
               <>
                 <Link
                   href="/sign-in"
-                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-5 py-3 rounded-xl text-base font-semibold transition-all duration-200"
+                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-8 py-3.5 rounded-xl text-base font-bold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 ring-2 ring-orange-400 ring-offset-2"
+                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 ring-2 ring-orange-400 ring-offset-2"
                 >
                   ✨ Get Started Free
                 </Link>
@@ -164,14 +164,14 @@ export default function SiteHeader() {
         {/* Mobile Navigation - Slide down panel */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-ink-200 shadow-lg">
-            <div className="px-4 py-6 space-y-4">
+            <div className="px-3 py-4 space-y-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block py-2 text-base font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md ${
+                  className={`block py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md ${
                     link.highlight
-                      ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white text-center px-4 py-3 rounded-lg font-bold shadow-lg'
+                      ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white text-center px-3 py-2.5 rounded-lg font-bold shadow-md'
                       : 'text-ink-700 hover:text-[var(--brand)]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -182,12 +182,12 @@ export default function SiteHeader() {
 
               {/* Mobile Auth */}
               {isSignedIn && user ? (
-                <div className="space-y-3 pt-4 border-t border-ink-200">
+                <div className="space-y-2.5 pt-3 border-t border-ink-200">
                   {/* Primary Action */}
                   {user.role === 'homeowner' ? (
                     <Link
                       href="/create-lead"
-                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Post Project
@@ -195,7 +195,7 @@ export default function SiteHeader() {
                   ) : (
                     <Link
                       href="/contractor/jobs"
-                      className="block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-center px-4 py-3 rounded-lg text-base font-bold ring-2 ring-green-400 ring-offset-1 transition-colors duration-200"
+                      className="block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       💼 Find Jobs
@@ -205,7 +205,7 @@ export default function SiteHeader() {
                   {/* Messages */}
                   <Link
                     href="/messages"
-                    className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <span>Messages</span>
@@ -215,7 +215,7 @@ export default function SiteHeader() {
                   {/* Profile */}
                   <Link
                     href="/profile"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Profile
@@ -227,23 +227,23 @@ export default function SiteHeader() {
                       signOut();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="block w-full text-left text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-2 rounded-lg text-base font-medium transition-colors duration-200"
+                    className="block w-full text-left text-red-600 hover:text-red-700 hover:bg-red-50 py-2 px-2 rounded-lg text-sm font-medium transition-colors duration-200"
                   >
                     Sign Out
                   </button>
                 </div>
               ) : (
-                <div className="space-y-3 pt-4 border-t border-ink-200">
+                <div className="space-y-2.5 pt-3 border-t border-ink-200">
                   <Link
                     href="/sign-in"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-base font-medium transition-colors duration-200"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="block w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] text-white text-center px-4 py-3 rounded-[var(--radius-button)] text-base font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+                    className="block w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] text-white text-center px-3 py-2.5 rounded-[var(--radius-button)] text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Get Started
