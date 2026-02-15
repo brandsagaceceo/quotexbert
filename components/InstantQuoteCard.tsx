@@ -158,18 +158,18 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border-2 border-orange-100">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="bg-gradient-to-br from-rose-500 to-orange-500 p-2 rounded-lg">
-          <PhotoIcon className="w-6 h-6 text-white" />
+    <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-4 md:p-6 lg:p-8 border-2 border-orange-100">
+      <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+        <div className="bg-gradient-to-br from-rose-500 to-orange-500 p-1.5 md:p-2 rounded-lg">
+          <PhotoIcon className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </div>
-        <h3 className="text-2xl font-bold text-slate-900">Instant Photo Quote</h3>
+        <h3 className="text-xl md:text-2xl font-bold text-slate-900">Instant Photo Quote</h3>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-3 md:space-y-5">
         {/* Photo Upload Area */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">
+          <label className="block text-xs md:text-sm font-semibold text-slate-700 mb-1.5 md:mb-2">
             Upload Photos (Optional, max 5)
           </label>
           
@@ -177,9 +177,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           <button
             type="button"
             onClick={openCamera}
-            className="w-full mb-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white 
-                     py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-3
-                     hover:from-rose-600 hover:to-orange-600 transition-all shadow-lg
+            className="w-full mb-2 md:mb-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white 
+                     py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl font-semibold text-base md:text-lg flex items-center justify-center gap-2 md:gap-3
+                     hover:from-rose-600 hover:to-orange-600 transition-all shadow-md md:shadow-lg
                      md:hidden"
           >
             <PhotoIcon className="w-7 h-7" />
@@ -250,7 +250,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-semibold text-slate-700 mb-2">
+          <label htmlFor="description" className="block text-xs md:text-sm font-semibold text-slate-700 mb-1.5 md:mb-2">
             What are we looking at? (Optional)
           </label>
           <textarea
@@ -259,14 +259,14 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             onChange={(e) => setDescription(e.target.value)}
             placeholder="E.g., Kitchen needs new cabinets and countertops, appliances are staying"
             rows={3}
-            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
+            className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base"
           />
         </div>
 
         {/* Project Type */}
         <div>
-          <label htmlFor="projectType" className="block text-sm font-semibold text-slate-700 mb-2">
+          <label htmlFor="projectType" className="block text-xs md:text-sm font-semibold text-slate-700 mb-1.5 md:mb-2">
             Project Type *
           </label>
           <select
@@ -274,8 +274,8 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             value={projectType}
             onChange={(e) => setProjectType(e.target.value)}
             required
-            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
+            className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base
                      bg-white cursor-pointer"
           >
             <option value="">Select project type...</option>
@@ -287,7 +287,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
 
         {/* Postal Code */}
         <div>
-          <label htmlFor="postalCode" className="block text-sm font-semibold text-slate-700 mb-2">
+          <label htmlFor="postalCode" className="block text-xs md:text-sm font-semibold text-slate-700 mb-1.5 md:mb-2">
             Postal Code (Optional)
           </label>
           <input
@@ -297,16 +297,16 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
             placeholder="M1A 1A1"
             maxLength={7}
-            className="w-full px-4 py-4 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
+            className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base"
           />
           <p className="text-xs text-slate-500 mt-1">For accurate GTA pricing</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3">
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-2.5 md:p-3">
+            <p className="text-xs md:text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
 
@@ -315,9 +315,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           type="submit"
           disabled={isLoading}
           className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                   hover:to-orange-700 text-white font-bold py-5 md:py-4 px-6 rounded-xl text-lg md:text-base
+                   hover:to-orange-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
                    transition-all transform hover:scale-[1.02] disabled:opacity-50 
-                   disabled:cursor-not-allowed disabled:transform-none shadow-xl"
+                   disabled:cursor-not-allowed disabled:transform-none shadow-lg md:shadow-xl"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">

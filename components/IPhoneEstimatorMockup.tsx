@@ -259,27 +259,27 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
   return (
     <IPhoneFrame>
-      <div className="px-4 md:px-6 pb-4">
+      <div className="px-3 md:px-6 pb-3">
         {/* Header */}
-        <div className="text-center mb-6 pt-2">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-3">
+        <div className="text-center mb-4 pt-2">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold mb-2">
             <SparklesIcon className="w-4 h-4" />
             AI Instant Estimate
           </div>
-          <h3 className="text-xl font-black text-slate-900 mb-1">
+          <h3 className="text-lg md:text-xl font-black text-slate-900 mb-1">
             Upload Phone Photos
           </h3>
-          <p className="text-sm text-slate-600">
+          <p className="text-xs md:text-sm text-slate-600">
             Get your detailed estimate in 30 seconds
           </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs">
-            <span className="bg-green-50 text-green-700 px-2 py-1 rounded-full font-semibold">✓ No signup required</span>
-            <span className="bg-rose-50 text-rose-900 px-2 py-1 rounded-full font-semibold">✓ 100% free</span>
-            <span className="bg-rose-50 text-rose-700 px-2 py-1 rounded-full font-semibold">✓ No spam</span>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✓ No signup required</span>
+            <span className="bg-rose-50 text-rose-900 px-2 py-0.5 rounded-full font-semibold">✓ 100% free</span>
+            <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full font-semibold">✓ No spam</span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           {/* Photo Upload Area - Big Drag & Drop */}
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -357,13 +357,13 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
             )}
           </div>
 
-          {/* Description - Bigger and More Obvious */}
+          {/* Description - Compact for mobile */}
           <div>
-            <label htmlFor="description" className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+            <label htmlFor="description" className="block text-xs md:text-sm font-bold text-slate-900 mb-1.5 md:mb-2 flex items-center gap-1.5">
+              <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
               Describe Your Project
             </label>
-            <p className="text-xs text-slate-600 mb-3">💡 More details = more accurate pricing</p>
+            <p className="text-xs text-slate-600 mb-2">💡 More details = more accurate pricing</p>
             <div className="relative">
               <textarea
                 id="description"
@@ -373,9 +373,9 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 • Patch a drywall hole (about 6 inches)
 • Replace bathtub + tile (small bathroom)
 • Install 6 potlights in living room"
-                rows={5}
-                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-orange-500 
-                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
+                rows={4}
+                className="w-full px-3 py-2 md:py-3 border-2 border-slate-300 rounded-lg md:rounded-xl focus:border-orange-500 
+                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base
                          placeholder:text-slate-400 resize-none"
               />
             </div>
@@ -396,17 +396,17 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
 
           {/* Project Type */}
           <div>
-            <label htmlFor="projectType" className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+            <label htmlFor="projectType" className="block text-xs md:text-sm font-bold text-slate-900 mb-1.5 md:mb-2 flex items-center gap-1.5">
+              <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
               Project Type <span className="text-red-500">*</span>
             </label>
-            <p className="text-xs text-slate-600 mb-3">Helps us calculate accurate pricing</p>
+            <p className="text-xs text-slate-600 mb-2">Helps us calculate accurate pricing</p>
             <select
               id="projectType"
               value={projectType}
               onChange={(e) => setProjectType(e.target.value)}
               required
-              className="w-full px-3 py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+              className="w-full px-3 py-2 md:py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
                        focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
                        bg-white cursor-pointer"
             >
@@ -422,7 +422,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
             <label htmlFor="postalCode" className="block text-xs font-bold text-slate-700 mb-1">
               Postal Code (optional)
             </label>
-            <p className="text-xs text-slate-500 mb-2">For accurate GTA pricing • We never share your location</p>
+            <p className="text-xs text-slate-500 mb-1.5">For accurate GTA pricing • We never share your location</p>
             <input
               id="postalCode"
               type="text"
@@ -430,11 +430,10 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
               onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
               placeholder="M5H 2N2"
               maxLength={7}
-              className="w-full px-3 py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
+              className="w-full px-3 py-2 md:py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
                        focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
                        placeholder:text-slate-400"
             />
-            <p className="text-xs text-slate-500 mt-1">For accurate GTA pricing</p>
           </div>
 
           {/* Error Message */}
@@ -444,14 +443,14 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit Button - Smaller on mobile */}
           <button
             type="submit"
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                     hover:to-orange-700 text-white font-bold py-4 px-6 rounded-xl text-base
+                     hover:to-orange-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
                      transition-all transform hover:scale-[1.02] disabled:opacity-50 
-                     disabled:cursor-not-allowed disabled:transform-none shadow-xl
+                     disabled:cursor-not-allowed disabled:transform-none shadow-lg md:shadow-xl
                      focus:outline-none focus:ring-4 focus:ring-orange-300"
           >
             {isLoading ? (

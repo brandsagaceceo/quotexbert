@@ -38,7 +38,11 @@ export default function FloatingActionStack({
 
     if (typeof window !== 'undefined' && window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleResize);
-      return () => window.visualViewport.removeEventListener('resize', handleResize);
+      return () => {
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener('resize', handleResize);
+        }
+      };
     }
   }, []);
 
@@ -64,9 +68,9 @@ export default function FloatingActionStack({
 
   return (
     <div 
-      className="fixed z-40 flex flex-col gap-3"
+      className="fixed z-40 flex flex-col gap-2 md:gap-3"
       style={{
-        bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 12px)',
+        bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 16px)',
         right: 'max(12px, env(safe-area-inset-right, 12px))'
       }}
     >
@@ -75,7 +79,7 @@ export default function FloatingActionStack({
           key={action.id}
           onClick={action.onClick}
           className={`
-            w-14 h-14 rounded-full shadow-lg
+            w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg
             flex items-center justify-center
             transition-all duration-200
             hover:scale-110 active:scale-95

@@ -93,9 +93,9 @@ export default function Home() {
         googleReviewUrl="YOUR_GOOGLE_REVIEW_URL_HERE"
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
-        {/* Hero Section - 2 Column Layout - BIGGER & MORE MODERN */}
-        <section id="get-estimate" className="relative py-16 md:py-24 overflow-hidden -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+4rem)] md:pt-[calc(var(--header-height,64px)+6rem)]">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
+        {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
+        <section id="get-estimate" className="relative py-8 md:py-16 lg:py-24 overflow-hidden -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)] md:pt-[calc(var(--header-height,64px)+4rem)] lg:pt-[calc(var(--header-height,64px)+6rem)]">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           <div className="absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
@@ -103,14 +103,14 @@ export default function Home() {
           <div className="absolute bottom-20 left-1/2 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
           <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              {/* Left Column - Headline & Benefits - BIGGER */}
-              <div className="text-center lg:text-left space-y-6">
-                <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white rounded-full shadow-2xl animate-pulse-glow">
-                  <span className="text-base font-bold">🤖 AI-POWERED ESTIMATES • 100% FREE</span>
+            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
+              {/* Left Column - Headline & Benefits - Mobile-Optimized */}
+              <div className="text-center lg:text-left space-y-4 md:space-y-6">
+                <div className="inline-block mb-3 md:mb-6 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white rounded-full shadow-lg md:shadow-2xl animate-pulse-glow">
+                  <span className="text-xs md:text-sm lg:text-base font-bold">🤖 AI-POWERED ESTIMATES • 100% FREE</span>
                 </div>
                 
-                <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight animate-fade-in-up">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 md:mb-8 leading-tight animate-fade-in-up">
                   <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
                     Is Your Quote
                   </span>
@@ -120,63 +120,63 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="text-2xl md:text-3xl text-slate-700 mb-10 leading-relaxed font-medium">
+                <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-6 md:mb-10 leading-relaxed font-medium">
                   <span className="text-rose-700 font-bold">Upload photos</span> of your project. 
                   Get a detailed, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
                   Compare before you commit.
                 </p>
 
-                {/* Key Benefits - BIGGER & MORE MODERN */}
-                <div className="space-y-6 mb-10">
-                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-xl">
-                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {/* Key Benefits - Compact for mobile */}
+                <div className="space-y-3 md:space-y-6 mb-6 md:mb-10">
+                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
+                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Get Prices in 30 Seconds</div>
-                      <div className="text-slate-600 text-base">Detailed breakdown, not guesswork</div>
+                      <div className="font-bold text-base md:text-xl text-slate-900">Get Prices in 30 Seconds</div>
+                      <div className="text-slate-600 text-sm md:text-base">Detailed breakdown, not guesswork</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl">
-                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
+                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Just Upload Photos</div>
-                      <div className="text-slate-600 text-base">Or describe it—works both ways</div>
+                      <div className="font-bold text-base md:text-xl text-slate-900">Just Upload Photos</div>
+                      <div className="text-slate-600 text-sm md:text-base">Or describe it—works both ways</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-left bg-white/60 backdrop-blur-sm p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-rose-600 to-orange-600 rounded-2xl flex items-center justify-center shadow-xl">
-                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
+                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-xl text-slate-900">Real Toronto Prices</div>
-                      <div className="text-slate-600 text-base">What contractors actually charge here</div>
+                      <div className="font-bold text-base md:text-xl text-slate-900">Real Toronto Prices</div>
+                      <div className="text-slate-600 text-sm md:text-base">What contractors actually charge here</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Social Proof - BIGGER */}
-                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-rose-200">
-                    <span className="text-base font-bold text-slate-700">⭐ 5.0/5 Rating</span>
+                {/* Social Proof - Compact */}
+                <div className="flex flex-wrap gap-2 md:gap-4 justify-center lg:justify-start">
+                  <div className="bg-white/90 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-3 rounded-full shadow-lg md:shadow-xl border-2 border-rose-200">
+                    <span className="text-xs md:text-base font-bold text-slate-700">⭐ 5.0/5 Rating</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-orange-200">
-                    <span className="text-base font-bold text-slate-700">🔒 100% Secure</span>
+                  <div className="bg-white/90 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-3 rounded-full shadow-lg md:shadow-xl border-2 border-orange-200">
+                    <span className="text-xs md:text-base font-bold text-slate-700">🔒 100% Secure</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-xl border-2 border-amber-200">
-                    <span className="text-base font-bold text-slate-700">✓ GTA Verified</span>
+                  <div className="bg-white/90 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-3 rounded-full shadow-lg md:shadow-xl border-2 border-amber-200">
+                    <span className="text-xs md:text-base font-bold text-slate-700">✓ GTA Verified</span>
                   </div>
                 </div>
               </div>
