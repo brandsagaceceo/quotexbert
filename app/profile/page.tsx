@@ -9,6 +9,7 @@ import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
+import OverflowDetector from "@/components/dev/OverflowDetector";
 import {
   User,
   MapPin,
@@ -514,8 +515,11 @@ export default function UnifiedProfilePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Persistent Edit/Save Button - Top Right */}
-      <div className="fixed right-3 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 4px)' }}>
+      {/* Development Tool - Overflow Detection */}
+      <OverflowDetector />
+
+      {/* Desktop Edit/Save Button - Top Right (hidden on mobile) */}
+      <div className="hidden md:block fixed right-3 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 4px)' }}>
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
@@ -546,9 +550,9 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Profile Identity Section */}
-      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-6 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
-        <div className="container mx-auto px-3 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end gap-3 md:gap-6">
+      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-8 md:pb-10" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 24px)' }}>
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
             {/* Profile Picture */}
             <div className="relative group flex-shrink-0">
                 <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
@@ -595,10 +599,40 @@ export default function UnifiedProfilePage() {
 
             {/* Profile Info Card */}
             <div className="flex-1">
-              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-3 md:p-6 border border-slate-200">
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-5 md:p-6 border border-slate-200">
+                  {/* Mobile Edit/Save Buttons - Inline (shown only on mobile) */}
+                  <div className="md:hidden flex justify-end gap-2 mb-5">
+                    {!isEditing ? (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2 shadow-md text-sm"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit Profile
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleSaveProfile}
+                          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg flex items-center gap-2 shadow-md text-sm"
+                        >
+                          <Save className="h-4 w-4" />
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(false)}
+                          className="bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-slate-700 flex items-center gap-2 shadow-md text-sm"
+                        >
+                          <X className="h-4 w-4" />
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                  </div>
+
                   <div>
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1 break-words">{displayName}</h1>
-                    <p className="text-rose-900 font-semibold text-sm md:text-base lg:text-lg capitalize mb-2">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
+                    <p className="text-rose-900 font-semibold text-sm md:text-base lg:text-lg capitalize mb-3">
                       {profile?.trade || authUser.role}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 md:gap-4 text-slate-600 text-xs md:text-sm">
@@ -630,8 +664,34 @@ export default function UnifiedProfilePage() {
 
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
-        <div className="container mx-auto px-2 md:px-4">
-          <nav className="flex space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide">
+        <div className="container mx-auto">
+          {/* Mobile: Scrollable pill tabs */}
+          <nav className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
+            {(isContractor 
+              ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
+              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
+            ).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold text-sm capitalize whitespace-nowrap min-h-[44px] transition-all ${
+                  activeTab === tab
+                    ? 'bg-rose-700 text-white shadow-md'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {tab === 'projects' ? 'My Projects' : 
+                 tab === 'estimates' ? 'AI Estimates' : 
+                 tab === 'quotes' ? 'AI Quotes' : 
+                 tab === 'accepted-jobs' ? 'Accepted Jobs' : 
+                 tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
+                 tab}
+              </button>
+            ))}
+          </nav>
+
+          {/* Desktop: Full tab bar */}
+          <nav className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
@@ -657,15 +717,15 @@ export default function UnifiedProfilePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+      <div className="container mx-auto px-4 md:px-4 py-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 md:space-y-8">
             {activeTab === 'overview' && (
               <>
                 {/* Bio Section */}
-                <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
-                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
+                  <div className="flex items-center justify-between mb-4 md:mb-4">
                     <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">About</h2>
                     {isEditing && (
                       <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
@@ -688,19 +748,19 @@ export default function UnifiedProfilePage() {
 
                 {/* Stats Cards */}
                 {isContractor && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
-                      <Briefcase className="h-6 w-6 md:h-8 md:w-8 text-rose-700 mx-auto mb-2" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
+                      <Briefcase className="h-7 w-7 md:h-8 md:w-8 text-rose-700 mx-auto mb-2" />
                       <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
                       <div className="text-xs md:text-sm text-gray-600">Completed Jobs</div>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
-                      <Star className="h-6 w-6 md:h-8 md:w-8 text-yellow-500 mx-auto mb-2" />
+                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
+                      <Star className="h-7 w-7 md:h-8 md:w-8 text-yellow-500 mx-auto mb-2" />
                       <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
                       <div className="text-xs md:text-sm text-gray-600">Average Rating</div>
                     </div>
-                    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 text-center">
-                      <Award className="h-6 w-6 md:h-8 md:w-8 text-green-600 mx-auto mb-2" />
+                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
+                      <Award className="h-7 w-7 md:h-8 md:w-8 text-green-600 mx-auto mb-2" />
                       <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
                       <div className="text-xs md:text-sm text-gray-600">Reviews</div>
                     </div>
@@ -710,8 +770,8 @@ export default function UnifiedProfilePage() {
             )}
 
             {activeTab === 'portfolio' && (
-              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 lg:p-8 border border-slate-200">
-                <div className="flex justify-between items-center mb-4 md:mb-6">
+              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
+                <div className="flex justify-between items-center mb-5 md:mb-6">
                   <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">Portfolio</h2>
                   <button 
                     onClick={() => setShowPortfolioForm(true)}
