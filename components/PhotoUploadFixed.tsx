@@ -29,6 +29,26 @@ export default function PhotoUploadFixed({
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [initializedFromProps, setInitializedFromProps] = useState(false);
+
+  // Initialize from photos prop (for base64 images from home page estimate)
+  useEffect(() => {
+    if (!initializedFromProps && photos && photos.length > 0) {
+      console.log('PhotoUploadFixed: Initializing with', photos.length, 'photos from props');
+      
+      // Convert base64/URL photos to PhotoItem format
+      const items: PhotoItem[] = photos.map((photoUrl, index) => ({
+        id: `loaded-${index}-${Date.now()}`,
+        file: new File([], `loaded-photo-${index}.jpg`, { type: 'image/jpeg' }), // Dummy file
+        previewUrl: photoUrl, // Use the base64 or URL directly
+        uploadedUrl: photoUrl, // Already uploaded (or base64 to be saved)
+        uploading: false
+      }));
+      
+      setPhotoItems(items);
+      setInitializedFromProps(true);
+    }
+  }, [photos, initializedFromProps]);
 
   // Cleanup blob URLs on unmount
   useEffect(() => {
@@ -47,9 +67,8 @@ export default function PhotoUploadFixed({
       .filter(item => item.uploadedUrl)
       .map(item => item.uploadedUrl!);
     
-    if (uploadedUrls.length > 0) {
-      onPhotosChange(uploadedUrls);
-    }
+    // Always notify parent, even if empty (so removal is tracked)
+    onPhotosChange(uploadedUrls);
   }, [photoItems, onPhotosChange]);
 
   const validateFile = (file: File): string | null => {
@@ -103,9 +122,7 @@ export default function PhotoUploadFixed({
       id: `${Date.now()}-${Math.random().toString(36).substring(2)}`,
       file,
       previewUrl: URL.createObjectURL(file), // Immediate local preview
-      uploading: false,
-      uploadedUrl: undefined,
-      error: undefined
+      uploading: false
     }));
 
     setPhotoItems(prev => [...prev, ...newItems]);
@@ -117,6 +134,14 @@ export default function PhotoUploadFixed({
   const uploadPhotosInBackground = async (items: PhotoItem[]) => {
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
+      
+      if (!item) continue; // Skip if undefined
+      
+      // Skip if already uploaded (loaded from props)
+      if (item.uploadedUrl && !item.uploadedUrl.startsWith('blob:')) {
+        console.log('Skipping upload for already-uploaded photo:', item.id);
+        continue;
+      }
       
       // Update status to uploading
       setPhotoItems(prev => prev.map(p => 
@@ -164,7 +189,8 @@ export default function PhotoUploadFixed({
         }
 
       } catch (error) {
-        console.error("Upload error for", item.file.name, error);
+        if (!item) continue; // Skip if undefined
+        console.error("Upload error for", item.file?.name || 'unknown file', error);
         
         // Mark as error but keep local preview
         setPhotoItems(prev => prev.map(p => 

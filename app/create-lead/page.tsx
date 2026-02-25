@@ -96,25 +96,77 @@ export default function CreateLeadPage() {
           }));
         }
         
-        // Load photos if available
+        // Load and upload photos if available
         if (estimatePhotos) {
           try {
             const photosArray = JSON.parse(estimatePhotos);
-            console.log('Loading photos:', photosArray.length);
-            // Keep photos in base64 format - they'll be converted during submission
-            setPhotos(photosArray);
+            console.log('Loading photos from estimate:', photosArray.length);
+            
+            // Upload base64 photos to storage
+            uploadBase64Photos(photosArray);
           } catch (photoError) {
             console.error('Error loading photos:', photoError);
           }
         }
         
-        // Clear the estimate data from localStorage after loading
+        // Clear both estimate data AND photos from localStorage after loading
         localStorage.removeItem('estimate_data');
+        localStorage.removeItem('estimate_photos');
       } catch (error) {
         console.error('Error loading estimate data:', error);
       }
     }
   }, []);
+
+  // Function to upload base64 photos to storage
+  const uploadBase64Photos = async (base64Photos: string[]) => {
+    console.log('Uploading', base64Photos.length, 'base64 photos to storage...');
+    
+    try {
+      const uploadPromises = base64Photos.map(async (base64, index) => {
+        try {
+          // Convert base64 to Blob
+          const response = await fetch(base64);
+          const blob = await response.blob();
+          
+          // Create File from Blob
+          const file = new File([blob], `estimate-photo-${index + 1}.jpg`, { type: blob.type || 'image/jpeg' });
+          
+          // Upload to server
+          const formData = new FormData();
+          formData.append('photos', file);
+          formData.append('type', 'leads');
+          
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!uploadResponse.ok) {
+            console.error('Failed to upload photo', index + 1);
+            return base64; // Fallback to base64 if upload fails
+          }
+          
+          const result = await uploadResponse.json();
+          const uploadedUrl = result.files?.[0] || result.url;
+          
+          console.log('Photo', index + 1, 'uploaded:', uploadedUrl);
+          return uploadedUrl || base64;
+        } catch (error) {
+          console.error('Error uploading photo', index + 1, error);
+          return base64; // Fallback to base64 if upload fails
+        }
+      });
+      
+      const uploadedUrls = await Promise.all(uploadPromises);
+      console.log('All photos uploaded, setting photos state');
+      setPhotos(uploadedUrls);
+    } catch (error) {
+      console.error('Error uploading base64 photos:', error);
+      // Fallback: use base64 photos as-is
+      setPhotos(base64Photos);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -4,9 +4,9 @@ import { logEventServer } from "@/lib/analytics";
 import OpenAI from "openai";
 
 // Initialize OpenAI client
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('demo') ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 interface EstimateRequest {
   description?: string;
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('demo')) {
+    if (!openai) {
       console.warn("OpenAI API key not configured, using fallback");
       const estimate = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
       return NextResponse.json(estimate);
