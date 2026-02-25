@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -120,7 +120,7 @@ model Lead {
   status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "completed" | "closed"
   claimed          Boolean          @default(false)
   published        Boolean          @default(false) // Changed default to false - homeowner controls when to publish
-  photos           String           @default("[]") // JSON array of photo URLs
+  photos           String           @default("[]") @db.Text // JSON array of photo URLs
   userId           String?          // Added userId field for homeowner
   maxContractors   Int              @default(3) // Maximum contractors that can apply
   acceptedContractors String        @default("[]") // JSON array of contractor IDs who accepted the job (max 3)
@@ -831,7 +831,7 @@ model SavedProject {
   budget              String?          // Budget range or estimate
   
   // Media
-  photos              String           @default("[]") // JSON array of uploaded photo URLs
+  photos              String           @default("[]") @db.Text // JSON array of uploaded photo URLs
   visualizerImages    String           @default("[]") // JSON array of AI visualizer result URLs
   
   // AI Data
