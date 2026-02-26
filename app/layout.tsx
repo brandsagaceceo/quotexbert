@@ -197,7 +197,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${interSans.variable} ${interMono.variable} antialiased bg-[var(--ink-100)] text-[var(--ink-900)]`}
+        className={`${interSans.variable} ${interMono.variable} antialiased bg-white text-[var(--ink-900)]`}
       >
         <ToastProvider>
           {/* Google Analytics & Tag Manager */}
@@ -218,7 +218,6 @@ export default function RootLayout({
             id="main-content" 
             className="min-h-screen"
             style={{
-              paddingTop: 'var(--header-height, 64px)',
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px))',
             }}
           >

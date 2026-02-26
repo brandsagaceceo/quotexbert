@@ -15,8 +15,8 @@ export default function SiteHeader() {
   const { signOut } = useClerk();
 
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/ai-quote", label: "Free AI Quote", highlight: true },
+    { href: "/", label: "Instant AI Estimate", highlight: true },
+    { href: "/ai-quote", label: "AI Quote Builder" },
     { href: "/blog", label: "Blog" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
@@ -24,7 +24,7 @@ export default function SiteHeader() {
 
   return (
     <header 
-      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-100"
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl shadow-sm"
       style={{ '--header-height': '64px' } as React.CSSProperties}
     >
       <div className="container mx-auto">

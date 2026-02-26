@@ -169,7 +169,7 @@ export default function ContractorJobsPage() {
 
   // Real-time job notifications
   useJobNotifications({
-    userId: user?.id,
+    userId: user?.id || '',
     enabled: isSignedIn && !!user,
     pollInterval: 15000, // Check every 15 seconds
     onNewJob: (job: Job) => {
@@ -329,6 +329,10 @@ export default function ContractorJobsPage() {
     );
   }
 
+  const activeFilterCount = Object.values(filters).filter(
+    (value) => value !== undefined && value !== ''
+  ).length;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -368,7 +372,9 @@ export default function ContractorJobsPage() {
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center justify-between w-full text-left"
             >
-              <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Filters {activeFilterCount > 0 && <span className="text-sm text-rose-700">({activeFilterCount} active)</span>}
+              </h3>
               <span className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>
                 ⌄
               </span>
@@ -377,7 +383,7 @@ export default function ContractorJobsPage() {
           
           {showFilters && (
             <div className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-4">
                 {/* Search */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -430,6 +436,20 @@ export default function ContractorJobsPage() {
                   />
                 </div>
 
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="City or ZIP"
+                    value={filters.location || ''}
+                    onChange={(e) => handleFilterChange({ location: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
                 {/* Max Budget */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -450,14 +470,14 @@ export default function ContractorJobsPage() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                 >
                   Clear Filters
                 </button>
-                <div className="text-sm text-gray-600 flex items-center">
+                <div className="text-sm text-gray-600 flex items-center sm:justify-end">
                   Showing {filteredJobs.length} of {jobs.length} jobs
                 </div>
               </div>

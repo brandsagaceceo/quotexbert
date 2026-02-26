@@ -76,7 +76,11 @@ interface JobData {
   id: string;
   title: string;
   status: string;
-  budget: string;
+  budget: string | number;
+  location?: string;
+  zipCode?: string;
+  applications?: Array<{ id: string }>;
+  assignedContractorId?: string | null;
   createdAt: string;
 }
 
@@ -274,9 +278,12 @@ export default function UnifiedProfilePage() {
             console.log("[ProfilePage] Jobs API response status:", jobsResponse.status);
             if (jobsResponse.ok) {
               const jobsData = await jobsResponse.json();
+              const homeownerJobs = Array.isArray(jobsData)
+                ? jobsData
+                : (jobsData?.jobs || []);
               console.log("[ProfilePage] Loaded homeowner jobs:", jobsData);
-              console.log("[ProfilePage] Number of jobs:", jobsData?.length || 0);
-              setJobs(jobsData || []);
+              console.log("[ProfilePage] Number of jobs:", homeownerJobs.length || 0);
+              setJobs(homeownerJobs.slice(0, 8));
             } else {
               console.error("[ProfilePage] Jobs API error:", jobsResponse.statusText);
             }
@@ -512,6 +519,25 @@ export default function UnifiedProfilePage() {
 
   const displayName = profile?.companyName || profile?.name || authUser.email;
   const isContractor = authUser.role === 'contractor';
+  const getHomeownerJobStatusStyles = (status: string) => {
+    const normalized = (status || '').toLowerCase();
+    if (normalized === 'open') return 'bg-green-100 text-green-800';
+    if (normalized === 'reviewing') return 'bg-amber-100 text-amber-800';
+    if (normalized === 'assigned') return 'bg-rose-100 text-rose-800';
+    if (normalized === 'completed') return 'bg-blue-100 text-blue-800';
+    if (normalized === 'draft') return 'bg-slate-100 text-slate-700';
+    return 'bg-gray-100 text-gray-700';
+  };
+
+  const formatJobStatus = (status: string) => {
+    const normalized = (status || '').toLowerCase();
+    if (normalized === 'open') return 'Open for Applications';
+    if (normalized === 'reviewing') return 'Reviewing';
+    if (normalized === 'assigned') return 'Contractor Assigned';
+    if (normalized === 'completed') return 'Completed';
+    if (normalized === 'draft') return 'Draft';
+    return status || 'Unknown';
+  };
 
   return (
     <div className="min-h-screen bg-white pb-20 md:pb-0">
@@ -763,6 +789,29 @@ export default function UnifiedProfilePage() {
                       <Award className="h-7 w-7 md:h-8 md:w-8 text-green-600 mx-auto mb-2" />
                       <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
                       <div className="text-xs md:text-sm text-gray-600">Reviews</div>
+                    </div>
+                  </div>
+                )}
+
+                {!isContractor && (
+                  <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
+                    <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-3">Your Project Hub</h2>
+                    <p className="text-slate-600 text-sm md:text-base mb-5">
+                      Start with an instant AI estimate, then post to the job board to get contractor applications.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Link
+                        href="/create-lead"
+                        className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                      >
+                        Post a Job on Job Board
+                      </Link>
+                      <Link
+                        href="/ai-quote"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold border border-rose-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition-colors"
+                      >
+                        Bonus: Free AI Quote Generator
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -1049,7 +1098,7 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
-            {activeTab === 'jobs' && (
+            {activeTab === 'jobs' && isContractor && (
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Jobs</h2>
                 
@@ -1171,7 +1220,15 @@ export default function UnifiedProfilePage() {
 
             {activeTab === 'jobs' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">My Posted Jobs</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900">My Posted Jobs</h2>
+                  <Link
+                    href="/create-lead"
+                    className="inline-flex items-center justify-center bg-gradient-to-r from-rose-700 to-orange-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:shadow-lg transition-all"
+                  >
+                    Post New Job
+                  </Link>
+                </div>
                 {jobs.length > 0 ? (
                   <div className="space-y-4">
                     {jobs.map((job) => (
@@ -1179,27 +1236,38 @@ export default function UnifiedProfilePage() {
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
-                            <div className="flex items-center gap-3 text-sm text-slate-600">
-                              <span>Budget: {job.budget}</span>
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                              <span>Budget: {typeof job.budget === 'number' ? `$${job.budget.toLocaleString()}` : job.budget}</span>
                               <span>•</span>
-                              <span className={`font-semibold ${
-                                job.status === 'open' ? 'text-green-600' : 
-                                job.status === 'assigned' ? 'text-rose-700' : 'text-slate-600'
-                              }`}>
-                                {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getHomeownerJobStatusStyles(job.status)}`}>
+                                {formatJobStatus(job.status)}
                               </span>
+                              {job.applications && (
+                                <>
+                                  <span>•</span>
+                                  <span>{job.applications.length} {job.applications.length === 1 ? 'Application' : 'Applications'}</span>
+                                </>
+                              )}
                             </div>
                           </div>
                           <div className="text-xs text-slate-500">
                             {new Date(job.createdAt).toLocaleDateString()}
                           </div>
                         </div>
-                        <a
-                          href={`/homeowner/jobs/${job.id}/applications`}
-                          className="inline-block text-sm bg-rose-700 text-white py-2 px-4 rounded-lg hover:bg-rose-800 transition-colors"
-                        >
-                          View Applications
-                        </a>
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/homeowner/jobs/${job.id}`}
+                            className="inline-block text-sm bg-slate-100 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors"
+                          >
+                            View Job Details
+                          </Link>
+                          <Link
+                            href={`/homeowner/jobs/${job.id}/applications`}
+                            className="inline-block text-sm bg-rose-700 text-white py-2 px-4 rounded-lg hover:bg-rose-800 transition-colors"
+                          >
+                            View Applications
+                          </Link>
+                        </div>
                       </div>
                     ))}
                   </div>

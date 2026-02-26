@@ -123,7 +123,7 @@ export default function Home() {
                 <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-6 md:mb-10 leading-relaxed font-medium">
                   <span className="text-rose-700 font-bold">Upload photos</span> of your project. 
                   Get a detailed, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
-                  Compare before you commit.
+                  Compare before you commit, then post your project to the job board for contractor bids.
                 </p>
 
                 {/* Key Benefits - Compact for mobile */}
@@ -253,24 +253,32 @@ export default function Home() {
               Ready to Start Your Project?
             </h2>
             <p className="text-xl mb-8 text-rose-100">
-              Get your instant AI estimate now. No signup required.
+              Use the instant AI estimate, then post on the job board to collect bids from verified contractors.
             </p>
-            <button
-              onClick={() => {
-                const estimatorElement = document.querySelector('[data-estimator]');
-                if (estimatorElement) {
-                  estimatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-              }}
-              className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-5 rounded-xl 
-                       transition-all transform hover:scale-105 shadow-2xl text-lg"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Upload Photos & Get Quote
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  const estimatorElement = document.querySelector('[data-estimator]');
+                  if (estimatorElement) {
+                    estimatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+                className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-5 rounded-xl 
+                         transition-all transform hover:scale-105 shadow-2xl text-lg"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Get Instant AI Estimate
+              </button>
+              <Link
+                href={isSignedIn ? '/create-lead' : '/sign-up'}
+                className="inline-flex items-center gap-2 bg-rose-900/40 border border-white/40 text-white font-semibold px-6 py-4 rounded-xl hover:bg-rose-900/55 transition-colors"
+              >
+                Post on Job Board
+              </Link>
+            </div>
           </div>
         </section>
       </div>
