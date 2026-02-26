@@ -218,7 +218,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
             <h2 className="text-2xl sm:text-3xl font-bold mb-2 overflow-wrap-anywhere">Your AI Estimate</h2>
             <p className="text-rose-100 text-xs sm:text-sm">Generated in seconds • Based on GTA pricing</p>
           </div>
-          <div className={`px-3 sm:px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-xs sm:text-sm whitespace-nowrap flex-shrink-0`}>
+          <div className={`px-3 sm:px-4 py-2 rounded-full ${getConfidenceColor(data.confidence)} font-semibold text-xs sm:text-sm whitespace-nowrap flex-shrink-0 max-w-full text-center`}>
             {Math.round(data.confidence * 100)}%
           </div>
         </div>
@@ -248,7 +248,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl p-4 sm:p-6 border-2 border-orange-200">
           <div className="text-center">
             <p className="text-xs sm:text-sm font-semibold text-slate-600 mb-2">Estimated Total Cost</p>
-            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1 break-words px-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1 break-words px-2 leading-tight">
               {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
             </div>
             <p className="text-xs text-slate-500">CAD, including HST estimate</p>
@@ -307,9 +307,9 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
                     <span>Labor:</span>
                     <span className="font-medium">{formatCurrency(item.labor_cost)}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-900 text-sm pt-1 border-t border-slate-300">
+                  <div className="flex justify-between gap-2 font-bold text-slate-900 text-sm pt-1 border-t border-slate-300">
                     <span>Total:</span>
-                    <span>{formatCurrency(item.material_cost + item.labor_cost)}</span>
+                    <span className="text-right break-words">{formatCurrency(item.material_cost + item.labor_cost)}</span>
                   </div>
                 </div>
                 {item.notes && <div className="text-xs text-slate-500 mt-2 break-words">{item.notes}</div>}
@@ -336,9 +336,9 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
                 <span className="text-slate-700">HST (13%):</span>
                 <span className="font-semibold">{formatCurrency(data.totals.tax_estimate)}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t-2 border-slate-900 text-base font-bold">
+              <div className="flex justify-between gap-2 pt-2 border-t-2 border-slate-900 text-base font-bold">
                 <span>Total:</span>
-                <span className="text-rose-700">{formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}</span>
+                <span className="text-rose-700 text-right break-words">{formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}</span>
               </div>
             </div>
           </div>
@@ -475,12 +475,12 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 pb-safe">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 pb-safe min-w-0">
           <button
             onClick={onGetContractorBids}
             className="w-full sm:flex-1 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
                      hover:to-orange-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
-                     transition-all transform hover:scale-[1.02] shadow-lg text-sm sm:text-base"
+                     transition-all transform hover:scale-[1.02] shadow-lg text-sm sm:text-base break-words"
           >
             Get 3 Contractor Bids
           </button>
@@ -496,11 +496,11 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         </div>
 
         {/* Share Actions */}
-        <div className="flex gap-3 pt-2 border-t border-slate-200">
+        <div className="flex flex-wrap gap-2 sm:gap-3 pt-2 border-t border-slate-200">
           <button
             onClick={handleCopyLink}
             className="flex items-center gap-2 text-sm text-slate-600 hover:text-orange-600 
-                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50"
+                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50 min-w-0"
           >
             {copied ? (
               <>
@@ -516,7 +516,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
           </button>
           <button
             className="flex items-center gap-2 text-sm text-slate-600 hover:text-orange-600 
-                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50"
+                     transition-colors px-3 py-2 rounded-lg hover:bg-slate-50 min-w-0"
           >
             <ShareIcon className="w-4 h-4" />
             <span>Share</span>
