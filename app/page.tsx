@@ -95,7 +95,7 @@ export default function Home() {
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
-        <section id="get-estimate" className="relative py-8 md:py-16 lg:py-24 overflow-hidden -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)] md:pt-[calc(var(--header-height,64px)+4rem)] lg:pt-[calc(var(--header-height,64px)+6rem)]">
+        <section id="get-estimate" className="relative py-6 md:py-16 lg:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
           <div className="absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>

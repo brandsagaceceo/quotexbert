@@ -224,7 +224,7 @@ export default function AIAssistantPopup() {
             isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
           style={{
-            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 12px)',
+            bottom: 'calc(6rem + env(safe-area-inset-bottom, 0px) + 12px)',
           }}
           aria-label="Open AI Assistant"
         >
@@ -241,7 +241,7 @@ export default function AIAssistantPopup() {
         <div 
           className="fixed right-4 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
-            bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px) + 12px)',
+            bottom: 'calc(6rem + env(safe-area-inset-bottom, 0px) + 12px)',
             maxHeight: 'calc(70vh - env(safe-area-inset-bottom, 0px))',
           }}
         >

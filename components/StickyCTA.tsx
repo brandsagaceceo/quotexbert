@@ -8,7 +8,7 @@ export function StickyCTA() {
     <>
       {/* Mobile Only - Sticky Bottom Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
-        <div className="bg-gradient-to-r from-rose-600 to-orange-600 shadow-2xl border-t-4 border-rose-700">
+        <div className="bg-gradient-to-r from-rose-600 to-orange-600 shadow-2xl">
           <Link 
             href="/#get-estimate"
             className="flex items-center justify-center gap-3 px-6 py-4 text-white font-bold text-lg active:scale-95 transition-transform"
@@ -19,7 +19,7 @@ export function StickyCTA() {
         </div>
         
         {/* Floating notification badge (optional) */}
-        <div className="absolute -top-3 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce">
+        <div className="absolute -top-2 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-bounce">
           100% FREE
         </div>
       </div>

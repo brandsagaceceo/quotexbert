@@ -24,7 +24,7 @@ export default function SiteHeader() {
 
   return (
     <header 
-      className="sticky top-0 z-40 bg-gradient-to-r from-white via-rose-50/30 to-orange-50/30 backdrop-blur-xl"
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-gray-100"
       style={{ '--header-height': '64px' } as React.CSSProperties}
     >
       <div className="container mx-auto">
