@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import LoadingState from '@/components/ui/LoadingState';
 
 const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
 
@@ -122,12 +123,11 @@ export default function EntitlementsDebugPage() {
 
   if (!authorized) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authorization...</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Checking authorization"
+        subtitle="Validating admin permissions"
+      />
     );
   }
 
@@ -176,9 +176,12 @@ export default function EntitlementsDebugPage() {
 
         {/* Entitlements Display */}
         {loading ? (
-          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading entitlements...</p>
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <LoadingState
+              title="Loading entitlements"
+              subtitle="Fetching subscription and permission data"
+              className="min-h-[260px]"
+            />
           </div>
         ) : entitlements ? (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import LoadingState from "@/components/ui/LoadingState";
 
 const ADMIN_EMAILS = ["brandsagaceo@gmail.com"];
 
@@ -99,7 +100,13 @@ export default function AffiliateAdminPage() {
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return (
+      <LoadingState
+        fullScreen
+        title="Loading affiliate dashboard"
+        subtitle="Calculating commissions and payouts"
+      />
+    );
   }
 
   return (

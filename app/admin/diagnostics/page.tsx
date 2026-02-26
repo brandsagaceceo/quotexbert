@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import LoadingState from "@/components/ui/LoadingState";
 
 // Admin emails (god-access users)
 const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
@@ -79,9 +80,11 @@ export default function AdminDiagnosticsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading diagnostics"
+        subtitle="Verifying admin access"
+      />
     );
   }
 

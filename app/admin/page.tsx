@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
+import LoadingState from "@/components/ui/LoadingState";
 import { 
   ChartBarIcon, 
   UserGroupIcon, 
@@ -96,13 +97,11 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          </div>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading admin dashboard"
+        subtitle="Fetching platform metrics and recent activity"
+      />
     );
   }
 

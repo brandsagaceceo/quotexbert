@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import LoadingState from "@/components/ui/LoadingState";
 
 interface LeadPricing {
   id: string;
@@ -112,7 +113,13 @@ export default function AdminLeadPricingPage() {
   ];
 
   if (loading) {
-    return <div className="text-center py-8">Loading pricing data...</div>;
+    return (
+      <LoadingState
+        fullScreen
+        title="Loading lead pricing"
+        subtitle="Fetching pricing rules by trade and city"
+      />
+    );
   }
 
   return (

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import LoadingState from '@/components/ui/LoadingState';
 import { Users, Briefcase, DollarSign, MessageSquare, RefreshCw, Shield } from 'lucide-react';
 
 interface UsageData {
@@ -97,12 +98,11 @@ export default function AdminMonitoringPage() {
   // Show loading while checking authentication
   if (!isLoaded || loading && !usageData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Loading monitoring data...</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading monitoring"
+        subtitle="Collecting platform usage and health metrics"
+      />
     );
   }
 
