@@ -9,6 +9,7 @@ import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopu
 import { canAcceptJob, isGodUser } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
 import { ToastContainer, type Toast } from "@/components/ToastNotification";
+import LoadingState from "@/components/ui/LoadingState";
 
 interface JobFilters {
   category?: string;
@@ -486,10 +487,10 @@ export default function ContractorJobsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading jobs...</p>
-          </div>
+          <LoadingState
+            title="Loading available jobs"
+            subtitle="Finding projects that match your categories"
+          />
         ) : filteredJobs.length === 0 ? (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Match Your Filters</h3>

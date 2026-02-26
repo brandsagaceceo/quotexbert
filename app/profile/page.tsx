@@ -10,6 +10,7 @@ import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
 import OverflowDetector from "@/components/dev/OverflowDetector";
+import LoadingState from "@/components/ui/LoadingState";
 import {
   User,
   MapPin,
@@ -487,13 +488,11 @@ export default function UnifiedProfilePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-orange-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-4 border-rose-700 mx-auto mb-6"></div>
-          <p className="text-xl font-semibold text-slate-800 mb-2">Loading your profile...</p>
-          <p className="text-sm text-slate-600">This should only take a moment</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading your profile"
+        subtitle="Syncing your account and project data"
+      />
     );
   }
 
@@ -502,15 +501,12 @@ export default function UnifiedProfilePage() {
   }
 
   if (isLoading) {
-    console.log("[ProfilePage RENDER] Showing loading spinner, isLoading:", isLoading);
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-700 mx-auto mb-4"></div>
-          <p className="text-gray-600">Setting up profile... (loading data)</p>
-          <p className="text-xs text-gray-400 mt-2">Debug: authUser={authUser?.email}, isLoading={String(isLoading)}</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Setting up your profile"
+        subtitle="Preparing tabs, jobs, and saved estimates"
+      />
     );
   }
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { Calendar, DollarSign, FileText, CheckCircle, Clock, Send } from 'lucide-react';
+import LoadingState from '@/components/ui/LoadingState';
 
 interface EstimateItem {
   id: string;
@@ -114,12 +115,11 @@ export default function HomeownerEstimatesPage() {
 
   if (!isLoaded || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-700 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your estimates...</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading your estimates"
+        subtitle="Gathering your AI estimate history"
+      />
     );
   }
 

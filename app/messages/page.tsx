@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
+import LoadingState from "@/components/ui/LoadingState";
 import { ChatBubbleLeftRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 interface Message {
@@ -140,18 +141,11 @@ export default function MessagesPage() {
 
   if (loading || !user) {
     return (
-      <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-slate-200"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-orange-400 border-t-transparent animate-spin"></div>
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-2">Loading Messages</h3>
-          <p className="text-slate-500">Connecting you to your conversations...</p>
-        </div>
-      </div>
+      <LoadingState
+        title="Loading messages"
+        subtitle="Connecting you to your conversations"
+        className="min-h-[calc(100vh-140px)]"
+      />
     );
   }
 

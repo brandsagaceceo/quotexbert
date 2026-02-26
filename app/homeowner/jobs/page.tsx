@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import LoadingState from '@/components/ui/LoadingState';
 import { Plus, Users, MessageCircle, Clock, DollarSign, Edit, Trash2 } from 'lucide-react';
 
 interface JobApplication {
@@ -110,12 +111,11 @@ export default function HomeownerJobsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-700 mx-auto mb-4"></div>
-          <p>Loading your jobs...</p>
-        </div>
-      </div>
+      <LoadingState
+        fullScreen
+        title="Loading your jobs"
+        subtitle="Pulling your posted projects and application updates"
+      />
     );
   }
 
