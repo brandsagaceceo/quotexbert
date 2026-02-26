@@ -58,7 +58,11 @@ const EXAMPLE_ESTIMATES = [
 ];
 
 export default function ExampleEstimates() {
-  const [selectedExample, setSelectedExample] = useState(EXAMPLE_ESTIMATES[0]);
+  const [selectedExample, setSelectedExample] = useState(EXAMPLE_ESTIMATES[0]!);
+
+  if (!selectedExample) {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
@@ -117,24 +121,24 @@ export default function ExampleEstimates() {
 
               {/* Cost Summary */}
               <div className="p-8 border-b border-slate-200">
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-3xl font-black text-green-700">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                  <div className="text-center p-4 bg-green-50 rounded-lg min-w-0">
+                    <div className="text-2xl sm:text-3xl font-black text-green-700 break-words leading-tight">
                       ${selectedExample.costLow.toLocaleString()}
                     </div>
-                    <div className="text-sm text-slate-600 mt-1">Low Estimate</div>
+                    <div className="text-sm text-slate-600 mt-1 break-words">Low Estimate</div>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <div className="text-3xl font-black text-orange-700">
+                  <div className="text-center p-4 bg-orange-50 rounded-lg min-w-0">
+                    <div className="text-2xl sm:text-3xl font-black text-orange-700 break-words leading-tight">
                       ${selectedExample.costHigh.toLocaleString()}
                     </div>
-                    <div className="text-sm text-slate-600 mt-1">High Estimate</div>
+                    <div className="text-sm text-slate-600 mt-1 break-words">High Estimate</div>
                   </div>
-                  <div className="text-center p-4 bg-rose-50 rounded-lg">
-                    <div className="text-3xl font-black text-rose-900">
+                  <div className="text-center p-4 bg-rose-50 rounded-lg min-w-0">
+                    <div className="text-2xl sm:text-3xl font-black text-rose-900 break-words leading-tight">
                       {selectedExample.proCount}
                     </div>
-                    <div className="text-sm text-slate-600 mt-1">Pros Available</div>
+                    <div className="text-sm text-slate-600 mt-1 break-words">Pros Available</div>
                   </div>
                 </div>
 
@@ -162,10 +166,10 @@ export default function ExampleEstimates() {
                   {selectedExample.lineItems.map((item, index) => (
                     <div
                       key={index}
-                      className="flex justify-between items-center p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                     >
-                      <span className="text-slate-700 font-medium">{item.name}</span>
-                      <span className="text-rose-700 font-bold">{item.cost}</span>
+                      <span className="text-slate-700 font-medium break-words">{item.name}</span>
+                      <span className="text-rose-700 font-bold sm:ml-3 break-words">{item.cost}</span>
                     </div>
                   ))}
                 </div>
