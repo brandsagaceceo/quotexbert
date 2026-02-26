@@ -2,8 +2,15 @@
 
 import { Camera } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export function StickyCTA() {
+  const { isSignedIn } = useAuth();
+
+  if (isSignedIn) {
+    return null;
+  }
+
   return (
     <>
       {/* Mobile Only - Sticky Bottom Bar */}
