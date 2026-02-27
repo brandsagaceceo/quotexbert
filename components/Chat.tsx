@@ -189,14 +189,14 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
   }
 
   return (
-    <div className="border rounded-lg h-[600px] flex flex-col bg-white overflow-hidden">
-      <div className="border-b p-4 shrink-0">
+    <div className="border border-gray-200 rounded-xl shadow-lg h-[600px] flex flex-col bg-white overflow-hidden">
+      <div className="border-b border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 p-4 shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold truncate">
+            <h2 className="text-lg font-semibold text-slate-900 truncate">
               {thread.lead.title}
             </h2>
-            <p className="text-sm text-gray-600 truncate">
+            <p className="text-sm text-slate-600 truncate">
               Chat with {otherUser?.email || "Unknown User"}
             </p>
           </div>
@@ -299,8 +299,8 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
         </div>
 
         {/* Message Input */}
-        <div className="border-t p-4 shrink-0">
-          <form onSubmit={sendMessage} className="flex space-x-2">
+        <div className="border-t border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 p-4 shrink-0">
+          <form onSubmit={sendMessage} className="flex space-x-3">
             <input
               type="text"
               value={newMessage}
@@ -308,12 +308,12 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                 setNewMessage(e.target.value)
               }
               placeholder="Type your message..."
-              className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 shadow-sm"
             />
             <button
               type="submit"
               disabled={!newMessage.trim()}
-              className="px-6 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-md hover:from-rose-600 hover:to-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0 min-w-[80px] font-semibold"
+              className="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-lg hover:from-rose-600 hover:to-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0 min-w-[80px] font-semibold shadow-md transition-all duration-200 hover:shadow-lg"
             >
               Send
             </button>
