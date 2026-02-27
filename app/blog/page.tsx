@@ -31,44 +31,100 @@ export default function BlogPage() {
   const blogPosts: BlogPost[] = [
     {
       id: "1",
-      title: "Complete Guide to Basement Finishing in Toronto 2025",
-      slug: "basement-finishing-toronto-guide-2025",
+      title: "Complete Guide to Basement Finishing in Toronto 2026",
+      slug: "basement-finishing-toronto-guide-2026",
       excerpt: "Transform your Toronto basement into a beautiful living space. Learn about permits, costs, design ideas, and finding the right GTA contractor for your project.",
       author: "Michael Chen",
-      publishedAt: "2025-01-22",
+      publishedAt: "2026-02-20",
       readTime: 12,
       category: "Basement",
       tags: ["toronto basement", "GTA renovation", "basement finishing", "toronto permits"],
       imageUrl: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=800&h=500&fit=crop",
-      seoTitle: "Basement Finishing Toronto 2025 | Complete GTA Guide & Costs",
+      seoTitle: "Basement Finishing Toronto 2026 | Complete GTA Guide & Costs",
       seoDescription: "Expert guide to finishing your Toronto basement. Permits, costs, design ideas, and finding qualified GTA contractors for basement renovations."
     },
     {
       id: "2",
-      title: "Kitchen Renovation Costs in Toronto & GTA: 2025 Price Guide",
-      slug: "toronto-kitchen-renovation-costs-2025",
+      title: "Kitchen Renovation Costs in Toronto & GTA: 2026 Price Guide",
+      slug: "toronto-kitchen-renovation-costs-2026",
       excerpt: "Planning a kitchen reno in Toronto? Get accurate cost breakdowns for cabinets, countertops, appliances, and labor in the Greater Toronto Area.",
       author: "Sarah Thompson",
-      publishedAt: "2025-01-20",
+      publishedAt: "2026-02-18",
       readTime: 10,
       category: "Kitchen",
       tags: ["toronto kitchen", "renovation costs", "GTA pricing", "kitchen remodel"],
       imageUrl: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=500&fit=crop&q=80",
-      seoTitle: "Toronto Kitchen Renovation Costs 2025 | GTA Pricing Guide",
+      seoTitle: "Toronto Kitchen Renovation Costs 2026 | GTA Pricing Guide",
       seoDescription: "Complete kitchen renovation cost guide for Toronto homeowners. GTA pricing, permit costs, and budgeting tips for your Toronto kitchen remodel."
     },
     {
+      id: "26",
+      title: "Why QuoteXbert is Different: How We're Revolutionizing Home Renovations in Toronto",
+      slug: "why-quotexbert-different-toronto-renovation-platform",
+      excerpt: "Discover how QuoteXbert uses AI technology and verified contractors to eliminate the guesswork from Toronto home renovations. Learn why GTA homeowners and contractors choose our platform over traditional methods.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-02-25",
+      readTime: 8,
+      category: "Contractor Tips",
+      tags: ["quotexbert platform", "ai estimates", "toronto contractors", "verified contractors"],
+      imageUrl: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Why QuoteXbert is Different | AI-Powered Toronto Renovation Platform",
+      seoDescription: "See how QuoteXbert revolutionizes Toronto renovations with AI estimates, verified contractors, transparent pricing, and instant matching in the GTA."
+    },
+    {
+      id: "27",
+      title: "The Future of Home Renovations: AI Estimates vs Traditional Quotes in 2026",
+      slug: "ai-estimates-vs-traditional-quotes-2026",
+      excerpt: "How AI-powered estimate technology is transforming the Toronto renovation industry. Compare instant AI calculations with traditional contractor quotes and learn why accuracy has never been better.",
+      author: "Technology Team",
+      publishedAt: "2026-02-24",
+      readTime: 11,
+      category: "Energy",
+      tags: ["ai technology", "renovation estimates", "toronto tech", "instant quotes"],
+      imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop&q=80",
+      seoTitle: "AI Renovation Estimates 2026 | How Technology is Changing Toronto Home Improvement",
+      seoDescription: "Explore how AI-powered estimates revolutionize Toronto renovations. Instant accuracy, transparent pricing, and smarter contractor matching in the GTA."
+    },
+    {
+      id: "28",
+      title: "Toronto Contractor Verification: How QuoteXbert Screens Every Professional",
+      slug: "toronto-contractor-verification-quotexbert-process",
+      excerpt: "Safety first! Learn about our rigorous 7-step contractor verification process including WSIB, insurance, licensing, criminal background checks, and ongoing quality monitoring for GTA professionals.",
+      author: "Safety & Compliance Team",
+      publishedAt: "2026-02-22",
+      readTime: 9,
+      category: "Contractor Tips",
+      tags: ["contractor verification", "safety", "wsib", "toronto contractors"],
+      imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Toronto Contractor Verification 2026 | QuoteXbert Safety Standards",
+      seoDescription: "How QuoteXbert verifies every Toronto contractor. WSIB, insurance, licensing, background checks, and quality monitoring for GTA professionals."
+    },
+    {
+      id: "29",
+      title: "Hidden Costs in Toronto Renovations: What Contractors Won't Tell You",
+      slug: "hidden-costs-toronto-renovations-2026",
+      excerpt: "Avoid budget blowouts! Uncover the hidden costs of Toronto renovations including permits, inspections, asbestos testing, structural surprises, and disposal fees that contractors often miss in initial quotes.",
+      author: "Budget Planning Team",
+      publishedAt: "2026-02-21",
+      readTime: 14,
+      category: "Contractor Tips",
+      tags: ["renovation costs", "hidden fees", "toronto permits", "budget planning"],
+      imageUrl: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Hidden Renovation Costs Toronto 2026 | Complete Budget Guide",
+      seoDescription: "Discover hidden costs in Toronto renovations. Permits, inspections, structural surprises, and fees contractors miss in GTA quotes."
+    },
+    {
       id: "3",
-      title: "How to Hire a Reliable Contractor in Toronto: 2025 Checklist",
+      title: "How to Hire a Reliable Contractor in Toronto: 2026 Checklist",
       slug: "hire-reliable-contractor-toronto-checklist",
       excerpt: "Avoid contractor scams in Toronto! Our comprehensive checklist covers licensing, insurance, WSIB, references, and red flags to watch for in the GTA.",
       author: "Jennifer Martinez",
-      publishedAt: "2025-01-18",
+      publishedAt: "2026-02-15",
       readTime: 8,
       category: "Contractor Tips",
       tags: ["toronto contractors", "hiring guide", "contractor tips", "GTA"],
       imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop",
-      seoTitle: "How to Hire Contractors in Toronto 2025 | GTA Hiring Checklist",
+      seoTitle: "How to Hire Contractors in Toronto 2026 | GTA Hiring Checklist",
       seoDescription: "Find reliable contractors in Toronto with our expert checklist. Verify licensing, WSIB, insurance, and avoid common contractor scams in the GTA."
     },
     {
@@ -77,12 +133,12 @@ export default function BlogPage() {
       slug: "small-bathroom-ideas-toronto-condos",
       excerpt: "Maximize your small Toronto condo bathroom with clever design ideas. Space-saving solutions, modern fixtures, and renovation tips for downtown living.",
       author: "David Park",
-      publishedAt: "2025-01-15",
+      publishedAt: "2026-02-12",
       readTime: 7,
       category: "Bathroom",
       tags: ["toronto condo", "small bathroom", "bathroom ideas", "downtown toronto"],
       imageUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=500&fit=crop",
-      seoTitle: "Small Bathroom Ideas for Toronto Condos 2025 | Space-Saving Tips",
+      seoTitle: "Small Bathroom Ideas for Toronto Condos 2026 | Space-Saving Tips",
       seoDescription: "Transform your small Toronto condo bathroom. Expert design ideas, space-saving fixtures, and renovation tips for downtown GTA condos.",
       isDIY: true
     },
@@ -92,12 +148,12 @@ export default function BlogPage() {
       slug: "toronto-roofing-repair-vs-replace",
       excerpt: "Toronto winters are tough on roofs. Learn when to repair vs replace, costs, materials best for Ontario climate, and finding qualified Toronto roofers.",
       author: "Robert Wilson",
-      publishedAt: "2025-01-12",
+      publishedAt: "2026-02-10",
       readTime: 9,
       category: "Roofing",
       tags: ["toronto roofing", "roof replacement", "GTA roofers", "ontario winter"],
       imageUrl: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&h=500&fit=crop&q=80",
-      seoTitle: "Toronto Roofing Guide 2025 | Repair vs Replace Your GTA Roof",
+      seoTitle: "Toronto Roofing Guide 2026 | Repair vs Replace Your GTA Roof",
       seoDescription: "Expert Toronto roofing advice. Learn when to repair vs replace, costs, winter damage prevention, and finding qualified Ontario roofers."
     },
     {
@@ -106,27 +162,27 @@ export default function BlogPage() {
       slug: "hardwood-flooring-toronto-guide",
       excerpt: "Choose the perfect hardwood flooring for your Toronto home. Compare engineered vs solid wood, costs, installation tips, and top GTA flooring contractors.",
       author: "Lisa Chang",
-      publishedAt: "2025-01-10",
+      publishedAt: "2026-02-08",
       readTime: 8,
       category: "Flooring",
       tags: ["toronto flooring", "hardwood floors", "GTA contractors", "flooring costs"],
       imageUrl: "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=500&fit=crop",
-      seoTitle: "Hardwood Flooring Toronto 2025 | Installation Guide & Costs",
+      seoTitle: "Hardwood Flooring Toronto 2026 | Installation Guide & Costs",
       seoDescription: "Complete guide to hardwood flooring in Toronto. Types, costs, installation tips, and finding qualified GTA flooring contractors.",
       isDIY: true
     },
     {
       id: "7",
-      title: "Home Addition Permits in Toronto: Complete 2025 Guide",
+      title: "Home Addition Permits in Toronto: Complete 2026 Guide",
       slug: "toronto-home-addition-permits-guide",
       excerpt: "Planning a home addition in Toronto? Navigate City of Toronto permits, zoning regulations, costs, and the approval process for GTA home expansions.",
       author: "Mark Stevens",
-      publishedAt: "2025-01-08",
+      publishedAt: "2026-02-06",
       readTime: 11,
       category: "Permits",
       tags: ["toronto permits", "home addition", "city of toronto", "zoning"],
       imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Home Addition Permits 2025 | City Approval Guide",
+      seoTitle: "Toronto Home Addition Permits 2026 | City Approval Guide",
       seoDescription: "Navigate Toronto home addition permits easily. City of Toronto regulations, zoning requirements, costs, and approval timeline for GTA additions."
     },
     {
@@ -135,12 +191,12 @@ export default function BlogPage() {
       slug: "toronto-deck-building-guide",
       excerpt: "Build the perfect outdoor space for your Toronto home. Deck design ideas, material comparisons, permit requirements, and finding GTA deck builders.",
       author: "Amanda Rodriguez",
-      publishedAt: "2025-01-05",
+      publishedAt: "2026-02-04",
       readTime: 10,
       category: "Outdoor",
       tags: ["toronto deck", "outdoor living", "GTA contractors", "deck design"],
       imageUrl: "https://images.unsplash.com/photo-1600585152915-d208bec867a1?w=800&h=500&fit=crop",
-      seoTitle: "Deck Building Toronto 2025 | Design Ideas, Materials & Costs",
+      seoTitle: "Deck Building Toronto 2026 | Design Ideas, Materials & Costs",
       seoDescription: "Build your dream Toronto deck. Design ideas, material options, permit requirements, and finding qualified GTA deck contractors.",
       isDIY: true
     },
@@ -150,12 +206,12 @@ export default function BlogPage() {
       slug: "energy-efficient-upgrades-toronto",
       excerpt: "Save money and stay comfortable in Toronto's extreme weather. Top energy-efficient upgrades, rebates, and ROI for GTA homeowners.",
       author: "Tom Anderson",
-      publishedAt: "2025-01-02",
+      publishedAt: "2026-02-02",
       readTime: 9,
       category: "Energy",
       tags: ["toronto energy", "home efficiency", "ontario rebates", "GTA upgrades"],
       imageUrl: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop",
-      seoTitle: "Energy-Efficient Home Upgrades Toronto 2025 | Save Money & Stay Warm",
+      seoTitle: "Energy-Efficient Home Upgrades Toronto 2026 | Save Money & Stay Warm",
       seoDescription: "Top energy-efficient upgrades for Toronto homes. Ontario rebates, ROI calculations, and contractors for GTA energy improvements.",
       isDIY: true
     },
@@ -165,12 +221,12 @@ export default function BlogPage() {
       slug: "toronto-painting-guide-interior-exterior",
       excerpt: "Refresh your Toronto home with a new paint job. Color trends, climate considerations, costs, and finding professional GTA painters.",
       author: "Emily Watson",
-      publishedAt: "2024-12-30",
+      publishedAt: "2026-01-30",
       readTime: 7,
       category: "Painting",
       tags: ["toronto painting", "interior paint", "exterior paint", "GTA painters"],
       imageUrl: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Home Painting Guide 2025 | Interior & Exterior Tips",
+      seoTitle: "Toronto Home Painting Guide 2026 | Interior & Exterior Tips",
       seoDescription: "Complete painting guide for Toronto homeowners. Color trends, climate considerations, costs, and finding qualified GTA painting contractors.",
       isDIY: true
     },
@@ -180,12 +236,12 @@ export default function BlogPage() {
       slug: "toronto-hvac-heating-cooling-guide",
       excerpt: "Stay comfortable year-round in Toronto. Compare HVAC systems for Ontario's climate, costs, energy efficiency, and top GTA HVAC contractors.",
       author: "Kevin Lee",
-      publishedAt: "2024-12-28",
+      publishedAt: "2026-01-28",
       readTime: 10,
       category: "HVAC",
       tags: ["toronto hvac", "heating cooling", "GTA contractors", "energy efficiency"],
       imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=500&fit=crop",
-      seoTitle: "Toronto HVAC Guide 2025 | Heating & Cooling Systems for Ontario",
+      seoTitle: "Toronto HVAC Guide 2026 | Heating & Cooling Systems for Ontario",
       seoDescription: "Choose the right HVAC system for your Toronto home. Compare options, costs, energy efficiency, and find qualified GTA HVAC contractors."
     },
     {
@@ -194,12 +250,12 @@ export default function BlogPage() {
       slug: "toronto-basement-waterproofing-guide",
       excerpt: "Protect your Toronto home from water damage. Basement waterproofing methods, costs, signs of water problems, and qualified GTA contractors.",
       author: "Rachel Green",
-      publishedAt: "2024-12-25",
+      publishedAt: "2026-01-25",
       readTime: 9,
       category: "Basement",
       tags: ["toronto waterproofing", "basement", "water damage", "GTA contractors"],
       imageUrl: "https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Basement Waterproofing 2025 | Protection & Solutions",
+      seoTitle: "Toronto Basement Waterproofing 2026 | Protection & Solutions",
       seoDescription: "Protect your Toronto basement from water damage. Waterproofing methods, costs, prevention tips, and finding qualified GTA contractors."
     },
     {
@@ -208,12 +264,12 @@ export default function BlogPage() {
       slug: "toronto-landscaping-ideas-climate-plants",
       excerpt: "Create a beautiful Toronto yard that thrives in Ontario's climate. Native plants, hardscaping ideas, costs, and finding GTA landscapers.",
       author: "Daniel Brown",
-      publishedAt: "2024-12-22",
+      publishedAt: "2026-01-22",
       readTime: 8,
       category: "Landscaping",
       tags: ["toronto landscaping", "ontario plants", "GTA contractors", "garden design"],
       imageUrl: "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Landscaping Guide 2025 | Climate-Appropriate Plants & Ideas",
+      seoTitle: "Toronto Landscaping Guide 2026 | Climate-Appropriate Plants & Ideas",
       seoDescription: "Beautiful landscaping for Toronto homes. Native Ontario plants, hardscaping ideas, costs, and finding qualified GTA landscaping contractors."
     },
     {
@@ -222,12 +278,12 @@ export default function BlogPage() {
       slug: "toronto-window-replacement-guide",
       excerpt: "Upgrade your Toronto home's windows for better energy efficiency. Compare window types, costs, rebates, and top GTA window installers.",
       author: "Patricia Miller",
-      publishedAt: "2024-12-20",
+      publishedAt: "2026-01-20",
       readTime: 9,
       category: "Windows",
       tags: ["toronto windows", "energy savings", "window replacement", "GTA contractors"],
       imageUrl: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=800&h=500&fit=crop&q=80",
-      seoTitle: "Window Replacement Toronto 2025 | Energy-Efficient Options & Costs",
+      seoTitle: "Window Replacement Toronto 2026 | Energy-Efficient Options & Costs",
       seoDescription: "Replace your Toronto home windows for better efficiency. Types, costs, Ontario rebates, and finding qualified GTA window contractors."
     },
     {
@@ -236,26 +292,26 @@ export default function BlogPage() {
       slug: "toronto-home-insurance-renovations",
       excerpt: "Don't let renovations void your insurance! Learn how Toronto home improvements affect insurance, what to disclose, and protecting your investment.",
       author: "Steven Adams",
-      publishedAt: "2024-12-18",
+      publishedAt: "2026-01-18",
       readTime: 7,
       category: "Insurance",
       tags: ["toronto insurance", "home renovations", "ontario insurance", "GTA"],
       imageUrl: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Home Insurance & Renovations 2025 | What to Know",
+      seoTitle: "Toronto Home Insurance & Renovations 2026 | What to Know",
       seoDescription: "Protect your Toronto renovation investment. How home improvements affect insurance, what to disclose, and Ontario insurance requirements."
     },
     {
       id: "16",
-      title: "Toronto Condo Renovation Rules & Restrictions 2025",
+      title: "Toronto Condo Renovation Rules & Restrictions 2026",
       slug: "toronto-condo-renovation-rules",
       excerpt: "Planning a condo reno in Toronto? Learn about building rules, noise bylaws, insurance requirements, and working with property management in the GTA.",
       author: "Jessica Taylor",
-      publishedAt: "2024-12-15",
+      publishedAt: "2026-01-15",
       readTime: 10,
       category: "Contractor Tips",
       tags: ["toronto condo", "renovation rules", "GTA", "bylaws"],
       imageUrl: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Condo Renovation Rules 2025 | Complete Guide",
+      seoTitle: "Toronto Condo Renovation Rules 2026 | Complete Guide",
       seoDescription: "Navigate Toronto condo renovation rules. Building requirements, noise bylaws, insurance, and working with GTA condo boards."
     },
     {
@@ -264,12 +320,12 @@ export default function BlogPage() {
       slug: "smart-home-toronto-guide",
       excerpt: "Upgrade your Toronto home with smart technology. Best devices for Canadian climate, costs, installation, and finding qualified GTA integrators.",
       author: "Alex Kumar",
-      publishedAt: "2024-12-12",
+      publishedAt: "2026-01-12",
       readTime: 9,
       category: "Energy",
       tags: ["smart home", "toronto tech", "home automation", "GTA"],
       imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=500&fit=crop",
-      seoTitle: "Smart Home Tech Toronto 2025 | Installation Guide & Costs",
+      seoTitle: "Smart Home Tech Toronto 2026 | Installation Guide & Costs",
       seoDescription: "Transform your Toronto home with smart technology. Best devices, costs, installation tips, and finding GTA smart home contractors.",
       isDIY: true
     },
@@ -279,12 +335,12 @@ export default function BlogPage() {
       slug: "toronto-garage-conversion-ideas",
       excerpt: "Maximize your Toronto property with a garage conversion. Ideas, permits, costs, insulation for Ontario winters, and qualified GTA contractors.",
       author: "Ryan Murphy",
-      publishedAt: "2024-12-10",
+      publishedAt: "2026-01-10",
       readTime: 8,
       category: "Basement",
       tags: ["garage conversion", "toronto renovation", "GTA contractors", "home addition"],
       imageUrl: "https://images.unsplash.com/photo-1590845947670-c009801ffa74?w=800&h=500&fit=crop&q=80",
-      seoTitle: "Toronto Garage Conversion 2025 | Ideas, Permits & Costs",
+      seoTitle: "Toronto Garage Conversion 2026 | Ideas, Permits & Costs",
       seoDescription: "Convert your Toronto garage into living space. Design ideas, permits, insulation for Ontario climate, costs, and GTA contractors."
     },
     {
@@ -293,12 +349,12 @@ export default function BlogPage() {
       slug: "toronto-accessible-home-renovations",
       excerpt: "Make your Toronto home accessible for all ages. Bathroom modifications, ramps, wider doorways, Ontario grants, and specialized GTA contractors.",
       author: "Linda Martinez",
-      publishedAt: "2024-12-08",
+      publishedAt: "2026-01-08",
       readTime: 11,
       category: "Bathroom",
       tags: ["accessible renovation", "aging in place", "toronto", "ontario grants"],
       imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=500&fit=crop",
-      seoTitle: "Accessible Home Renovations Toronto 2025 | Aging in Place Guide",
+      seoTitle: "Accessible Home Renovations Toronto 2026 | Aging in Place Guide",
       seoDescription: "Create an accessible Toronto home. Modifications, Ontario grants, costs, and finding specialized GTA accessibility contractors."
     },
     {
@@ -307,12 +363,12 @@ export default function BlogPage() {
       slug: "toronto-foundation-repair-guide",
       excerpt: "Protect your Toronto home's foundation. Warning signs, repair methods, costs, preventing damage in freeze-thaw cycles, and expert GTA contractors.",
       author: "Michael O'Brien",
-      publishedAt: "2024-12-05",
+      publishedAt: "2026-01-05",
       readTime: 12,
       category: "Contractor Tips",
       tags: ["foundation repair", "toronto", "structural", "GTA contractors"],
       imageUrl: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&h=500&fit=crop",
-      seoTitle: "Foundation Repair Toronto 2025 | Signs, Costs & Prevention",
+      seoTitle: "Foundation Repair Toronto 2026 | Signs, Costs & Prevention",
       seoDescription: "Fix your Toronto home's foundation. Warning signs, repair methods, costs for Ontario climate, and qualified GTA foundation contractors."
     },
     {
@@ -321,12 +377,12 @@ export default function BlogPage() {
       slug: "toronto-outdoor-kitchen-design",
       excerpt: "Build the perfect outdoor kitchen for Toronto entertaining. Design ideas, weatherproofing for Ontario, costs, and finding skilled GTA contractors.",
       author: "Sophia Chen",
-      publishedAt: "2024-12-02",
+      publishedAt: "2026-01-02",
       readTime: 10,
       category: "Outdoor",
       tags: ["outdoor kitchen", "toronto backyard", "GTA", "entertaining"],
       imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=500&fit=crop",
-      seoTitle: "Outdoor Kitchen Toronto 2025 | Design Ideas & Costs",
+      seoTitle: "Outdoor Kitchen Toronto 2026 | Design Ideas & Costs",
       seoDescription: "Create an outdoor kitchen for your Toronto backyard. Design ideas, weatherproofing, costs, and finding qualified GTA contractors."
     },
     {
@@ -335,12 +391,12 @@ export default function BlogPage() {
       slug: "toronto-fire-safety-upgrades",
       excerpt: "Ensure your Toronto home meets fire code. Smoke alarms, sprinklers, escape routes, Ontario Building Code requirements, and qualified GTA contractors.",
       author: "David Wong",
-      publishedAt: "2024-11-28",
+      publishedAt: "2025-12-28",
       readTime: 8,
       category: "Contractor Tips",
       tags: ["fire safety", "building code", "toronto", "ontario"],
       imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=500&fit=crop&q=80",
-      seoTitle: "Fire Safety Upgrades Toronto 2025 | Code Requirements & Costs",
+      seoTitle: "Fire Safety Upgrades Toronto 2026 | Code Requirements & Costs",
       seoDescription: "Upgrade fire safety in your Toronto home. Ontario Building Code requirements, costs, and finding qualified GTA fire safety contractors."
     },
     {
@@ -349,12 +405,12 @@ export default function BlogPage() {
       slug: "toronto-home-office-renovation",
       excerpt: "Create the perfect Toronto home office. Design ideas, soundproofing, lighting, CRA tax deductions, and finding GTA renovation contractors.",
       author: "Caroline Lee",
-      publishedAt: "2024-11-25",
+      publishedAt: "2025-12-25",
       readTime: 9,
       category: "Basement",
       tags: ["home office", "toronto renovation", "tax deductions", "GTA"],
       imageUrl: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=500&fit=crop",
-      seoTitle: "Toronto Home Office Renovation 2025 | Design & Tax Guide",
+      seoTitle: "Toronto Home Office Renovation 2026 | Design & Tax Guide",
       seoDescription: "Build your dream Toronto home office. Design tips, soundproofing, CRA tax deductions, and qualified GTA contractors."
     },
     {
@@ -363,12 +419,12 @@ export default function BlogPage() {
       slug: "toronto-pool-installation-guide",
       excerpt: "Add a pool to your Toronto backyard. Compare pool types, installation costs, winterizing for Ontario, maintenance, and trusted GTA pool builders.",
       author: "James Mitchell",
-      publishedAt: "2024-11-22",
+      publishedAt: "2025-12-22",
       readTime: 11,
       category: "Outdoor",
       tags: ["pool installation", "toronto backyard", "GTA", "outdoor living"],
       imageUrl: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800&h=500&fit=crop",
-      seoTitle: "Pool Installation Toronto 2025 | Types, Costs & Winterizing",
+      seoTitle: "Pool Installation Toronto 2026 | Types, Costs & Winterizing",
       seoDescription: "Install a pool in your Toronto backyard. Types, costs, winterizing for Ontario, maintenance, and finding qualified GTA pool contractors."
     },
     {
@@ -377,17 +433,17 @@ export default function BlogPage() {
       slug: "toronto-historic-home-renovation",
       excerpt: "Renovate your historic Toronto home with care. Heritage permits, preserving character, modern upgrades, costs, and specialized GTA contractors.",
       author: "Margaret Thompson",
-      publishedAt: "2024-11-18",
+      publishedAt: "2025-12-18",
       readTime: 13,
       category: "Contractor Tips",
       tags: ["historic homes", "heritage", "toronto", "GTA renovation"],
       imageUrl: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=500&fit=crop",
-      seoTitle: "Historic Home Renovation Toronto 2025 | Heritage Preservation",
+      seoTitle: "Historic Home Renovation Toronto 2026 | Heritage Preservation",
       seoDescription: "Renovate your historic Toronto home. Heritage permits, preserving character, modern upgrades, and specialized GTA restoration contractors."
     }
   ];
 
-  const categories = ["all", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows"];
+  const categories = ["all", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows", "Insurance", "Permits", "Landscaping", "Painting"];
 
   const filteredPosts = selectedCategory === "all"
     ? blogPosts
@@ -429,7 +485,7 @@ export default function BlogPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">Toronto Home Renovation Blog</h1>
               <p className="text-lg md:text-xl text-orange-100 max-w-2xl">
                 Straightforward, experience-based guides written for real Toronto and GTA homeowners.
-                No fluff 	 just practical timelines, cost ranges, and decisions we see every week.
+                No fluff — just practical timelines, cost ranges, and decisions we see every week.
               </p>
             </div>
             <div className="hidden md:block">
@@ -438,17 +494,17 @@ export default function BlogPage() {
                 <div className="relative h-full w-full flex flex-col justify-between p-4 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">Trending this week</span>
-                    <span className="text-xs text-orange-100">Updated for 2025</span>
+                    <span className="text-xs text-orange-100">Updated for 2026</span>
                   </div>
                   <div className="space-y-2 text-xs text-orange-50">
                     <p>
-                      • Basement finishing timelines in Toronto
+                      • AI vs traditional renovation estimates
                     </p>
                     <p>
-                      • What contractors really look for in good leads
+                      • How QuoteXbert verifies contractors
                     </p>
                     <p>
-                      • DIY vs pro: when to call in help
+                      • Hidden costs in Toronto renovations
                     </p>
                   </div>
                 </div>

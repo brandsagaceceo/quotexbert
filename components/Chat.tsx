@@ -313,7 +313,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
             <button
               type="submit"
               disabled={!newMessage.trim()}
-              className="px-4 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-md hover:from-rose-600 hover:to-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0"
+              className="px-6 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-md hover:from-rose-600 hover:to-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed shrink-0 min-w-[80px] font-semibold"
             >
               Send
             </button>

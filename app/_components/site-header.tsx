@@ -13,10 +13,8 @@ export default function SiteHeader() {
   const { signOut } = useClerk();
 
   const navLinks = [
-    { href: "/", label: "Instant AI Estimate", highlight: true },
-    { href: "/ai-quote", label: "AI Quote Builder" },
+    { href: "/", label: "AI Estimate" },
     { href: "/blog", label: "Blog" },
-    { href: "/affiliates", label: "Affiliates" },
     { href: "/about", label: "About" },
   ];
 
@@ -33,84 +31,79 @@ export default function SiteHeader() {
           </div>
 
           {/* Desktop Navigation - BIGGER & MORE MODERN */}
-          <nav className="hidden lg:flex items-center space-x-2">
+          <nav className="hidden lg:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`${
-                  link.highlight 
-                    ? 'bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white px-4 py-2.5 rounded-xl font-bold shadow-lg hover:shadow-2xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-2 text-sm animate-pulse-glow' 
-                    : 'text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl font-semibold text-sm'
-                } transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2`}
+                className="text-gray-700 hover:text-rose-700 font-semibold text-sm transition-colors duration-200"
               >
-                {link.highlight && '✨ '}{link.label}
+                {link.label}
               </Link>
             ))}
           </nav>
 
           {/* Right Side Actions - BIGGER & MORE PROMINENT */}
-          <div className="hidden lg:flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-4">
             {/* Authentication */}
             {isSignedIn && user ? (
               <>
-                {/* Primary Action Button - BIGGER */}
+                {/* Primary Action Button */}
                 {user.role === 'homeowner' ? (
                   <Link
                     href="/create-lead"
-                    className="bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ring-2 ring-orange-400 ring-offset-2"
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                   >
-                    🏗️ Post Your Project
+                    Post Project
                   </Link>
                 ) : (
                   <Link
                     href="/contractor/jobs"
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ring-2 ring-green-400 ring-offset-2"
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                   >
-                    💼 See Jobs in Your Area
+                    Browse Jobs
                   </Link>
                 )}
 
-                {/* Messages with badge - BIGGER */}
+                {/* Secondary Navigation */}
                 <Link
                   href="/messages"
-                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 relative inline-flex items-center"
+                  className="text-gray-700 hover:text-rose-700 px-3 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Messages
                 </Link>
 
-                {/* Profile Menu - BIGGER */}
-                <div className="flex items-center space-x-2">
+                <NotificationBell />
+
+                {/* Profile Dropdown */}
+                <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
                   <Link
                     href="/profile"
-                    className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                    className="text-gray-700 hover:text-rose-700 px-3 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Profile
                   </Link>
                   <button
                     onClick={() => signOut()}
-                    className="text-gray-700 hover:text-red-700 hover:bg-red-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                    className="text-gray-600 hover:text-red-700 px-3 py-2 text-sm font-medium transition-colors duration-200"
                   >
                     Sign Out
                   </button>
                 </div>
-
-                {/* Notification Bell - FAR RIGHT */}
-                <NotificationBell />
               </>
             ) : (
               <>
                 <Link
                   href="/sign-in"
-                  className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                  className="text-gray-700 hover:text-rose-700 px-4 py-2 text-sm font-medium transition-colors duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2 ring-2 ring-orange-400 ring-offset-2"
+                  className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200"
                 >
-                  ✨ Get Started Free
+                  Get Started
                 </Link>
               </>
             )}
@@ -169,25 +162,21 @@ export default function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`block py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 rounded-md ${
-                    link.highlight
-                      ? 'bg-gradient-to-r from-rose-700 to-orange-600 text-white text-center px-3 py-2.5 rounded-lg font-bold shadow-md'
-                      : 'text-ink-700 hover:text-[var(--brand)]'
-                  }`}
+                  className="block py-2 text-sm font-medium text-gray-700 hover:text-rose-700 transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {link.highlight && '✨ '}{link.label}
+                  {link.label}
                 </Link>
               ))}
 
               {/* Mobile Auth */}
               {isSignedIn && user ? (
-                <div className="space-y-2.5 pt-3 border-t border-ink-200">
+                <div className="space-y-2.5 pt-3 border-t border-gray-200">
                   {/* Primary Action */}
                   {user.role === 'homeowner' ? (
                     <Link
                       href="/create-lead"
-                      className="block bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
+                      className="block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Post Project
@@ -195,17 +184,17 @@ export default function SiteHeader() {
                   ) : (
                     <Link
                       href="/contractor/jobs"
-                      className="block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
+                      className="block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      💼 Find Jobs
+                      Browse Jobs
                     </Link>
                   )}
                   
                   {/* Messages */}
                   <Link
                     href="/messages"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    className="block text-gray-700 hover:text-rose-700 py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Messages
@@ -213,7 +202,7 @@ export default function SiteHeader() {
 
                   <Link
                     href="/notifications"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    className="block text-gray-700 hover:text-rose-700 py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Notifications
@@ -222,7 +211,7 @@ export default function SiteHeader() {
                   {/* Profile */}
                   <Link
                     href="/profile"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    className="block text-gray-700 hover:text-rose-700 py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Profile
@@ -240,17 +229,17 @@ export default function SiteHeader() {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-2.5 pt-3 border-t border-ink-200">
+                <div className="space-y-2.5 pt-3 border-t border-gray-200">
                   <Link
                     href="/sign-in"
-                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    className="block text-gray-700 hover:text-rose-700 py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="block w-full bg-[var(--brand)] hover:bg-[var(--brand-dark)] text-white text-center px-3 py-2.5 rounded-[var(--radius-button)] text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
+                    className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Get Started
