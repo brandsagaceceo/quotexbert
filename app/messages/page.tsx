@@ -178,12 +178,12 @@ export default function MessagesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
           <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-[calc(100vh-240px)] lg:max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
+            <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
-              <div className="p-6 border-b border-slate-200/50 flex-shrink-0">
+              <div className="p-5 border-b border-gray-200 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-slate-900">Conversations</h2>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-red-400 flex items-center justify-center">
+                  <h2 className="text-lg font-semibold text-slate-900">Conversations</h2>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-rose-600 to-orange-600 flex items-center justify-center">
                     <ChatBubbleLeftRightIcon className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function MessagesPage() {
                     placeholder="Search conversations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-200 placeholder-slate-400"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 placeholder-slate-400"
                   />
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,16 +272,20 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={thread.id}
-                          className={`group relative p-4 cursor-pointer rounded-xl transition-all duration-200 hover:bg-slate-50 ${
+                          onClick={() => setSelectedThread(thread)}
+                          className={`group relative p-4 cursor-pointer rounded-lg transition-all duration-200 ${
                             isSelected 
-                              ? 'bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 shadow-sm' 
-                              : 'hover:shadow-sm'
+                              ? 'bg-rose-50 border-l-4 border-rose-600 shadow-sm' 
+                              : 'hover:bg-slate-50 border-l-4 border-transparent'
                           }`}
                         >
                           {/* Delete Button */}
                           <button
-                            onClick={(e) => deleteThread(thread.id, e)}
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all duration-200 transform hover:scale-105 z-10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteThread(thread.id, e);
+                            }}
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 w-7 h-7 rounded-md bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all duration-200 z-20"
                             title="Delete conversation"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,13 +293,10 @@ export default function MessagesPage() {
                             </svg>
                           </button>
 
-                          <div 
-                            onClick={() => setSelectedThread(thread)}
-                            className="flex items-start space-x-3"
-                          >
+                          <div className="flex items-start space-x-3">
                             {/* Avatar */}
                             <div className="flex-shrink-0">
-                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center shadow-md">
+                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center shadow-sm">
                                 <UserCircleIcon className="w-6 h-6 text-white" />
                               </div>
                             </div>
@@ -327,8 +328,6 @@ export default function MessagesPage() {
                                 </p>
                               )}
                             </div>
-                            
-                          </div>
                         </div>
                       );
                     })}
@@ -341,7 +340,7 @@ export default function MessagesPage() {
           {/* Modern Chat Area */}
           <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
                 <div className="lg:hidden px-4 py-3">
                   <button
                     onClick={() => setSelectedThread(null)}
@@ -360,10 +359,10 @@ export default function MessagesPage() {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center relative z-10 h-full">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 flex items-center justify-center relative z-10 h-full">
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                    <ChatBubbleLeftRightIcon className="w-12 h-12 text-slate-400" />
+                  <div className="w-20 h-20 mx-auto mb-5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                    <ChatBubbleLeftRightIcon className="w-10 h-10 text-slate-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-700 mb-2">Welcome to Messages</h3>
                   <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">
