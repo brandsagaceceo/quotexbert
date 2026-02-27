@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     siteName: "QuoteXbert",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "QuoteXbert - Instant Home Renovation Estimates in Toronto & GTA"
@@ -87,15 +87,15 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "QuoteXbert - AI Home Renovation Estimates Toronto & GTA",
     description: "Get instant AI renovation estimates. Connect with verified GTA contractors. Upload photos, receive accurate quotes in minutes.",
-    images: ["/og-image.jpg"],
+    images: ["/twitter-image.svg"],
     creator: "@quotexbert",
   },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "/icon.svg",
   },
   alternates: {
     canonical: "https://www.quotexbert.com"
@@ -151,7 +151,7 @@ export default function RootLayout({
                   "url": "https://www.quotexbert.com",
                   "logo": {
                     "@type": "ImageObject",
-                    "url": "https://www.quotexbert.com/logo.png"
+                    "url": "https://www.quotexbert.com/icon.svg"
                   },
                   "contactPoint": {
                     "@type": "ContactPoint",
@@ -163,7 +163,7 @@ export default function RootLayout({
                 {
                   "@type": "LocalBusiness",
                   "name": "QuoteXbert - Toronto Home Renovation Quotes",
-                  "image": "https://www.quotexbert.com/og-image.jpg",
+                  "image": "https://www.quotexbert.com/og-image.svg",
                   "url": "https://www.quotexbert.com",
                   "telephone": "+1-416-XXX-XXXX",
                   "priceRange": "$$",

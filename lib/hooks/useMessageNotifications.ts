@@ -70,8 +70,8 @@ export function useMessageNotifications(options: MessageNotificationOptions = {}
 
     try {
       const notification = new Notification(title, {
-        icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
+        icon: '/icon.svg',
+        badge: '/favicon.svg',
         ...options
       });
 
@@ -103,7 +103,7 @@ export function useMessageNotifications(options: MessageNotificationOptions = {}
       if (notification) {
         notification.onclick = () => {
           window.focus();
-          window.location.href = '/conversations';
+          window.location.href = `/messages?threadId=${conversationId}`;
         };
       }
     }

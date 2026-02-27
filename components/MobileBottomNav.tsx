@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useUnreadMessageCount } from "@/lib/hooks/useUnreadMessageCount";
 import {
   Home,
   Search,
@@ -19,14 +18,12 @@ interface NavItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   active: boolean;
-  badge?: number;
   isAction?: boolean;
 }
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isSignedIn, authUser } = useAuth();
-  const { unreadCount } = useUnreadMessageCount();
 
   if (!isSignedIn || !authUser) {
     return null;
@@ -56,8 +53,7 @@ export default function MobileBottomNav() {
       href: "/messages",
       label: "Messages",
       icon: MessageCircle,
-      active: pathname === "/messages",
-      badge: unreadCount
+      active: pathname === "/messages"
     },
     {
       href: "/profile",
@@ -90,8 +86,7 @@ export default function MobileBottomNav() {
       href: "/messages",
       label: "Messages",
       icon: MessageCircle,
-      active: pathname === "/messages",
-      badge: unreadCount
+      active: pathname === "/messages"
     },
     {
       href: "/profile",
@@ -132,11 +127,6 @@ export default function MobileBottomNav() {
             >
               <div className="relative inline-flex items-center gap-1">
                 <Icon className={`h-5 w-5 ${item.isAction ? "h-6 w-6" : ""}`} />
-                {item.badge && item.badge > 0 && (
-                  <div className="bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center min-w-[16px] flex-shrink-0">
-                    {item.badge > 9 ? "9+" : item.badge}
-                  </div>
-                )}
               </div>
               <span className={`text-xs mt-1 font-medium ${item.isAction ? "text-xs" : "text-[10px]"}`}>
                 {item.label}

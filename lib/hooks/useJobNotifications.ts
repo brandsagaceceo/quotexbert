@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 
 export interface Job {
   id: string;
@@ -27,8 +27,9 @@ export function useJobNotifications(options: UseJobNotificationsOptions = {}) {
     onNewJob
   } = options;
 
-  const [lastChecked, setLastChecked] = useState<Date>(new Date());
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const seenJobIdsRef = useRef<Set<string>>(new Set());
+  const initializedRef = useRef(false);
 
   // Initialize audio on mount
   useEffect(() => {
@@ -70,11 +71,16 @@ export function useJobNotifications(options: UseJobNotificationsOptions = {}) {
       const data = await response.json();
       const jobs: Job[] = data.jobs || [];
 
-      // Find jobs posted after last check
-      const newJobs = jobs.filter(job => {
-        const jobDate = new Date(job.createdAt);
-        return jobDate > lastChecked;
-      });
+      if (!initializedRef.current) {
+        jobs.forEach((job) => seenJobIdsRef.current.add(job.id));
+        initializedRef.current = true;
+        return;
+      }
+
+      // Find jobs not seen yet
+      const newJobs = jobs.filter((job) => !seenJobIdsRef.current.has(job.id));
+
+      newJobs.forEach((job) => seenJobIdsRef.current.add(job.id));
 
       if (newJobs.length > 0) {
         // Play notification sound
@@ -88,13 +94,11 @@ export function useJobNotifications(options: UseJobNotificationsOptions = {}) {
         newJobs.forEach(job => {
           onNewJob?.(job);
         });
-
-        setLastChecked(new Date());
       }
     } catch (error) {
       console.error('Error checking for new jobs:', error);
     }
-  }, [enabled, userId, lastChecked, onNewJob]);
+  }, [enabled, userId, onNewJob]);
 
   // Poll for new jobs
   useEffect(() => {

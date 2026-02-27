@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
 import LoadingState from "@/components/ui/LoadingState";
-import { ChatBubbleLeftRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftRightIcon, UserCircleIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 interface Message {
   id: string;
@@ -49,8 +49,15 @@ export default function MessagesPage() {
   // Auto-select thread from URL parameter
   useEffect(() => {
     const threadId = searchParams.get('threadId');
-    if (threadId && threads.length > 0) {
-      const targetThread = threads.find(thread => thread.id === threadId);
+    const leadId = searchParams.get('leadId');
+
+    if (threads.length > 0) {
+      const targetThread = threadId
+        ? threads.find(thread => thread.id === threadId)
+        : leadId
+          ? threads.find(thread => thread.lead.id === leadId)
+          : null;
+
       if (targetThread) {
         setSelectedThread(targetThread);
       }
@@ -170,7 +177,7 @@ export default function MessagesPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
-          <div className="lg:col-span-4 xl:col-span-3 flex flex-col min-h-0 h-full max-h-[calc(100vh-240px)] lg:max-h-full">
+          <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-[calc(100vh-240px)] lg:max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
               <div className="p-6 border-b border-slate-200/50 flex-shrink-0">
@@ -321,10 +328,6 @@ export default function MessagesPage() {
                               )}
                             </div>
                             
-                            {/* Unread indicator */}
-                            {lastMessage && Math.random() > 0.7 && (
-                              <div className="w-2 h-2 bg-orange-400 rounded-full flex-shrink-0"></div>
-                            )}
                           </div>
                         </div>
                       );
@@ -336,10 +339,25 @@ export default function MessagesPage() {
           </div>
 
           {/* Modern Chat Area */}
-          <div className="lg:col-span-8 xl:col-span-9 flex flex-col min-h-0">
+          <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
-                <Chat thread={selectedThread} currentUserId={user?.id} />
+                <div className="lg:hidden border-b border-slate-200 px-4 py-3">
+                  <button
+                    onClick={() => setSelectedThread(null)}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700"
+                  >
+                    <ArrowLeftIcon className="h-4 w-4" />
+                    Back to conversations
+                  </button>
+                </div>
+                {user?.id ? (
+                  <Chat thread={selectedThread} currentUserId={user.id} />
+                ) : (
+                  <div className="flex items-center justify-center h-full p-4">
+                    <div className="text-center text-slate-500">Loading user information...</div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex items-center justify-center relative z-10 h-full">

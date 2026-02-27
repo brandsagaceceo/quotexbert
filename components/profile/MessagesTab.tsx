@@ -84,7 +84,7 @@ export default function MessagesTab({ contractorId }: { contractorId: string }) 
       {conversations.map((conversation) => (
         <Link
           key={conversation.id}
-          href={`/conversations/${conversation.jobId}`}
+          href={`/messages?leadId=${conversation.jobId}`}
           className="block bg-white border-2 border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all hover:border-rose-300"
         >
           <div className="flex items-start gap-4">

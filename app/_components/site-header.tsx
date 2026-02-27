@@ -3,15 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useUnreadMessageCount } from "@/lib/hooks/useUnreadMessageCount";
-import { UnreadBadge } from "./UnreadBadge";
 import Logo from "@/components/Logo";
+import NotificationBell from "@/components/NotificationBell";
 import { useClerk } from "@clerk/nextjs";
 
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isSignedIn, authUser: user } = useAuth();
-  const { unreadCount } = useUnreadMessageCount();
   const { signOut } = useClerk();
 
   const navLinks = [
@@ -79,8 +77,9 @@ export default function SiteHeader() {
                   className="text-gray-700 hover:text-rose-700 hover:bg-rose-50 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 relative inline-flex items-center"
                 >
                   Messages
-                  <UnreadBadge count={unreadCount} className="ml-2" />
                 </Link>
+
+                <NotificationBell />
 
                 {/* Profile Menu - BIGGER */}
                 <div className="flex items-center space-x-2">
@@ -205,11 +204,18 @@ export default function SiteHeader() {
                   {/* Messages */}
                   <Link
                     href="/messages"
-                    className="flex items-center justify-between text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span>Messages</span>
-                    <UnreadBadge count={unreadCount} />
+                    Messages
+                  </Link>
+
+                  <Link
+                    href="/notifications"
+                    className="block text-ink-700 hover:text-[var(--brand)] py-2 text-sm font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Notifications
                   </Link>
                   
                   {/* Profile */}

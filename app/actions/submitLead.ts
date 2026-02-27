@@ -4,6 +4,7 @@ import { z } from "zod";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { sendLeadEmail } from "@/lib/email";
+import { NotificationService } from "@/lib/notifications";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 // Canadian postal code regex (case-insensitive, space optional)
@@ -429,6 +430,21 @@ export async function submitLead(formData: FormData) {
     } catch (emailError) {
       console.error(`[submitLead:${requestId}] Email notification error:`, emailError);
       // Don't fail the request if email fails
+    }
+
+    // Notify contractors about the new job
+    try {
+      await NotificationService.notifyAllContractors({
+        leadId: lead.id,
+        title: data.title,
+        description: data.description,
+        budget: finalBudget,
+        city: data.postalCode,
+      });
+      console.log(`[submitLead:${requestId}] Contractor notifications sent`);
+    } catch (notificationError) {
+      console.error(`[submitLead:${requestId}] Contractor notification error:`, notificationError);
+      // Don't fail lead creation if notifications fail
     }
 
     return {

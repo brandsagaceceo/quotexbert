@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useMessageNotifications } from "@/lib/hooks/useMessageNotifications";
 
 interface Message {
   id: string;
@@ -29,7 +30,7 @@ interface Thread {
 
 interface ChatProps {
   thread: Thread;
-  currentUserId: string;
+  currentUserId?: string;
 }
 
 export default function Chat({ thread, currentUserId }: ChatProps) {
@@ -42,6 +43,24 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
   const [contractorHired, setContractorHired] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const lastMessageIdRef = useRef<string | null>(null);
+
+  const { notifyNewMessage } = useMessageNotifications({
+    enabled: true,
+    soundEnabled: true,
+    browserNotificationsEnabled: true,
+  });
+
+  // Early return if no currentUserId - AFTER all hooks
+  if (!currentUserId) {
+    return (
+      <div className="flex items-center justify-center h-full p-4">
+        <div className="text-center text-gray-500">
+          Please sign in to view messages
+        </div>
+      </div>
+    );
+  }
 
   // Computed values (not hooks)
   const otherUser =
@@ -62,6 +81,24 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
       const response = await fetch(`/api/threads/${thread.id}/messages`);
       if (response.ok) {
         const data = await response.json();
+        const latestMessage = data.messages[data.messages.length - 1];
+        if (
+          latestMessage &&
+          lastMessageIdRef.current &&
+          latestMessage.id !== lastMessageIdRef.current &&
+          latestMessage.fromUser.id !== currentUserId
+        ) {
+          notifyNewMessage(
+            latestMessage.fromUser.email,
+            latestMessage.body.substring(0, 120),
+            thread.id
+          );
+        }
+
+        if (latestMessage) {
+          lastMessageIdRef.current = latestMessage.id;
+        }
+
         setMessages(data.messages);
       }
     } catch (error) {
@@ -69,7 +106,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     } finally {
       setLoading(false);
     }
-  }, [thread.id]);
+  }, [thread.id, currentUserId, notifyNewMessage]);
 
   const scrollToBottom = useCallback(() => {
     if (shouldScrollToBottom && messagesContainerRef.current) {

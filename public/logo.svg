@@ -1,116 +1,16 @@
-<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Burgundy to Orange gradient -->
-    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#800020"/>
-      <stop offset="50%" stop-color="#9f1239"/>
-      <stop offset="100%" stop-color="#ea580c"/>
-    </linearGradient>
-    
-    <!-- Strong shadow for depth -->
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.4"/>
-    </filter>
-    
-    <!-- Glow effect -->
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  
-  <!-- Background circle with shadow -->
-  <circle cx="40" cy="40" r="37" fill="white" filter="url(#shadow)"/>
-  
-  <!-- Outer ring with gradient -->
-  <circle cx="40" cy="40" r="35" fill="none" stroke="url(#brandGradient)" stroke-width="4"/>
-  
-  <!-- Q Letter - BIGGER and BOLDER -->
-  <text x="40" y="50" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="900" text-anchor="middle" dominant-baseline="central" fill="url(#brandGradient)" letter-spacing="-2" filter="url(#glow)">Q</text>
-  
-  <!-- Accent dots for visual interest -->
-  <circle cx="52" cy="52" r="3" fill="#ea580c" opacity="0.8"/>
-  <circle cx="28" cy="28" r="2" fill="#800020" opacity="0.6"/>
-</svg>
-  <ellipse cx="39" cy="61" rx="5" ry="2.5" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.5"/>
-  <ellipse cx="24" cy="60" rx="3" ry="1.5" fill="#555555" opacity="0.6"/>
-  <ellipse cx="38" cy="60" rx="3" ry="1.5" fill="#555555" opacity="0.6"/>
-  
-  <!-- Robot Body with realistic cylindrical shape -->
-  <ellipse cx="32" cy="40" rx="12" ry="14" fill="url(#orangeBody)" stroke="#BF360C" stroke-width="1"/>
-  <!-- Body highlight for 3D effect -->
-  <ellipse cx="29" cy="35" rx="8" ry="10" fill="#FF8F65" opacity="0.6"/>
-  <!-- Body panel lines -->
-  <path d="M22 35 Q32 38 42 35" stroke="#D84315" stroke-width="0.8" fill="none"/>
-  <path d="M22 42 Q32 45 42 42" stroke="#D84315" stroke-width="0.8" fill="none"/>
-  
-  <!-- Control Panel with realistic depth -->
-  <rect x="26" y="38" width="12" height="8" rx="2" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.8"/>
-  <rect x="27" y="39" width="10" height="6" rx="1" fill="#1A1A1A"/>
-  <!-- Control buttons with glow -->
-  <circle cx="29" cy="42" r="1.5" fill="url(#eyeGlow)" stroke="#FF8F00" stroke-width="0.3"/>
-  <circle cx="35" cy="42" r="1.5" fill="url(#eyeGlow)" stroke="#FF8F00" stroke-width="0.3"/>
-  <!-- Button highlights -->
-  <circle cx="28.5" cy="41.5" r="0.8" fill="#FFEB3B" opacity="0.8"/>
-  <circle cx="34.5" cy="41.5" r="0.8" fill="#FFEB3B" opacity="0.8"/>
-  
-  <!-- Robot Arms with realistic proportions -->
-  <ellipse cx="15" cy="42" rx="5" ry="8" fill="url(#orangeBody)" stroke="#BF360C" stroke-width="0.8"/>
-  <ellipse cx="49" cy="42" rx="5" ry="8" fill="url(#orangeBody)" stroke="#BF360C" stroke-width="0.8"/>
-  <!-- Arm highlights -->
-  <ellipse cx="14" cy="39" rx="3" ry="5" fill="#FF8F65" opacity="0.7"/>
-  <ellipse cx="48" cy="39" rx="3" ry="5" fill="#FF8F65" opacity="0.7"/>
-  <!-- Arm joints -->
-  <circle cx="15" cy="46" r="2" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.5"/>
-  <circle cx="49" cy="46" r="2" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.5"/>
-  
-  <!-- Robot Hands -->
-  <circle cx="15" cy="50" r="3.5" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.8"/>
-  <circle cx="49" cy="50" r="3.5" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.8"/>
-  <circle cx="14" cy="49" r="2" fill="#555555" opacity="0.8"/>
-  <circle cx="48" cy="49" r="2" fill="#555555" opacity="0.8"/>
-  
-  <!-- House-shaped Head with realistic architecture -->
-  <path d="M16 28 L32 16 L48 28 L48 32 L16 32 Z" fill="url(#roofGrad)" stroke="#3E2723" stroke-width="1"/>
-  <!-- Roof texture lines -->
-  <path d="M20 26 L32 18 L44 26" stroke="#8D6E63" stroke-width="0.5" opacity="0.7"/>
-  <path d="M18 27 L32 19 L46 27" stroke="#6D4C41" stroke-width="0.3" opacity="0.5"/>
-  
-  <!-- House body/head -->
-  <rect x="16" y="28" width="32" height="12" rx="1" fill="url(#headMetal)" stroke="#212121" stroke-width="1"/>
-  <!-- Head panel lines for realism -->
-  <line x1="18" y1="30" x2="46" y2="30" stroke="#8A8A8A" stroke-width="0.3" opacity="0.6"/>
-  <line x1="18" y1="34" x2="46" y2="34" stroke="#8A8A8A" stroke-width="0.3" opacity="0.6"/>
-  <line x1="18" y1="38" x2="46" y2="38" stroke="#8A8A8A" stroke-width="0.3" opacity="0.6"/>
-  
-  <!-- Chimney with realistic brick texture -->
-  <rect x="40" y="14" width="5" height="10" rx="0.5" fill="url(#roofGrad)" stroke="#3E2723" stroke-width="0.8"/>
-  <rect x="40.5" y="14.5" width="4" height="1.5" fill="#8D6E63" opacity="0.8"/>
-  <rect x="40.5" y="16.5" width="4" height="1.5" fill="#6D4C41" opacity="0.6"/>
-  
-  <!-- Antenna/Speaker details on head sides -->
-  <circle cx="12" cy="30" r="2.5" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.6"/>
-  <circle cx="52" cy="30" r="2.5" fill="url(#darkMetal)" stroke="#212121" stroke-width="0.6"/>
-  <circle cx="12" cy="30" r="1.5" fill="#FF6B35" opacity="0.8"/>
-  <circle cx="52" cy="30" r="1.5" fill="#FF6B35" opacity="0.8"/>
-  
-  <!-- Glowing Eyes with realistic depth -->
-  <circle cx="25" cy="32" r="4" fill="url(#eyeGlow)" stroke="#E65100" stroke-width="1"/>
-  <circle cx="39" cy="32" r="4" fill="url(#eyeGlow)" stroke="#E65100" stroke-width="1"/>
-  <!-- Eye lenses -->
-  <circle cx="25" cy="32" r="3" fill="#FFC107" opacity="0.9"/>
-  <circle cx="39" cy="32" r="3" fill="#FFC107" opacity="0.9"/>
-  <!-- Eye highlights for glassy look -->
-  <circle cx="26" cy="30" r="1.5" fill="#FFFFFF" opacity="0.9"/>
-  <circle cx="40" cy="30" r="1.5" fill="#FFFFFF" opacity="0.9"/>
-  <!-- Eye pupils -->
-  <circle cx="25" cy="32" r="1" fill="#1A1A1A"/>
-  <circle cx="39" cy="32" r="1" fill="#1A1A1A"/>
-  
-  <!-- Robot mouth with subtle expression -->
-  <path d="M28 36 Q32 38 36 36" stroke="#424242" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-  <path d="M29 36.5 Q32 37.5 35 36.5" stroke="#616161" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="QuoteXbert logo">
+  <circle cx="40" cy="40" r="38" fill="#800020"/>
+  <circle cx="40" cy="40" r="35" fill="none" stroke="#a0002a" stroke-width="2"/>
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="Inter, Arial, sans-serif"
+    font-size="44"
+    font-weight="800"
+    fill="#ffffff"
+  >
+    Q
+  </text>
 </svg>

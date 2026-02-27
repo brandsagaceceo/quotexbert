@@ -93,7 +93,7 @@ function createMessageReceivedTemplate(preview: string, threadId: string): strin
           <div class="content">
             <h2>You have a new message</h2>
             <p>${preview}</p>
-            <a href="${baseUrl}/messages?thread=${threadId}" class="button">View Message</a>
+            <a href="${baseUrl}/messages?threadId=${threadId}" class="button">View Message</a>
           </div>
           <div class="footer">
             <p>This email was sent by Quotexbert. Visit your <a href="${baseUrl}/messages">messages</a> to manage notifications.</p>
