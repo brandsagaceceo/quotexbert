@@ -100,7 +100,7 @@ export default function MobileBottomNav() {
 
   return (
     <div 
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white z-50"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         '--bottom-nav-height': '64px',

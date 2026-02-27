@@ -22,7 +22,7 @@ export default function SiteHeader() {
 
   return (
     <header 
-      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl shadow-sm"
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl"
       style={{ '--header-height': '64px' } as React.CSSProperties}
     >
       <div className="container mx-auto">
@@ -162,7 +162,7 @@ export default function SiteHeader() {
 
         {/* Mobile Navigation - Slide down panel */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-ink-200 shadow-lg">
+          <div className="md:hidden bg-white shadow-lg">
             <div className="px-3 py-4 space-y-3">
               {navLinks.map((link) => (
                 <Link
