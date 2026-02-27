@@ -79,8 +79,6 @@ export default function SiteHeader() {
                   Messages
                 </Link>
 
-                <NotificationBell />
-
                 {/* Profile Menu - BIGGER */}
                 <div className="flex items-center space-x-2">
                   <Link
@@ -96,6 +94,9 @@ export default function SiteHeader() {
                     Sign Out
                   </button>
                 </div>
+
+                {/* Notification Bell - FAR RIGHT */}
+                <NotificationBell />
               </>
             ) : (
               <>

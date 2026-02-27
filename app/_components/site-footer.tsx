@@ -83,7 +83,7 @@ export default function SiteFooter() {
         </div>
 
         {/* Social Media Links */}
-        <div className="border-t border-ink-200 mt-8 pt-8">
+        <div className="mt-8 pt-8">
           <div className="flex justify-center items-center gap-6 mb-6">
             <a
               href="https://www.tiktok.com/@quotexbert"

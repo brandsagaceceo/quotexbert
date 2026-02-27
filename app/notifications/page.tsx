@@ -258,7 +258,7 @@ export default function NotificationsPage() {
 
                 return (
                   <div key={groupName}>
-                    <div className="px-5 py-3 bg-gray-50 border-y border-gray-100 text-xs font-bold uppercase tracking-wide text-gray-600">
+                    <div className="px-5 py-3 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-600">
                       {groupName}
                     </div>
                     <ul>

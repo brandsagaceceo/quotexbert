@@ -685,7 +685,7 @@ export default function UnifiedProfilePage() {
         </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
+      <div className="bg-white sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
         <div className="container mx-auto">
           {/* Mobile: Scrollable pill tabs */}
           <nav className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">

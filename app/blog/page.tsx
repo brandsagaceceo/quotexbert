@@ -458,7 +458,7 @@ export default function BlogPage() {
         </section>
 
         {/* Category Filter */}
-        <section className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <section className="bg-white sticky top-0 z-10">
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (

@@ -378,7 +378,7 @@ export default function ConversationsPage() {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50">
       <div className="h-screen flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="bg-white px-6 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ChatBubbleLeftRightIcon className="w-8 h-8 text-rose-700" />
@@ -413,7 +413,7 @@ export default function ConversationsPage() {
             {/* Conversations Sidebar */}
             <div className="bg-white border-r border-gray-200 flex flex-col h-full">
               {/* Search */}
-              <div className="p-4 border-b border-gray-200">{/* Search */}
+              <div className="p-4">{/* Search */}
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -504,7 +504,7 @@ export default function ConversationsPage() {
               {selectedConversation ? (
                 <>
                   {/* Chat Header */}
-                  <div className="px-6 py-4 border-b border-gray-100 bg-white shadow-sm">
+                  <div className="px-6 py-4 bg-white">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="relative">
@@ -645,7 +645,7 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                   </div>
 
                   {/* Input Area */}
-                  <form onSubmit={sendMessage} className="p-4 bg-white border-t border-gray-100 shadow-lg">
+                  <form onSubmit={sendMessage} className="p-4 bg-white">
                     {/* Error Message */}
                     {sendError && (
                       <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">

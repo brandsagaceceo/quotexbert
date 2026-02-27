@@ -217,39 +217,39 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full transition-colors"
+        className="relative p-2.5 text-gray-700 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M15 17h5l-5 5v-5zM6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6zM8 18v-1a6 6 0 1112 0v1"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
 
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-            {unreadCount > 9 ? "9+" : unreadCount}
+          <span className="absolute -top-1 -right-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold px-1.5 shadow-md">
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+        <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-[500px] overflow-hidden">
+          <div className="px-5 py-4 bg-gradient-to-r from-rose-50 to-orange-50 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                className="text-sm text-rose-600 hover:text-rose-700 font-semibold hover:bg-white px-3 py-1 rounded-lg transition-all"
               >
                 Mark all read
               </button>
             )}
           </div>
 
-          <div className="px-3 py-2 border-b border-gray-100 flex flex-wrap gap-1.5">
+          <div className="px-3 py-3 bg-white flex flex-wrap gap-2">
             {([
               { key: "all", label: "All" },
               { key: "unread", label: "Unread" },
@@ -259,10 +259,10 @@ export default function NotificationBell() {
               <button
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
-                className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeFilter === filter.key
-                    ? "bg-rose-700 text-white border-rose-700"
-                    : "bg-white text-gray-700 border-gray-300"
+                    ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 {filter.label}
@@ -270,13 +270,13 @@ export default function NotificationBell() {
             ))}
           </div>
 
-          <div className="max-h-64 overflow-y-auto">
+          <div className="max-h-[340px] overflow-y-auto">
             {filteredNotifications.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
+              <div className="p-8 text-center text-gray-500">
+                <svg className="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                <p>No notifications yet</p>
+                <p className="font-medium">No notifications</p>
               </div>
             ) : (
               (["Today", "Yesterday", "Earlier"] as const).map((groupName) => {
@@ -285,14 +285,14 @@ export default function NotificationBell() {
 
                 return (
                   <div key={groupName}>
-                    <div className="px-4 py-2 bg-gray-50 border-y border-gray-100 text-[11px] font-bold uppercase tracking-wide text-gray-600">
+                    <div className="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 text-[11px] font-extrabold uppercase tracking-wider text-gray-700">
                       {groupName}
                     </div>
                     {groupItems.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          !notification.read ? "bg-red-50" : ""
+                        className={`p-4 hover:bg-rose-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0 ${
+                          !notification.read ? "bg-rose-50/50" : "bg-white"
                         }`}
                         onClick={() => handleNotificationClick(notification)}
                       >
@@ -325,15 +325,15 @@ export default function NotificationBell() {
           </div>
 
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-200">
+            <div className="px-4 py-3 bg-gray-50">
               <button
                 onClick={() => {
                   setIsOpen(false);
                   window.location.href = "/notifications";
                 }}
-                className="w-full text-center text-sm text-red-600 hover:text-red-700 font-medium"
+                className="w-full text-center text-sm text-rose-600 hover:text-white hover:bg-gradient-to-r hover:from-rose-600 hover:to-orange-600 font-bold py-2 rounded-lg transition-all"
               >
-                View all notifications
+                View all notifications →
               </button>
             </div>
           )}
