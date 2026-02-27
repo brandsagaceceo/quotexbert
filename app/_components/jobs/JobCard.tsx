@@ -74,7 +74,7 @@ export default function JobCard({
     <div className="bg-white border border-ink-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-200">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-lg font-semibold text-ink-900">
               {lead.projectType}
@@ -86,15 +86,15 @@ export default function JobCard({
             )}
           </div>
 
-          <div className="flex items-center gap-4 text-sm text-ink-600 mb-2">
+          <div className="flex items-center gap-4 text-sm text-ink-600 mb-2 flex-wrap">
             <span>{timeAgo}</span>
             {location && <span>{location}</span>}
             {budget && <span className="font-medium text-brand">{budget}</span>}
           </div>
         </div>
 
-        <div className="text-right">
-          <div className="text-lg font-bold text-brand">{lead.estimate}</div>
+        <div className="text-right flex-shrink-0 ml-4">
+          <div className="inline-block px-3 py-1.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-base rounded-lg shadow-sm">{lead.estimate}</div>
         </div>
       </div>
 

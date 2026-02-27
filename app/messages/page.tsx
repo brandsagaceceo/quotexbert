@@ -342,7 +342,7 @@ export default function MessagesPage() {
           <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
               <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
-                <div className="lg:hidden border-b border-slate-200 px-4 py-3">
+                <div className="lg:hidden px-4 py-3">
                   <button
                     onClick={() => setSelectedThread(null)}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700"
