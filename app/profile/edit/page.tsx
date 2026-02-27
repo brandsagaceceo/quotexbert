@@ -42,6 +42,7 @@ export default function ProfileEditorPage() {
   
   const [profile, setProfile] = useState<ContractorProfile | null>(null);
   const [formData, setFormData] = useState({
+    displayName: "",
     companyName: "",
     trade: "",
     bio: "",
@@ -77,6 +78,7 @@ export default function ProfileEditorPage() {
         const data = await response.json();
         setProfile(data.profile);
         setFormData({
+          displayName: user?.name || "",
           companyName: data.profile.companyName || "",
           trade: data.profile.trade || "",
           bio: data.profile.bio || "",
@@ -185,6 +187,26 @@ export default function ProfileEditorPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Display Name */}
+            <div>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-300 mb-2">
+                Display Name *
+              </label>
+              <input
+                type="text"
+                id="displayName"
+                name="displayName"
+                value={formData.displayName}
+                onChange={handleInputChange}
+                required
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                placeholder="How you want to appear to clients (instead of email)"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                This name will be shown to clients instead of your email address
+              </p>
+            </div>
+
             {/* Company Name */}
             <div>
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-300 mb-2">

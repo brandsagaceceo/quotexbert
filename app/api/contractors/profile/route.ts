@@ -57,7 +57,8 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const validatedData = contractorProfileSchema.parse(body);
+    const { displayName, ...contractorData } = body;
+    const validatedData = contractorProfileSchema.parse(contractorData);
 
     // Check if user has contractor role
     const user = await prisma.user.findUnique({
@@ -70,6 +71,14 @@ export async function PUT(request: NextRequest) {
         { error: "Only contractors can update contractor profiles" },
         { status: 403 }
       );
+    }
+
+    // Update user displayName if provided
+    if (displayName !== undefined) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { displayName: displayName || null },
+      });
     }
 
     // Build the update/create data object, filtering out undefined values

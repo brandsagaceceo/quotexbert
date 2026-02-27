@@ -522,10 +522,10 @@ export default function ContractorJobsPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span>📍 {job.location || job.zipCode}</span>
-                      <span>💰 {job.budget}</span>
-                      <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded">{job.category}</span>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2">
+                      <span className="whitespace-nowrap">📍 {job.location || job.zipCode}</span>
+                      <span className="whitespace-nowrap">💰 {job.budget}</span>
+                      <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${

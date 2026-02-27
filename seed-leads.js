@@ -1250,10 +1250,12 @@ async function seedLeads() {
       },
     ];
 
-    console.log(`Creating ${leadTemplates.length} realistic GTA & Durham Region leads...\n`);
+    // Limit to first 20 leads for more realistic demo data
+    const leadsToCreate = leadTemplates.slice(0, 20);
+    console.log(`Creating ${leadsToCreate.length} realistic GTA & Durham Region leads...\n`);
 
     let leadCount = 0;
-    for (const leadTemplate of leadTemplates) {
+    for (const leadTemplate of leadsToCreate) {
       // Randomly assign to a homeowner
       const homeowner = homeowners[Math.floor(Math.random() * homeowners.length)];
       
@@ -1274,16 +1276,16 @@ async function seedLeads() {
       
       leadCount++;
       console.log(
-        `✓ ${leadCount}/${leadTemplates.length}: ${lead.title} - $${leadTemplate.budgetMin.toLocaleString()}-$${leadTemplate.budgetMax.toLocaleString()}`,
+        `✓ ${leadCount}/${leadsToCreate.length}: ${lead.title} - $${leadTemplate.budgetMin.toLocaleString()}-$${leadTemplate.budgetMax.toLocaleString()}`,
       );
     }
 
     console.log(`\n🎉 Successfully seeded ${leadCount} leads!`);
     console.log("📊 Summary:");
-    console.log(`   - Total Leads: ${leadCount}`);
+    console.log(`   - Total Leads: ${leadCount} (reduced from 93 for more realistic demo)`);
     console.log(`   - All Status: OPEN & PUBLISHED`);
-    console.log(`   - Cities: Toronto, Mississauga, Brampton, Markham, Vaughan, Richmond Hill, Oakville, Burlington, Pickering, Ajax, Whitby, Oshawa, Bowmanville, Courtice, Newcastle`);
-    console.log(`   - Categories: ${[...new Set(leadTemplates.map(l => l.category))].length} different trades`);
+    console.log(`   - Cities: Toronto, Mississauga, Brampton, Markham, Vaughan, Richmond Hill, Pickering, Ajax, Whitby, Oshawa`);
+    console.log(`   - Categories: ${[...new Set(leadsToCreate.map(l => l.category))].length} different trades`);
     console.log(`   - Budget Range: $250 - $120,000`);
     console.log("\n✅ All leads are ready for contractors to browse on /contractor/jobs");
   } catch (error) {
