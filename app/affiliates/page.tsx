@@ -40,10 +40,10 @@ export default function AffiliatePage() {
   return (
     <>
       <Head>
-        <title>Affiliate Program - Earn 50% Commission | QuoteXbert</title>
-        <meta name="description" content="Earn 50% commission referring contractors to QuoteXbert. Passive income potential: $500-$5000+ monthly. Join our affiliate program today." />
-        <meta property="og:title" content="Affiliate Program - Earn 50% Commission" />
-        <meta property="og:description" content="Earn 50% commission referring contractors. Passive income potential up to $5000+ monthly." />
+        <title>Affiliate Program - Earn 20% Commission | QuoteXbert</title>
+        <meta name="description" content="Earn 20% commission referring contractors to QuoteXbert. Passive income potential: $149-$2,980+ monthly. Join our affiliate program today." />
+        <meta property="og:title" content="Affiliate Program - Earn 20% Commission" />
+        <meta property="og:description" content="Earn 20% commission referring contractors. Passive income potential up to $2,980+ monthly." />
         <meta property="og:image" content="/og-affiliate.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
@@ -61,12 +61,12 @@ export default function AffiliatePage() {
               Referring Contractors
             </h1>
             <p className="text-2xl text-slate-700 max-w-3xl mx-auto mb-8 font-medium">
-              Join our affiliate program and earn <span className="text-rose-700 font-black">50% commission</span> for every contractor you refer. Turn your network into <span className="text-orange-600 font-black">passive income</span>.
+              Join our affiliate program and earn <span className="text-rose-700 font-black">20% commission</span> for every contractor you refer. Turn your network into <span className="text-orange-600 font-black">passive income</span>.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-lg">
               <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-md">
                 <span className="text-2xl">💰</span>
-                <span className="font-bold text-slate-800">50% Commission</span>
+                <span className="font-bold text-slate-800">20% Commission</span>
               </div>
               <div className="flex items-center gap-2 bg-white px-6 py-3 rounded-full shadow-md">
                 <span className="text-2xl">🔄</span>
@@ -103,8 +103,8 @@ export default function AffiliatePage() {
                 <div className="bg-gradient-to-br from-pink-600 to-orange-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   3
                 </div>
-                <h3 className="font-bold text-xl mb-3 text-slate-900">Earn 50%</h3>
-                <p className="text-slate-600">You automatically earn 50% of their subscription fees for 12 full months</p>
+                <h3 className="font-bold text-xl mb-3 text-slate-900">Earn 20%</h3>
+                <p className="text-slate-600">You automatically earn 20% of their subscription fees for 12 full months</p>
               </div>
               <div className="text-center group">
                 <div className="bg-gradient-to-br from-orange-600 to-orange-700 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
@@ -129,7 +129,7 @@ export default function AffiliatePage() {
                     <tr>
                       <th className="px-6 py-5 text-left font-bold text-base">Contractors</th>
                       <th className="px-6 py-5 text-left font-bold text-base">Their Revenue</th>
-                      <th className="px-6 py-5 text-left font-bold text-base">Your Commission (50%)</th>
+                      <th className="px-6 py-5 text-left font-bold text-base">Your Commission (20%)</th>
                       <th className="px-6 py-5 text-left font-bold text-base">Annual Income</th>
                     </tr>
                   </thead>
@@ -137,32 +137,32 @@ export default function AffiliatePage() {
                     <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">5 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$745/mo</td>
-                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$372/mo</td>
-                      <td className="px-6 py-5 font-bold text-slate-900">$4,464/yr</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$149/mo</td>
+                      <td className="px-6 py-5 font-bold text-slate-900">$1,788/yr</td>
                     </tr>
                     <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">10 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$1,490/mo</td>
-                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$745/mo</td>
-                      <td className="px-6 py-5 font-bold text-slate-900">$8,940/yr</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$298/mo</td>
+                      <td className="px-6 py-5 font-bold text-slate-900">$3,576/yr</td>
                     </tr>
                     <tr className="bg-gradient-to-r from-rose-50 to-orange-50 hover:from-rose-100 hover:to-orange-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-lg">25 contractors ⭐</td>
                       <td className="px-6 py-5 text-slate-700 font-semibold">$3,725/mo</td>
-                      <td className="px-6 py-5 font-black text-rose-700 text-xl">$1,862/mo</td>
-                      <td className="px-6 py-5 font-black text-slate-900 text-lg">$22,344/yr</td>
+                      <td className="px-6 py-5 font-black text-rose-700 text-xl">$745/mo</td>
+                      <td className="px-6 py-5 font-black text-slate-900 text-lg">$8,940/yr</td>
                     </tr>
                     <tr className="hover:bg-rose-50/50 transition-colors">
                       <td className="px-6 py-5 font-bold text-slate-900">50 contractors</td>
                       <td className="px-6 py-5 text-slate-700">$7,450/mo</td>
-                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$3,725/mo</td>
-                      <td className="px-6 py-5 font-bold text-slate-900">$44,700/yr</td>
+                      <td className="px-6 py-5 font-bold text-rose-700 text-lg">$1,490/mo</td>
+                      <td className="px-6 py-5 font-bold text-slate-900">$17,880/yr</td>
                     </tr>
                     <tr className="bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-xl">100 contractors 🚀</td>
                       <td className="px-6 py-5 text-slate-700 font-bold text-lg">$14,900/mo</td>
-                      <td className="px-6 py-5 font-black text-transparent bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-2xl">$7,450/mo</td>
-                      <td className="px-6 py-5 font-black text-slate-900 text-xl">$89,400/yr</td>
+                      <td className="px-6 py-5 font-black text-transparent bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-2xl">$2,980/mo</td>
+                      <td className="px-6 py-5 font-black text-slate-900 text-xl">$35,760/yr</td>
                     </tr>
                   </tbody>
                 </table>
@@ -178,7 +178,7 @@ export default function AffiliatePage() {
             <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">💰</div>
               <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">High Commission Rate</h3>
-              <p className="text-slate-600">50% commission on all lead fees - one of the highest rates in the industry</p>
+              <p className="text-slate-600">20% commission on all contractor subscriptions - earn consistent recurring revenue</p>
             </div>
             
             <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
@@ -198,7 +198,7 @@ export default function AffiliatePage() {
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 rounded-xl p-8 text-center shadow-lg">
             <h2 className="text-3xl font-bold mb-4 text-slate-900">Start Earning with QuoteXbert Today</h2>
             <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-              Turn your contractor network into consistent passive income. Join our affiliate program and start earning 50% commission on every referral.
+              Turn your contractor network into consistent passive income. Join our affiliate program and start earning 20% commission on every referral.
             </p>
             
             <div className="mb-6 text-center">
@@ -216,7 +216,21 @@ export default function AffiliatePage() {
               <div className="bg-gradient-to-br from-green-50/80 to-orange-50/80 rounded-lg p-6 max-w-md mx-auto">
                 <div className="text-3xl mb-4">🎉</div>
                 <h3 className="text-xl font-semibold text-green-700 mb-2">Welcome to the Program!</h3>
-                <p className="text-slate-600">Check your email for your affiliate dashboard access and referral link.</p>
+                <p className="text-slate-600 mb-6">Check your email for your affiliate dashboard access and referral link.</p>
+                <div className="flex flex-col gap-3">
+                  <a
+                    href="/affiliate-dashboard"
+                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all text-center"
+                  >
+                    Go to Dashboard →
+                  </a>
+                  <a
+                    href="/affiliate-university"
+                    className="bg-white text-rose-700 border-2 border-rose-300 px-6 py-3 rounded-xl font-semibold hover:bg-rose-50 transition-all text-center"
+                  >
+                    Start Learning →
+                  </a>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleJoinAffiliate} className="max-w-md mx-auto">
@@ -247,7 +261,7 @@ export default function AffiliatePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How much can I earn?</h3>
-                <p className="text-slate-600">With 50% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $5,000+ monthly.</p>
+                <p className="text-slate-600">With 20% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $2,000+ monthly.</p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
@@ -257,7 +271,7 @@ export default function AffiliatePage() {
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How long do I earn from referrals?</h3>
-                <p className="text-slate-600">You earn 50% commission for 12 months from each contractor you refer.</p>
+                <p className="text-slate-600">You earn 20% commission for 12 months from each contractor you refer.</p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">

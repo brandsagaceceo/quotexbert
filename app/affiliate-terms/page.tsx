@@ -41,8 +41,7 @@ export default function AffiliateTermsPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Current Commission Rates</h3>
               <ul className="space-y-2 text-gray-700">
                 <li><strong>Homeowner Signups:</strong> $15 per qualified lead (homeowner posts a job)</li>
-                <li><strong>Contractor Signups:</strong> 20% of first month subscription ($20-$60)</li>
-                <li><strong>Recurring:</strong> 10% recurring commission for 12 months</li>
+                <li><strong>Contractor Subscriptions:</strong> 20% recurring commission for 12 months ($20-$30/month per contractor)</li>
               </ul>
             </div>
             <p className="text-gray-700">

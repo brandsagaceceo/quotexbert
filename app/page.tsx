@@ -94,6 +94,31 @@ export default function Home() {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
+        {/* Contractor CTA Banner - Above The Fold */}
+        {user?.role === 'contractor' && (
+          <section className="relative bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-6 md:py-8 overflow-hidden">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="max-w-7xl mx-auto px-4 relative z-10">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-center md:text-left">
+                  <h2 className="text-2xl md:text-3xl font-black mb-2">
+                    🎯 Ready to Grow Your Business?
+                  </h2>
+                  <p className="text-lg md:text-xl text-rose-100">
+                    Browse 45+ active leads in Toronto & GTA • Get qualified projects today
+                  </p>
+                </div>
+                <Link
+                  href="/contractor/jobs"
+                  className="flex-shrink-0 bg-white text-rose-700 font-bold px-8 py-4 rounded-xl hover:bg-rose-50 transition-all transform hover:scale-105 shadow-2xl text-lg whitespace-nowrap"
+                >
+                  Browse Available Leads →
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
         <section id="get-estimate" className="relative py-6 md:py-16 lg:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
@@ -240,6 +265,113 @@ export default function Home() {
                 <div className="bg-green-100 rounded-xl px-8 py-4 border-2 border-green-300">
                   <div className="text-5xl font-black text-green-800">$0</div>
                   <div className="text-sm font-semibold text-green-700 text-center">Always</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contractor Lead Generation Banner */}
+        <section className="py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-600 rounded-full filter blur-3xl animate-blob"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-600 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+          </div>
+          
+          <div className="max-w-6xl mx-auto px-4 relative z-10">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Left: Value Prop */}
+              <div className="text-center md:text-left">
+                <div className="inline-block bg-rose-600/20 border border-rose-500/30 rounded-full px-4 py-2 mb-4">
+                  <span className="text-rose-400 font-semibold text-sm">FOR CONTRACTORS</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                  Get Quality Leads.<br />Grow Your Business.
+                </h2>
+                <p className="text-xl text-slate-300 mb-6">
+                  Stop chasing leads. Access 45+ ready-to-quote projects in Toronto & GTA. 
+                  All homeowners are verified and ready to hire.
+                </p>
+                
+                {/* Quick Stats */}
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
+                    <div className="text-3xl font-black text-rose-500">45+</div>
+                    <div className="text-slate-400 text-sm">Active Leads</div>
+                  </div>
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
+                    <div className="text-3xl font-black text-orange-500">12</div>
+                    <div className="text-slate-400 text-sm">Categories</div>
+                  </div>
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
+                    <div className="text-3xl font-black text-amber-500">GTA</div>
+                    <div className="text-slate-400 text-sm">Coverage</div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                  <Link
+                    href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/sign-up"}
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-2xl text-lg"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {isSignedIn && user?.role === 'contractor' ? "Browse Leads Now" : "Join as Contractor"}
+                  </Link>
+                  <Link
+                    href="/showcase"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-700/50 border border-slate-600 text-white font-semibold px-6 py-4 rounded-xl hover:bg-slate-600/50 transition-colors"
+                  >
+                    See How It Works
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right: Key Benefits */}
+              <div className="space-y-4">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">Pre-Qualified Homeowners</h3>
+                      <p className="text-slate-300 text-sm">All leads have budgets and are ready to hire</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">Local Toronto & GTA Projects</h3>
+                      <p className="text-slate-300 text-sm">All projects are in your service area</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white mb-1">$350 - $120,000 Projects</h3>
+                      <p className="text-slate-300 text-sm">Small repairs to full renovations</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
