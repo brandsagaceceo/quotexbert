@@ -35,9 +35,9 @@ export default function ContactPage() {
   return (
     <>
       <Head>
-        <title>Contact QuotexBert Support - Get Help Today</title>
-        <meta name="description" content="Contact QuotexBert support for help with estimates, contractor matching, billing, or technical issues. We're here to help homeowners and contractors." />
-        <meta property="og:title" content="Contact QuotexBert Support" />
+        <title>Contact QuoteXbert Support - Get Help Today</title>
+        <meta name="description" content="Contact QuoteXbert support for help with estimates, contractor matching, billing, or technical issues. We're here to help homeowners and contractors." />
+        <meta property="og:title" content="Contact QuoteXbert Support" />
         <meta property="og:description" content="Get help with estimates, contractor matching, billing, or technical issues." />
         <meta property="og:image" content="/og-contact.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -48,7 +48,7 @@ export default function ContactPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-              Get in Touch with <span className="bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">QuotexBert Support</span>
+              Get in Touch with <span className="bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">QuoteXbert Support</span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Whether you're a homeowner seeking help with estimates or a contractor needing assistance with our platform, our support team is here to help. We typically respond within 2-4 hours during business hours.
@@ -193,7 +193,7 @@ export default function ContactPage() {
                     → Contractor Job Board Guide
                   </a>
                   <a href="/about" className="block text-red-700 hover:text-red-800 transition-colors">
-                    → About QuotexBert
+                    → About QuoteXbert
                   </a>
                 </div>
               </div>

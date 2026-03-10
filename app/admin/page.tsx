@@ -111,7 +111,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-4">
-            QuotexBert Admin Dashboard
+            QuoteXbert Admin Dashboard
           </h1>
           <p className="text-xl text-slate-600">
             Manage your platform, users, and business operations
