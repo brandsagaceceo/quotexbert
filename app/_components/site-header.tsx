@@ -12,6 +12,7 @@ export default function SiteHeader() {
   const { isSignedIn, authUser: user } = useAuth();
   const { signOut } = useClerk();
 
+  // Navigation links - updated March 10, 2026
   const navLinks = [
     { href: "/", label: "AI Estimate" },
     { href: "/for-contractors", label: "For Contractors" },
