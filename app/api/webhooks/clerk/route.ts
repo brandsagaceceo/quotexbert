@@ -55,8 +55,18 @@ export async function POST(req: Request) {
 
   if (eventType === 'user.created') {
     const { id, email_addresses, first_name, last_name, created_at } = evt.data;
-    const email = email_addresses[0]?.email_address;
-    const name = `${first_name || ''} ${last_name || ''}`.trim() || 'New User';
+    const email = email_addresses[0]?.email_address || '';
+    // Generate a proper name with fallback to email
+    let name = `${first_name || ''} ${last_name || ''}`.trim();
+    if (!name && email) {
+      // Use email prefix as name (e.g., 'john.doe@gmail.com' -> 'john doe')
+      const parts = email.split('@');
+      const emailPrefix = parts[0] || '';
+      name = emailPrefix.replace(/[._-]/g, ' ').trim() || 'User';
+    }
+    if (!name) {
+      name = 'User';
+    }
 
     console.log(`[CLERK WEBHOOK] New user created: ${email}`);
 
@@ -125,11 +135,20 @@ export async function POST(req: Request) {
           data: {
             clerkUserId: id,
             email: email || '',
-            name: name,
+            name: name, // Always has valid name from above logic
             role: 'homeowner', // Default role, can be updated during onboarding
           }
         });
-        console.log('[CLERK WEBHOOK] User record created in database');
+        console.log(`[CLERK WEBHOOK] User record created in database with name: ${name}`);
+      } else {
+        // Update existing user's name if it's missing or generic
+        if (!existingUser.name || existingUser.name === 'New User' || existingUser.name === 'User') {
+          await prisma.user.update({
+            where: { clerkUserId: id },
+            data: { name: name }
+          });
+          console.log(`[CLERK WEBHOOK] Updated existing user name to: ${name}`);
+        }
       }
     } catch (dbError) {
       console.error('[CLERK WEBHOOK] Failed to create user in database:', dbError);
@@ -145,14 +164,17 @@ export async function POST(req: Request) {
 
     // Update user in database if exists
     try {
-      await prisma.user.updateMany({
-        where: { clerkUserId: id },
-        data: {
-          email: email || undefined,
-          name: name || undefined,
-        }
-      });
-      console.log('[CLERK WEBHOOK] User record updated in database');
+      const updateData: Record<string, string> = {};
+      if (email) updateData.email = email;
+      if (name) updateData.name = name;
+
+      if (Object.keys(updateData).length > 0 && id) {
+        await prisma.user.updateMany({
+          where: { clerkUserId: id },
+          data: updateData
+        });
+        console.log('[CLERK WEBHOOK] User record updated in database');
+      }
     } catch (dbError) {
       console.error('[CLERK WEBHOOK] Failed to update user in database:', dbError);
     }
@@ -163,16 +185,18 @@ export async function POST(req: Request) {
     console.log(`[CLERK WEBHOOK] User deleted: ${id}`);
 
     // Optionally soft-delete or archive user data
-    try {
-      await prisma.user.updateMany({
-        where: { clerkUserId: id },
-        data: {
-          isActive: false,
-        }
-      });
-      console.log('[CLERK WEBHOOK] User marked as inactive in database');
-    } catch (dbError) {
-      console.error('[CLERK WEBHOOK] Failed to deactivate user in database:', dbError);
+    if (id) {
+      try {
+        await prisma.user.updateMany({
+          where: { clerkUserId: id },
+          data: {
+            isActive: false,
+          }
+        });
+        console.log('[CLERK WEBHOOK] User marked as inactive in database');
+      } catch (dbError) {
+        console.error('[CLERK WEBHOOK] Failed to deactivate user in database:', dbError);
+      }
     }
   }
 

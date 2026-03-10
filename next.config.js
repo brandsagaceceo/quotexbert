@@ -33,6 +33,17 @@ const nextConfig = {
         hostname: '**.vercel-storage.com',
       }
     ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+  },
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  // Optimize production bundles
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@clerk/nextjs', 'date-fns'],
   },
   // Completely disable linting
   webpack: (config, { isServer }) => {

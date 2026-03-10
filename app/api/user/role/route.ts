@@ -90,70 +90,62 @@ export async function POST(req: NextRequest) {
 
     // Create or update user in database
     const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
-    const userName: string = clerkUser.firstName 
-      ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
-      : email.split('@')[0] || 'User';
-
-    console.log('Updating user:', { userId, email, role });
-
-    // First try to find user by email (in case of duplicate sign-ups)
-    let existingUserByEmail = await prisma.user.findUnique({
-      where: { email: email }
-    });
-
-    if (existingUserByEmail) {
-      // User with this email exists, update it
-      console.log('Updating existing user by email');
-      await prisma.user.update({
-        where: { email: email },
-        data: {
-          id: userId, // Update to match current Clerk userId
-          role: role,
-          name: userName,
-        },
-      });
-    } else {
-      // Check if user exists by ID
-      const existingUserById = await prisma.user.findUnique({
-        where: { id: userId }
-      });
-
-      if (existingUserById) {
-        // User exists by ID, just update the role
-        console.log('Updating existing user by id');
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            role: role,
-            name: userName,
-          },
-        });
-      } else {
-        // No user exists, create new one
-        console.log('Creating new user');
-        await prisma.user.create({
-          data: {
-            id: userId,
-            email: email,
-            name: userName,
-            role: role,
-          },
-        });
-      }
+    
+    // Generate proper name with fallback logic
+    let userName = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim();
+    if (!userName) {
+      // Use email prefix as name (e.g., 'john.doe@gmail.com' -> 'john doe')
+      const emailPrefix = email.split('@')[0] || '';
+      userName = emailPrefix ? emailPrefix.replace(/[._-]/g, ' ').trim() : 'User';
+      if (!userName) userName = 'User';
+    }
+    if (!userName) {
+      userName = 'User';
     }
 
-    console.log('User role updated successfully');
+    console.log('Updating user:', { userId, email, userName, role });
+
+    // Use upsert for cleaner create-or-update logic
+    // This prevents duplicate users and avoids trying to update the immutable id field
+    const updatedUser = await prisma.user.upsert({
+      where: { id: userId },
+      update: {
+        role: role,
+        name: userName,
+        email: email,
+      },
+      create: {
+        id: userId,
+        email: email,
+        name: userName,
+        role: role,
+      },
+    });
+
+    console.log('User role updated successfully:', updatedUser.role);
 
     // Return success with a flag to reload the session
     const response = NextResponse.json({ success: true, role, refreshSession: true });
     return response;
   } catch (error) {
     console.error("Error updating user role:", error);
-    console.error("Error details:", {
+    
+    // Log detailed error information for debugging
+    if (error && typeof error === 'object') {
+      const prismaError = error as any;
+      console.error("Prisma error details:", {
+        code: prismaError.code,
+        meta: prismaError.meta,
+        message: prismaError.message,
+      });
+    }
+    
+    console.error("Error context:", {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'NOT SET'
     });
+    
     return NextResponse.json(
       { 
         error: "Failed to update role",

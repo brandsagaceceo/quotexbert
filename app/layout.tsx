@@ -5,26 +5,32 @@ import { ClerkProvider } from "@clerk/nextjs";
 import SiteHeader from "./_components/site-header";
 import SiteFooter from "./_components/site-footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import DevStatus from "./_components/DevStatus";
-import ProactiveAIHelper from "@/components/ProactiveAIHelper";
-import AIAssistantPopup from "@/components/AIAssistantPopup";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { OverflowDebugger } from "@/components/OverflowDebugger";
 import { ToastProvider } from "@/components/ToastProvider";
+import dynamicImport from "next/dynamic";
 import "./globals.css";
 import "../styles/mobile.css";
 
 export const dynamic = 'force-dynamic';
 
+// Lazy load development and optional components
+const DevStatus = dynamicImport(() => import("./_components/DevStatus"), { ssr: false });
+const OverflowDebugger = dynamicImport(() => import("@/components/OverflowDebugger").then(mod => ({ default: mod.OverflowDebugger })), { ssr: false });
+const AIAssistantPopup = dynamicImport(() => import("@/components/AIAssistantPopup"), { ssr: false });
+
 const interSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const interMono = Inter({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -244,8 +250,12 @@ export default function RootLayout({
           <SiteFooter />
           <MobileBottomNav />
           <AIAssistantPopup />
-          <DevStatus />
-          <OverflowDebugger />
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <DevStatus />
+              <OverflowDebugger />
+            </>
+          )}
         </ToastProvider>
       </body>
     </html>

@@ -272,7 +272,7 @@ export default function AboutPage() {
                 Get My Estimate
               </Link>
               <Link
-                href="/contractor/jobs"
+                href="/for-contractors"
                 className="bg-slate-200 hover:bg-slate-300 text-slate-800 px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Join as Contractor

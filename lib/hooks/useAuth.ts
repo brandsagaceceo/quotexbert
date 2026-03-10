@@ -28,24 +28,38 @@ export function useAuth() {
         try {
           const response = await fetch('/api/user/role');
           const data = await response.json();
+          // Use API role if available, otherwise fall back to Clerk metadata
+          // This ensures we get the most up-to-date role from the database
           if (data.role) {
             role = data.role;
-          } else {
-            // If API returns null/undefined, keep role as undefined
-            role = undefined;
           }
+          // If both API and Clerk have no role, then role stays undefined
         } catch (error) {
           console.error('Error fetching user role:', error);
+          // On error, keep the Clerk role if available
         } finally {
           setRoleLoading(false);
+        }
+        
+        // Generate proper name with fallback logic (consistent with backend)
+        const email = clerkUser.primaryEmailAddress?.emailAddress || '';
+        let userName = clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim();
+        if (!userName && email) {
+          // Use email prefix as name (e.g., 'john.doe@gmail.com' -> 'john doe')
+          const emailPrefix = email.split('@')[0] || '';
+          userName = emailPrefix ? emailPrefix.replace(/[._-]/g, ' ').trim() : 'User';
+          if (!userName) userName = 'User';
+        }
+        if (!userName) {
+          userName = 'User';
         }
         
         // Only set authUser if we have a role - otherwise set null so pages know user needs onboarding
         if (role) {
           setAuthUser({
             id: clerkUser.id,
-            email: clerkUser.primaryEmailAddress?.emailAddress || '',
-            name: clerkUser.fullName || clerkUser.firstName || 'User',
+            email: email,
+            name: userName,
             role: role,
             profilePhoto: clerkUser.imageUrl
           });
@@ -53,8 +67,8 @@ export function useAuth() {
           // User is signed in but has no role - set a partial user object
           setAuthUser({
             id: clerkUser.id,
-            email: clerkUser.primaryEmailAddress?.emailAddress || '',
-            name: clerkUser.fullName || clerkUser.firstName || 'User',
+            email: email,
+            name: userName,
             role: null as any, // No role yet - needs onboarding
             profilePhoto: clerkUser.imageUrl
           });

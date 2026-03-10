@@ -11,7 +11,7 @@ export default function SiteFooter() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center mb-4">
-              <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">quotexbert</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
             </Link>
             <p className="text-ink-600 mb-4 max-w-md">
               Connect homeowners with trusted contractors. Get instant quotes
@@ -142,7 +142,7 @@ export default function SiteFooter() {
             </a>
           </div>
           <p className="text-sm text-ink-500 text-center">
-            © {currentYear} quotexbert. All rights reserved. Made with ❤️ in
+            © {currentYear} QuoteXbert. All rights reserved. Made with ❤️ in
             Canada.
           </p>
         </div>

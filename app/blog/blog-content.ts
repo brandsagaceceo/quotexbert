@@ -317,7 +317,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Start Your Toronto Basement Project?</h3>
         <p class="text-slate-700 mb-4">Get connected with pre-screened, licensed contractors who specialize in Toronto basement renovations. Compare quotes, check verified reviews, and ensure all work meets City of Toronto building codes.</p>
-        <p class="text-sm text-slate-600">QuotexBert verifies WSIB coverage, insurance, and Ontario licensing for all contractors in our network, giving you peace of mind throughout your basement finishing project.</p>
+        <p class="text-sm text-slate-600">QuoteXbert verifies WSIB coverage, insurance, and Ontario licensing for all contractors in our network, giving you peace of mind throughout your basement finishing project.</p>
       </div>
     </div>
   `,

@@ -1,22 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import Link from "next/link";
 import { IPhoneEstimatorMockup } from "@/components/IPhoneEstimatorMockup";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
-import { ServiceAreaCities } from "@/components/ServiceAreaCities";
 import { ReviewsSection, Review } from "@/components/ReviewsSection";
 import { LocalBusinessSchema } from "@/components/LocalBusinessSchema";
 import { TrustSignals } from "@/components/TrustSignals";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { ExitIntentModal } from "@/components/ExitIntentModal";
 import { StickyCTA } from "@/components/StickyCTA";
-import { ReviewCaptureModal } from "@/components/ReviewCaptureModal";
-import ExampleEstimates from "@/components/ExampleEstimates";
-import TrustFAQ from "@/components/TrustFAQ";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { trackEstimateComplete, trackCTAClick } from "@/components/GoogleAnalytics";
+
+// Lazy load below-the-fold components for better performance
+const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
+const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection").then(mod => ({ default: mod.TestimonialsSection })));
+const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(mod => ({ default: mod.ExitIntentModal })));
+const ReviewCaptureModal = lazy(() => import("@/components/ReviewCaptureModal").then(mod => ({ default: mod.ReviewCaptureModal })));
+const ExampleEstimates = lazy(() => import("@/components/ExampleEstimates"));
+const TrustFAQ = lazy(() => import("@/components/TrustFAQ"));
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
@@ -81,17 +83,21 @@ export default function Home() {
       <LocalBusinessSchema googleBusinessUrl="YOUR_GOOGLE_BUSINESS_URL_HERE" />
 
       {/* Exit Intent Modal */}
-      <ExitIntentModal onCaptureEmail={handleCaptureEmail} />
+      <Suspense fallback={null}>
+        <ExitIntentModal onCaptureEmail={handleCaptureEmail} />
+      </Suspense>
 
       {/* Sticky Mobile CTA */}
       <StickyCTA />
 
       {/* Review Capture Modal */}
-      <ReviewCaptureModal 
-        isOpen={showReviewModal} 
-        onClose={() => setShowReviewModal(false)}
-        googleReviewUrl="YOUR_GOOGLE_REVIEW_URL_HERE"
-      />
+      <Suspense fallback={null}>
+        <ReviewCaptureModal 
+          isOpen={showReviewModal} 
+          onClose={() => setShowReviewModal(false)}
+          googleReviewUrl="YOUR_GOOGLE_REVIEW_URL_HERE"
+        />
+      </Suspense>
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
         {/* Contractor CTA Banner - Above The Fold */}
@@ -217,6 +223,85 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Who Are You? Split Path Section */}
+        {!estimateResult && (
+          <section className="py-16 bg-white">
+            <div className="max-w-6xl mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                  I'm here to...
+                </h2>
+                <p className="text-xl text-slate-600">
+                  Choose your path to get started
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {/* Homeowner Path */}
+                <Link
+                  href="/#get-estimate"
+                  className="group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all"
+                >
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">🏠</div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-3">Get a Project Quote</h3>
+                  <p className="text-slate-600 mb-6 leading-relaxed">
+                    Upload photos, get instant AI estimates, and connect with verified contractors in your area.
+                  </p>
+                  <div className="flex items-center gap-2 text-rose-700 font-bold group-hover:gap-4 transition-all">
+                    <span>Get My Estimate</span>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </Link>
+
+                {/* Contractor Path */}
+                <Link
+                  href="/for-contractors"
+                  className="group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-8 border-2 border-sky-200 hover:border-sky-400 hover:shadow-2xl transition-all"
+                >
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">🔧</div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-3">Find Quality Leads</h3>
+                  <p className="text-slate-600 mb-6 leading-relaxed">
+                    Get pre-qualified leads in Toronto & GTA. No bidding wars. Choose your service areas and pricing.
+                  </p>
+                  <div className="flex items-center gap-2 text-sky-700 font-bold group-hover:gap-4 transition-all">
+                    <span>Join as Contractor</span>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </Link>
+              </div>
+
+              {/* Mid-Renovation Tool */}
+              <div className="mt-8 max-w-4xl mx-auto">
+                <Link
+                  href="/renovation-check"
+                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all flex items-center gap-6"
+                >
+                  <div className="text-5xl group-hover:scale-110 transition-transform">🔍</div>
+                  <div className="flex-1">
+                    <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
+                      NEW FEATURE
+                    </div>
+                    <h3 className="text-xl font-black text-slate-900 mb-2">Ask AI About Your Renovation</h3>
+                    <p className="text-slate-600 text-sm">
+                      Upload photos of work in progress and get AI guidance on whether it looks correct. Perfect for peace of mind during renovations.
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-2 text-purple-700 font-bold">
+                    <span>Try It Free</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Estimate Results */}
         {estimateResult && (
           <section id="estimate-results" className="py-8 sm:py-12 bg-white w-full overflow-hidden">
@@ -229,7 +314,9 @@ export default function Home() {
         )}
 
         {/* Example Estimates - Show Trust */}
-        <ExampleEstimates />
+        <Suspense fallback={<div className="py-12" />}>
+          <ExampleEstimates />
+        </Suspense>
 
         {/* Trust Signals Section */}
         <TrustSignals />
@@ -238,13 +325,19 @@ export default function Home() {
         <HowItWorksSection />
 
         {/* Trust FAQ - How Pricing Works, Contractor Verification */}
-        <TrustFAQ />
+        <Suspense fallback={<div className="py-12" />}>
+          <TrustFAQ />
+        </Suspense>
 
         {/* Testimonials with Social Proof */}
-        <TestimonialsSection />
+        <Suspense fallback={<div className="py-12" />}>
+          <TestimonialsSection />
+        </Suspense>
 
         {/* Service Area Cities */}
-        <ServiceAreaCities />
+        <Suspense fallback={<div className="py-12" />}>
+          <ServiceAreaCities />
+        </Suspense>
 
         {/* Free for Homeowners Banner */}
         <section className="py-12 bg-gradient-to-r from-green-50 to-emerald-50">
@@ -312,11 +405,11 @@ export default function Home() {
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link
-                    href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/sign-up"}
+                    href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/for-contractors"}
                     className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-2xl text-lg"
                   >
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     {isSignedIn && user?.role === 'contractor' ? "Browse Leads Now" : "Join as Contractor"}
                   </Link>
