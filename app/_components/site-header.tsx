@@ -14,6 +14,7 @@ export default function SiteHeader() {
 
   const navLinks = [
     { href: "/", label: "AI Estimate" },
+    { href: "/for-contractors", label: "For Contractors" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
   ];
