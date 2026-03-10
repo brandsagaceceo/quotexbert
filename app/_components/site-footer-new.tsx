@@ -32,7 +32,7 @@ export default function SiteFooter() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/jobs"
+                  href="/"
                   className="text-ink-600 hover:text-brand transition-colors duration-200"
                 >
                   Get a Quote

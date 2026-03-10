@@ -225,7 +225,7 @@ export default function Home() {
 
         {/* Who Are You? Split Path Section */}
         {!estimateResult && (
-          <section className="py-16 bg-white">
+          <section className="py-16 bg-gradient-to-br from-white to-orange-50">
             <div className="max-w-6xl mx-auto px-4">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">

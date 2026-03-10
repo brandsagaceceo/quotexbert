@@ -152,10 +152,10 @@ export default function HomePage() {
                 <p className="text-neutral-300 mb-4">{estimate.description}</p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
-                    href="/jobs"
+                    href="/"
                     className="flex-1 bg-teal-600 hover:bg-teal-700 text-center px-6 py-3 rounded-lg font-medium transition-colors"
                   >
-                    Post This Job
+                    Get Started
                   </Link>
                   <Link
                     href="/contractor/jobs"

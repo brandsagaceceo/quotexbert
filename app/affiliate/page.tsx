@@ -10,7 +10,7 @@ export default function AffiliatePage() {
       earnings: "$12,450",
       period: "Last 6 Months",
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
-      quote: "QuotexBert's affiliate program has been an incredible addition to my business. I recommend them to all my clients doing renovations, and the commissions are fantastic!",
+      quote: "QuoteXbert's affiliate program has been an incredible addition to my business. I recommend them to all my clients doing renovations, and the commissions are fantastic!",
       rating: 5,
       referrals: 47
     },
@@ -20,7 +20,7 @@ export default function AffiliatePage() {
       earnings: "$8,920",
       period: "Last 4 Months",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      quote: "Every home inspection I do leads to renovation recommendations. QuotexBert makes it easy to connect homeowners with quality contractors. Win-win for everyone!",
+      quote: "Every home inspection I do leads to renovation recommendations. QuoteXbert makes it easy to connect homeowners with quality contractors. Win-win for everyone!",
       rating: 5,
       referrals: 34
     },
@@ -30,7 +30,7 @@ export default function AffiliatePage() {
       earnings: "$15,780",
       period: "Last 8 Months",
       image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
-      quote: "As a designer, I work with contractors constantly. QuotexBert's affiliate program lets me earn while providing value to my clients. It's been a game-changer!",
+      quote: "As a designer, I work with contractors constantly. QuoteXbert's affiliate program lets me earn while providing value to my clients. It's been a game-changer!",
       rating: 5,
       referrals: 62
     },
@@ -40,7 +40,7 @@ export default function AffiliatePage() {
       earnings: "$6,340",
       period: "Last 3 Months",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-      quote: "Managing multiple properties means constant maintenance needs. QuotexBert's platform makes it easy to find reliable contractors, and I earn commission on every referral!",
+      quote: "Managing multiple properties means constant maintenance needs. QuoteXbert's platform makes it easy to find reliable contractors, and I earn commission on every referral!",
       rating: 5,
       referrals: 28
     }
@@ -102,7 +102,7 @@ export default function AffiliatePage() {
     {
       step: "2",
       title: "Share Your Link",
-      description: "Promote QuotexBert using your unique link on social media, blogs, emails, or your website.",
+      description: "Promote QuoteXbert using your unique link on social media, blogs, emails, or your website.",
       icon: "🔗"
     },
     {
