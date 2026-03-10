@@ -442,6 +442,10 @@ export default function ShowcasePage() {
                       <div className="font-medium text-green-900">Demo Contractor</div>
                       <div className="text-sm text-green-700">Full contractor profile with company details and trade info</div>
                     </div>
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <div className="font-medium text-blue-900">Demo Admin</div>
+                      <div className="text-sm text-blue-700">Admin access with full platform management capabilities</div>
+                    </div>
                     <div className="p-3 bg-purple-50 rounded-lg">
                       <div className="font-medium text-purple-900">Test Contractors</div>
                       <div className="text-sm text-purple-700">3 additional contractors: plumbing, electrical, painting</div>
