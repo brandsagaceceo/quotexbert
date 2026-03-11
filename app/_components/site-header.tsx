@@ -12,10 +12,11 @@ export default function SiteHeader() {
   const { isSignedIn, authUser: user } = useAuth();
   const { signOut } = useClerk();
 
-  // Navigation links - updated March 10, 2026
+  // Navigation links - updated March 11, 2026
   const navLinks = [
     { href: "/", label: "AI Estimate" },
     { href: "/for-contractors", label: "For Contractors" },
+    { href: "/affiliates", label: "Affiliates" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
   ];
@@ -44,14 +45,14 @@ export default function SiteHeader() {
               </Link>
             ))}
             
-            {/* Support Phone */}
-            <a
-              href="tel:9052429460"
+            {/* Support - Desktop: Contact Page, Mobile calls handled in mobile menu */}
+            <Link
+              href="/contact"
               className="flex items-center gap-2 text-gray-700 hover:text-rose-700 font-semibold text-sm transition-colors duration-200 border-l border-gray-200 pl-6"
             >
               <span className="text-xs text-gray-500 font-normal">Need Help?</span>
-              <span>📞 905-242-9460</span>
-            </a>
+              <span>📞 Contact Us</span>
+            </Link>
           </nav>
 
           {/* Right Side Actions - BIGGER & MORE PROMINENT */}
@@ -189,6 +190,15 @@ export default function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
+
+              {/* Mobile Help - Direct Phone Call */}
+              <a
+                href="tel:9052429460"
+                className="block py-2 text-sm font-medium text-rose-600 hover:text-rose-700 transition-colors duration-200 border-t border-gray-100 mt-2 pt-4"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                📞 Need Help? Call Us
+              </a>
 
               {/* Mobile Auth */}
               {isSignedIn && user ? (

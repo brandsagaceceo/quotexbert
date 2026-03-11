@@ -15,7 +15,8 @@ import {
   Settings,
   TrendingUp,
   MessageSquare,
-  Calendar
+  Calendar,
+  CheckCircle
 } from "lucide-react";
 
 export default function ContractorDashboard() {
@@ -80,44 +81,43 @@ export default function ContractorDashboard() {
       label: "Browse Jobs",
       href: "/contractor/jobs",
       icon: Briefcase,
-      color: "bg-blue-500 hover:bg-blue-600",
-      description: "View available jobs in your area",
+      color: "bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700",
+      description: "Find new renovation projects",
+    },
+    {
+      label: "My Accepted Jobs",
+      href: "/contractor/jobs?filter=accepted",
+      icon: CheckCircle,
+      color: "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700",
+      description: "View your active projects",
     },
     {
       label: "Leads Map",
       href: "/contractor/leads-map",
       icon: MapPin,
-      color: "bg-green-500 hover:bg-green-600",
+      color: "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700",
       description: "See jobs on interactive map",
-    },
-    {
-      label: "My Quotes",
-      href: "/contractor/quotes",
-      icon: FileText,
-      color: "bg-purple-500 hover:bg-purple-600",
-      description: "Manage your quotes",
-      badge: pendingQuotes > 0 ? pendingQuotes : undefined,
     },
     {
       label: "Messages",
       href: "/messages",
       icon: MessageSquare,
-      color: "bg-orange-500 hover:bg-orange-600",
-      description: "Chat with clients",
+      color: "bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700",
+      description: "Chat with homeowners",
       badge: unreadMessages > 0 ? unreadMessages : undefined,
     },
     {
-      label: "Portfolio",
-      href: "/contractor/portfolio",
+      label: "My Performance",
+      href: "/contractor/profile",
       icon: TrendingUp,
-      color: "bg-indigo-500 hover:bg-indigo-600",
-      description: "Showcase your work",
+      color: "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700",
+      description: "View metrics & reviews",
     },
     {
       label: "Subscription",
-      href: "/contractor/subscriptions",
+      href: "/contractor/subscription",
       icon: CreditCard,
-      color: "bg-rose-500 hover:bg-rose-600",
+      color: "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700",
       description: "Manage your plan",
     },
   ];

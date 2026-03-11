@@ -76,8 +76,26 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(estimate);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating estimate:", error);
+    
+    // Check for rate limit / quota errors
+    const errorMessage = error?.message || error?.toString() || '';
+    const isQuotaError = 
+      errorMessage.includes('quota') || 
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('429') ||
+      error?.status === 429;
+    
+    if (isQuotaError) {
+      return NextResponse.json(
+        { 
+          error: "High demand right now. Please try again in a moment.",
+          type: "rate_limit"
+        },
+        { status: 429 }
+      );
+    }
     
     // Fallback to basic estimate if OpenAI fails
     try {

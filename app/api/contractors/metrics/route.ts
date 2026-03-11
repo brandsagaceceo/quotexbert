@@ -89,41 +89,50 @@ export async function GET(request: Request) {
       ? avgResponseTimeMinutes / 60 
       : null;
 
-    // Count leads received (jobs where contractor is in acceptedContractors array)
-    const allLeads = await prisma.lead.findMany({
+    // Count leads received (any job where contractor could have seen it or been invited)
+    // This should be broader than just accepted jobs
+    const leadsWhereContractorMatches = await prisma.lead.findMany({
       where: {
         status: {
           in: ["open", "claimed", "accepted", "in_progress", "completed"],
         },
       },
       select: {
+        id: true,
         acceptedContractors: true,
         acceptedById: true,
         claimed: true,
+        claimedBy: true,
       },
     });
 
-    // Parse acceptedContractors JSON arrays and count
     let leadsReceived = 0;
     let jobsAccepted = 0;
+    const seenLeadIds = new Set<string>();
 
-    for (const lead of allLeads) {
+    for (const lead of leadsWhereContractorMatches) {
       try {
         const acceptedContractors = JSON.parse(
           lead.acceptedContractors || "[]"
         );
-        if (
+        
+        // Count as "received" if contractor ever interacted with it (claimed or accepted)
+        const hasInteraction = 
           acceptedContractors.includes(contractorId) ||
-          lead.acceptedById === contractorId
-        ) {
+          lead.acceptedById === contractorId ||
+          lead.claimedBy === contractorId;
+        
+        if (hasInteraction && !seenLeadIds.has(lead.id)) {
           leadsReceived++;
+          seenLeadIds.add(lead.id);
         }
 
-        // Count accepted jobs (where contractor accepted the job)
-        if (
+        // Count as "accepted" only if contractor is in acceptedContractors or is the acceptedById
+        const hasAccepted = 
           acceptedContractors.includes(contractorId) ||
-          lead.acceptedById === contractorId
-        ) {
+          lead.acceptedById === contractorId;
+        
+        if (hasAccepted) {
           jobsAccepted++;
         }
       } catch (e) {
