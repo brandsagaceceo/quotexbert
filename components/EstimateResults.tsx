@@ -177,6 +177,8 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
 
   <div class="footer">
     <p class="logo">QuoteXbert</p>
+    <p><strong>Need help understanding your estimate?</strong></p>
+    <p>Call QuoteXbert Support: 📞 905-242-9460 | Email: QuoteXbert@gmail.com</p>
     <p>www.quotexbert.com | Get instant renovation estimates</p>
     <p style="font-size: 12px; margin-top: 15px;">
       This estimate is valid for reference purposes. QuoteXbert is not a contractor and does not perform work.

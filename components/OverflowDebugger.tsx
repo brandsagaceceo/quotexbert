@@ -40,15 +40,16 @@ export function OverflowDebugger() {
         });
         
         if (widestElement) {
-          console.warn('Widest element:', widestElement);
+          const widestHTMLElement = widestElement as HTMLElement;
+          console.warn('Widest element:', widestHTMLElement);
           console.warn('Element width:', maxWidth);
-          console.warn('Classes:', widestElement.className);
+          console.warn('Classes:', widestHTMLElement.className);
           
           // Highlight the element temporarily
-          const originalOutline = (widestElement as HTMLElement).style.outline;
-          (widestElement as HTMLElement).style.outline = '3px solid red';
+          const originalOutline = widestHTMLElement.style.outline;
+          widestHTMLElement.style.outline = '3px solid red';
           setTimeout(() => {
-            (widestElement as HTMLElement).style.outline = originalOutline;
+            widestHTMLElement.style.outline = originalOutline;
           }, 3000);
         }
       } else {

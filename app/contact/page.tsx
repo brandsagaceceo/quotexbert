@@ -189,8 +189,8 @@ export default function ContactPage() {
                   <a href="/contractor/billing" className="block text-red-700 hover:text-red-800 transition-colors">
                     → Billing & Payment Help
                   </a>
-                  <a href="/contractor/jobs" className="block text-orange-700 hover:text-orange-800 transition-colors">
-                    → Contractor Job Board Guide
+                  <a href="/for-contractors" className="block text-orange-700 hover:text-orange-800 transition-colors">
+                    → For Contractors Info
                   </a>
                   <a href="/about" className="block text-red-700 hover:text-red-800 transition-colors">
                     → About QuoteXbert

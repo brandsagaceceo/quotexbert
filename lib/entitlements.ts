@@ -141,7 +141,7 @@ export async function getUserEntitlements(userId: string): Promise<UserEntitleme
         subscriptionStatus: true,
         subscriptionPlan: true,
         subscriptionCurrentPeriodEnd: true,
-        proOverride: true,
+        proOverrideEnabled: true,
         proOverrideTier: true,
         selectedCategories: true
       }
@@ -175,7 +175,7 @@ export async function getUserEntitlements(userId: string): Promise<UserEntitleme
       subscriptionStatus: user.subscriptionStatus,
       subscriptionPlan: user.subscriptionPlan,
       currentPeriodEnd: user.subscriptionCurrentPeriodEnd,
-      proOverride: user.proOverride || false,
+      proOverride: user.proOverrideEnabled || false,
       proOverrideTier: user.proOverrideTier,
       categoryLimit: tierConfig.categoryLimit,
       selectedCategories: categories,
@@ -183,7 +183,7 @@ export async function getUserEntitlements(userId: string): Promise<UserEntitleme
       canAcceptJobs: isGod || tierConfig.canAcceptJobs,
       canPickCategories: isGod || tierConfig.canPickCategories,
       canViewAllLeads: isGod || tierConfig.canViewAllLeads,
-      features: tierConfig.features
+      features: [...tierConfig.features] as string[]
     };
   } catch (error) {
     console.error('[ENTITLEMENTS] Error fetching user entitlements:', error);

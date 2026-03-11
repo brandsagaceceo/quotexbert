@@ -153,13 +153,15 @@ function generateFallbackEnhancement(projectType: string, existingDesc: string):
   for (const key of Object.keys(templates)) {
     if (type.includes(key)) {
       const template = templates[key];
-      // Incorporate existing description if provided
-      if (existingDesc) {
-        template.description = existingDesc + ' ' + template.description;
+      if (template) {
+        // Incorporate existing description if provided
+        if (existingDesc) {
+          template.description = existingDesc + ' ' + template.description;
+        }
+        return template;
       }
-      return template;
     }
   }
 
-  return templates['kitchen']; // Default fallback
+  return templates['kitchen']!; // Default fallback (guaranteed to exist)
 }

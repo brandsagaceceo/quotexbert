@@ -19,18 +19,42 @@ export default function SiteFooter() {
             </p>
           </div>
 
+          {/* Support */}
+          <div>
+            <h3 className="text-lg font-bold text-ink-900 mb-4">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="tel:9052429460"
+                  className="text-ink-600 hover:text-[var(--brand)] transition-colors duration-200 flex items-center gap-2"
+                >
+                  <span>📞</span>
+                  <span>905-242-9460</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:quotexbert@gmail.com?subject=QuoteXbert Support&body=Please describe your issue and include a screenshot if possible."
+                  className="text-ink-600 hover:text-[var(--brand)] transition-colors duration-200"
+                >
+                  QuoteXbert@gmail.com
+                </a>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-ink-600 hover:text-brand transition-colors duration-200"
+                >
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-bold text-ink-900 mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <a
-                  href="mailto:quoteexpert@gmail.com?subject=QuoteXbert Support&body=Please describe your issue and include a screenshot if possible."
-                  className="text-ink-600 hover:text-[var(--brand)] transition-colors duration-200"
-                >
-                  Contact Support
-                </a>
-              </li>
               <li>
                 <Link
                   href="/#get-estimate"
@@ -41,10 +65,10 @@ export default function SiteFooter() {
               </li>
               <li>
                 <Link
-                  href="/contractor/jobs"
+                  href="/for-contractors"
                   className="text-ink-600 hover:text-brand transition-colors duration-200"
                 >
-                  Browse Jobs
+                  For Contractors
                 </Link>
               </li>
               <li>

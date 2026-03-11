@@ -60,7 +60,7 @@
 
 **Changes**:
 - Added "Contact Support" link as first item in Quick Links
-- Uses mailto: quoteexpert@gmail.com with pre-filled subject line
+- Uses mailto: quotexbert@gmail.com with pre-filled subject line
 - Simple, zero-overhead support solution
 
 ---

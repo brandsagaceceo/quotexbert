@@ -43,6 +43,15 @@ export default function SiteHeader() {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Support Phone */}
+            <a
+              href="tel:9052429460"
+              className="flex items-center gap-2 text-gray-700 hover:text-rose-700 font-semibold text-sm transition-colors duration-200 border-l border-gray-200 pl-6"
+            >
+              <span className="text-xs text-gray-500 font-normal">Need Help?</span>
+              <span>📞 905-242-9460</span>
+            </a>
           </nav>
 
           {/* Right Side Actions - BIGGER & MORE PROMINENT */}

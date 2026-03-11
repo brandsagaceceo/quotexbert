@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmailNotification } from "@/lib/email-notifications";
+import { updateContractorResponseTime } from "@/lib/responseTime";
 
 export async function GET(
   request: NextRequest,
@@ -175,6 +176,19 @@ export async function POST(
     } catch (emailError) {
       console.error('Failed to send email notification:', emailError);
       // Don't fail the request if email fails
+    }
+
+    // Update contractor response time metrics if contractor sent the message
+    if (senderRole === 'contractor') {
+      try {
+        // Run asynchronously without blocking the response
+        updateContractorResponseTime(senderId).catch(err => {
+          console.error('Error updating contractor response time:', err);
+        });
+      } catch (responseTimeError) {
+        console.error('Failed to trigger response time update:', responseTimeError);
+        // Don't fail the request if this fails
+      }
     }
 
     return NextResponse.json(message, { status: 201 });

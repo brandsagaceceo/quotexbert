@@ -47,6 +47,34 @@ async function logEmailEvent(
   }
 }
 
+/**
+ * Rate limiting for new lead emails
+ * Maximum 5 new lead emails per contractor per hour
+ */
+async function checkEmailRateLimit(userId: string, emailType: string = 'new_lead'): Promise<boolean> {
+  try {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    
+    const recentEmails = await prisma.emailEvent.count({
+      where: {
+        userId,
+        type: emailType,
+        status: 'sent',
+        createdAt: {
+          gte: oneHourAgo,
+        },
+      },
+    });
+
+    // Allow maximum 5 emails per hour
+    return recentEmails < 5;
+  } catch (error) {
+    console.error('[EMAIL] Failed to check rate limit:', error);
+    // On error, allow the email (fail open)
+    return true;
+  }
+}
+
 interface LeadEmailPayload {
   postalCode: string;
   projectType: string;
@@ -487,6 +515,192 @@ export async function sendContractAcceptedEmail(params: {
     return { success: true };
   } catch (error) {
     console.error("Failed to send contract accepted email:", error);
+    return { success: false, error };
+  }
+}
+
+// Job Accepted Email (for homeowner)
+export async function sendJobAcceptedEmail(
+  homeowner: { id: string; email: string; name?: string | null },
+  contractor: { companyName: string; name?: string | null },
+  job: { id: string; title: string; category: string; city?: string }
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping job accepted email');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: homeowner.email,
+      subject: `${contractor.companyName} Accepted Your Job! ✅`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0;">Good News!</h1>
+              </div>
+              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
+                <h2>Hi ${homeowner.name || 'there'}! 🎉</h2>
+                <p><strong>${contractor.companyName}</strong> has accepted your job request!</p>
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+                  <h3 style="margin-top: 0;">${job.title}</h3>
+                  <p><strong>Contractor:</strong> ${contractor.companyName}</p>
+                  <p><strong>Category:</strong> ${job.category}</p>
+                  ${job.city ? `<p><strong>Location:</strong> ${job.city}</p>` : ''}
+                </div>
+                <p><strong>Next Steps:</strong></p>
+                <ul>
+                  <li>Message the contractor to discuss details</li>
+                  <li>Schedule a site visit if needed</li>
+                  <li>Request and review their quote</li>
+                </ul>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${baseUrl}/messages" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Message Contractor</a>
+                </div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    await logEmailEvent('job_accepted', homeowner.email, homeowner.id, job.id, undefined, 'sent');
+    console.log(`[EMAIL] Job accepted notification sent to ${homeowner.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('job_accepted', homeowner.email, homeowner.id, job.id, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send job accepted email:', error);
+    return { success: false, error };
+  }
+}
+
+// New Renovation Lead Email (for contractor matching their categories)
+export async function sendNewRenovationLeadEmail(
+  contractor: { id: string; email: string; companyName?: string | null },
+  job: { id: string; title: string; category: string; city?: string; estimatedPrice?: string | null; description?: string }
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping renovation lead email');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  // Check rate limit (max 5 emails per hour per contractor)
+  const canSendEmail = await checkEmailRateLimit(contractor.id, 'new_lead');
+  if (!canSendEmail) {
+    console.log(`[EMAIL] Rate limit reached for contractor ${contractor.id}, skipping new lead email`);
+    await logEmailEvent('new_lead', contractor.email, contractor.id, job.id, undefined, 'failed', 'Rate limit exceeded (max 5 per hour)');
+    return { success: false, error: 'Rate limit exceeded' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: contractor.email,
+      subject: `New ${job.category} Lead on QuoteXbert`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0;">New Renovation Lead</h1>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">QuoteXbert</p>
+              </div>
+              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
+                <div style="background: white; padding: 25px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9f1239;">
+                  <h2 style="margin-top: 0; color: #9f1239;">${job.title || job.category}</h2>
+                  ${job.city ? `<p style="font-size: 16px; margin: 10px 0;"><strong>📍 Location:</strong> ${job.city}</p>` : ''}
+                  ${job.estimatedPrice ? `<p style="font-size: 18px; margin: 10px 0; color: #10b981;"><strong>💰 Estimated:</strong> ${job.estimatedPrice}</p>` : ''}
+                  ${job.description ? `<p style="margin: 15px 0; color: #666;">${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}</p>` : ''}
+                </div>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px;">View Lead</a>
+                </div>
+                <p style="color: #6b7280; font-size: 13px; text-align: center;">You're receiving this because this job matches your selected categories.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    await logEmailEvent('new_lead', contractor.email, contractor.id, job.id, undefined, 'sent');
+    console.log(`[EMAIL] New renovation lead sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('new_lead', contractor.email, contractor.id, job.id, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send renovation lead email:', error);
+    return { success: false, error };
+  }
+}
+
+// Review Received Email (for contractor)
+export async function sendReviewReceivedEmail(
+  contractor: { id: string; email: string; companyName?: string | null },
+  review: { id: string; rating: number; comment?: string | null; reviewerName?: string }
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping review email');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const stars = '⭐'.repeat(review.rating);
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      to: contractor.email,
+      subject: `New ${review.rating}-Star Review Received! ⭐`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0;">New Review!</h1>
+              </div>
+              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
+                <h2>Great news, ${contractor.companyName || 'there'}! 🎉</h2>
+                <p>You've received a new review on QuoteXbert:</p>
+                <div style="background: white; padding: 25px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                  <div style="font-size: 24px; margin-bottom: 10px;">${stars}</div>
+                  <p style="margin: 10px 0;"><strong>Rating:</strong> ${review.rating}/5</p>
+                  ${review.reviewerName ? `<p style="margin: 10px 0;"><strong>From:</strong> ${review.reviewerName}</p>` : ''}
+                  ${review.comment ? `
+                    <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                      <p style="margin: 0; font-style: italic;">"${review.comment}"</p>
+                    </div>
+                  ` : ''}
+                </div>
+                <p><strong>Why reviews matter:</strong></p>
+                <ul>
+                  <li>Build trust with potential clients</li>
+                  <li>Improve your ranking in search results</li>
+                  <li>Showcase your quality work</li>
+                </ul>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${baseUrl}/contractor/profile" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Your Profile</a>
+                </div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    await logEmailEvent('review_received', contractor.email, contractor.id, undefined, review.id, 'sent');
+    console.log(`[EMAIL] Review notification sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('review_received', contractor.email, contractor.id, undefined, review.id, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send review email:', error);
     return { success: false, error };
   }
 }

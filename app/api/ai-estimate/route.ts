@@ -239,7 +239,8 @@ function detectProjectCategory(description: string): string {
 
 // Helper to generate a concise project title
 function generateProjectTitle(description: string, category: string): string {
-  const firstSentence = description.split(/[.!?]/)[0].trim();
+  const sentences = description.split(/[.!?]/);
+  const firstSentence = sentences.length > 0 && sentences[0] ? sentences[0].trim() : description.trim();
   const shortDesc = firstSentence.length > 50 ? firstSentence.substring(0, 50) + '...' : firstSentence;
   
   const categoryNames: Record<string, string> = {

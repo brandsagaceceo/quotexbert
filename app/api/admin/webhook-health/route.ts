@@ -34,9 +34,9 @@ export async function GET() {
         FROM "StripeWebhookLog"
         ORDER BY "createdAt" DESC
         LIMIT 20
-      `;
+      `;  
       recentEvents = events;
-      if (events.length > 0) {
+      if (events.length > 0 && events[0]) {
         lastWebhookTime = events[0].createdAt.toISOString();
       }
     } catch (error) {
@@ -49,7 +49,7 @@ export async function GET() {
           select: { createdAt: true }
         });
         
-        if (transactions.length > 0) {
+        if (transactions.length > 0 && transactions[0]) {
           lastWebhookTime = transactions[0].createdAt.toISOString();
           recentEvents = transactions.map(t => ({
             type: 'invoice.payment_succeeded (inferred)',

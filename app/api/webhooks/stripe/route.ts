@@ -141,8 +141,10 @@ async function handleCheckoutSessionCompleted(session: any) {
       try {
         const { stripe } = await import('@/lib/stripe');
         const subscriptionDetails = await stripe.subscriptions.retrieve(session.subscription as string);
-        currentPeriodEnd = new Date(subscriptionDetails.current_period_end * 1000);
-        console.log(`[STRIPE WEBHOOK] Retrieved subscription period end: ${currentPeriodEnd}`);
+        if (subscriptionDetails && 'current_period_end' in subscriptionDetails) {
+          currentPeriodEnd = new Date((subscriptionDetails.current_period_end as number) * 1000);
+          console.log(`[STRIPE WEBHOOK] Retrieved subscription period end: ${currentPeriodEnd}`);
+        }
       } catch (subError) {
         console.error("[STRIPE WEBHOOK] Failed to retrieve subscription details:", subError);
       }

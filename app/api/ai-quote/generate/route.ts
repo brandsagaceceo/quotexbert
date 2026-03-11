@@ -181,7 +181,7 @@ IMPORTANT:
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -265,8 +265,10 @@ function generateFallbackQuote(params: {
   const budgetMatch = budget.match(/\$?([\d,]+)/g);
   let estimateHigh = 15000;
   if (budgetMatch && budgetMatch.length > 0) {
-    const lastAmount = budgetMatch[budgetMatch.length - 1].replace(/,/g, '');
-    estimateHigh = parseInt(lastAmount) || 15000;
+    const lastAmount = budgetMatch[budgetMatch.length - 1];
+    if (lastAmount) {
+      estimateHigh = parseInt(lastAmount.replace(/,/g, '')) || 15000;
+    }
   }
   
   const materials = Math.round(estimateHigh * 0.40);

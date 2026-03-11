@@ -234,7 +234,7 @@ export default function EditJobPage() {
               </label>
               <PhotoUpload
                 photos={photos}
-                onChange={setPhotos}
+                onPhotosChange={setPhotos}
                 maxPhotos={5}
               />
             </div>

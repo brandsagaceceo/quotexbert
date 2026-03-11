@@ -11,6 +11,7 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { StickyCTA } from "@/components/StickyCTA";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { trackEstimateComplete, trackCTAClick } from "@/components/GoogleAnalytics";
+import RecentActivityFeed from "@/components/RecentActivityFeed";
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
@@ -223,6 +224,66 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Trust Strip - Added below hero */}
+        <section className="py-8 bg-white border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {/* Badge 1 */}
+              <div className="flex items-center gap-3 justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ AI Estimates</div>
+                  <div className="text-xs text-gray-600 hidden md:block">Instant pricing</div>
+                </div>
+              </div>
+
+              {/* Badge 2 */}
+              <div className="flex items-center gap-3 justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Verified Contractors</div>
+                  <div className="text-xs text-gray-600 hidden md:block">Licensed pros</div>
+                </div>
+              </div>
+
+              {/* Badge 3 */}
+              <div className="flex items-center gap-3 justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Real Reviews</div>
+                  <div className="text-xs text-gray-600 hidden md:block">Verified feedback</div>
+                </div>
+              </div>
+
+              {/* Badge 4 */}
+              <div className="flex items-center gap-3 justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-rose-100 to-rose-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Toronto Focused</div>
+                  <div className="text-xs text-gray-600 hidden md:block">GTA marketplace</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Who Are You? Split Path Section */}
         {!estimateResult && (
           <section className="py-16 bg-gradient-to-br from-white to-orange-50">
@@ -277,7 +338,7 @@ export default function Home() {
               {/* Mid-Renovation Tool */}
               <div className="mt-8 max-w-4xl mx-auto">
                 <Link
-                  href="/renovation-check"
+                  href="/ai-renovation-check"
                   className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all flex items-center gap-6"
                 >
                   <div className="text-5xl group-hover:scale-110 transition-transform">🔍</div>
@@ -285,7 +346,7 @@ export default function Home() {
                     <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
                       NEW FEATURE
                     </div>
-                    <h3 className="text-xl font-black text-slate-900 mb-2">Ask AI About Your Renovation</h3>
+                    <h3 className="text-xl font-black text-slate-900 mb-2">AI Renovation Inspector</h3>
                     <p className="text-slate-600 text-sm">
                       Upload photos of work in progress and get AI guidance on whether it looks correct. Perfect for peace of mind during renovations.
                     </p>
@@ -320,6 +381,78 @@ export default function Home() {
 
         {/* Trust Signals Section */}
         <TrustSignals />
+
+        {/* Recent Activity Feed */}
+        <section className="py-16 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <RecentActivityFeed
+              maxItems={10}
+              showTitle={true}
+              title="Real Renovation Estimates Happening Right Now"
+              description="See live activity from homeowners and contractors across Toronto & GTA"
+            />
+          </div>
+        </section>
+
+        {/* Trust Indicators - Testimonials */}
+        <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+                Trusted by Toronto Homeowners and Contractors
+              </h2>
+              <p className="text-xl text-slate-600">Real feedback from real people</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Homeowner Testimonial */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-slate-200">
+                <div className="flex items-center gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className="w-6 h-6 text-amber-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
+                  "Got a renovation quote in seconds and found a contractor quickly. The AI estimate was spot-on and saved me so much time compared to waiting days for quotes."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    S
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900">Sarah M.</div>
+                    <div className="text-sm text-slate-600">Homeowner, Toronto</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contractor Testimonial */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-slate-200">
+                <div className="flex items-center gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className="w-6 h-6 text-amber-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
+                  "Better than bidding sites. I pick the jobs I want and homeowners already have realistic budgets. No more lowball offers or tire kickers wasting my time."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-sky-400 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    M
+                  </div>
+                  <div>
+                    <div className="font-bold text-slate-900">Mike R.</div>
+                    <div className="text-sm text-slate-600">Contractor, GTA</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* How It Works */}
         <HowItWorksSection />

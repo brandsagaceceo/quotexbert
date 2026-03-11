@@ -75,7 +75,7 @@ function enhanceMessage(message: string, context?: string): string {
       
       if (match === match.toUpperCase() && match.length > 0) {
         return replacement.toUpperCase();
-      } else if (match.length > 0 && match[0] === match[0].toUpperCase()) {
+      } else if (match.length > 0 && match[0] && match[0] === match[0].toUpperCase()) {
         return replacement.charAt(0).toUpperCase() + replacement.slice(1);
       }
       return replacement;

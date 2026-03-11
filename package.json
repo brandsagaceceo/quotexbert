@@ -37,6 +37,7 @@
     "@vercel/blob": "^2.0.0",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
+    "date-fns": "^4.1.0",
     "firebase": "^12.3.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.545.0",

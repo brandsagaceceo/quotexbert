@@ -10,6 +10,9 @@ import { canAcceptJob, isGodUser } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
 import { ToastContainer, type Toast } from "@/components/ToastNotification";
 import LoadingState from "@/components/ui/LoadingState";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { formatDistanceToNow } from "date-fns";
+import { ContractorMetricsCard } from "@/components/ContractorMetricsCard";
 
 interface JobFilters {
   category?: string;
@@ -17,6 +20,8 @@ interface JobFilters {
   maxBudget?: number | undefined;
   location?: string;
   search?: string;
+  sortBy?: 'newest' | 'budget-high' | 'budget-low';
+  urgency?: 'hot' | 'active' | 'older';
 }
 
 export default function ContractorJobsPage() {
@@ -31,6 +36,7 @@ export default function ContractorJobsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showOnboardingPopup, setShowOnboardingPopup] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [newJobAlert, setNewJobAlert] = useState<any | null>(null);
   const { authUser: user, isSignedIn } = useAuth();
   const router = useRouter();
 
@@ -131,6 +137,36 @@ export default function ContractorJobsPage() {
       );
     }
 
+    // Filter by urgency
+    if (filters.urgency) {
+      filtered = filtered.filter(job => {
+        const minutesAgo = (Date.now() - new Date(job.createdAt).getTime()) / 60000;
+        if (filters.urgency === 'hot') return minutesAgo <= 30;
+        if (filters.urgency === 'active') return minutesAgo > 30 && minutesAgo <= 360;
+        if (filters.urgency === 'older') return minutesAgo > 360;
+        return true;
+      });
+    }
+
+    // Apply sorting
+    if (filters.sortBy === 'newest') {
+      filtered = filtered.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } else if (filters.sortBy === 'budget-high') {
+      filtered = filtered.sort((a, b) => {
+        const budgetA = parseInt(a.budget?.replace(/[^0-9]/g, '') || '0');
+        const budgetB = parseInt(b.budget?.replace(/[^0-9]/g, '') || '0');
+        return budgetB - budgetA;
+      });
+    } else if (filters.sortBy === 'budget-low') {
+      filtered = filtered.sort((a, b) => {
+        const budgetA = parseInt(a.budget?.replace(/[^0-9]/g, '') || '0');
+        const budgetB = parseInt(b.budget?.replace(/[^0-9]/g, '') || '0');
+        return budgetA - budgetB;
+      });
+    }
+
     setFilteredJobs(filtered);
   };
 
@@ -172,10 +208,16 @@ export default function ContractorJobsPage() {
   useJobNotifications({
     userId: user?.id || '',
     enabled: isSignedIn && !!user,
-    pollInterval: 15000, // Check every 15 seconds
+    pollInterval: 30000, // Check every 30 seconds
     onNewJob: (job: Job) => {
       // Refresh jobs list
       fetchJobs();
+      
+      // Show alert banner for matching jobs
+      if (subscriptions.some(sub => sub.category === job.category && sub.status === 'active')) {
+        setNewJobAlert(job);
+        setTimeout(() => setNewJobAlert(null), 60000); // Hide after 1 minute
+      }
       
       // Show toast notification
       addToast({
@@ -366,6 +408,113 @@ export default function ContractorJobsPage() {
           )}
         </div>
 
+        {/* Performance Metrics */}
+        {user?.id && (
+          <div className="mb-6">
+            <ContractorMetricsCard contractorId={user.id} />
+          </div>
+        )}
+
+        {/* New Job Alert Banner */}
+        {newJobAlert && (
+          <div className="mb-6 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-2xl p-6 shadow-2xl animate-pulse">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl">🔥</span>
+                  <h3 className="text-2xl font-black">New Renovation Lead Near You!</h3>
+                </div>
+                <div className="space-y-1 text-lg">
+                  <p className="font-semibold">{newJobAlert.location} – {newJobAlert.category} – {newJobAlert.budget}</p>
+                  <p className="opacity-90">{newJobAlert.title}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const element = document.getElementById(`job-${newJobAlert.id}`);
+                    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setNewJobAlert(null);
+                  }}
+                  className="mt-4 bg-white text-orange-600 font-bold py-2 px-6 rounded-lg hover:bg-orange-50 transition"
+                >
+                  View Job →
+                </button>
+              </div>
+              <button
+                onClick={() => setNewJobAlert(null)}
+                className="text-white hover:text-orange-100 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Hot Leads Filters */}
+        <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 p-4">
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                const newFilters = { ...filters };
+                delete newFilters.urgency;
+                delete newFilters.sortBy;
+                setFilters(newFilters);
+              }}
+              className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${
+                !filters.urgency && !filters.sortBy
+                  ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Jobs
+            </button>
+            <button
+              onClick={() => {
+                const newFilters = { ...filters };
+                newFilters.urgency = 'hot';
+                delete newFilters.sortBy;
+                setFilters(newFilters);
+              }}
+              className={`px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+                filters.urgency === 'hot'
+                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                  : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-2 border-orange-200'
+              }`}
+            >
+              <span>🔥</span> Hot Leads
+            </button>
+            <button
+              onClick={() => {
+                const newFilters = { ...filters };
+                delete newFilters.urgency;
+                newFilters.sortBy = 'newest';
+                setFilters(newFilters);
+              }}
+              className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${
+                filters.sortBy === 'newest'
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
+                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-2 border-blue-200'
+              }`}
+            >
+              ✨ Newest Jobs
+            </button>
+            <button
+              onClick={() => {
+                const newFilters = { ...filters };
+                delete newFilters.urgency;
+                newFilters.sortBy = 'budget-high';
+                setFilters(newFilters);
+              }}
+              className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${
+                filters.sortBy === 'budget-high'
+                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                  : 'bg-green-50 text-green-700 hover:bg-green-100 border-2 border-green-200'
+              }`}
+            >
+              💰 Highest Value
+            </button>
+          </div>
+        </div>
+
         {/* Filter Section */}
         <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/50">
           <div className="p-4 border-b border-gray-200">
@@ -384,7 +533,7 @@ export default function ContractorJobsPage() {
           
           {showFilters && (
             <div className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4 mb-4">
                 {/* Search */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -469,6 +618,23 @@ export default function ContractorJobsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
+
+                {/* Sort By */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Sort By
+                  </label>
+                  <select
+                    value={filters.sortBy || ''}
+                    onChange={(e) => handleFilterChange({ sortBy: e.target.value as 'newest' | 'budget-high' | 'budget-low' || undefined })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <option value="">Default</option>
+                    <option value="newest">Newest First</option>
+                    <option value="budget-high">Highest Budget</option>
+                    <option value="budget-low">Lowest Budget</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -522,16 +688,44 @@ export default function ContractorJobsPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2">
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2 mb-2">
                       <span className="whitespace-nowrap">📍 {job.location || job.zipCode}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
                       <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
+                      {/* Contractor Interest Counter */}
+                      {job._count?.applications > 0 && (
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded whitespace-nowrap font-semibold flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                          </svg>
+                          {job._count.applications} contractor{job._count.applications !== 1 ? 's' : ''} interested
+                        </span>
+                      )}
                     </div>
+                    {/* Urgency Badge */}
+                    <UrgencyBadge createdAt={job.createdAt} />
+                    {/* Claimed Badge */}
+                    {job.claimed && job.claimedBy && (
+                      <div className="mt-2 flex items-center gap-2 text-sm">
+                        <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                          🔥 Claimed
+                          {job.claimedAt && (
+                            <span className="text-xs opacity-75">
+                              {new Date(job.createdAt).getTime() - new Date(job.claimedAt).getTime() < 3600000 
+                                ? 'recently' 
+                                : formatDistanceToNow(new Date(job.claimedAt), { addSuffix: true })}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    job.status === 'Open' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    job.status === 'open' ? 'bg-green-100 text-green-800' : 
+                    job.status === 'claimed' ? 'bg-orange-100 text-orange-800' :
+                    'bg-gray-100 text-gray-800'
                   }`}>
-                    {job.status}
+                    {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                   </span>
                 </div>
                 

@@ -222,6 +222,10 @@ ESTIMATION GUIDELINES:
   const maxAttempts = 2;
   let lastError: Error | null = null;
 
+  if (!openai) {
+    throw new Error("OpenAI service is not available");
+  }
+
   while (attempt < maxAttempts) {
     try {
       const completion = await openai.chat.completions.create({
@@ -320,6 +324,10 @@ Consider:
 - Industry standard pricing
 
 Be realistic and conservative. Return ONLY the JSON, no other text.`;
+
+  if (!openai) {
+    throw new Error("OpenAI service is not available");
+  }
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

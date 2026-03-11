@@ -38,7 +38,7 @@ Please explain in 3-4 paragraphs:
 Be specific, friendly, and educational. Help homeowners understand the value. Use real numbers from their quote.`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",

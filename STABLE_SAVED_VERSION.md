@@ -1,4 +1,4 @@
-# 🚀 STABLE SAVED VERSION – QuotexBert
+# 🚀 STABLE SAVED VERSION – QuoteXbert
 
 **Date**: August 16, 2025  
 **Status**: ✅ FULLY OPERATIONAL & STABLE  

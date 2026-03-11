@@ -19,7 +19,7 @@
 **Problem**: No easy way to contact support  
 **Solution**: Mailto link in footer
 - File: `app/_components/site-footer.tsx`
-- Link: `mailto:quoteexpert@gmail.com`
+- Link: `mailto:quotexbert@gmail.com`
 
 ### 4. Comp Subscription System
 **Problem**: Need to grant free PRO access to test account
@@ -234,7 +234,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ## 📞 Support
 
-Email: quoteexpert@gmail.com  
+Email: quotexbert@gmail.com  
 Admin Dashboard: https://quotexbert.com/admin/affiliates  
 Comp Subscription: `POST /api/admin/comp` with `x-admin-token` header
 

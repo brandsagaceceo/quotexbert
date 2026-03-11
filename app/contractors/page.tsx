@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import {
   Search,
   MapPin,
@@ -30,7 +32,8 @@ interface ContractorProfile {
   reviewCount: number;
   profilePhoto?: string;
   portfolio?: any[];
-  completedJobs?: number;
+  completedJobs: number;
+  responseTimeLabel?: string;
 }
 
 export default function ContractorSearchPage() {
@@ -79,7 +82,7 @@ export default function ContractorSearchPage() {
           verified: true,
           avgRating: 4.8,
           reviewCount: 24,
-          completedJobs: 156
+          completedJobs: 27
         },
         {
           id: "contractor-2",
@@ -93,7 +96,7 @@ export default function ContractorSearchPage() {
           verified: true,
           avgRating: 4.9,
           reviewCount: 18,
-          completedJobs: 89
+          completedJobs: 18
         },
         {
           id: "contractor-3",
@@ -423,17 +426,21 @@ export default function ContractorSearchPage() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="text-base md:text-lg font-bold text-gray-900 truncate">{contractor.companyName}</h3>
-                              {contractor.verified && (
-                                <Award className="h-4 w-4 md:h-5 md:w-5 text-green-600 flex-shrink-0" />
-                              )}
+                              <VerifiedBadge verified={contractor.verified} size="sm" />
                             </div>
                             <p className="text-rose-700 font-medium text-sm md:text-base">{contractor.trade}</p>
                             {contractor.city && (
                               <div className="flex items-center text-gray-600 text-xs md:text-sm mt-1">
                                 <MapPin className="h-3 w-3 md:h-4 md:w-4 mr-1 flex-shrink-0" />
                                 <span className="truncate">{contractor.city} • {contractor.serviceRadiusKm}km radius</span>
+                              </div>
+                            )}
+                            {contractor.responseTimeLabel && (
+                              <div className="flex items-center gap-1 mt-2 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium w-fit">
+                                <span>⚡</span>
+                                <span>Responds in {contractor.responseTimeLabel}</span>
                               </div>
                             )}
                           </div>
@@ -492,9 +499,12 @@ export default function ContractorSearchPage() {
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Contact
                         </button>
-                        <button className="flex-1 sm:flex-none px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm md:text-base font-medium">
+                        <Link
+                          href={`/contractors/${contractor.userId}`}
+                          className="flex-1 sm:flex-none px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm md:text-base font-medium text-center"
+                        >
                           View Profile
-                        </button>
+                        </Link>
                       </div>
                     </div>
                   </div>

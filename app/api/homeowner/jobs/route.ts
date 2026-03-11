@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendEmailNotification } from '@/lib/email-notifications';
+import { sendNewRenovationLeadEmail } from '@/lib/email';
 
 // GET - Fetch homeowner's jobs with applications
 export async function GET(request: NextRequest) {
@@ -78,7 +79,12 @@ export async function POST(request: NextRequest) {
         select: {
           id: true,
           email: true,
-          name: true
+          name: true,
+          contractorProfile: {
+            select: {
+              companyName: true
+            }
+          }
         }
       });
 
@@ -102,19 +108,26 @@ export async function POST(request: NextRequest) {
           }
         }).catch(err => console.error('Failed to create notification:', err));
 
-        // Send email notification
-        return sendEmailNotification({
-          type: 'job_posted',
-          toEmail: contractor.email,
-          data: {
-            jobTitle: title,
-            jobId: job.id,
-            location: zipCode,
-            budget: budget,
-            category: category,
-            description: description
-          }
-        });
+        // Send email notification using new template
+        try {
+          await sendNewRenovationLeadEmail(
+            {
+              id: contractor.id,
+              email: contractor.email,
+              companyName: contractor.contractorProfile?.companyName || contractor.name || 'Contractor',
+            },
+            {
+              id: job.id,
+              title,
+              category,
+              city: zipCode,
+              description,
+            }
+          );
+        } catch (emailError) {
+          console.error(`Failed to send email to contractor ${contractor.id}:`, emailError);
+          // Don't fail the request if individual emails fail
+        }
       });
 
       await Promise.allSettled(notificationPromises);

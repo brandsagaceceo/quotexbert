@@ -116,6 +116,11 @@ export async function getAllOpenLeads() {
             name: true,
             email: true
           }
+        },
+        _count: {
+          select: {
+            applications: true
+          }
         }
       }
     });

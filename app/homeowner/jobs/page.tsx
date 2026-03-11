@@ -48,6 +48,7 @@ export default function HomeownerJobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
+  const [showAIBanner, setShowAIBanner] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -133,6 +134,41 @@ export default function HomeownerJobsPage() {
           </Button>
         </Link>
       </div>
+
+      {/* AI Renovation Inspector Banner */}
+      {showAIBanner && (
+        <div className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 shadow-lg">
+          <button
+            onClick={() => setShowAIBanner(false)}
+            className="float-right text-gray-400 hover:text-gray-600"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="flex items-start gap-4">
+            <div className="text-4xl">🔍</div>
+            <div className="flex-1">
+              <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
+                NEW FEATURE
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">AI Renovation Inspector</h3>
+              <p className="text-gray-700 mb-3 text-sm">
+                Renovation in progress? Upload photos and ask AI if the work looks correct. Get peace of mind before final payment.
+              </p>
+              <Link
+                href="/ai-renovation-check"
+                className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-semibold"
+              >
+                <span>Try It Free</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {jobs.length === 0 ? (
         <Card>

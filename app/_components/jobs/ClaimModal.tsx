@@ -181,6 +181,7 @@ export default function ClaimModal({
           </div>
         )}
       </div>
+      </div>
     </div>
   );
 }

@@ -18,7 +18,7 @@ export default function SiteFooter() {
                 height={32}
                 className="w-8 h-8"
               />
-              <span className="text-xl font-bold text-brand">quotexbert</span>
+              <span className="text-xl font-bold text-brand">QuoteXbert</span>
             </Link>
             <p className="text-ink-600 mb-4 max-w-md">
               Connect homeowners with trusted contractors. Get instant quotes
@@ -76,7 +76,7 @@ export default function SiteFooter() {
         {/* Bottom Bar */}
         <div className="border-t border-ink-200 mt-8 pt-8 text-center">
           <p className="text-sm text-ink-500">
-            © {currentYear} quotexbert. All rights reserved. Made with ❤️ in
+            © {currentYear} QuoteXbert. All rights reserved. Made with ❤️ in
             Canada.
           </p>
         </div>

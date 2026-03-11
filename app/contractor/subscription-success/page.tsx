@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function SubscriptionSuccessPage() {
   const router = useRouter();
-  const { authUser: user, refreshUser } = useAuth();
+  const { authUser: user } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Processing your subscription...');
 
@@ -22,11 +22,6 @@ export default function SubscriptionSuccessPage() {
       try {
         // Wait a bit for webhook to process
         await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Force refresh user data from server
-        if (refreshUser) {
-          await refreshUser();
-        }
 
         // Fetch fresh entitlements
         const response = await fetch(`/api/user/entitlements?userId=${user.id}`);
@@ -60,7 +55,7 @@ export default function SubscriptionSuccessPage() {
     }
 
     refreshEntitlements();
-  }, [user, router, refreshUser]);
+  }, [user, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-slate-50 flex items-center justify-center p-4">

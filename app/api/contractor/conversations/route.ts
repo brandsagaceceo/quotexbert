@@ -34,11 +34,15 @@ export async function GET(req: Request) {
                 email: true,
               }
             },
-            messages: {
-              orderBy: {
-                createdAt: 'desc'
-              },
-              take: 1
+            Thread: {
+              include: {
+                messages: {
+                  orderBy: {
+                    createdAt: 'desc'
+                  },
+                  take: 1
+                }
+              }
             }
           }
         }

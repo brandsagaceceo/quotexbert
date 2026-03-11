@@ -49,7 +49,7 @@ This document outlines all changes made and provides step-by-step testing proced
 6. ✅ **Expected:** `subscriptionPlan` = "HANDYMAN", `subscriptionStatus` = "active"
 7. Log in as that user → Navigate to `/profile/categories`
 8. Select 3 categories (e.g., Plumbing, Electrical, Drywall)
-9. Submit → Navigate to job board at `/jobs`
+9. Submit → Navigate to contractor landing page at `/for-contractors` (legacy `/jobs` redirects here)
 10. ✅ **Expected:** Only jobs matching selected categories visible
 
 **Tier Authorization Matrix:**

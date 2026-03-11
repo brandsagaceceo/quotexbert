@@ -260,6 +260,7 @@ export function ReviewForm({ contractorId, contractorName, leadId, onSubmit, onC
           </form>
         </div>
       </div>
+      </div>
     </div>
   );
 }

@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
             type: 'job_no_response',
             title: 'No contractors have responded yet',
             message: `Your job "${job.title}" hasn't received any bids yet. We've reached out to matching contractors in your area.`,
-            link: `/homeowner/jobs/${job.id}`,
+            relatedId: job.id,
+            relatedType: 'job',
             read: false
           }
         });
@@ -103,7 +104,8 @@ export async function POST(request: NextRequest) {
             type: 'job_viewed_no_bid',
             title: 'Contractors viewed your job',
             message: `${job.viewCount} contractor${job.viewCount > 1 ? 's' : ''} viewed your job "${job.title}" but haven't bid yet. Try adding more photos or details to get faster quotes.`,
-            link: `/homeowner/jobs/${job.id}`,
+            relatedId: job.id,
+            relatedType: 'job',
             read: false
           }
         });

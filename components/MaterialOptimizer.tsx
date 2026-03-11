@@ -235,7 +235,7 @@ export default function MaterialOptimizer() {
       }
     };
 
-    return recommendations[type] || recommendations['kitchen'];
+    return recommendations[type] || recommendations['kitchen']!;
   };
 
   return (

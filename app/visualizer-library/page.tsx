@@ -139,8 +139,11 @@ export default function VisualizerLibrary() {
       newIndex = currentIndex === filteredExamples.length - 1 ? 0 : currentIndex + 1;
     }
     
-    setSelectedExample(filteredExamples[newIndex]);
-    setShowBefore(true);
+    const nextExample = filteredExamples[newIndex];
+    if (nextExample) {
+      setSelectedExample(nextExample);
+      setShowBefore(true);
+    }
   };
 
   return (

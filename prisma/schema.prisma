@@ -90,6 +90,7 @@ model ContractorProfile {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   companyName     String
+  slug            String?  @unique // SEO-friendly URL slug (e.g., "mikes-plumbing-toronto")
   trade           String   // "plumbing", "electrical", "general", etc.
   bio             String?
   city            String?
@@ -99,14 +100,24 @@ model ContractorProfile {
   verified        Boolean  @default(false)
   avgRating       Float    @default(0)
   reviewCount     Int      @default(0)
+  completedJobs   Int      @default(0)  // Track completed jobs for contractor
+  categories      String   @default("[]") @db.Text // JSON array of service categories contractor offers
   isActive        Boolean  @default(true)
   profilePhoto    String?  // Added for profile photo storage
   coverPhoto      String?  // Added for cover photo storage
+  
+  // Response time tracking
+  avgResponseTimeMinutes Int?     // Average response time in minutes
+  responseTimeLabel      String?  // Human-readable label (e.g., "~2 hours", "~30 minutes")
+  totalResponses         Int      @default(0) // Total number of responses tracked
+  lastResponseCalculated DateTime? // Last time response metrics were calculated
   
   portfolio       PortfolioItem[]
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  
+  notifications   ContractorNotification[]
   
   @@map("contractor_profiles")
 }
@@ -120,6 +131,8 @@ model Lead {
   category         String
   status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "completed" | "closed"
   claimed          Boolean          @default(false)
+  claimedBy        String?          // Contractor ID who claimed first
+  claimedAt        DateTime?        // When lead was first claimed
   published        Boolean          @default(false) // Changed default to false - homeowner controls when to publish
   photos           String           @default("[]") @db.Text // JSON array of photo URLs
   userId           String?          // Added userId field for homeowner
@@ -137,6 +150,7 @@ model Lead {
   contractorId     String?
   contractor       User?            @relation("ContractorLeads", fields: [contractorId], references: [id])
   
+  completedAt      DateTime?        // When the job was completed
   acceptedById     String?          // Final selected contractor
   acceptedBy       User?            @relation("AcceptedLeads", fields: [acceptedById], references: [id])
   
@@ -425,8 +439,14 @@ model HomeownerProfile {
   name         String?
   city         String?
   phone        String?
-  profilePhoto String?  // Added for profile photo storage
-  coverPhoto   String?  // Added for cover photo storage
+  profilePhoto String?  // Profile photo storage
+  coverPhoto   String?  // Cover photo storage
+  
+  // New fields for enhanced homeowner profile
+  bio          String?  @db.Text // Short bio about homeowner
+  homeType     String?  // "house" | "condo" | "townhouse" | "apartment"
+  preferredRenovationTypes String @default("[]") // JSON array of renovation interests
+  budgetRange  String?  // Budget range preference (e.g., "5000-10000", "10000-25000")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -505,6 +525,25 @@ model Review {
   
   @@unique([leadId, homeownerId]) // One review per homeowner per lead
   @@map("reviews")
+}
+
+model ContractorNotification {
+  id             String   @id @default(cuid())
+  contractorId   String
+  contractor     ContractorProfile @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  
+  type           String   // "new_job_match", "job_accepted", "job_completed", "new_review"
+  title          String
+  message        String
+  jobId          String?
+  leadId         String?
+  
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  
+  @@index([contractorId, read])
+  @@index([createdAt])
+  @@map("contractor_notifications")
 }
 
 // New Conversation System for Job Communication
@@ -969,4 +1008,57 @@ model StripeWebhookLog {
   @@index([createdAt])
   @@index([processed])
   @@map("stripe_webhook_logs")
+}
+
+// ============================================
+// GROWTH FEATURES - REFERRAL SYSTEMS
+// ============================================
+
+// Contractor referral tracking
+model ContractorReferral {
+  id             String   @id @default(cuid())
+  referrerId     String   // Contractor who sent the invitation
+  referredEmail  String   // Email of invited contractor
+  referredUserId String?  // User ID once they sign up  
+  status         String   @default("pending") // 'pending' | 'signed_up' | 'active'
+  rewardEarned   Int      @default(0) // Credits or currency earned
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([referrerId])
+  @@index([referredEmail])
+  @@index([status])
+  @@map("contractor_referrals")
+}
+
+// Homeowner referral tracking  
+model HomeownerReferral {
+  id             String   @id @default(cuid())
+  referrerId     String   // Homeowner who shared the link
+  referredEmail  String?  // Email of invited friend (if captured)
+  referredUserId String?  // User ID once they sign up
+  status         String   @default("pending") // 'pending' | 'estimated' | 'posted_job'
+  estimateCount  Int      @default(0) // Number of estimates generated
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([referrerId])
+  @@index([status])
+  @@map("homeowner_referrals")
+}
+
+// Activity feed events - expanded tracking
+model ActivityFeedEvent {
+  id          String   @id @default(cuid())
+  type        String   // 'quote_generated' | 'job_posted' | 'contractor_joined' | 'job_claimed' | 'job_completed' | 'review_submitted'
+  category    String?  // Renovation category
+  city        String   // Location
+  estimate    Int?     // Estimated cost
+  contractorName String? // For contractor_joined events
+  rating      Int?     // For review_submitted events
+  createdAt   DateTime @default(now())
+  
+  @@index([type])
+  @@index([createdAt])
+  @@map("activity_feed_events")
 }

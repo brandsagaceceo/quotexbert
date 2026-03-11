@@ -27,7 +27,9 @@ export const metadata: Metadata = {
     description: 'AI-powered kitchen renovation estimates for Toronto homeowners.',
     images: ['https://quotexbert.com/og-kitchen.jpg'],
   },
-  canonical: 'https://quotexbert.com/toronto-kitchen-renovation',
+  alternates: {
+    canonical: 'https://quotexbert.com/toronto-kitchen-renovation',
+  },
 };
 
 export default function TorontoKitchenRenovationPage() {

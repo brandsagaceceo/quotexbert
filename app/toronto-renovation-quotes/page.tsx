@@ -27,7 +27,9 @@ export const metadata: Metadata = {
     description: 'Get accurate renovation estimates in Toronto instantly.',
     images: ['https://quotexbert.com/og-toronto-quotes.jpg'],
   },
-  canonical: 'https://quotexbert.com/toronto-renovation-quotes',
+  alternates: {
+    canonical: 'https://quotexbert.com/toronto-renovation-quotes',
+  },
 };
 
 export default function TorontoRenovationQuotesPage() {

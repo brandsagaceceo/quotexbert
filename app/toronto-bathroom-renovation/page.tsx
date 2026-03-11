@@ -27,7 +27,9 @@ export const metadata: Metadata = {
     description: 'AI-powered bathroom renovation estimates for Toronto homeowners.',
     images: ['https://quotexbert.com/og-bathroom.jpg'],
   },
-  canonical: 'https://quotexbert.com/toronto-bathroom-renovation',
+  alternates: {
+    canonical: 'https://quotexbert.com/toronto-bathroom-renovation',
+  },
 };
 
 export default function TorontoBathroomRenovationPage() {

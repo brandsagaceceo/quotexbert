@@ -6,9 +6,7 @@ import { z } from 'zod';
 // Schema for validating the request
 const compSubscriptionSchema = z.object({
   email: z.string().email('Invalid email address'),
-  tier: z.enum(['FREE', 'HANDYMAN', 'RENOVATION', 'GENERAL'], {
-    errorMap: () => ({ message: 'Tier must be one of: FREE, HANDYMAN, RENOVATION, GENERAL' })
-  }),
+  tier: z.enum(['FREE', 'HANDYMAN', 'RENOVATION', 'GENERAL']).describe('Tier must be one of: FREE, HANDYMAN, RENOVATION, GENERAL'),
   expiresAt: z.string().datetime().optional().nullable(),
   reason: z.string().max(500).optional(),
 });

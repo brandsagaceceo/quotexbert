@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface ContractorInfo {
   userId: string;
@@ -9,6 +10,7 @@ interface ContractorInfo {
   verified: boolean;
   avgRating: number;
   reviewCount: number;
+  completedJobs?: number;
 }
 
 interface ContractorCardProps {
@@ -47,18 +49,14 @@ export function ContractorCard({
     <div className={`bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors ${sizeClasses[size]}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Link 
               href={`/contractors/${contractor.userId}`}
               className="font-semibold text-white hover:text-blue-400 transition-colors"
             >
               {contractor.companyName}
             </Link>
-            {contractor.verified && (
-              <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
-                ✓
-              </span>
-            )}
+            <VerifiedBadge verified={contractor.verified} size="sm" />
           </div>
           
           {showTrade && (
@@ -75,8 +73,8 @@ export function ContractorCard({
         </div>
       </div>
 
-      {showRating && contractor.reviewCount > 0 && (
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-700">
+      {showRating && (contractor.reviewCount > 0 || contractor.avgRating > 0) && (
+        <div className="flex items-center gap-2 pt-2 border-t border-gray-700 flex-wrap">
           <div className="flex items-center gap-1">
             {renderStars(contractor.avgRating)}
             <span className="text-sm font-medium text-white ml-1">
@@ -159,15 +157,11 @@ export function ContractorListItem({
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h3 className="font-semibold text-white">
               {contractor.companyName}
             </h3>
-            {contractor.verified && (
-              <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                ✓ Verified
-              </span>
-            )}
+            <VerifiedBadge verified={contractor.verified} size="sm" />
           </div>
           
           <div className="flex items-center gap-4 text-sm text-gray-400">

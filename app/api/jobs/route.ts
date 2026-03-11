@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Get all open leads - contractors can view all but only apply to subscribed categories
     const leads = await getAllOpenLeads();
 
-    const jobs = leads.map(lead => ({
+    const jobs = leads.map((lead: any) => ({
       id: lead.id,
       title: lead.title || `${lead.category} Project`,
       description: lead.description || 'No description available',
@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
       status: lead.status || 'open',
       homeowner: lead.homeowner?.name || 'Anonymous',
       photos: lead.photos || '[]', // Include photos from lead
-      createdAt: lead.createdAt
+      createdAt: lead.createdAt,
+      _count: {
+        applications: lead._count?.applications || 0
+      }
     }));
 
     return NextResponse.json({

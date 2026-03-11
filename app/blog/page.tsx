@@ -536,8 +536,28 @@ export default function BlogPage() {
 
         {/* Blog Grid */}
         <section className="max-w-6xl mx-auto px-4 py-12">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => {
+          {filteredPosts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">No Articles Yet</h3>
+              <p className="text-slate-600 mb-8 max-w-md mx-auto">
+                We're working on bringing you helpful renovation guides for this category. Check back soon!
+              </p>
+              <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-8">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
+                    <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-2xl">🔨</span>
+                    </div>
+                    <h4 className="font-semibold text-slate-800 mb-2">Coming Soon</h4>
+                    <p className="text-sm text-slate-600">Expert guides for Toronto homeowners</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPosts.map((post) => {
               // Ensure every blog post has an image - use fallback if missing or invalid
               const imageUrl = post.imageUrl && post.imageUrl.trim() !== '' ? post.imageUrl : DEFAULT_BLOG_IMAGE;
               
@@ -616,7 +636,8 @@ export default function BlogPage() {
               </article>
               );
             })}
-          </div>
+            </div>
+          )}
         </section>
 
         {/* DIY Guides Section */}

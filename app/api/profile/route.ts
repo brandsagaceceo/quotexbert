@@ -78,6 +78,10 @@ export async function GET(request: NextRequest) {
         phone: user.homeownerProfile.phone,
         profilePhoto: user.homeownerProfile.profilePhoto,
         coverPhoto: user.homeownerProfile.coverPhoto,
+        bio: user.homeownerProfile.bio,
+        homeType: user.homeownerProfile.homeType,
+        preferredRenovationTypes: JSON.parse(user.homeownerProfile.preferredRenovationTypes || "[]"),
+        budgetRange: user.homeownerProfile.budgetRange,
         totalJobs: user._count.leads
       })
     };
@@ -137,7 +141,14 @@ export async function PUT(request: NextRequest) {
         city: updateData.city || user.homeownerProfile?.city,
         phone: updateData.phone || user.homeownerProfile?.phone,
         profilePhoto: updateData.profilePhoto !== undefined ? updateData.profilePhoto : user.homeownerProfile?.profilePhoto,
-        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : user.homeownerProfile?.coverPhoto
+        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : user.homeownerProfile?.coverPhoto,
+        // New fields
+        bio: updateData.bio !== undefined ? updateData.bio : user.homeownerProfile?.bio,
+        homeType: updateData.homeType !== undefined ? updateData.homeType : user.homeownerProfile?.homeType,
+        preferredRenovationTypes: updateData.preferredRenovationTypes !== undefined 
+          ? JSON.stringify(updateData.preferredRenovationTypes) 
+          : user.homeownerProfile?.preferredRenovationTypes || "[]",
+        budgetRange: updateData.budgetRange !== undefined ? updateData.budgetRange : user.homeownerProfile?.budgetRange
       };
 
       await prisma.homeownerProfile.upsert({

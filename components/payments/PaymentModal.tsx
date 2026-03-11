@@ -249,6 +249,7 @@ export default function PaymentModal({
           />
         </Elements>
       </div>
+      </div>
     </div>
   );
 }

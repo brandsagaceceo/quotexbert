@@ -132,6 +132,7 @@ export default function PaymentReleaseModal({
           </button>
         </div>
       </div>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
 import { canAccessLead as canAccessLeadGod } from "@/lib/god-access";
 import { sendEmailNotification } from "@/lib/email-notifications";
+import { sendJobAcceptedEmail } from "@/lib/email";
 
 export async function POST(
   request: NextRequest,
@@ -71,6 +72,9 @@ export async function POST(
       );
     }
 
+    // Check if this is the first claim
+    const isFirstClaim = !currentLead.claimed && currentAcceptedList.length === 0;
+
     // Check if job has reached maximum acceptances (3 contractors)
     if (currentAcceptedList.length >= 3) {
       return NextResponse.json(
@@ -104,15 +108,32 @@ export async function POST(
     // Update acceptedContractors array
     const updatedAccepted = [...currentAcceptedList, contractorId];
     
-    // If this is the 3rd contractor, close the job
-    const newStatus = updatedAccepted.length >= 3 ? 'closed' : currentAcceptedList.length === 0 ? 'reviewing' : currentLead.status;
+    // Determine new status based on acceptance count
+    let newStatus = currentLead.status;
+    if (updatedAccepted.length >= 3) {
+      newStatus = 'closed'; // Job is closed after 3 contractors
+    } else if (isFirstClaim) {
+      newStatus = 'claimed'; // First contractor claimed the job
+    } else if (currentAcceptedList.length === 0) {
+      newStatus = 'reviewing';
+    }
+    
+    // Prepare update data
+    const leadUpdateData: any = {
+      acceptedContractors: JSON.stringify(updatedAccepted),
+      claimed: true,
+      status: newStatus
+    };
+
+    // If this is the first claim, set claiming fields
+    if (isFirstClaim) {
+      leadUpdateData.claimedBy = contractorId;
+      leadUpdateData.claimedAt = new Date();
+    }
     
     await prisma.lead.update({
       where: { id: jobId },
-      data: { 
-        acceptedContractors: JSON.stringify(updatedAccepted),
-        status: newStatus
-      }
+      data: leadUpdateData
     });
 
     // Check if thread already exists for this lead
@@ -163,22 +184,33 @@ export async function POST(
       }
     });
 
-    // Send email notification to homeowner
+    // Send email notification to homeowner using new email template
     try {
-      await sendEmailNotification({
-        type: 'quote_received', // Using quote_received template as closest match
-        toEmail: currentLead.homeowner.email,
-        data: {
-          jobTitle: currentLead.title,
-          contractorName: contractor.name || contractor.email,
-          quoteAmount: 'TBD',
-          timeline: 'To be discussed',
-          quoteDetails: message || 'The contractor is ready to discuss your project details.',
-          quoteId: acceptance.id
-        }
+      // Get contractor details for email
+      const contractorProfile = await prisma.contractorProfile.findUnique({
+        where: { userId: contractorId },
+        select: { companyName: true, trade: true }
       });
+
+      await sendJobAcceptedEmail(
+        {
+          id: currentLead.homeownerId,
+          name: currentLead.homeowner.name || 'Homeowner',
+          email: currentLead.homeowner.email,
+        },
+        {
+          name: contractor.name || contractor.email,
+          companyName: contractorProfile?.companyName || contractor.name || contractor.email,
+        },
+        {
+          id: currentLead.id,
+          title: currentLead.title,
+          category: currentLead.category,
+        }
+      );
     } catch (emailError) {
-      console.error('Failed to send email to homeowner:', emailError);
+      console.error('Failed to send job accepted email to homeowner:', emailError);
+      // Don't fail the request if email fails
     }
 
     // Create notification for contractor

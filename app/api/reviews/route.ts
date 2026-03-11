@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { reviewSchema } from "@/lib/validation/schemas";
 import { auth } from "@clerk/nextjs/server";
+import { sendReviewReceivedEmail } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   try {
@@ -172,6 +173,52 @@ export async function POST(request: NextRequest) {
         reviewCount,
       },
     });
+
+    // Send email notification to contractor about new review
+    try {
+      const contractor = await prisma.user.findUnique({
+        where: { id: validatedData.contractorId },
+        select: { 
+          email: true, 
+          name: true,
+          contractorProfile: {
+            select: { companyName: true }
+          }
+        },
+      });
+
+      if (contractor?.email) {
+        // Create in-app notification for contractor
+        await prisma.notification.create({
+          data: {
+            userId: validatedData.contractorId,
+            type: "NEW_REVIEW",
+            title: `New ${validatedData.rating}-Star Review Received!`,
+            message: `You received a ${validatedData.rating}-star review${validatedData.text ? `: "${validatedData.text.substring(0, 100)}${validatedData.text.length > 100 ? '...' : ''}"` : '.'}`,
+            relatedId: review.id,
+            relatedType: "review",
+          }
+        }).catch(err => console.error('Failed to create review notification:', err));
+
+        // Send email notification
+        await sendReviewReceivedEmail(
+          {
+            id: validatedData.contractorId,
+            email: contractor.email,
+            companyName: contractor.contractorProfile?.companyName || contractor.name || 'Your Company',
+          },
+          {
+            id: review.id,
+            rating: validatedData.rating,
+            comment: validatedData.text || null,
+            reviewerName: user.role === 'homeowner' ? 'A homeowner' : 'A client',
+          }
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send review notification:', emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json({ review });
   } catch (error) {
