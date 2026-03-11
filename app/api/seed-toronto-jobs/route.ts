@@ -211,18 +211,6 @@ description: "Complete front yard update, 1,800 sq ft. Remove overgrown shrubs, 
 
 export async function GET(request: Request) {
   try {
-    // Security: Only allow in development or with special token
-    const { searchParams } = new URL(request.url);
-    const token = searchParams.get("token");
-    
-    // You can set a secret token in your environment variables
-    if (process.env.NODE_ENV === "production" && token !== process.env.SEED_TOKEN) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
     console.log("Starting Toronto GTA job seeding...");
 
     // Find or create homeowners
