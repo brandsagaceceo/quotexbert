@@ -43,9 +43,9 @@ export default function ForContractorsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-rose-900 via-orange-900 to-amber-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
@@ -140,7 +140,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Trust Badge Strip */}
-      <section className="bg-white border-b border-slate-200 py-6">
+      <section className="bg-gradient-to-r from-rose-50 to-orange-50 border-b border-rose-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Badge 1 */}
@@ -200,7 +200,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Earnings Calculator */}
-      <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+      <section className="py-20 bg-gradient-to-br from-rose-50 to-orange-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -211,7 +211,7 @@ export default function ForContractorsPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-green-200">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-rose-200">
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               {/* Input 1: Jobs per month */}
               <div>
@@ -274,8 +274,8 @@ export default function ForContractorsPage() {
             </div>
 
             {/* Result Display */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-8 text-center">
-              <p className="text-green-100 text-lg mb-2">Estimated Monthly Revenue</p>
+            <div className="bg-gradient-to-r from-rose-600 to-orange-600 rounded-xl p-8 text-center">
+              <p className="text-rose-100 text-lg mb-2">Estimated Monthly Revenue</p>
               <p id="monthlyRevenue" className="text-6xl font-black text-white mb-4">
                 $15,000
               </p>
@@ -295,7 +295,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Contractor Success Stories */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -407,7 +407,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Support Contact Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 to-sky-50">
+      <section className="py-16 bg-gradient-to-br from-rose-50 to-orange-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">
             Questions About Joining QuoteXbert?
@@ -418,9 +418,9 @@ export default function ForContractorsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <a
               href="tel:9052429460"
-              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-blue-200"
+              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-rose-200"
             >
-              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <div className="text-left">
@@ -430,9 +430,9 @@ export default function ForContractorsPage() {
             </a>
             <a
               href="mailto:quotexbert@gmail.com"
-              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-blue-200"
+              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-rose-200"
             >
-              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <div className="text-left">
@@ -448,7 +448,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Recent Activity Feed */}
-      <section className="py-20 bg-gradient-to-b from-white to-slate-50">
+      <section className="py-20 bg-gradient-to-b from-amber-50 to-orange-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <RecentActivityFeed
             maxItems={8}
@@ -460,7 +460,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Example Renovation Leads */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -533,7 +533,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-b from-white to-slate-50">
+      <section id="how-it-works" className="py-20 bg-gradient-to-b from-orange-50 to-rose-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -594,7 +594,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Why Contractors Join */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -683,7 +683,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Service Categories */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-gradient-to-br from-rose-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -708,7 +708,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-orange-50 to-amber-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
