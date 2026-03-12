@@ -1,7 +1,77 @@
 import { MetadataRoute } from 'next'
+import {
+  CITY_SLUGS,
+  SERVICE_SLUGS,
+  NEIGHBORHOOD_SLUGS,
+  CONTRACTOR_LEAD_SLUGS,
+} from '@/lib/seo-data'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
+
+  // ── Programmatic SEO: Renovation Estimates by City ──────────────────────────
+  const renovationEstimatePages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/renovation-estimates`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    ...CITY_SLUGS.map((city) => ({
+      url: `${baseUrl}/renovation-estimates/${city}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    })),
+  ]
+
+  // ── Programmatic SEO: Renovation Services by Type ───────────────────────────
+  const renovationServicePages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/renovation-services`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    ...SERVICE_SLUGS.map((service) => ({
+      url: `${baseUrl}/renovation-services/${service}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
+    })),
+  ]
+
+  // ── Programmatic SEO: Contractor Lead Pages ─────────────────────────────────
+  const contractorLeadPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/contractor-leads`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    ...CONTRACTOR_LEAD_SLUGS.map((slug) => ({
+      url: `${baseUrl}/contractor-leads/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
+    })),
+  ]
+
+  // ── Programmatic SEO: Toronto Neighbourhood Pages ───────────────────────────
+  const neighborhoodPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/neighborhoods`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    ...NEIGHBORHOOD_SLUGS.map((area) => ({
+      url: `${baseUrl}/neighborhoods/${area}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    })),
+  ]
   
   // Location pages (NEW - highest priority for local SEO)
   const locationPages: MetadataRoute.Sitemap = [
@@ -150,6 +220,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }))
 
   return [
+    ...renovationEstimatePages,
+    ...renovationServicePages,
+    ...contractorLeadPages,
+    ...neighborhoodPages,
     ...locationPages,
     ...torontoPages,
     ...staticPages,

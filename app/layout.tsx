@@ -36,27 +36,27 @@ const interMono = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
   title: {
-    default: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA",
+    default: "QuoteXbert – Instant AI Renovation Quotes in Toronto",
     template: "%s | QuoteXbert"
   },
   description:
-    "Get instant AI-powered home renovation estimates in Toronto & the Greater Toronto Area. Upload photos, get free quotes from verified contractors. Kitchen, bathroom, basement renovations & more.",
+    "Upload a photo of your renovation and get an instant AI-powered price estimate. Connect with trusted contractors across Toronto and the GTA.",
   keywords: [
+    "renovation cost Toronto",
+    "AI renovation estimate",
+    "contractor quotes Toronto",
+    "bathroom renovation cost Toronto",
+    "kitchen renovation price GTA",
     "home renovation estimates Toronto",
     "Toronto contractors",
     "GTA home repair quotes",
     "instant renovation estimates",
-    "AI contractor quotes",
-    "Toronto kitchen renovation cost",
-    "Toronto bathroom renovation",
     "basement finishing Toronto",
     "Durham Region contractors",
-    "Ajax home renovation",
-    "Bowmanville contractors",
-    "Whitby renovation quotes",
+    "Scarborough renovation quotes",
+    "Mississauga contractors",
     "verified contractors GTA",
-    "home improvement Toronto",
-    "renovation cost calculator"
+    "renovation cost calculator",
   ],
   authors: [{ name: "QuoteXbert" }],
   creator: "QuoteXbert",
@@ -76,23 +76,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_CA",
     url: "https://www.quotexbert.com",
-    title: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA", 
+    title: "QuoteXbert – Instant AI Renovation Quotes in Toronto",
     description:
-      "Upload photos and get instant AI-powered renovation estimates. Connect with verified contractors across Toronto and the Greater Toronto Area. Free, fast, and accurate.",
+      "Upload a photo of your renovation and get an instant AI-powered price estimate. Connect with trusted contractors across Toronto and the GTA.",
     siteName: "QuoteXbert",
     images: [
       {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "QuoteXbert - Instant Home Renovation Estimates in Toronto & GTA"
+        alt: "QuoteXbert – Instant AI Renovation Quotes in Toronto & GTA"
       }
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QuoteXbert - AI Home Renovation Estimates Toronto & GTA",
-    description: "Get instant AI renovation estimates. Connect with verified GTA contractors. Upload photos, receive accurate quotes in minutes.",
+    title: "QuoteXbert – Instant AI Renovation Quotes in Toronto",
+    description: "Upload a photo of your renovation and get an instant AI-powered price estimate. Connect with trusted contractors across Toronto and the GTA.",
     images: ["/twitter-image.svg"],
     creator: "@quotexbert",
   },
@@ -175,21 +175,21 @@ export default function RootLayout({
                   "url": "https://www.quotexbert.com",
                   "logo": {
                     "@type": "ImageObject",
-                    "url": "https://www.quotexbert.com/icon.svg"
+                    "url": "https://www.quotexbert.com/quotexbert-robot.png"
                   },
-                  "contactPoint": {
-                    "@type": "ContactPoint",
-                    "telephone": "+1-416-XXX-XXXX",
-                    "contactType": "Customer Service",
-                    "areaServed": "CA"
-                  }
+                  "description": "AI-powered renovation estimates for Toronto homeowners. Upload a photo and get an instant price estimate.",
+                  "sameAs": [
+                    "https://twitter.com/quotexbert",
+                    "https://www.instagram.com/quotexbert"
+                  ]
                 },
                 {
                   "@type": "LocalBusiness",
-                  "name": "QuoteXbert - Toronto Home Renovation Quotes",
+                  "@id": "https://www.quotexbert.com/#localbusiness",
+                  "name": "QuoteXbert",
+                  "description": "AI-powered renovation estimates for Toronto and GTA homeowners. Upload a photo, get an instant estimate, connect with trusted contractors.",
                   "image": "https://www.quotexbert.com/og-image.svg",
                   "url": "https://www.quotexbert.com",
-                  "telephone": "+1-416-XXX-XXXX",
                   "priceRange": "$$",
                   "address": {
                     "@type": "PostalAddress",
@@ -204,16 +204,35 @@ export default function RootLayout({
                   },
                   "areaServed": [
                     { "@type": "City", "name": "Toronto" },
+                    { "@type": "City", "name": "North York" },
+                    { "@type": "City", "name": "Scarborough" },
+                    { "@type": "City", "name": "Etobicoke" },
                     { "@type": "City", "name": "Mississauga" },
-                    { "@type": "City", "name": "Oshawa" },
-                    { "@type": "City", "name": "Whitby" },
-                    { "@type": "City", "name": "Ajax" }
+                    { "@type": "City", "name": "Brampton" },
+                    { "@type": "City", "name": "Vaughan" },
+                    { "@type": "City", "name": "Markham" },
+                    { "@type": "City", "name": "Richmond Hill" },
+                    { "@type": "City", "name": "Ajax" },
+                    { "@type": "City", "name": "Pickering" },
+                    { "@type": "City", "name": "Whitby" }
                   ],
                   "aggregateRating": {
                     "@type": "AggregateRating",
                     "ratingValue": "5.0",
                     "reviewCount": "0"
                   }
+                },
+                {
+                  "@type": "Service",
+                  "@id": "https://www.quotexbert.com/#service",
+                  "name": "AI Renovation Estimate Platform",
+                  "description": "Upload a photo of your renovation project and receive an instant AI-powered price estimate. Connect with verified contractors across Toronto and the GTA.",
+                  "provider": {
+                    "@id": "https://www.quotexbert.com/#organization"
+                  },
+                  "areaServed": "Toronto, GTA",
+                  "serviceType": "Home Renovation Estimation",
+                  "url": "https://www.quotexbert.com"
                 }
               ]
             })
