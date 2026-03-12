@@ -5,9 +5,17 @@ export const emailSchema = z.string().email("Invalid email address");
 export const phoneSchema = z
   .string()
   .regex(/^\+?[\d\s\-\(\)]+$/, "Invalid phone number");
+
+// Canadian postal code regex: accepts formats like L1B1E4 or L1B 1E4 (space or hyphen optional)
+export const CANADIAN_POSTAL_CODE_REGEX = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+
 export const postalCodeSchema = z
   .string()
-  .regex(/^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$/, "Invalid Canadian postal code");
+  .transform((val) => val.trim().toUpperCase())
+  .refine(
+    (val) => val === "" || CANADIAN_POSTAL_CODE_REGEX.test(val),
+    "Please enter a valid postal code like L1B 1E4.",
+  );
 
 // User validation
 export const userRoleSchema = z.enum(["admin", "contractor", "homeowner"]);

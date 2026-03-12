@@ -4,6 +4,7 @@ import { useState, useRef, ChangeEvent } from "react";
 import Image from "next/image";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
+import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
 interface IPhoneEstimatorMockupProps {
   onEstimateComplete: (result: any) => void;
@@ -191,6 +192,12 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
       return;
     }
 
+    const trimmedPostalCode = postalCode.trim();
+    if (trimmedPostalCode && !CANADIAN_POSTAL_CODE_REGEX.test(trimmedPostalCode)) {
+      setError("Please enter a valid postal code like L1B 1E4.");
+      return;
+    }
+
     setIsLoading(true);
     setLoadingStage("Analyzing photos...");
 
@@ -224,7 +231,7 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
           description: description.trim(),
           photos: photoBase64,
           projectType,
-          postalCode: postalCode.trim(),
+          postalCode: postalCode.trim().toUpperCase(),
           userId,
         }),
       });

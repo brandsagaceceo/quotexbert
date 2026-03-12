@@ -4,6 +4,7 @@ import { useState, useRef, ChangeEvent } from "react";
 import Image from "next/image";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import PhotoFeedbackHelper from "@/components/PhotoFeedbackHelper";
+import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
 interface InstantQuoteCardProps {
   onEstimateComplete: (result: any) => void;
@@ -114,6 +115,12 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
       return;
     }
 
+    const trimmedPostalCode = postalCode.trim();
+    if (trimmedPostalCode && !CANADIAN_POSTAL_CODE_REGEX.test(trimmedPostalCode)) {
+      setError("Please enter a valid postal code like L1B 1E4.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -138,7 +145,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           description: description.trim(),
           photos: photoBase64,
           projectType,
-          postalCode: postalCode.trim(),
+          postalCode: postalCode.trim().toUpperCase(),
           userId,
         }),
       });
