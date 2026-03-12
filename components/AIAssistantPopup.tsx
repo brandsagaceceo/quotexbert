@@ -58,7 +58,7 @@ export default function AIAssistantPopup() {
     }
   }, [isSignedIn, authUser]);
 
-  // NEW: Auto-hide when near bottom CTAs or forms
+  // NEW: Auto-hide when near bottom CTAs, forms, or value props
   useEffect(() => {
     const handleScroll = () => {
       if (!buttonRef.current) return;
@@ -67,10 +67,11 @@ export default function AIAssistantPopup() {
       const scrollY = window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
       
-      // Hide if near bottom (within 200px) on mobile
+      // Hide if near bottom (within 300px) or near top value props on mobile
       if (window.innerWidth < 768) {
-        const nearBottom = scrollY + viewportHeight > docHeight - 200;
-        setIsHidden(nearBottom);
+        const nearBottom = scrollY + viewportHeight > docHeight - 300;
+        const nearTopValueProps = scrollY < 400; // Hide in first 400px to avoid overlapping headers/value props
+        setIsHidden(nearBottom || nearTopValueProps);
       } else {
         setIsHidden(false);
       }

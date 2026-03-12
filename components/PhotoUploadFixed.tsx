@@ -29,6 +29,7 @@ export default function PhotoUploadFixed({
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [initializedFromProps, setInitializedFromProps] = useState(false);
 
   // Initialize from photos prop (for base64 images from home page estimate)
@@ -261,12 +262,17 @@ export default function PhotoUploadFixed({
     fileInputRef.current?.click();
   };
 
+  const openCamera = () => {
+    if (disabled) return;
+    cameraInputRef.current?.click();
+  };
+
   return (
     <div className="space-y-4">
       {/* Upload Area */}
       <div
         className={`
-          border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
+          border-2 border-dashed rounded-xl p-6 text-center transition-all
           ${dragActive 
             ? "border-rose-500 bg-rose-50 scale-105" 
             : "border-gray-300 hover:border-rose-400 hover:bg-gray-50"
@@ -276,13 +282,21 @@ export default function PhotoUploadFixed({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={openFileSelector}
       >
         <input
           ref={fileInputRef}
           type="file"
           multiple
           accept="image/jpeg,image/jpg,image/png,image/webp"
+          onChange={(e) => handleFileSelect(e.target.files)}
+          className="hidden"
+          disabled={disabled}
+        />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
           disabled={disabled}
@@ -297,8 +311,35 @@ export default function PhotoUploadFixed({
             {photoItems.length > 0 ? "Add More Photos" : "Upload Project Photos"}
           </p>
           
+          <div className="flex gap-3 mb-3">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openFileSelector();
+              }}
+              disabled={disabled}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg font-medium hover:from-rose-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Upload className="w-4 h-4" />
+              Choose Files
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                openCamera();
+              }}
+              disabled={disabled}
+              className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-rose-600 text-rose-600 rounded-lg font-medium hover:bg-rose-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ImageIcon className="w-4 h-4" />
+              Take Photo
+            </button>
+          </div>
+          
           <p className="text-sm text-gray-600 mb-1">
-            Drag & drop or click to select
+            Or drag & drop photos here
           </p>
           
           <p className="text-xs text-gray-500">

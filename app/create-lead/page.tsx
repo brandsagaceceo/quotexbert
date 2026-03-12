@@ -25,6 +25,7 @@ export default function CreateLeadPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [hasLoadedSavedData, setHasLoadedSavedData] = useState(false);
 
   // Function to determine category from description
   const detectCategoryFromDescription = (description: string): string => {
@@ -72,10 +73,40 @@ export default function CreateLeadPage() {
 
   // Load estimate data on component mount
   useEffect(() => {
+    // First, try to restore any previously saved form data (from interrupted session)
+    const savedFormData = localStorage.getItem('create_lead_draft');
+    const savedPhotos = localStorage.getItem('create_lead_draft_photos');
+    
+    if (savedFormData && !hasLoadedSavedData) {
+      try {
+        const draft = JSON.parse(savedFormData);
+        console.log('💾 Restoring saved form data from previous session');
+        setFormData(draft);
+        setHasLoadedSavedData(true);
+        
+        // Show notification that data was restored
+        setSuccessMessage("✓ Your previous form data has been restored!");
+        setTimeout(() => setSuccessMessage(""), 5000);
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+      }
+    }
+    
+    if (savedPhotos && !hasLoadedSavedData) {
+      try {
+        const photoUrls = JSON.parse(savedPhotos);
+        console.log('💾 Restoring', photoUrls.length, 'saved photos from previous session');
+        setPhotos(photoUrls);
+      } catch (error) {
+        console.error('Error loading saved photos:', error);
+      }
+    }
+    
+    // Then check for estimate data from the AI estimator (only if no saved form data)
     const estimateData = localStorage.getItem('estimate_data');
     const estimatePhotos = localStorage.getItem('estimate_photos');
     
-    if (estimateData) {
+    if (estimateData && !savedFormData) {
       try {
         const estimate = JSON.parse(estimateData);
         console.log('Loading estimate data:', estimate);
@@ -117,7 +148,26 @@ export default function CreateLeadPage() {
         console.error('Error loading estimate data:', error);
       }
     }
-  }, []);
+  }, [hasLoadedSavedData]);
+
+  // Auto-save form data to localStorage whenever it changes (for session recovery)
+  useEffect(() => {
+    // Only save if user has started filling out the form
+    const hasData = formData.title || formData.description || formData.category || formData.budget || formData.zipCode;
+    
+    if (hasData) {
+      console.log('💾 Auto-saving form data...');
+      localStorage.setItem('create_lead_draft', JSON.stringify(formData));
+    }
+  }, [formData]);
+
+  // Auto-save photos to localStorage
+  useEffect(() => {
+    if (photos.length > 0) {
+      console.log('💾 Auto-saving', photos.length, 'photos...');
+      localStorage.setItem('create_lead_draft_photos', JSON.stringify(photos));
+    }
+  }, [photos]);
 
   // Function to upload base64 photos to storage
   const uploadBase64Photos = async (base64Photos: string[]) => {
@@ -237,6 +287,11 @@ export default function CreateLeadPage() {
         });
         setPhotos([]);
         
+        // Clear saved draft from localStorage
+        localStorage.removeItem('create_lead_draft');
+        localStorage.removeItem('create_lead_draft_photos');
+        console.log('💾 Cleared saved draft after successful submission');
+        
         // Redirect after showing success message
         setTimeout(() => {
           router.push(`/profile`);
@@ -315,6 +370,23 @@ export default function CreateLeadPage() {
     }
   };
 
+  const clearDraft = () => {
+    if (confirm("Are you sure you want to clear your saved form data and start fresh?")) {
+      localStorage.removeItem('create_lead_draft');
+      localStorage.removeItem('create_lead_draft_photos');
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        budget: "",
+        zipCode: ""
+      });
+      setPhotos([]);
+      setSuccessMessage("Draft cleared! Starting fresh.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 via-slate-50 to-red-50 flex items-center justify-center">
@@ -381,6 +453,25 @@ export default function CreateLeadPage() {
               <span className="text-sm font-semibold text-gray-800">Multiple Quotes</span>
             </div>
           </div>
+          
+          {/* Auto-save indicator */}
+          {(formData.title || formData.description || photos.length > 0) && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-blue-800">
+                  💾 Your work is automatically saved
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={clearDraft}
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                Clear & Start Fresh
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl border-2 border-rose-200 p-6 sm:p-8">

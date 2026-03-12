@@ -8,11 +8,32 @@ export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkingRole, setCheckingRole] = useState(true);
   const router = useRouter();
   const { getToken } = useAuth();
 
-  // Don't check role on mount - let user select freely
-  // The middleware and profile page will handle redirects
+  // Check if user already has a role on mount
+  useEffect(() => {
+    const checkExistingRole = async () => {
+      try {
+        const response = await fetch("/api/user/role");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.role && (data.role === "contractor" || data.role === "homeowner")) {
+            console.log("[Onboarding] User already has role:", data.role, "redirecting to profile");
+            router.push("/profile");
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("[Onboarding] Error checking existing role:", err);
+      } finally {
+        setCheckingRole(false);
+      }
+    };
+
+    checkExistingRole();
+  }, [router]);
 
   const roles = [
     {
@@ -69,6 +90,18 @@ export default function OnboardingPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading spinner while checking for existing role
+  if (checkingRole) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#800020] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 py-12 px-4">
