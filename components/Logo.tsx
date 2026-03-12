@@ -18,7 +18,7 @@ const sizeMap = {
   xl: { width: 67, height: 80, textSize: "text-4xl" },
   "2xl": { width: 100, height: 120, textSize: "text-5xl" },
   "3xl": { width: 125, height: 150, textSize: "text-6xl" },
-  "responsive-header": { width: 40, height: 48, textSize: "text-[2rem] sm:text-[2.5rem] md:text-[3rem]" }
+  "responsive-header": { width: 48, height: 58, textSize: "text-[2.5rem] sm:text-[3rem] md:text-[3.5rem]" }
 };
 
 export default function Logo({ 
