@@ -181,12 +181,7 @@ export default function RootLayout({
                   "sameAs": [
                     "https://twitter.com/quotexbert",
                     "https://www.instagram.com/quotexbert"
-                  ],
-                  "contactPoint": {
-                    "@type": "ContactPoint",
-                    "contactType": "Customer Service",
-                    "areaServed": "CA"
-                  }
+                  ]
                 },
                 {
                   "@type": "LocalBusiness",

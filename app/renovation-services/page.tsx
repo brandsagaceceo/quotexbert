@@ -59,7 +59,7 @@ export default function RenovationServicesIndex() {
         <div className="mt-16 bg-gradient-to-r from-teal-600 to-cyan-600 rounded-2xl p-8 text-white text-center">
           <h2 className="text-3xl font-bold mb-4">Get an Instant AI Estimate</h2>
           <p className="text-lg mb-6 opacity-95">
-            Upload a photo of your renovation space and receive a personalised AI price estimate—free, fast, and accurate.
+            Upload a photo of your renovation space and receive a personalized AI price estimate—free, fast, and accurate.
           </p>
           <Link
             href="/"
