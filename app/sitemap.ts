@@ -1,5 +1,30 @@
 import { MetadataRoute } from 'next'
 
+// GTA city slugs for renovation-cost dynamic pages
+const GTA_CITY_SLUGS = [
+  'toronto', 'north-york', 'scarborough', 'etobicoke', 'mississauga',
+  'brampton', 'vaughan', 'markham', 'ajax', 'pickering', 'whitby', 'richmond-hill',
+]
+
+// Renovation-type page slugs
+const RENOVATION_TYPE_SLUGS = [
+  'kitchen-renovation-cost-toronto',
+  'bathroom-renovation-cost-toronto',
+  'basement-finishing-cost-toronto',
+  'deck-building-cost-toronto',
+  'roof-replacement-cost-toronto',
+  'flooring-installation-cost-toronto',
+  'painting-cost-toronto',
+  'plumbing-repair-cost-toronto',
+  'electrical-work-cost-toronto',
+]
+
+// Neighborhood contractor page slugs
+const NEIGHBORHOOD_SLUGS = [
+  'leslieville', 'the-beaches', 'east-york', 'liberty-village',
+  'danforth', 'high-park', 'parkdale', 'yorkville', 'north-york', 'scarborough',
+]
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
   
@@ -149,6 +174,40 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
+  // Programmatic SEO: renovation cost city pages
+  const renovationCostCityPages: MetadataRoute.Sitemap = GTA_CITY_SLUGS.map(city => ({
+    url: `${baseUrl}/renovation-cost/${city}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: city === 'toronto' ? 0.95 : 0.88,
+  }))
+
+  // Programmatic SEO: renovation-cost toronto sub-pages (existing)
+  const renovationCostTorontoSubPages: MetadataRoute.Sitemap = [
+    'kitchen', 'bathroom', 'basement',
+  ].map(type => ({
+    url: `${baseUrl}/renovation-cost/toronto/${type}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }))
+
+  // Programmatic SEO: renovation-type specific pages
+  const renovationTypePages: MetadataRoute.Sitemap = RENOVATION_TYPE_SLUGS.map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }))
+
+  // Programmatic SEO: neighborhood contractor pages
+  const neighborhoodPages: MetadataRoute.Sitemap = NEIGHBORHOOD_SLUGS.map(slug => ({
+    url: `${baseUrl}/contractors/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.85,
+  }))
+
   return [
     ...locationPages,
     ...torontoPages,
@@ -156,5 +215,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...contractorPages,
     ...legalPages,
     ...blogSitemapEntries,
+    ...renovationCostCityPages,
+    ...renovationCostTorontoSubPages,
+    ...renovationTypePages,
+    ...neighborhoodPages,
   ]
 }
