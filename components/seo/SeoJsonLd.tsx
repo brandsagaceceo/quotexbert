@@ -36,7 +36,6 @@ export default function SeoJsonLd({
     description:
       'AI-powered home renovation quotes and contractor matching platform serving Toronto and the Greater Toronto Area.',
     image: 'https://www.quotexbert.com/logo.png',
-    telephone: '',
     areaServed: [
       { '@type': 'City', name: 'Toronto', containedInPlace: { '@type': 'Province', name: 'Ontario' } },
       { '@type': 'City', name: 'Mississauga', containedInPlace: { '@type': 'Province', name: 'Ontario' } },
@@ -117,7 +116,7 @@ export default function SeoJsonLd({
     <>
       {schemas.map((schema, i) => (
         <script
-          key={i}
+          key={(schema as Record<string, string>)['@type'] ?? String(i)}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />

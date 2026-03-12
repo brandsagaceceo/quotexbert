@@ -31,7 +31,7 @@ export const GTA_CITIES = {
     population: '360K',
     avgHomeCost: '$975K',
     description:
-      "Etobicoke's mature neighbourhoods feature many 1960s-80s bungalows and two-storeys ripe for renovation. Kitchen updates and open-concept remodels are especially popular here.",
+      "Etobicoke's mature neighborhoods feature many 1960s-80s bungalows and two-storeys ripe for renovation. Kitchen updates and open-concept remodels are especially popular here.",
   },
   mississauga: {
     name: 'Mississauga',
@@ -340,7 +340,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['Kitchen remodels', 'Bathroom updates', 'Victorian home restorations', 'Basement suites'],
     avgPriceRange: '$15,000 – $80,000',
     description:
-      "Leslieville is one of Toronto's most sought-after east-end neighbourhoods. Its charming Victorian and Edwardian homes attract buyers and renovators alike. The area's mix of young families and design professionals drives demand for quality kitchen and bath renovations.",
+      "Leslieville is one of Toronto's most sought-after east-end neighborhoods. Its charming Victorian and Edwardian homes attract buyers and renovators alike. The area's mix of young families and design professionals drives demand for quality kitchen and bath renovations.",
     popularProjects: [
       { name: 'Victorian Kitchen Remodel', range: '$40,000 – $75,000' },
       { name: 'Bathroom Renovation', range: '$18,000 – $35,000' },
@@ -355,7 +355,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['Luxury kitchen renovations', 'Master bath upgrades', 'Deck additions', 'Basement family rooms'],
     avgPriceRange: '$20,000 – $120,000',
     description:
-      'The Beaches is a premium east-end neighbourhood known for its lakefront living. Homeowners here invest in high-quality renovations that complement the upscale character of the area — from luxury kitchen remodels to stunning deck additions facing the lake.',
+      'The Beaches is a premium east-end neighborhood known for its lakefront living. Homeowners here invest in high-quality renovations that complement the upscale character of the area — from luxury kitchen remodels to stunning deck additions facing the lake.',
     popularProjects: [
       { name: 'Luxury Kitchen Renovation', range: '$65,000 – $120,000' },
       { name: 'Master Bathroom Remodel', range: '$35,000 – $65,000' },
@@ -400,7 +400,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['Kitchen renovations', 'Basement apartments', 'Bathroom updates', 'Exterior restoration'],
     avgPriceRange: '$15,000 – $85,000',
     description:
-      "The Danforth neighbourhood, known as Greektown, is a vibrant community with a strong demand for renovations. Homeowners along Danforth and surrounding streets frequently invest in kitchen renovations, basement suites, and whole-home updates.",
+      "The Danforth neighborhood, known as Greektown, is a vibrant community with a strong demand for renovations. Homeowners along Danforth and surrounding streets frequently invest in kitchen renovations, basement suites, and whole-home updates.",
     popularProjects: [
       { name: 'Kitchen Renovation', range: '$25,000 – $60,000' },
       { name: 'Basement Suite', range: '$70,000 – $120,000' },
@@ -415,7 +415,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['High-end kitchen remodels', 'Master suite additions', 'Basement suites', 'Heritage home restorations'],
     avgPriceRange: '$25,000 – $150,000',
     description:
-      "High Park attracts Toronto's professional families who invest significantly in their homes. The neighbourhood's mix of Tudor, Victorian, and mid-century homes see renovation projects ranging from thoughtful heritage restorations to contemporary kitchen and bath transformations.",
+      "High Park attracts Toronto's professional families who invest significantly in their homes. The neighborhood's mix of Tudor, Victorian, and mid-century homes see renovation projects ranging from thoughtful heritage restorations to contemporary kitchen and bath transformations.",
     popularProjects: [
       { name: 'High-End Kitchen Remodel', range: '$70,000 – $130,000' },
       { name: 'Basement Legal Suite', range: '$90,000 – $150,000' },
@@ -430,7 +430,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['Victorian restoration', 'Basement suites', 'Kitchen updates', 'Exterior improvements'],
     avgPriceRange: '$12,000 – $75,000',
     description:
-      "Parkdale is one of Toronto's most rapidly gentrifying neighbourhoods. Investors and owner-occupants are renovating Parkdale's Victorian semi-detached and detached homes to take advantage of rising property values. Basement suites and full-home renovations lead the way.",
+      "Parkdale is one of Toronto's most rapidly gentrifying neighborhoods. Investors and owner-occupants are renovating Parkdale's Victorian semi-detached and detached homes to take advantage of rising property values. Basement suites and full-home renovations lead the way.",
     popularProjects: [
       { name: 'Victorian Home Renovation', range: '$50,000 – $120,000' },
       { name: 'Basement Suite', range: '$70,000 – $110,000' },
@@ -445,7 +445,7 @@ export const TORONTO_NEIGHBORHOODS = {
     commonRenovations: ['Luxury condo renovations', 'High-end kitchen remodels', 'Smart home systems', 'Custom millwork'],
     avgPriceRange: '$30,000 – $250,000',
     description:
-      "Yorkville is Toronto's most prestigious neighbourhood. Renovation budgets here reflect the area's luxury status — custom millwork, premium appliances, heated floors, and smart home systems are standard. QuoteXbert helps even luxury homeowners verify fair contractor pricing.",
+      "Yorkville is Toronto's most prestigious neighborhood. Renovation budgets here reflect the area's luxury status — custom millwork, premium appliances, heated floors, and smart home systems are standard. QuoteXbert helps even luxury homeowners verify fair contractor pricing.",
     popularProjects: [
       { name: 'Luxury Kitchen Renovation', range: '$100,000 – $250,000' },
       { name: 'Luxury Condo Renovation', range: '$50,000 – $150,000' },
@@ -538,7 +538,7 @@ export const FAQ_DATABASE = {
     {
       question: 'Should I renovate my kitchen before selling?',
       answer:
-        "A kitchen renovation typically returns 50–80% of its cost at resale in Toronto. Mid-range updates ($25,000–$40,000) often have the best ROI. Full luxury renovations don't always recoup their full cost — unless you're in a premium neighbourhood.",
+        "A kitchen renovation typically returns 50–80% of its cost at resale in Toronto. Mid-range updates ($25,000–$40,000) often have the best ROI. Full luxury renovations don't always recoup their full cost — unless you're in a premium neighborhood.",
     },
   ],
   bathroom: [
