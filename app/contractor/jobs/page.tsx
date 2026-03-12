@@ -720,7 +720,7 @@ export default function ContractorJobsPage() {
                       </div>
                     )}
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                     job.status === 'open' ? 'bg-green-100 text-green-800' : 
                     job.status === 'claimed' ? 'bg-orange-100 text-orange-800' :
                     'bg-gray-100 text-gray-800'
