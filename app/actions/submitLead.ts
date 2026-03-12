@@ -6,15 +6,18 @@ import { prisma } from "@/lib/prisma";
 import { sendLeadEmail } from "@/lib/email";
 import { NotificationService } from "@/lib/notifications";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-
-// Canadian postal code regex (case-insensitive, space optional)
-const canadianPostalCodeRegex =
-  /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
+import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
 const leadSchema = z.object({
-  postalCode: z.string().refine((val) => canadianPostalCodeRegex.test(val), {
-    message: "Please enter a valid Canadian postal code",
-  }),
+  postalCode: z
+    .string()
+    .optional()
+    .default("")
+    .transform((val) => val.trim().toUpperCase())
+    .refine(
+      (val) => val === "" || CANADIAN_POSTAL_CODE_REGEX.test(val),
+      { message: "Please enter a valid postal code like L1B 1E4." },
+    ),
   projectType: z
     .string()
     .min(1, "Project type is required")

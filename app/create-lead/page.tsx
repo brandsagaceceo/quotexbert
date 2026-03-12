@@ -8,6 +8,7 @@ import PhotoUploadFixed from "@/components/PhotoUploadFixed";
 import { submitLead } from "@/app/actions/submitLead";
 import { CATEGORY_GROUPS } from "@/lib/categories";
 import { Sparkles, CheckCircle, AlertCircle } from "lucide-react";
+import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
 export default function CreateLeadPage() {
   const { authUser: user } = useAuth();
@@ -186,11 +187,14 @@ export default function CreateLeadPage() {
     if (!formData.title.trim()) errors.title = "Project title is required";
     if (!formData.category) errors.category = "Please select a category";
     if (!formData.description.trim()) errors.description = "Project description is required";
-    if (!formData.zipCode.trim()) errors.zipCode = "Postal code is required";
+    const normalizedZipCode = formData.zipCode.trim().toUpperCase();
+    if (normalizedZipCode && !CANADIAN_POSTAL_CODE_REGEX.test(normalizedZipCode)) {
+      errors.zipCode = "Please enter a valid postal code like L1B 1E4.";
+    }
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setError("Please fill in all required fields");
+      setError("Please correct the errors below");
       return;
     }
 
@@ -203,7 +207,7 @@ export default function CreateLeadPage() {
       submitFormData.append("projectType", formData.category);
       submitFormData.append("description", formData.description);
       submitFormData.append("budget", formData.budget);
-      submitFormData.append("postalCode", formData.zipCode);
+      submitFormData.append("postalCode", normalizedZipCode);
       submitFormData.append("photos", JSON.stringify(photos));
       // Pass the user ID to ensure server action has it
       submitFormData.append("userId", user.id);
@@ -510,7 +514,7 @@ export default function CreateLeadPage() {
               {/* Postal Code */}
               <div>
                 <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-800 mb-2">
-                  Postal Code <span className="text-rose-500">*</span>
+                  Postal Code <span className="text-gray-500 font-normal">(optional)</span>
                 </label>
                 <input
                   type="text"
@@ -523,14 +527,12 @@ export default function CreateLeadPage() {
                     }
                   }}
                   placeholder="K1A 0A6"
-                  pattern="[A-Za-z]\d[A-Za-z][ \-]?\d[A-Za-z]\d"
-                  title="Canadian postal code format: A1A 1A1 or A1A-1A1"
+                  maxLength={7}
                   className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
                     fieldErrors.zipCode 
                       ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
                       : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
                   }`}
-                  required
                   disabled={isSubmitting}
                 />
                 {fieldErrors.zipCode && (
