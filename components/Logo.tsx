@@ -10,14 +10,15 @@ interface LogoProps {
   className?: string;
 }
 
+// Width:height ratio matches logo.svg viewBox (200:240 = 5:6)
 const sizeMap = {
-  sm: { width: 32, height: 32, textSize: "text-lg" },
-  md: { width: 48, height: 48, textSize: "text-2xl" },
-  lg: { width: 64, height: 64, textSize: "text-3xl" },
-  xl: { width: 80, height: 80, textSize: "text-4xl" },
-  "2xl": { width: 120, height: 120, textSize: "text-5xl" },
-  "3xl": { width: 150, height: 150, textSize: "text-6xl" },
-  "responsive-header": { width: 150, height: 150, textSize: "text-[2rem] sm:text-[2.5rem] md:text-[3rem]" }
+  sm: { width: 32, height: 38, textSize: "text-lg" },
+  md: { width: 40, height: 48, textSize: "text-2xl" },
+  lg: { width: 50, height: 60, textSize: "text-3xl" },
+  xl: { width: 67, height: 80, textSize: "text-4xl" },
+  "2xl": { width: 100, height: 120, textSize: "text-5xl" },
+  "3xl": { width: 125, height: 150, textSize: "text-6xl" },
+  "responsive-header": { width: 40, height: 48, textSize: "text-[2rem] sm:text-[2.5rem] md:text-[3rem]" }
 };
 
 export default function Logo({ 
@@ -29,10 +30,20 @@ export default function Logo({
   const { width, height, textSize } = sizeMap[size];
   
   const logoContent = (
-    <div className={`flex items-center ${className}`}>
-      <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
-        QuoteXbert
-      </span>
+    <div className={`flex items-center gap-2 ${className}`}>
+      <Image
+        src="/logo.svg"
+        alt="QuoteXbert mascot"
+        width={width}
+        height={height}
+        priority
+        className="shrink-0"
+      />
+      {showText && (
+        <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
+          QuoteXbert
+        </span>
+      )}
     </div>
   );
 
