@@ -140,6 +140,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'bathroom-renovation-cost-toronto-2026',
     'kitchen-renovation-cost-gta-2026',
     'why-contractors-overquote-avoid-it-2026',
+    // Programmatic SEO blog posts 2026
+    'average-bathroom-renovation-cost-toronto-2026',
+    'kitchen-renovation-cost-toronto-2026',
+    'how-contractors-get-more-renovation-jobs-toronto',
+    'basement-finishing-cost-ontario-2026',
+    'renovation-mistakes-toronto-homeowners-make',
+    // Existing content blog posts
+    'basement-renovation-pickering-ajax',
+    'bathroom-costs-oshawa-vs-toronto',
+    'deck-building-costs-clarington',
+    'electrical-panel-upgrade-toronto',
+    'hardwood-flooring-cost-toronto',
+    'kitchen-faucet-replacement-cost-toronto',
+    'roof-repair-vs-replacement-gta',
+    'toronto-basement-renovation-complete-guide-2026',
+    'toronto-home-renovation-costs-2026',
   ]
 
   const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map(slug => ({
@@ -149,12 +165,110 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
+  // Renovation cost pages (programmatic SEO)
+  const renovationCostSlugs = [
+    'bathroom-renovation-cost-toronto',
+    'kitchen-renovation-cost-toronto',
+    'basement-finishing-cost-toronto',
+    'deck-building-cost-toronto',
+    'roof-replacement-cost-toronto',
+    'flooring-installation-cost-toronto',
+    'painting-cost-toronto',
+    'plumbing-repair-cost-toronto',
+    'electrical-work-cost-toronto',
+    'home-renovation-cost-toronto',
+  ]
+
+  const renovationCostPages: MetadataRoute.Sitemap = renovationCostSlugs.map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }))
+
+  // Neighbourhood & GTA city pages (programmatic SEO)
+  const neighbourhoodSlugs = [
+    'renovation-estimates-leslieville',
+    'renovation-estimates-the-beaches',
+    'renovation-estimates-east-york',
+    'renovation-estimates-liberty-village',
+    'renovation-estimates-danforth',
+    'renovation-estimates-high-park',
+    'renovation-estimates-parkdale',
+    'renovation-estimates-yorkville',
+    'renovation-estimates-north-york',
+    'renovation-estimates-scarborough',
+    'renovation-estimates-etobicoke',
+    'renovation-estimates-mississauga',
+    'renovation-estimates-brampton',
+    'renovation-estimates-vaughan',
+    'renovation-estimates-markham',
+    'renovation-estimates-richmond-hill',
+    'renovation-estimates-pickering',
+    'renovation-estimates-ajax',
+    'renovation-estimates-whitby',
+    'renovation-estimates-oshawa',
+    'renovation-estimates-burlington',
+    'renovation-estimates-oakville',
+  ]
+
+  const neighbourhoodPages: MetadataRoute.Sitemap = neighbourhoodSlugs.map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }))
+
+  // Contractor lead pages (programmatic SEO)
+  const contractorLeadSlugs = [
+    'contractor-leads-toronto',
+    'plumber-leads-toronto',
+    'electrician-leads-toronto',
+    'roofing-leads-toronto',
+    'handyman-leads-toronto',
+    'general-contractor-leads-toronto',
+    'construction-jobs-toronto',
+    'renovation-jobs-toronto',
+    'find-contractor-work-toronto',
+    'home-renovation-leads-gta',
+  ]
+
+  const contractorLeadPages: MetadataRoute.Sitemap = contractorLeadSlugs.map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.80,
+  }))
+
+  // Trade job pages (programmatic SEO)
+  const tradeJobSlugs = [
+    'plumbing-jobs-toronto',
+    'electrical-jobs-toronto',
+    'roofing-jobs-toronto',
+    'bathroom-renovation-jobs-toronto',
+    'kitchen-renovation-jobs-toronto',
+    'deck-building-jobs-toronto',
+    'flooring-installation-jobs-toronto',
+    'painting-jobs-toronto',
+  ]
+
+  const tradeJobPages: MetadataRoute.Sitemap = tradeJobSlugs.map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.78,
+  }))
+
   return [
     ...locationPages,
     ...torontoPages,
     ...staticPages,
     ...contractorPages,
     ...legalPages,
+    ...renovationCostPages,
+    ...neighbourhoodPages,
+    ...contractorLeadPages,
+    ...tradeJobPages,
     ...blogSitemapEntries,
   ]
 }

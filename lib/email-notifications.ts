@@ -186,7 +186,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
               </ul>
             </div>
             
-            <a href="${process.env.NEXT_PUBLIC_URL}/conversations/${data.conversationId}" class="button">Message Homeowner</a>
+            <a href="${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}" class="button">Message Homeowner</a>
             
             <p>Good luck with your project!</p>
             <p>Best regards,<br>The QuoteXbert Team</p>
@@ -195,7 +195,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>© 2024 QuoteXbert. All rights reserved.</p>
           </div>
         `,
-        text: `Congratulations! Your quote for ${data.jobTitle} was accepted by ${data.homeownerName}. Amount: $${data.quoteAmount}. Contact them at ${process.env.NEXT_PUBLIC_URL}/conversations/${data.conversationId}`
+        text: `Congratulations! Your quote for ${data.jobTitle} was accepted by ${data.homeownerName}. Amount: $${data.quoteAmount}. Contact them at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
       };
 
     case 'message_received':
@@ -216,7 +216,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             
             <p>Reply to continue the conversation.</p>
             
-            <a href="${process.env.NEXT_PUBLIC_URL}/conversations/${data.conversationId}" class="button">View & Reply</a>
+            <a href="${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}" class="button">View & Reply</a>
             
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
@@ -225,7 +225,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p><a href="#">Manage Email Preferences</a></p>
           </div>
         `,
-        text: `New message from ${data.senderName} about ${data.jobTitle}: "${data.messagePreview}". Reply at ${process.env.NEXT_PUBLIC_URL}/conversations/${data.conversationId}`
+        text: `New message from ${data.senderName} about ${data.jobTitle}: "${data.messagePreview}". Reply at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
       };
 
     case 'payment_received':

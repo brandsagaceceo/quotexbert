@@ -214,7 +214,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
                     </a>
                   )}
                   <Link
-                    href={`/conversations/${job.id}`}
+                    href={`/messages?leadId=${job.id}`}
                     className="bg-rose-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-rose-800 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <MessageCircle className="h-4 w-4" />
