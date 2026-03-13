@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (lead.status !== "closed") {
+    if (lead.status !== "closed" && lead.status !== "completed") {
       return NextResponse.json(
         { error: "Can only review completed jobs" },
         { status: 400 }

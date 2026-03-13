@@ -32,6 +32,67 @@ export default function ContractorPortfolioPage() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    projectType: '',
+    description: '',
+    location: '',
+    projectCost: '',
+    duration: '',
+    materials: '',
+    clientStory: '',
+    tags: '',
+    beforeImages: '',
+    afterImages: '',
+  });
+
+  const PROJECT_TYPES = [
+    'Kitchen Renovation', 'Bathroom Remodel', 'Basement Finishing', 'Roofing',
+    'Electrical', 'Plumbing', 'Painting', 'Flooring', 'Landscaping',
+    'Deck / Patio', 'HVAC', 'Windows & Doors', 'Drywall', 'Other'
+  ];
+
+  const resetForm = () => {
+    setFormData({ title: '', projectType: '', description: '', location: '', projectCost: '', duration: '', materials: '', clientStory: '', tags: '', beforeImages: '', afterImages: '' });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      const payload = {
+        contractorId: user.id,
+        title: formData.title,
+        caption: formData.description,
+        projectType: formData.projectType,
+        beforeImages: formData.beforeImages ? formData.beforeImages.split('\n').map(s => s.trim()).filter(Boolean) : [],
+        afterImages: formData.afterImages ? formData.afterImages.split('\n').map(s => s.trim()).filter(Boolean) : [],
+        description: formData.description,
+        projectCost: formData.projectCost,
+        duration: formData.duration,
+        materials: formData.materials,
+        location: formData.location,
+        clientStory: formData.clientStory,
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      };
+      const res = await fetch('/api/contractors/portfolio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        resetForm();
+        setShowAddForm(false);
+        await fetchPortfolioItems();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     if (user && user.role === 'contractor') {
@@ -163,21 +224,165 @@ export default function ContractorPortfolioPage() {
           <div className="min-h-full flex items-center justify-center p-4 py-8">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto">
             <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Add New Project</h2>
-                <Button variant="secondary" onClick={() => setShowAddForm(false)}>
-                  Close
-                </Button>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Add New Project</h2>
+                <button onClick={() => { setShowAddForm(false); resetForm(); }} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
               </div>
-              <p className="text-gray-600 mb-4">
-                Create a portfolio post to showcase your work. This will be displayed on your profile and in job applications.
-              </p>
-              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-gray-500">Portfolio form coming soon!</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  This will include photo upload, project details, and social-style posting
-                </p>
-              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Project Title <span className="text-red-500">*</span></label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Master Bath Renovation in Mississauga"
+                    value={formData.title}
+                    onChange={e => setFormData(p => ({ ...p, title: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                  />
+                </div>
+
+                {/* Project type + location */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Project Type <span className="text-red-500">*</span></label>
+                    <select
+                      required
+                      value={formData.projectType}
+                      onChange={e => setFormData(p => ({ ...p, projectType: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    >
+                      <option value="">Select type…</option>
+                      {PROJECT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Mississauga, ON"
+                      value={formData.location}
+                      onChange={e => setFormData(p => ({ ...p, location: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Cost + Duration */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Project Cost ($)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 12500"
+                      value={formData.projectCost}
+                      onChange={e => setFormData(p => ({ ...p, projectCost: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Duration</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 3 weeks"
+                      value={formData.duration}
+                      onChange={e => setFormData(p => ({ ...p, duration: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Project Description</label>
+                  <textarea
+                    rows={3}
+                    placeholder="What did this project involve? What challenges did you solve?"
+                    value={formData.description}
+                    onChange={e => setFormData(p => ({ ...p, description: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none"
+                  />
+                </div>
+
+                {/* Materials */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Materials Used</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Carrara marble, custom cabinetry, Delta fixtures"
+                    value={formData.materials}
+                    onChange={e => setFormData(p => ({ ...p, materials: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                  />
+                </div>
+
+                {/* Client story */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Client Story / Testimonial</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Share a quote or story from the client (optional)"
+                    value={formData.clientStory}
+                    onChange={e => setFormData(p => ({ ...p, clientStory: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none"
+                  />
+                </div>
+
+                {/* Before images */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Before Photos <span className="font-normal text-gray-400">(one URL per line)</span></label>
+                  <textarea
+                    rows={2}
+                    placeholder="https://example.com/before1.jpg"
+                    value={formData.beforeImages}
+                    onChange={e => setFormData(p => ({ ...p, beforeImages: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none font-mono"
+                  />
+                </div>
+
+                {/* After images */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">After Photos <span className="font-normal text-gray-400">(one URL per line)</span></label>
+                  <textarea
+                    rows={2}
+                    placeholder="https://example.com/after1.jpg"
+                    value={formData.afterImages}
+                    onChange={e => setFormData(p => ({ ...p, afterImages: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none font-mono"
+                  />
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Tags <span className="font-normal text-gray-400">(comma separated)</span></label>
+                  <input
+                    type="text"
+                    placeholder="e.g. bathroom, luxury, tile work, Mississauga"
+                    value={formData.tags}
+                    onChange={e => setFormData(p => ({ ...p, tags: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                  />
+                </div>
+
+                {/* Submit */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-sm font-bold rounded-xl disabled:opacity-60 transition-colors"
+                  >
+                    {submitting ? 'Saving…' : 'Post to Portfolio'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddForm(false); resetForm(); }}
+                    className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

@@ -60,9 +60,13 @@ export default function ContractorDashboard() {
         setRecentJobs(jobsData.jobs.slice(0, 5));
       }
 
-      // Note: In production, fetch actual unread messages and pending quotes
-      // For now, using placeholder values
-      setUnreadMessages(0);
+      // Fetch real unread message count
+      const notifRes = await fetch(`/api/notifications?userId=${authUser?.id}`);
+      const notifData = await notifRes.json();
+      const unreadMsgCount = (notifData.notifications || []).filter(
+        (n: any) => !n.read && n.type === 'NEW_MESSAGE'
+      ).length;
+      setUnreadMessages(unreadMsgCount);
       setPendingQuotes(0);
 
     } catch (error) {

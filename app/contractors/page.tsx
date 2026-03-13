@@ -67,82 +67,13 @@ export default function ContractorSearchPage() {
 
   const fetchContractors = async () => {
     try {
-      // For demo purposes, create sample contractor data
-      const sampleContractors: ContractorProfile[] = [
-        {
-          id: "contractor-1",
-          userId: "demo-contractor",
-          companyName: "Demo Construction Co.",
-          trade: "General Contractor",
-          bio: "Professional construction company with 15+ years of experience in residential renovations.",
-          city: "Toronto",
-          serviceRadiusKm: 25,
-          website: "https://democonstruction.com",
-          phone: "(416) 555-0123",
-          verified: true,
-          avgRating: 4.8,
-          reviewCount: 24,
-          completedJobs: 27
-        },
-        {
-          id: "contractor-2",
-          userId: "contractor-2",
-          companyName: "Elite Kitchen Design",
-          trade: "Kitchen Specialist",
-          bio: "Specializing in modern kitchen renovations and custom cabinetry.",
-          city: "Mississauga",
-          serviceRadiusKm: 30,
-          phone: "(905) 555-0456",
-          verified: true,
-          avgRating: 4.9,
-          reviewCount: 18,
-          completedJobs: 18
-        },
-        {
-          id: "contractor-3",
-          userId: "contractor-3",
-          companyName: "Perfect Plumbing Pro",
-          trade: "Plumbing",
-          bio: "Licensed plumber serving the GTA. Emergency services available 24/7.",
-          city: "North York",
-          serviceRadiusKm: 35,
-          phone: "(647) 555-0789",
-          verified: true,
-          avgRating: 4.7,
-          reviewCount: 31,
-          completedJobs: 203
-        },
-        {
-          id: "contractor-4",
-          userId: "contractor-4",
-          companyName: "Spark Electric Solutions",
-          trade: "Electrical",
-          bio: "Certified electricians providing safe and reliable electrical services.",
-          city: "Scarborough",
-          serviceRadiusKm: 20,
-          verified: false,
-          avgRating: 4.5,
-          reviewCount: 12,
-          completedJobs: 67
-        },
-        {
-          id: "contractor-5",
-          userId: "contractor-5",
-          companyName: "Artisan Painters",
-          trade: "Painting",
-          bio: "Interior and exterior painting specialists with attention to detail.",
-          city: "Etobicoke",
-          serviceRadiusKm: 40,
-          verified: true,
-          avgRating: 4.6,
-          reviewCount: 28,
-          completedJobs: 134
-        }
-      ];
-
-      setContractors(sampleContractors);
+      const res = await fetch('/api/contractors/list');
+      if (res.ok) {
+        const data = await res.json();
+        setContractors(data);
+      }
     } catch (error) {
-      console.error("Error fetching contractors:", error);
+      console.error('Error fetching contractors:', error);
     } finally {
       setIsLoading(false);
     }

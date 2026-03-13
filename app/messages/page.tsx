@@ -7,16 +7,21 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
 import LoadingState from "@/components/ui/LoadingState";
-import { ChatBubbleLeftRightIcon, UserCircleIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+
+interface UserInThread {
+  id: string;
+  email: string;
+  name?: string | null;
+  contractorProfile?: { companyName: string; profilePhoto?: string | null } | null;
+  homeownerProfile?: { name?: string | null; profilePhoto?: string | null } | null;
+}
 
 interface Message {
   id: string;
   body: string;
   createdAt: string;
-  fromUser: {
-    id: string;
-    email: string;
-  };
+  fromUser: UserInThread;
 }
 
 interface Thread {
@@ -24,10 +29,33 @@ interface Thread {
   lead: {
     id: string;
     title: string;
-    homeowner: { id: string; email: string };
-    contractor?: { id: string; email: string };
+    homeowner: UserInThread;
+    contractor?: UserInThread | null;
   };
   messages: Message[];
+}
+
+function getDisplayName(user: UserInThread | null | undefined): string {
+  if (!user) return "Unknown User";
+  return user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || user.email;
+}
+
+function getPhoto(user: UserInThread | null | undefined): string | null {
+  if (!user) return null;
+  return user.contractorProfile?.profilePhoto || user.homeownerProfile?.profilePhoto || null;
+}
+
+function ConvAvatar({ user }: { user: UserInThread | null | undefined }) {
+  const photo = getPhoto(user);
+  const name = getDisplayName(user);
+  if (photo) {
+    return <img src={photo} alt={name} className="w-11 h-11 rounded-full object-cover flex-shrink-0 shadow-sm" />;
+  }
+  return (
+    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+      <span className="text-sm font-bold text-white">{name.charAt(0).toUpperCase()}</span>
+    </div>
+  );
 }
 
 export default function MessagesPage() {
@@ -109,7 +137,7 @@ export default function MessagesPage() {
     }
   };
 
-  const getConversationPartner = (thread: Thread) => {
+  const getConversationPartner = (thread: Thread): UserInThread | null | undefined => {
     if (!user) return null;
     return thread.lead.homeowner.id === user.id
       ? thread.lead.contractor
@@ -140,9 +168,10 @@ export default function MessagesPage() {
   const filteredThreads = threads.filter(thread => {
     if (!searchTerm) return true;
     const partner = getConversationPartner(thread);
+    const partnerName = getDisplayName(partner);
     return (
       thread.lead.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partner?.email.toLowerCase().includes(searchTerm.toLowerCase())
+      partnerName.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 
@@ -294,36 +323,31 @@ export default function MessagesPage() {
                           </button>
 
                           <div className="flex items-start space-x-3">
-                            {/* Avatar */}
-                            <div className="flex-shrink-0">
-                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center shadow-sm">
-                                <UserCircleIcon className="w-6 h-6 text-white" />
-                              </div>
-                            </div>
+                            <ConvAvatar user={otherUser} />
                             
                             {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0 pr-6">
+                              <div className="flex items-center justify-between gap-1">
                                 <p className="text-sm font-semibold text-slate-900 truncate">
-                                  {thread.lead.title}
+                                  {getDisplayName(otherUser)}
                                 </p>
                                 {lastMessage && (
-                                  <span className="text-xs text-slate-500 flex-shrink-0 ml-2">
+                                  <span className="text-xs text-slate-400 flex-shrink-0">
                                     {formatTime(lastMessage.createdAt)}
                                   </span>
                                 )}
                               </div>
                               
-                              <p className="text-xs text-slate-600 font-medium">
-                                {otherUser?.email || 'Unknown User'}
+                              <p className="text-xs text-slate-400 truncate">
+                                {thread.lead.title}
                               </p>
                               
                               {lastMessage ? (
-                                <p className="text-sm text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                                   {lastMessage.body}
                                 </p>
                               ) : (
-                                <p className="text-sm text-slate-400 mt-2 italic">
+                                <p className="text-xs text-slate-400 mt-1 italic">
                                   No messages yet
                                 </p>
                               )}

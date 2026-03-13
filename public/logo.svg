@@ -1,4 +1,188 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img" aria-label="QuoteXbert robot mascot logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img" aria-label="QuoteXbert logo">
+  <defs>
+    <!-- Brand gradients -->
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="brandGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="darkBody" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <!-- 3D shine overlay -->
+    <linearGradient id="shine" x1="0%" y1="0%" x2="20%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </linearGradient>
+    <!-- Eye iris gradient (friendly cyan-white) -->
+    <radialGradient id="eyeIris" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#67e8f9"/>
+      <stop offset="80%" stop-color="#0891b2"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <!-- Eye ring gradient -->
+    <radialGradient id="eyeRing" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </radialGradient>
+    <!-- Drop shadows -->
+    <filter id="dropShadow" x="-20%" y="-15%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.4"/>
+    </filter>
+    <filter id="softShadow" x="-10%" y="-5%" width="120%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.25"/>
+    </filter>
+    <filter id="eyeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- === LEGS === -->
+  <!-- Left leg -->
+  <rect x="73" y="200" width="23" height="32" rx="9" fill="url(#darkBody)" filter="url(#softShadow)"/>
+  <rect x="73" y="200" width="23" height="16" rx="9" fill="url(#shine)"/>
+  <!-- Left foot -->
+  <rect x="67" y="224" width="33" height="14" rx="7" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <rect x="67" y="224" width="33" height="7" rx="7" fill="url(#shine)"/>
+
+  <!-- Right leg -->
+  <rect x="104" y="200" width="23" height="32" rx="9" fill="url(#darkBody)" filter="url(#softShadow)"/>
+  <rect x="104" y="200" width="23" height="16" rx="9" fill="url(#shine)"/>
+  <!-- Right foot -->
+  <rect x="100" y="224" width="33" height="14" rx="7" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <rect x="100" y="224" width="33" height="7" rx="7" fill="url(#shine)"/>
+
+  <!-- === TORSO === -->
+  <!-- Hips connector -->
+  <rect x="68" y="186" width="64" height="18" rx="10" fill="url(#brandGrad)"/>
+  <rect x="68" y="186" width="64" height="9" rx="10" fill="url(#shine)"/>
+
+  <!-- Waist joint rings -->
+  <rect x="74" y="178" width="52" height="6" rx="3" fill="#1e293b"/>
+  <rect x="74" y="184" width="52" height="4" rx="2" fill="#0f172a"/>
+
+  <!-- Main torso box -->
+  <rect x="61" y="118" width="78" height="62" rx="14" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <!-- 3D top shine -->
+  <rect x="61" y="118" width="78" height="30" rx="14" fill="url(#shine)" opacity="0.9"/>
+  <!-- Chest panel (accent detail) -->
+  <rect x="73" y="130" width="54" height="34" rx="8" fill="#9f1239" opacity="0.35"/>
+  <rect x="73" y="130" width="54" height="14" rx="8" fill="white" opacity="0.06"/>
+
+  <!-- === ARMS === -->
+  <!-- Left shoulder ball -->
+  <circle cx="56" cy="132" r="12" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <ellipse cx="52" cy="128" rx="5" ry="4" fill="white" opacity="0.18"/>
+
+  <!-- Left upper arm -->
+  <rect x="28" y="124" width="30" height="22" rx="11" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <rect x="28" y="124" width="30" height="11" rx="11" fill="url(#shine)"/>
+
+  <!-- Left elbow joint -->
+  <rect x="31" y="144" width="24" height="4" rx="2" fill="#1e293b"/>
+  <rect x="31" y="148" width="24" height="4" rx="2" fill="#0f172a"/>
+
+  <!-- Left forearm -->
+  <rect x="29" y="150" width="28" height="22" rx="11" fill="url(#brandGrad)"/>
+  <rect x="29" y="150" width="28" height="11" rx="11" fill="url(#shine)"/>
+
+  <!-- Left hand -->
+  <circle cx="43" cy="180" r="12" fill="url(#darkBody)" filter="url(#softShadow)"/>
+  <ellipse cx="40" cy="177" rx="4.5" ry="3.5" fill="white" opacity="0.18"/>
+
+  <!-- Right shoulder ball -->
+  <circle cx="144" cy="132" r="12" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <ellipse cx="140" cy="128" rx="5" ry="4" fill="white" opacity="0.18"/>
+
+  <!-- Right upper arm -->
+  <rect x="142" y="124" width="30" height="22" rx="11" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <rect x="142" y="124" width="30" height="11" rx="11" fill="url(#shine)"/>
+
+  <!-- Right elbow joint -->
+  <rect x="145" y="144" width="24" height="4" rx="2" fill="#1e293b"/>
+  <rect x="145" y="148" width="24" height="4" rx="2" fill="#0f172a"/>
+
+  <!-- Right forearm -->
+  <rect x="143" y="150" width="28" height="22" rx="11" fill="url(#brandGrad)"/>
+  <rect x="143" y="150" width="28" height="11" rx="11" fill="url(#shine)"/>
+
+  <!-- Right hand -->
+  <circle cx="157" cy="180" r="12" fill="url(#darkBody)" filter="url(#softShadow)"/>
+  <ellipse cx="154" cy="177" rx="4.5" ry="3.5" fill="white" opacity="0.18"/>
+
+  <!-- === NECK === -->
+  <rect x="87" y="108" width="26" height="12" rx="5" fill="url(#darkBody)"/>
+  <rect x="87" y="108" width="26" height="6" rx="5" fill="url(#shine)"/>
+
+  <!-- === HEAD (house-shaped pentagon) === -->
+  <path d="M53 108 L53 70 L100 38 L147 70 L147 108 Z" fill="url(#headGrad)" filter="url(#dropShadow)"/>
+  <!-- Left face highlight plane -->
+  <path d="M53 108 L53 70 L100 38 L100 108 Z" fill="white" opacity="0.03"/>
+
+  <!-- === ROOF === -->
+  <path d="M46 74 L100 35 L154 74 L149 74 L100 43 L51 74 Z" fill="url(#roofGrad)" filter="url(#softShadow)"/>
+  <!-- Roof right-slope highlight -->
+  <path d="M100 35 L154 74 L149 74 L100 43 Z" fill="white" opacity="0.18"/>
+
+  <!-- Chimney -->
+  <rect x="126" y="34" width="16" height="24" rx="4" fill="url(#roofGrad)"/>
+  <rect x="123" y="31" width="22" height="7" rx="3" fill="url(#brandGradLight)"/>
+
+  <!-- Ear discs -->
+  <circle cx="53" cy="90" r="11" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <ellipse cx="50" cy="87" rx="4.5" ry="3.5" fill="white" opacity="0.22"/>
+
+  <circle cx="147" cy="90" r="11" fill="url(#brandGrad)" filter="url(#softShadow)"/>
+  <ellipse cx="144" cy="87" rx="4.5" ry="3.5" fill="white" opacity="0.22"/>
+
+  <!-- === EYES (friendly cyan glow — not alien orange) === -->
+  <!-- Left eye -->
+  <circle cx="83" cy="84" r="16" fill="url(#eyeRing)" filter="url(#softShadow)"/>
+  <circle cx="83" cy="84" r="12.5" fill="#0f172a"/>
+  <circle cx="83" cy="84" r="9.5" fill="url(#eyeIris)" filter="url(#eyeGlow)"/>
+  <!-- Pupil depth -->
+  <circle cx="83" cy="84" r="3.5" fill="#0c4a6e" opacity="0.7"/>
+  <!-- Catchlight -->
+  <circle cx="79" cy="80" r="3" fill="white" opacity="0.85"/>
+  <circle cx="86" cy="88" r="1.5" fill="white" opacity="0.4"/>
+
+  <!-- Right eye -->
+  <circle cx="117" cy="84" r="16" fill="url(#eyeRing)" filter="url(#softShadow)"/>
+  <circle cx="117" cy="84" r="12.5" fill="#0f172a"/>
+  <circle cx="117" cy="84" r="9.5" fill="url(#eyeIris)" filter="url(#eyeGlow)"/>
+  <!-- Pupil depth -->
+  <circle cx="117" cy="84" r="3.5" fill="#0c4a6e" opacity="0.7"/>
+  <!-- Catchlight -->
+  <circle cx="113" cy="80" r="3" fill="white" opacity="0.85"/>
+  <circle cx="120" cy="88" r="1.5" fill="white" opacity="0.4"/>
+
+  <!-- === SMILE (friendly curve) === -->
+  <!-- Shadow -->
+  <path d="M85 101 Q100 115 115 101" stroke="#0f172a" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.3"/>
+  <!-- Main smile -->
+  <path d="M85 100 Q100 114 115 100" stroke="#475569" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- Smile highlight -->
+  <path d="M85 100 Q100 114 115 100" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Cheek blush (subtle warmth) -->
+  <ellipse cx="72" cy="101" rx="7" ry="4" fill="#f43f5e" opacity="0.18"/>
+  <ellipse cx="128" cy="101" rx="7" ry="4" fill="#f43f5e" opacity="0.18"/>
+</svg>
   <!-- Body -->
   <rect x="62" y="118" width="76" height="58" rx="14" fill="#b03a20"/>
   <!-- Waist / spring coils -->
