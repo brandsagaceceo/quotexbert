@@ -10,15 +10,15 @@ import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import StructuredData from "@/components/seo/StructuredData";
 
 interface Props {
-  params: { slug: string };
+  params: { city: string };
 }
 
 export async function generateStaticParams() {
-  return renovationCostPages.map((p) => ({ slug: p.slug }));
+  return renovationCostPages.map((p) => ({ city: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const page = renovationCostPages.find((p) => p.slug === params.slug);
+  const page = renovationCostPages.find((p) => p.slug === params.city);
   if (!page) return {};
   return {
     title: page.metaTitle,
@@ -65,7 +65,7 @@ const neighborhoodLinks = [
 ];
 
 export default function RenovationCostPage({ params }: Props) {
-  const page = renovationCostPages.find((p) => p.slug === params.slug);
+  const page = renovationCostPages.find((p) => p.slug === params.city);
   if (!page) notFound();
 
   return (
