@@ -50,17 +50,7 @@ export default function AIAssistantPopup() {
       return;
     }
 
-    // Show popup after 3 seconds if hasn't been shown
-    const hasSeenPopup = localStorage.getItem('hasSeenAIAssistant');
-    if (!hasSeenPopup) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        initializeChat();
-        localStorage.setItem('hasSeenAIAssistant', 'true');
-        sessionStorage.setItem('aiAssistantShownThisSession', 'true');
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    // Auto-open disabled — widget button remains visible for users to click
   }, [isSignedIn, authUser]);
 
   // Auto-hide on form/messaging pages and near bottom CTAs on mobile

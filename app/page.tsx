@@ -308,26 +308,26 @@ export default function Home() {
 
         {/* Real Homes Photo Strip */}
         <section className="relative overflow-hidden">
-          <div className="grid grid-cols-2 md:grid-cols-4 h-48 md:h-64">
+          <div className="grid grid-cols-2 md:grid-cols-4 h-56 md:h-80">
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=800&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Kitchen · $28k saved</span>
+              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=1000&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Kitchen · $28k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=800&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Bathroom · $9k saved</span>
+              <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=1000&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Bathroom · $9k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=800&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Basement · $15k saved</span>
+              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=1000&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Basement · $15k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=800&fit=crop&crop=center&q=80" alt="Toronto home" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Exterior · $22k saved</span>
+              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=center&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Exterior · $22k saved</span>
             </div>
           </div>
           {/* Overlay callout */}
@@ -554,11 +554,11 @@ export default function Home() {
           {/* Real Homeowner Hero Photo Section */}
           <section className="relative overflow-hidden bg-slate-900">
             <img
-              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1400&h=900&fit=crop&crop=top&q=80"
+              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1600&h=800&fit=crop&crop=center&q=80"
               alt="Happy homeowners in their renovated Toronto starter home"
-              className="w-full h-64 md:h-96 object-cover object-top opacity-40"
+              className="w-full h-[300px] md:h-[500px] object-cover object-center opacity-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/70 to-slate-900/30" />
             <div className="absolute inset-0 flex items-center">
               <div className="max-w-6xl mx-auto px-6 w-full">
                 <div className="max-w-xl">
