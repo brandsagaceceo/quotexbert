@@ -36,8 +36,14 @@ interface ChatProps {
 }
 
 function getDisplayName(user: UserProfile | null | undefined): string {
-  if (!user) return "Unknown User";
-  return user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || user.email;
+  if (!user) return "User";
+  return (
+    user.contractorProfile?.companyName ||
+    user.homeownerProfile?.name ||
+    user.name ||
+    user.email?.split("@")[0] ||
+    "User"
+  );
 }
 
 function getProfilePhoto(user: UserProfile | null | undefined): string | null {
@@ -141,14 +147,20 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     } catch { /* non-critical */ }
   }, [thread.id, currentUserId]);
 
-  const scrollToBottom = useCallback(() => {
-    if (shouldScrollToBottom && messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    if (shouldScrollToBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior, block: "end" });
     }
   }, [shouldScrollToBottom]);
 
   useEffect(() => { fetchMessages(); setShouldScrollToBottom(true); }, [fetchMessages]);
-  useEffect(() => { if (shouldScrollToBottom) scrollToBottom(); }, [messages, shouldScrollToBottom, scrollToBottom]);
+  useEffect(() => {
+    if (shouldScrollToBottom) {
+      // instant on first load, smooth for new messages
+      const isFirstLoad = messages.length > 0 && lastMessageIdRef.current === messages[messages.length - 1]?.id;
+      scrollToBottom(isFirstLoad ? "instant" : "smooth");
+    }
+  }, [messages, shouldScrollToBottom, scrollToBottom]);
   useEffect(() => {
     const msgInterval = setInterval(fetchMessages, 3000);
     const typingInterval = setInterval(checkTyping, 2000);
@@ -226,7 +238,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Loading messagesâ€¦</p>
+          <p className="text-sm text-gray-500">Loading messages...</p>
         </div>
       </div>
     );
@@ -248,13 +260,13 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
             <button onClick={hireContractor} disabled={hiringContractor}
               className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg disabled:opacity-60 flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              {hiringContractor ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "âœ…"}
-              {hiringContractor ? "Hiringâ€¦" : "Hire Contractor"}
+              {hiringContractor ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "\u2713"}
+              {hiringContractor ? "Hiring..." : "Hire Contractor"}
             </button>
           )}
           {contractorHired && (
             <span className="px-3 py-1.5 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-200">
-              âœ… Hired!
+              &#10003; Hired!
             </span>
           )}
         </div>
@@ -335,14 +347,18 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
       </div>
 
       {/* Input */}
-      <div className="flex-shrink-0 px-4 py-3 border-t border-gray-100 bg-white">
+      <div
+        className="flex-shrink-0 px-3 py-2.5 border-t border-gray-100 bg-white"
+        style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))' }}
+      >
         <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={handleInputChange}
-            placeholder={`Message ${getDisplayName(otherUser)}â€¦`}
+            placeholder={`Message ${getDisplayName(otherUser)}...`}
             className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400"
+            style={{ fontSize: '16px' }}
           />
           <button
             type="submit"

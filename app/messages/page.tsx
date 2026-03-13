@@ -36,8 +36,14 @@ interface Thread {
 }
 
 function getDisplayName(user: UserInThread | null | undefined): string {
-  if (!user) return "Unknown User";
-  return user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || user.email;
+  if (!user) return "User";
+  return (
+    user.contractorProfile?.companyName ||
+    user.homeownerProfile?.name ||
+    user.name ||
+    user.email?.split("@")[0] ||
+    "User"
+  );
 }
 
 function getPhoto(user: UserInThread | null | undefined): string | null {
@@ -186,16 +192,22 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 min-h-[calc(100vh-140px)] flex flex-col overflow-hidden">
+    <div
+      className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex flex-col overflow-hidden"
+      style={{
+        height: 'calc(100dvh - var(--header-height, 64px) - var(--bottom-nav-height, 72px))',
+        minHeight: '400px',
+      }}
+    >
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden">
         {/* Modern Header */}
-        <div className="mb-8 flex-shrink-0">
+        <div className="mb-3 sm:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent">
                 Messages
               </h1>
-              <p className="text-slate-600 mt-2 text-lg">Stay connected with your project partners</p>
+              <p className="text-slate-500 mt-1 text-sm sm:text-lg hidden sm:block">Stay connected with your project partners</p>
             </div>
             <div className="hidden sm:flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -204,12 +216,12 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
-          <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-[calc(100vh-240px)] lg:max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
+          <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
             <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
-              <div className="p-5 border-b border-gray-200 flex-shrink-0">
+              <div className="p-3 sm:p-5 border-b border-gray-200 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-slate-900">Conversations</h2>
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-rose-600 to-orange-600 flex items-center justify-center">
@@ -302,7 +314,7 @@ export default function MessagesPage() {
                         <div
                           key={thread.id}
                           onClick={() => setSelectedThread(thread)}
-                          className={`group relative p-4 cursor-pointer rounded-lg transition-all duration-200 ${
+                          className={`group relative p-3 cursor-pointer rounded-lg transition-all duration-200 ${
                             isSelected 
                               ? 'bg-rose-50 border-l-4 border-rose-600 shadow-sm' 
                               : 'hover:bg-slate-50 border-l-4 border-transparent'
@@ -343,7 +355,7 @@ export default function MessagesPage() {
                               </p>
                               
                               {lastMessage ? (
-                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                                <p className="text-xs text-slate-500 mt-0.5 line-clamp-1 leading-relaxed">
                                   {lastMessage.body}
                                 </p>
                               ) : (
