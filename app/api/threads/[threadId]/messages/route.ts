@@ -13,8 +13,18 @@ export async function GET(
     const messages = await prisma.message.findMany({
       where: { threadId },
       include: {
-        fromUser: true,
-        toUser: true,
+        fromUser: {
+          include: {
+            contractorProfile: { select: { companyName: true, profilePhoto: true } },
+            homeownerProfile: { select: { name: true, profilePhoto: true } },
+          },
+        },
+        toUser: {
+          include: {
+            contractorProfile: { select: { companyName: true, profilePhoto: true } },
+            homeownerProfile: { select: { name: true, profilePhoto: true } },
+          },
+        },
       },
       orderBy: { createdAt: "asc" },
     });

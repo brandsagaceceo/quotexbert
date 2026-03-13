@@ -35,15 +35,30 @@ export async function GET(request: NextRequest) {
       include: {
         lead: {
           include: {
-            homeowner: true,
-            contractor: true,
+            homeowner: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
+            contractor: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
           },
         },
         messages: {
           take: 1,
           orderBy: { createdAt: "desc" },
           include: {
-            fromUser: true,
+            fromUser: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
           },
         },
       },

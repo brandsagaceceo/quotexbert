@@ -22,6 +22,7 @@ export function useAuth() {
       if (isLoaded && clerkUser) {
         // Start with whatever Clerk session has
         let role = clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin' | undefined;
+        let dbProfilePhoto: string | null = null;
 
         // Always fetch server-side role to pick up updates made during onboarding
         setRoleLoading(true);
@@ -32,6 +33,10 @@ export function useAuth() {
           // This ensures we get the most up-to-date role from the database
           if (data.role) {
             role = data.role;
+          }
+          // Use DB profile photo if set, otherwise fall back to Clerk OAuth image
+          if (data.profilePhoto) {
+            dbProfilePhoto = data.profilePhoto;
           }
           // If both API and Clerk have no role, then role stays undefined
         } catch (error) {
@@ -61,7 +66,7 @@ export function useAuth() {
             email: email,
             name: userName,
             role: role,
-            profilePhoto: clerkUser.imageUrl
+            profilePhoto: dbProfilePhoto || clerkUser.imageUrl
           });
         } else {
           // User is signed in but has no role - set a partial user object
@@ -70,7 +75,7 @@ export function useAuth() {
             email: email,
             name: userName,
             role: null as any, // No role yet - needs onboarding
-            profilePhoto: clerkUser.imageUrl
+            profilePhoto: dbProfilePhoto || clerkUser.imageUrl
           });
         }
       } else if (isLoaded) {

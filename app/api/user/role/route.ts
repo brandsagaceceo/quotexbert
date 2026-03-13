@@ -21,7 +21,11 @@ export async function GET() {
     // Check if user exists in database
     let user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true }
+      select: {
+        role: true,
+        contractorProfile: { select: { profilePhoto: true } },
+        homeownerProfile: { select: { profilePhoto: true } }
+      }
     });
     
     // If user doesn't exist, auto-create them WITHOUT a role (they must select during onboarding)
@@ -42,17 +46,23 @@ export async function GET() {
             name: userName,
             role: null
           },
-          select: { role: true }
+          select: {
+            role: true,
+            contractorProfile: { select: { profilePhoto: true } },
+            homeownerProfile: { select: { profilePhoto: true } }
+          }
         });
       } catch (error) {
         console.error('Error creating user:', error);
         // Return null if creation fails - user must select role
-        user = { role: null };
+        user = { role: null, contractorProfile: null, homeownerProfile: null };
       }
     }
     
+    const profilePhoto = (user as any)?.contractorProfile?.profilePhoto || (user as any)?.homeownerProfile?.profilePhoto || null;
     return NextResponse.json({ 
-      role: user?.role || null
+      role: user?.role || null,
+      profilePhoto
     });
   } catch (error) {
     return NextResponse.json({ 

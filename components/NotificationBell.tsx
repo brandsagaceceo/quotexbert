@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 interface Notification {
@@ -21,6 +21,58 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>("all");
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const prevUnreadCountRef = useRef<number | null>(null); // null = first fetch
+
+  // Initialize AudioContext and resume it on first user interaction (browser autoplay policy)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const resumeAudio = () => {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+    };
+    document.addEventListener('click', resumeAudio, { once: true });
+    document.addEventListener('keydown', resumeAudio, { once: true });
+    return () => {
+      document.removeEventListener('click', resumeAudio);
+      document.removeEventListener('keydown', resumeAudio);
+    };
+  }, []);
+
+  const playNotificationSound = () => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      // Two-tone chime: high then slightly lower
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.25, startTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      const now = ctx.currentTime;
+      playTone(880, now, 0.25);
+      playTone(660, now + 0.2, 0.3);
+    } catch {
+      // Ignore sound errors - non-critical
+    }
+  };
 
   useEffect(() => {
     if (!authUser?.id) return;
@@ -37,8 +89,16 @@ export default function NotificationBell() {
       const response = await fetch(`/api/notifications?userId=${authUser.id}`);
       if (response.ok) {
         const data = await response.json();
+        const newUnreadCount: number = data.unreadCount || 0;
+
+        // Play sound when new notifications arrive (not on the very first fetch)
+        if (prevUnreadCountRef.current !== null && newUnreadCount > prevUnreadCountRef.current) {
+          playNotificationSound();
+        }
+        prevUnreadCountRef.current = newUnreadCount;
+
         setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+        setUnreadCount(newUnreadCount);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
