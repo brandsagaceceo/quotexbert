@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { GTA_CITIES, RENOVATION_TYPES } from '@/lib/seo/gta-cities'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
@@ -270,5 +271,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...contractorLeadPages,
     ...tradeJobPages,
     ...blogSitemapEntries,
+    // Programmatic city × renovation type pages (112 pages)
+    ...GTA_CITIES.flatMap(city =>
+      RENOVATION_TYPES.map(reno => ({
+        url: `${baseUrl}/renovation-cost/${city.slug}/${reno.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: city.slug === 'toronto' ? 0.88 : 0.78,
+      }))
+    ),
+    // Contractor city pages (14 pages)
+    ...GTA_CITIES.map(city => ({
+      url: `${baseUrl}/contractors/${city.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: city.slug === 'toronto' ? 0.90 : 0.80,
+    })),
+    // Contractor join page
+    {
+      url: `${baseUrl}/contractors/join`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.92,
+    },
   ]
 }
