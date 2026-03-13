@@ -41,7 +41,7 @@ export default function SiteFooter() {
               <li><Link href="/contractors/mississauga" className="text-ink-600 hover:text-brand transition-colors">Contractors — Mississauga</Link></li>
               <li><Link href="/contractors/brampton" className="text-ink-600 hover:text-brand transition-colors">Contractors — Brampton</Link></li>
               <li><Link href="/contractors/vaughan" className="text-ink-600 hover:text-brand transition-colors">Contractors — Vaughan</Link></li>
-              <li><Link href="/for-contractors" className="text-ink-600 hover:text-brand transition-colors">Contractor Overview</Link></li>
+              <li><Link href="/contractors/join" className="text-ink-600 hover:text-brand transition-colors">Contractor Overview</Link></li>
             </ul>
           </div>
 

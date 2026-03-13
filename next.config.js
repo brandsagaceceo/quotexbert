@@ -3,6 +3,7 @@ const nextConfig = {
   // Domain redirects - ensure apex domain redirects to www
   async redirects() {
     return [
+      // Apex → www
       {
         source: '/:path*',
         has: [
@@ -12,6 +13,12 @@ const nextConfig = {
           },
         ],
         destination: 'https://www.quotexbert.com/:path*',
+        permanent: true,
+      },
+      // Legacy contractor landing page → canonical join page
+      {
+        source: '/for-contractors',
+        destination: '/contractors/join',
         permanent: true,
       },
     ];

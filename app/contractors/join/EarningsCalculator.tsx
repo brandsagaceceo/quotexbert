@@ -10,9 +10,8 @@ export default function EarningsCalculator() {
   const [avgJobValue, setAvgJobValue] = useState(20000);
 
   const annualRevenue = jobsPerMonth * avgJobValue * 12;
-  const leadCostPerJob = 29; // Pro plan monthly / average jobs closed
   const annualLeadCost = 29 * 12;
-  const roi = Math.round(((annualRevenue - annualLeadCost) / annualLeadCost) * 100);
+  const roi = Math.round(annualRevenue / annualLeadCost);
 
   const fmt = (n: number) =>
     n >= 1000000
@@ -20,6 +19,13 @@ export default function EarningsCalculator() {
       : n >= 1000
       ? `$${Math.round(n / 1000)}k`
       : `$${n}`;
+
+  const fmtRoi = (n: number) =>
+    n >= 1_000_000
+      ? `${(n / 1_000_000).toFixed(1)}M×`
+      : n >= 1_000
+      ? `${Math.round(n / 1_000)}k×`
+      : `${n}×`;
 
   return (
     <section className="bg-gradient-to-br from-slate-50 to-amber-50 rounded-2xl p-6 md:p-8 border border-amber-100">
@@ -77,7 +83,7 @@ export default function EarningsCalculator() {
       </div>
 
       {/* Results */}
-      <div className="grid grid-cols-3 gap-4 bg-white rounded-xl border border-amber-200 p-5">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 bg-white rounded-xl border border-amber-200 p-3 sm:p-5">
         <div className="text-center">
           <div className="text-3xl font-black text-amber-600">{fmt(annualRevenue)}</div>
           <div className="text-xs text-slate-600 mt-1 font-medium">Annual Revenue</div>
@@ -87,7 +93,7 @@ export default function EarningsCalculator() {
           <div className="text-xs text-slate-600 mt-1 font-medium">Annual Platform Cost</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-black text-green-600">{roi.toLocaleString()}×</div>
+          <div className="text-3xl font-black text-green-600">{fmtRoi(roi)}</div>
           <div className="text-xs text-slate-600 mt-1 font-medium">Return on Investment</div>
         </div>
       </div>

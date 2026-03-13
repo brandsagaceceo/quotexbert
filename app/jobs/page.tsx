@@ -12,5 +12,5 @@ import { redirect } from 'next/navigation';
  * Last updated: March 10, 2026
  */
 export default function JobsRedirect() {
-  redirect('/for-contractors');
+  redirect('/contractors/join');
 }
