@@ -679,7 +679,18 @@ export default function ContractorJobsPage() {
           </div>
         ) : (
           <div className="grid gap-6">
-            {filteredJobs.map((job) => (
+            {filteredJobs.map((job) => {
+              const _isSubscribed = subscriptions.some(sub =>
+                sub.category === job.category &&
+                sub.status === 'active' &&
+                sub.canClaimLeads
+              );
+              const _hasAccess = canAcceptJob(user?.email, _isSubscribed);
+              // For non-subscribers, only show city-level location
+              const _displayLocation = _hasAccess
+                ? (job.location || job.zipCode)
+                : (job.location || job.zipCode || '').split(',')[0].trim() || job.zipCode || 'Location hidden';
+              return (
               <div 
                 key={job.id} 
                 id={`job-${job.id}`}
@@ -689,7 +700,7 @@ export default function ContractorJobsPage() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2 mb-2">
-                      <span className="whitespace-nowrap">📍 {job.location || job.zipCode}</span>
+                      <span className="whitespace-nowrap">📍 {_displayLocation}{!_hasAccess && ' (area only)'}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
                       <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
                       {/* Contractor Interest Counter */}
@@ -729,14 +740,28 @@ export default function ContractorJobsPage() {
                   </span>
                 </div>
                 
-                <p className="text-gray-700 mb-4">
-                  {expandedJob === job.id 
-                    ? job.description 
-                    : job.description?.length > 120 
-                      ? job.description.substring(0, 120) + '...' 
-                      : job.description
-                  }
-                </p>
+                {_hasAccess ? (
+                  <p className="text-gray-700 mb-4">
+                    {expandedJob === job.id 
+                      ? job.description 
+                      : job.description?.length > 120 
+                        ? job.description.substring(0, 120) + '...' 
+                        : job.description
+                    }
+                  </p>
+                ) : (
+                  <div className="mb-4 relative rounded-xl overflow-hidden">
+                    <p className="text-gray-700 blur-sm select-none pointer-events-none leading-relaxed">
+                      {job.description?.substring(0, 150) || 'Subscribe to see the full project description and contact details.'}
+                    </p>
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
+                      <Link href="/contractor/subscriptions"
+                        className="bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all">
+                        Subscribe to {job.category} to unlock
+                      </Link>
+                    </div>
+                  </div>
+                )}
 
                 {/* Expanded Details */}
                 {expandedJob === job.id && (
@@ -747,7 +772,7 @@ export default function ContractorJobsPage() {
                         <span className="font-medium">Budget:</span> {job.budget}
                       </div>
                       <div>
-                        <span className="font-medium">Location:</span> {job.location || job.zipCode}
+                        <span className="font-medium">Location:</span> {_hasAccess ? (job.location || job.zipCode) : _displayLocation + ' (area only)'}
                       </div>
                       <div>
                         <span className="font-medium">Category:</span> {job.category}
@@ -795,16 +820,8 @@ export default function ContractorJobsPage() {
                       {expandedJob === job.id ? 'Hide Details' : 'View Details'}
                     </button>
                     {job.status === 'open' && (() => {
-                      const isSubscribed = subscriptions.some(sub => 
-                        sub.category === job.category && 
-                        sub.status === 'active' && 
-                        sub.canClaimLeads
-                      );
-                      
-                      // God users can accept without subscription
-                      const hasAccess = canAcceptJob(user?.email, isSubscribed);
-                      
-                      return hasAccess ? (
+                      // Access already computed per card above as _hasAccess
+                      return _hasAccess ? (
                         <button 
                           onClick={() => openAcceptanceModal(job.id, job.title)}
                           disabled={accepting === job.id}
@@ -832,7 +849,8 @@ export default function ContractorJobsPage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

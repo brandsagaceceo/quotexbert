@@ -53,6 +53,7 @@ interface ProfileData {
   totalJobs?: number;
   isActive?: boolean;
   serviceRadiusKm?: number;
+  displayName?: string;
 }
 
 interface PortfolioItem {
@@ -123,7 +124,8 @@ export default function UnifiedProfilePage() {
     city: '',
     phone: '',
     website: '',
-    serviceRadiusKm: 25
+    serviceRadiusKm: 25,
+    displayName: '',
   });
 
   useEffect(() => {
@@ -197,7 +199,8 @@ export default function UnifiedProfilePage() {
               city: profileData.city || '',
               phone: profileData.phone || '',
               website: profileData.website || '',
-              serviceRadiusKm: profileData.serviceRadiusKm || 25
+              serviceRadiusKm: profileData.serviceRadiusKm || 25,
+              displayName: profileData.displayName || profileData.name || '',
             });
           }
         } catch (error) {
@@ -513,7 +516,7 @@ export default function UnifiedProfilePage() {
   console.log("[ProfilePage RENDER] Rendering main profile, profile:", profile);
   console.log("[ProfilePage RENDER] Jobs state:", jobs, "Count:", jobs.length);
 
-  const displayName = profile?.companyName || profile?.name || authUser.email;
+  const displayName = profile?.displayName || profile?.companyName || profile?.name || authUser.email;
   const isContractor = authUser.role === 'contractor';
   const getHomeownerJobStatusStyles = (status: string) => {
     const normalized = (status || '').toLowerCase();
@@ -1430,6 +1433,8 @@ export default function UnifiedProfilePage() {
                 <div className="space-y-5">
                   {isEditing ? (
                     <>
+                      {isContractor ? (
+                        <>
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
                         <input
@@ -1481,6 +1486,46 @@ export default function UnifiedProfilePage() {
                           placeholder="https://yourwebsite.com"
                         />
                       </div>
+                        </>
+                      ) : (
+                        // ── Homeowner edit fields ──
+                        <>
+                          <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Display Name</label>
+                            <p className="text-xs text-slate-500 mb-2">Used instead of your real name — contractors will see this.</p>
+                            <input
+                              type="text"
+                              value={editData.displayName}
+                              onChange={(e) => setEditData({...editData, displayName: e.target.value})}
+                              className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                              placeholder="e.g., Alex or HomeRenovator2025"
+                              style={{ fontSize: '16px' }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
+                            <input
+                              type="tel"
+                              value={editData.phone}
+                              onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                              className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                              placeholder="(555) 123-4567"
+                              style={{ fontSize: '16px' }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
+                            <input
+                              type="text"
+                              value={editData.city}
+                              onChange={(e) => setEditData({...editData, city: e.target.value})}
+                              className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                              placeholder="Toronto"
+                              style={{ fontSize: '16px' }}
+                            />
+                          </div>
+                        </>
+                      )}
                     </>
                   ) : (
                     <>
