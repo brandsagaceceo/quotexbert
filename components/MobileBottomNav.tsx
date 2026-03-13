@@ -100,13 +100,13 @@ export default function MobileBottomNav() {
 
   return (
     <div 
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-[0_-1px_6px_rgba(0,0,0,0.06)]"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         '--bottom-nav-height': '64px',
       } as React.CSSProperties}
     >
-      <div className="grid grid-cols-5 h-16">
+      <div className="grid grid-cols-5 h-16 items-stretch">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -114,21 +114,19 @@ export default function MobileBottomNav() {
               key={item.href}
               href={item.href}
               className={`
-                flex flex-col items-center justify-center h-full px-1 transition-colors relative
+                flex flex-col items-center justify-center h-full px-0.5 transition-colors relative
                 ${item.active 
                   ? "text-rose-600" 
                   : "text-gray-500 hover:text-rose-600"
                 }
                 ${item.isAction 
-                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700 mx-2 my-1 rounded-xl" 
+                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700 mx-1 my-1.5 rounded-xl" 
                   : ""
                 }
               `}
             >
-              <div className="relative inline-flex items-center gap-1">
-                <Icon className={`h-5 w-5 ${item.isAction ? "h-6 w-6" : ""}`} />
-              </div>
-              <span className={`text-xs mt-1 font-medium ${item.isAction ? "text-xs" : "text-[10px]"}`}>
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className="text-[10px] mt-0.5 font-medium leading-tight">
                 {item.label}
               </span>
             </Link>
