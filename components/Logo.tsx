@@ -40,7 +40,7 @@ export default function Logo({
         className="shrink-0"
       />
       {showText && (
-        <span className={`font-black bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent ${textSize} tracking-tight`}>
+        <span className={`font-black text-[#800020] ${textSize} tracking-tight`}>
           QuoteXbert
         </span>
       )}
