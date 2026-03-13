@@ -329,7 +329,6 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, o
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
                 multiple
                 onChange={handleFileInput}
                 className="hidden"
