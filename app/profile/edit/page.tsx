@@ -368,7 +368,7 @@ export default function ProfileEditorPage() {
 
               {profile && (
                 <a
-                  href={`/contractors/${user?.id}`}
+                  href={`/contractors/profile/${user?.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"

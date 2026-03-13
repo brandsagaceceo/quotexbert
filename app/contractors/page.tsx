@@ -431,7 +431,7 @@ export default function ContractorSearchPage() {
                           Contact
                         </button>
                         <Link
-                          href={`/contractors/${contractor.userId}`}
+                          href={`/contractors/profile/${contractor.userId}`}
                           className="flex-1 sm:flex-none px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm md:text-base font-medium text-center"
                         >
                           View Profile
