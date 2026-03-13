@@ -51,7 +51,7 @@ export function ContractorCard({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Link 
-              href={`/contractors/${contractor.userId}`}
+              href={`/contractors/profile/${contractor.userId}`}
               className="font-semibold text-white hover:text-blue-400 transition-colors"
             >
               {contractor.companyName}
@@ -118,7 +118,7 @@ export function ContractorBadge({ contractor, linkToProfile = true }: Contractor
   if (linkToProfile) {
     return (
       <Link 
-        href={`/contractors/${contractor.userId}`}
+        href={`/contractors/profile/${contractor.userId}`}
         className="hover:opacity-80 transition-opacity"
       >
         {content}
@@ -197,7 +197,7 @@ export function ContractorListItem({
         
         <div className="flex flex-col gap-2 ml-4">
           <Link
-            href={`/contractors/${contractor.userId}`}
+            href={`/contractors/profile/${contractor.userId}`}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center"

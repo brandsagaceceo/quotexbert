@@ -451,27 +451,45 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Mid-Renovation Tool */}
-              <div className="mt-8 max-w-4xl mx-auto">
+              {/* Mid-Renovation Tools */}
+              <div className="mt-8 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Second Opinion Card */}
+                <Link
+                  href="/second-opinion"
+                  className="group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all flex items-center gap-4"
+                >
+                  <div className="text-4xl group-hover:scale-110 transition-transform flex-shrink-0">⚖️</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="inline-block bg-rose-100 text-rose-800 text-xs font-semibold px-2 py-1 rounded-full mb-1">
+                      MID-RENOVATION
+                    </div>
+                    <h3 className="text-lg font-black text-slate-900 mb-1">Is My Quote Fair?</h3>
+                    <p className="text-slate-600 text-sm leading-snug">
+                      Get a second opinion on your contractor's price — instantly.
+                    </p>
+                    <span className="inline-flex items-center gap-1 text-rose-700 font-bold text-sm mt-2 group-hover:gap-2 transition-all">
+                      Check Now →
+                    </span>
+                  </div>
+                </Link>
+
+                {/* AI Inspector Card */}
                 <Link
                   href="/ai-renovation-check"
-                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all flex items-center gap-6"
+                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all flex items-center gap-4"
                 >
-                  <div className="text-5xl group-hover:scale-110 transition-transform">🔍</div>
-                  <div className="flex-1">
-                    <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">
-                      NEW FEATURE
+                  <div className="text-4xl group-hover:scale-110 transition-transform flex-shrink-0">🔍</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded-full mb-1">
+                      QUALITY CHECK
                     </div>
-                    <h3 className="text-xl font-black text-slate-900 mb-2">AI Renovation Inspector</h3>
-                    <p className="text-slate-600 text-sm">
-                      Upload photos of work in progress and get AI guidance on whether it looks correct. Perfect for peace of mind during renovations.
+                    <h3 className="text-lg font-black text-slate-900 mb-1">AI Renovation Inspector</h3>
+                    <p className="text-slate-600 text-sm leading-snug">
+                      Upload photos — AI checks if the work looks correct.
                     </p>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2 text-purple-700 font-bold">
-                    <span>Try It Free</span>
-                    <svg className="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+                    <span className="inline-flex items-center gap-1 text-purple-700 font-bold text-sm mt-2 group-hover:gap-2 transition-all">
+                      Try Free →
+                    </span>
                   </div>
                 </Link>
               </div>

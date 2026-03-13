@@ -10,7 +10,9 @@ import {
   Briefcase,
   User,
   Plus,
-  FileText
+  FileText,
+  Map,
+  Scale
 } from "lucide-react";
 
 interface NavItem {
@@ -37,11 +39,12 @@ export default function MobileBottomNav() {
       active: pathname === "/"
     },
     {
-      href: "/contractors",
-      label: "Find Pros",
-      icon: Search,
-      active: pathname === "/contractors"
+      href: "/second-opinion",
+      label: "2nd Opinion",
+      icon: Scale,
+      active: pathname === "/second-opinion"
     },
+
     {
       href: "/create-lead",
       label: "Post Job",
@@ -77,10 +80,10 @@ export default function MobileBottomNav() {
       active: pathname.startsWith("/contractor/jobs")
     },
     {
-      href: "/contractor/quotes",
-      label: "Quotes",
-      icon: FileText,
-      active: pathname.startsWith("/contractor/quotes")
+      href: "/contractor/leads-map",
+      label: "Heat Map",
+      icon: Map,
+      active: pathname.startsWith("/contractor/leads-map")
     },
     {
       href: "/messages",

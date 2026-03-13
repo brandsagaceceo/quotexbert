@@ -96,11 +96,18 @@ export default function ContractorDashboard() {
       description: "View your active projects",
     },
     {
-      label: "Leads Map",
+      label: "Demand Heat Map",
       href: "/contractor/leads-map",
       icon: MapPin,
       color: "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700",
-      description: "See jobs on interactive map",
+      description: "See where jobs are concentrated",
+    },
+    {
+      label: "Estimate for Customer",
+      href: "/",
+      icon: FileText,
+      color: "bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700",
+      description: "Generate an AI estimate to share",
     },
     {
       label: "Messages",

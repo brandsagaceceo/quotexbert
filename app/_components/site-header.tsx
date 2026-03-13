@@ -15,6 +15,7 @@ export default function SiteHeader() {
   // Navigation links - updated March 12, 2026
   const navLinks = [
     { href: "/", label: "AI Estimate" },
+    { href: "/second-opinion", label: "Second Opinion" },
     { href: "/renovation-costs", label: "Renovation Costs" },
     { href: "/contractors/join", label: "For Contractors" },
     { href: "/affiliates", label: "Affiliates" },

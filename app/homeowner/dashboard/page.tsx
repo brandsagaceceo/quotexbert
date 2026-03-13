@@ -124,6 +124,14 @@ export default function HomeownerDashboard() {
       icon: Camera,
       color: "from-amber-600 to-orange-600",
       stat: "New!"
+    },
+    {
+      title: "Get Second Opinion",
+      description: "Is your contractor's quote fair? Get an AI verdict in 30 seconds",
+      href: "/second-opinion",
+      icon: TrendingUp,
+      color: "from-rose-600 to-pink-600",
+      stat: "Free"
     }
   ];
 

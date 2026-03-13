@@ -306,7 +306,7 @@ export default function AdminVerificationPage() {
                     </button>
                     
                     <a
-                      href={`/contractors/${contractor.userId}`}
+                      href={`/contractors/profile/${contractor.userId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-center"
