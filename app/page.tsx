@@ -278,9 +278,9 @@ export default function Home() {
                   {/* Stacked real homeowner faces */}
                   <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-rose-200">
                     <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
                     </div>
                     <span className="text-xs md:text-sm font-bold text-slate-700">500+ homeowners</span>
                   </div>
@@ -308,24 +308,24 @@ export default function Home() {
 
         {/* Real Homes Photo Strip */}
         <section className="relative overflow-hidden">
-          <div className="grid grid-cols-2 md:grid-cols-4 h-40 md:h-56">
+          <div className="grid grid-cols-2 md:grid-cols-4 h-48 md:h-64">
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=500&fit=crop&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=800&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Kitchen · $28k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=500&fit=crop&q=80" alt="Bathroom renovation" className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=800&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Bathroom · $9k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=500&fit=crop&q=80" alt="Living room renovation" className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=800&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Basement · $15k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=500&fit=crop&q=80" alt="Toronto home" className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=800&fit=crop&crop=center&q=80" alt="Toronto home" className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <span className="absolute bottom-2 left-3 text-white text-xs font-bold">Exterior · $22k saved</span>
             </div>
@@ -554,9 +554,9 @@ export default function Home() {
           {/* Real Homeowner Hero Photo Section */}
           <section className="relative overflow-hidden bg-slate-900">
             <img
-              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1400&h=600&fit=crop&q=80"
+              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1400&h=900&fit=crop&crop=top&q=80"
               alt="Happy homeowners in their renovated Toronto starter home"
-              className="w-full h-64 md:h-96 object-cover opacity-40"
+              className="w-full h-64 md:h-96 object-cover object-top opacity-40"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
             <div className="absolute inset-0 flex items-center">
@@ -650,7 +650,7 @@ export default function Home() {
                   "Got a renovation quote in seconds. The AI estimate was spot-on and saved me so much time compared to waiting days for quotes."
                 </p>
                 <div className="flex items-center gap-3">
-                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&q=80" alt="Sarah M." className="w-12 h-12 rounded-full object-cover ring-2 ring-rose-200" />
+                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=faces&q=80" alt="Sarah M." className="w-12 h-12 rounded-full object-cover object-top ring-2 ring-rose-200" />
                   <div>
                     <div className="font-bold text-slate-900">Sarah M.</div>
                     <div className="text-sm text-slate-600">Homeowner, Toronto</div>
@@ -675,7 +675,7 @@ export default function Home() {
                   "We just bought our first home in Mississauga. QuoteXbert saved us from overpaying by $12,000 on our kitchen reno. The estimate matched what the winning contractor charged almost exactly."
                 </p>
                 <div className="flex items-center gap-3">
-                  <img src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=96&h=96&fit=crop&q=80" alt="Jennifer K." className="w-12 h-12 rounded-full object-cover ring-2 ring-rose-300" />
+                  <img src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=96&h=96&fit=crop&crop=faces&q=80" alt="Jennifer K." className="w-12 h-12 rounded-full object-cover object-top ring-2 ring-rose-300" />
                   <div>
                     <div className="font-bold text-slate-900">Jennifer &amp; Dave K.</div>
                     <div className="text-sm text-slate-600">First-time homeowners, Mississauga</div>
@@ -696,7 +696,7 @@ export default function Home() {
                   "Better than bidding sites. I pick the jobs I want and homeowners already have realistic budgets. No more lowball offers wasting my time."
                 </p>
                 <div className="flex items-center gap-3">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&q=80" alt="Mike R." className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-200" />
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=faces&q=80" alt="Mike R." className="w-12 h-12 rounded-full object-cover object-top ring-2 ring-blue-200" />
                   <div>
                     <div className="font-bold text-slate-900">Mike R.</div>
                     <div className="text-sm text-slate-600">Contractor, GTA</div>

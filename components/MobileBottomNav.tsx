@@ -11,7 +11,6 @@ import {
   User,
   Plus,
   FileText,
-  Map,
   Scale
 } from "lucide-react";
 
@@ -80,12 +79,6 @@ export default function MobileBottomNav() {
       active: pathname.startsWith("/contractor/jobs")
     },
     {
-      href: "/contractor/leads-map",
-      label: "Heat Map",
-      icon: Map,
-      active: pathname.startsWith("/contractor/leads-map")
-    },
-    {
       href: "/messages",
       label: "Messages",
       icon: MessageCircle,
@@ -109,7 +102,7 @@ export default function MobileBottomNav() {
         '--bottom-nav-height': '64px',
       } as React.CSSProperties}
     >
-      <div className="grid grid-cols-5 h-16 items-stretch">
+      <div className={`grid h-16 items-stretch ${navItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'}`}>
         {navItems.map((item) => {
           const Icon = item.icon;
           return (

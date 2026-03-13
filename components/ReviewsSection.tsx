@@ -31,7 +31,7 @@ const EXAMPLE_REVIEWS: Review[] = [
     text: "Got quotes from GTA contractors in under 5 minutes. The AI estimate was remarkably accurate compared to the final bids I received. Saved me so much time!",
     date: "2026-01-10",
     verified: false,
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces",
     projectType: "Kitchen Renovation",
   },
   {
@@ -42,7 +42,7 @@ const EXAMPLE_REVIEWS: Review[] = [
     text: "Found a reliable roofing contractor through QuoteXbert. The photo upload feature made it super easy to show exactly what needed fixing. Highly recommend!",
     date: "2026-01-08",
     verified: false,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
     projectType: "Roofing Repair",
   },
   {
@@ -53,7 +53,7 @@ const EXAMPLE_REVIEWS: Review[] = [
     text: "The instant estimate feature is a game-changer! I uploaded photos of my bathroom and got a detailed breakdown within seconds. Made budgeting so much easier.",
     date: "2026-01-05",
     verified: false,
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces",
     projectType: "Bathroom Remodel",
   },
   {
@@ -118,7 +118,7 @@ function ReviewCard({ review, isExample }: { review: Review; isExample: boolean 
             alt={review.name}
             width={60}
             height={60}
-            className="rounded-full object-cover"
+            className="rounded-full object-cover object-top"
           />
         )}
         <div className="flex-1">
