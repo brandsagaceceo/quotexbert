@@ -55,7 +55,7 @@ function ConvAvatar({ user }: { user: UserInThread | null | undefined }) {
   const photo = getPhoto(user);
   const name = getDisplayName(user);
   if (photo) {
-    return <img src={photo} alt={name} className="w-11 h-11 rounded-full object-cover flex-shrink-0 shadow-sm" />;
+    return <img src={photo} alt={name} className="avatar-img w-11 h-11 rounded-full object-cover flex-shrink-0 shadow-sm" />;
   }
   return (
     <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-sm">

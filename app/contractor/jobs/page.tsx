@@ -694,11 +694,11 @@ export default function ContractorJobsPage() {
               <div 
                 key={job.id} 
                 id={`job-${job.id}`}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50 transition-all duration-300"
+                className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-lg border border-white/50 transition-all duration-300"
               >
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{job.title}</h3>
+                    <h3 className="text-base md:text-xl font-bold text-gray-900 mb-1.5">{job.title}</h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2 mb-2">
                       <span className="whitespace-nowrap">📍 {_displayLocation}{!_hasAccess && ' (area only)'}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
@@ -808,14 +808,14 @@ export default function ContractorJobsPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm text-gray-500">
+                <div className="flex justify-between items-center mt-3 flex-wrap gap-2">
+                  <span className="text-xs text-gray-500">
                     Posted {new Date(job.createdAt).toLocaleDateString()}
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button 
                       onClick={() => toggleJobDetails(job.id)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium transition-colors"
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                     >
                       {expandedJob === job.id ? 'Hide Details' : 'View Details'}
                     </button>
@@ -825,7 +825,7 @@ export default function ContractorJobsPage() {
                         <button 
                           onClick={() => openAcceptanceModal(job.id, job.title)}
                           disabled={accepting === job.id}
-                          className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                          className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
                         >
                           {accepting === job.id ? 'Accepting...' : 'Accept Job'}
                         </button>

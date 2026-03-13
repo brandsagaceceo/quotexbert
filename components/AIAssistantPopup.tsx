@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, MessageCircle, Sparkles, Home, Briefcase, Send } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface Message {
   role: 'assistant' | 'user';
@@ -14,6 +14,7 @@ interface Message {
 export default function AIAssistantPopup() {
   const { authUser, isSignedIn } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -21,6 +22,10 @@ export default function AIAssistantPopup() {
   const [showTerms, setShowTerms] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Pages where the widget should be hidden (forms, messaging, dense UIs)
+  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up'];
+  const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p));
 
   useEffect(() => {
     // Determine user type
@@ -58,8 +63,14 @@ export default function AIAssistantPopup() {
     }
   }, [isSignedIn, authUser]);
 
-  // NEW: Auto-hide when near bottom CTAs, forms, or value props
+  // Auto-hide on form/messaging pages and near bottom CTAs on mobile
   useEffect(() => {
+    if (shouldHideForPath) {
+      setIsHidden(true);
+      if (isOpen) setIsOpen(false);
+      return;
+    }
+
     const handleScroll = () => {
       if (!buttonRef.current) return;
       
@@ -67,25 +78,25 @@ export default function AIAssistantPopup() {
       const scrollY = window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
       
-      // Hide if near bottom (within 300px) or near top value props on mobile
+      // Hide if near bottom (within 300px) on mobile to avoid overlapping CTAs
       if (window.innerWidth < 768) {
         const nearBottom = scrollY + viewportHeight > docHeight - 300;
-        const nearTopValueProps = scrollY < 400; // Hide in first 400px to avoid overlapping headers/value props
-        setIsHidden(nearBottom || nearTopValueProps);
+        setIsHidden(nearBottom);
       } else {
         setIsHidden(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    setIsHidden(false);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
-    handleScroll(); // Check initial position
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [shouldHideForPath]);
 
   const initializeChat = () => {
     const welcomeMessage: Message = {
@@ -215,18 +226,15 @@ export default function AIAssistantPopup() {
     <>
       {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
       {!isOpen && (
-        <button
+      <button
           ref={buttonRef}
           onClick={() => {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className={`fixed right-4 z-40 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group ${
-            isHidden ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group${
+            isHidden ? ' widget-hidden' : ''
           }`}
-          style={{
-            bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 20px)',
-          }}
           aria-label="Open AI Assistant"
         >
           <Sparkles className="h-5 w-5" />

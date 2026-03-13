@@ -12,8 +12,25 @@
   --ink-500: #64748b;
   --ink-700: #334155;
   --ink-900: #0f172a;
-  --radius-card: 1.25rem;
+  --radius-card: 1rem;
   --radius-button: 9999px;
+
+  /* ── Mobile Design System ── */
+  --section-py-mobile: 2rem;      /* 32px section padding on mobile */
+  --section-py-desktop: 4rem;     /* 64px section padding on desktop */
+  --card-p-mobile: 1rem;          /* 16px card padding on mobile */
+  --card-p-desktop: 1.5rem;       /* 24px card padding on desktop */
+  --gap-mobile: 0.75rem;          /* 12px gap on mobile */
+
+  /* ── Mobile Typography Scale ── */
+  --text-h1-mobile: 2rem;         /* 32px */
+  --text-h2-mobile: 1.5rem;       /* 24px */
+  --text-h3-mobile: 1.125rem;     /* 18px */
+  --text-body-mobile: 0.9375rem;  /* 15px */
+  --text-caption-mobile: 0.8125rem; /* 13px */
+  --text-h1-desktop: 3.5rem;      /* 56px */
+  --text-h2-desktop: 2.25rem;     /* 36px */
+  --text-h3-desktop: 1.5rem;      /* 24px */
 }
 
 @theme inline {
@@ -441,4 +458,171 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QUOTEXBERT MOBILE-FIRST DESIGN SYSTEM
+   Premium UI polish for iPhone Safari & mobile browsers
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Tighter mobile heading scale ── */
+@media (max-width: 767px) {
+  .text-4xl { font-size: 1.875rem !important; }
+  .text-5xl { font-size: 2.125rem !important; }
+  .text-6xl { font-size: 2.375rem !important; }
+  .text-7xl { font-size: 2.625rem !important; }
+  .text-8xl { font-size: 2.875rem !important; }
+
+  /* Tighter section spacing on mobile */
+  .py-16 { padding-top: 2.25rem !important; padding-bottom: 2.25rem !important; }
+  .py-20 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+  .py-24 { padding-top: 2.75rem !important; padding-bottom: 2.75rem !important; }
+}
+
+/* ── Avatar / Image cropping fix ── */
+.avatar-img {
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 50%;
+}
+
+.profile-hero-img {
+  width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.content-img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* ── Stage chip pills ── */
+.stage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 36px;
+  white-space: nowrap;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.stage-chip:hover {
+  background: #fee2e2;
+  color: #be123c;
+  border-color: #fca5a5;
+}
+
+.stage-chip.active {
+  background: #fff1f2;
+  color: #be123c;
+  border-color: #fb7185;
+}
+
+/* ── Scrollable chip row ── */
+.chip-scroll-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.chip-scroll-row::-webkit-scrollbar { display: none; }
+
+/* ── Stat card on dark pages ── */
+.stat-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 0.875rem;
+  padding: 0.875rem 1rem;
+  backdrop-filter: blur(6px);
+}
+.stat-card .stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+.stat-card .stat-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+/* ── Heat map container ── */
+@media (max-width: 767px) {
+  .heat-map-container { max-height: 240px; overflow: hidden; }
+}
+
+/* ── View toggle pills ── */
+.view-toggle {
+  display: inline-flex;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  gap: 0.125rem;
+}
+.view-toggle-btn {
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  color: #94a3b8;
+  background: transparent;
+}
+.view-toggle-btn.active {
+  background: #be123c;
+  color: #ffffff;
+  box-shadow: 0 1px 6px rgba(190,18,60,0.4);
+}
+
+/* ── Compact job card ── */
+.job-card-compact {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 0.875rem;
+  padding: 0.875rem 1rem;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+@media (max-width: 767px) {
+  .job-card-compact { padding: 0.75rem; }
+}
+
+/* ── Mobile floating widget safe position ── */
+.floating-widget-safe {
+  position: fixed;
+  right: 1rem;
+  z-index: 40;
+  bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 1.25rem);
+  transition: opacity 0.25s, transform 0.25s;
+}
+.floating-widget-safe.widget-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8) translateY(8px);
+}
+
+/* ── Footer mobile layout ── */
+@media (max-width: 767px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .footer-brand-col { grid-column: 1 / -1; }
 }

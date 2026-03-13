@@ -6,10 +6,10 @@ export default function SiteFooter() {
 
   return (
     <footer className="bg-white/95 backdrop-blur-xl border-t border-gray-100">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          {/* Brand — spans 2 cols on desktop */}
-          <div className="col-span-2 md:col-span-1">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="footer-grid grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
+          {/* Brand — spans 2 cols on desktop, full width on mobile */}
+          <div className="footer-brand-col col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center mb-4">
               <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
             </Link>

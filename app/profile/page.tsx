@@ -585,7 +585,7 @@ export default function UnifiedProfilePage() {
                     <img 
                       src={profile.profilePhoto} 
                       alt={displayName}
-                      className="w-full h-full object-cover"
+                      className="avatar-img w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
@@ -841,7 +841,7 @@ export default function UnifiedProfilePage() {
                             <img 
                               src={item.imageUrl} 
                               alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              className="content-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80';
                               }}
@@ -850,7 +850,7 @@ export default function UnifiedProfilePage() {
                             <img 
                               src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80' 
                               alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              className="content-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                             />
                           )}
                           {/* Gradient overlay */}
