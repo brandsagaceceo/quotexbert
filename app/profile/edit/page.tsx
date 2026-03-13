@@ -141,16 +141,16 @@ export default function ProfileEditorPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-900 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="animate-pulse">
-            <div className="bg-gray-800 rounded-lg p-8">
-              <div className="h-8 bg-gray-700 rounded w-1/3 mb-8"></div>
+            <div className="bg-white rounded-lg p-8 border border-slate-200">
+              <div className="h-8 bg-slate-100 rounded w-1/3 mb-8"></div>
               <div className="space-y-6">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i}>
-                    <div className="h-4 bg-gray-700 rounded w-1/4 mb-2"></div>
-                    <div className="h-10 bg-gray-700 rounded w-full"></div>
+                    <div className="h-4 bg-slate-100 rounded w-1/4 mb-2"></div>
+                    <div className="h-10 bg-slate-100 rounded w-full"></div>
                   </div>
                 ))}
               </div>
@@ -162,11 +162,11 @@ export default function ProfileEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-gray-800 rounded-lg p-8">
+        <div className="bg-white rounded-lg p-8 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-white">Contractor Profile</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Contractor Profile</h1>
             {profile?.verified && (
               <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                 ✓ Verified
@@ -175,21 +175,21 @@ export default function ProfileEditorPage() {
           </div>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
-              <p className="text-red-400">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-600">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="bg-green-900/20 border border-green-500 rounded-lg p-4 mb-6">
-              <p className="text-green-400">Profile saved successfully!</p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p className="text-green-600">Profile saved successfully!</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Display Name */}
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="displayName" className="block text-sm font-medium text-slate-700 mb-2">
                 Display Name *
               </label>
               <input
@@ -199,17 +199,17 @@ export default function ProfileEditorPage() {
                 value={formData.displayName}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                 placeholder="How you want to appear to clients (instead of email)"
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 This name will be shown to clients instead of your email address
               </p>
             </div>
 
             {/* Company Name */}
             <div>
-              <label htmlFor="companyName" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="companyName" className="block text-sm font-medium text-slate-700 mb-2">
                 Company Name *
               </label>
               <input
@@ -219,14 +219,14 @@ export default function ProfileEditorPage() {
                 value={formData.companyName}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                 placeholder="Your company or business name"
               />
             </div>
 
             {/* Trade */}
             <div>
-              <label htmlFor="trade" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="trade" className="block text-sm font-medium text-slate-700 mb-2">
                 Trade/Specialty *
               </label>
               <select
@@ -235,7 +235,7 @@ export default function ProfileEditorPage() {
                 value={formData.trade}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
               >
                 <option value="">Select your trade</option>
                 {TRADES.map(trade => (
@@ -248,7 +248,7 @@ export default function ProfileEditorPage() {
 
             {/* Bio */}
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="bio" className="block text-sm font-medium text-slate-700 mb-2">
                 Bio/Description
               </label>
               <textarea
@@ -257,7 +257,7 @@ export default function ProfileEditorPage() {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                 placeholder="Tell potential clients about your experience, specialties, and what sets you apart..."
               />
             </div>
@@ -265,7 +265,7 @@ export default function ProfileEditorPage() {
             {/* Location */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="city" className="block text-sm font-medium text-slate-700 mb-2">
                   City/Location
                 </label>
                 <input
@@ -274,13 +274,13 @@ export default function ProfileEditorPage() {
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                   placeholder="Your primary service city"
                 />
               </div>
 
               <div>
-                <label htmlFor="serviceRadiusKm" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="serviceRadiusKm" className="block text-sm font-medium text-slate-700 mb-2">
                   Service Radius (km)
                 </label>
                 <input
@@ -291,7 +291,7 @@ export default function ProfileEditorPage() {
                   onChange={handleInputChange}
                   min="1"
                   max="500"
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                 />
               </div>
             </div>
@@ -299,7 +299,7 @@ export default function ProfileEditorPage() {
             {/* Contact Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-2">
                   Phone Number
                 </label>
                 <input
@@ -308,13 +308,13 @@ export default function ProfileEditorPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                   placeholder="Your business phone number"
                 />
               </div>
 
               <div>
-                <label htmlFor="website" className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-2">
                   Website
                 </label>
                 <input
@@ -323,7 +323,7 @@ export default function ProfileEditorPage() {
                   name="website"
                   value={formData.website}
                   onChange={handleInputChange}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                   placeholder="https://your-website.com"
                 />
               </div>
@@ -331,25 +331,25 @@ export default function ProfileEditorPage() {
 
             {/* Rating Display */}
             {profile && (
-              <div className="bg-gray-700 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-white mb-2">Your Rating</h3>
+              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Your Rating</h3>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     {Array.from({ length: 5 }, (_, i) => (
                       <span
                         key={i}
                         className={`text-lg ${
-                          i < Math.floor(profile.avgRating) ? "text-yellow-400" : "text-gray-600"
+                          i < Math.floor(profile.avgRating) ? "text-yellow-400" : "text-slate-300"
                         }`}
                       >
                         ★
                       </span>
                     ))}
-                    <span className="text-lg font-bold text-white">
+                    <span className="text-lg font-bold text-slate-900">
                       {profile.avgRating.toFixed(1)}
                     </span>
                   </div>
-                  <span className="text-gray-400">
+                  <span className="text-slate-500">
                     ({profile.reviewCount} review{profile.reviewCount !== 1 ? 's' : ''})
                   </span>
                 </div>
@@ -371,7 +371,7 @@ export default function ProfileEditorPage() {
                   href={`/contractors/profile/${user?.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-lg font-medium transition-colors"
                 >
                   View Public Profile
                 </a>

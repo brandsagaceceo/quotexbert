@@ -178,18 +178,18 @@ export default function PortfolioManagementPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-900 py-8">
+      <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="animate-pulse">
-            <div className="bg-gray-800 rounded-lg p-8">
-              <div className="h-8 bg-gray-700 rounded w-1/3 mb-8"></div>
+            <div className="bg-white rounded-lg p-8 border border-slate-200">
+              <div className="h-8 bg-slate-200 rounded w-1/3 mb-8"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-gray-700 rounded-lg overflow-hidden">
-                    <div className="h-48 bg-gray-600"></div>
+                  <div key={i} className="bg-slate-100 rounded-lg overflow-hidden">
+                    <div className="h-48 bg-slate-200"></div>
                     <div className="p-4">
-                      <div className="h-4 bg-gray-600 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-600 rounded w-1/2"></div>
+                      <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-slate-200 rounded w-1/2"></div>
                     </div>
                   </div>
                 ))}
@@ -202,11 +202,11 @@ export default function PortfolioManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-gray-800 rounded-lg p-8">
+        <div className="bg-white rounded-lg p-8 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-white">Portfolio Management</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Portfolio Management</h1>
             <button
               onClick={() => setShowForm(!showForm)}
               className="bg-rose-700 hover:bg-rose-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
@@ -216,19 +216,19 @@ export default function PortfolioManagementPage() {
           </div>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 mb-6">
-              <p className="text-red-400">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-600">{error}</p>
             </div>
           )}
 
           {/* Add New Item Form */}
           {showForm && (
-            <div className="bg-gray-700 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold text-white mb-6">Add Portfolio Item</h2>
+            <div className="bg-slate-50 rounded-lg p-6 mb-8 border border-slate-200">
+              <h2 className="text-xl font-bold text-slate-900 mb-6">Add Portfolio Item</h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
                     Title *
                   </label>
                   <input
@@ -238,13 +238,13 @@ export default function PortfolioManagementPage() {
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                     placeholder="Project title (e.g., 'Kitchen Renovation', 'Bathroom Remodel')"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="caption" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="caption" className="block text-sm font-medium text-slate-700 mb-2">
                     Description
                   </label>
                   <textarea
@@ -253,13 +253,13 @@ export default function PortfolioManagementPage() {
                     value={formData.caption}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-rose-700 focus:ring-1 focus:ring-blue-500"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                     placeholder="Brief description of the project, materials used, challenges overcome..."
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="file" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="file" className="block text-sm font-medium text-slate-700 mb-2">
                     Image *
                   </label>
                   <input
@@ -268,9 +268,9 @@ export default function PortfolioManagementPage() {
                     accept="image/*"
                     onChange={handleFileChange}
                     required
-                    className="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-rose-700 file:text-white hover:file:bg-blue-700"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-4 py-3 text-slate-900 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-rose-600 file:text-white hover:file:bg-rose-700"
                   />
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     Max file size: 5MB. Supported formats: JPG, PNG, WebP
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export default function PortfolioManagementPage() {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-3 rounded-lg font-medium transition-colors"
                   >
                     Cancel
                   </button>
@@ -299,13 +299,13 @@ export default function PortfolioManagementPage() {
           {/* Portfolio Grid */}
           {portfolioItems.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
+              <div className="text-slate-400 mb-4">
                 <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-300 mb-2">No portfolio items yet</h3>
-              <p className="text-gray-400 mb-6">
+              <h3 className="text-lg font-medium text-slate-900 mb-2">No portfolio items yet</h3>
+              <p className="text-slate-500 mb-6">
                 Start building your portfolio by adding photos of your best work.
               </p>
               <button
@@ -318,7 +318,7 @@ export default function PortfolioManagementPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="bg-gray-700 rounded-lg overflow-hidden group">
+                <div key={item.id} className="bg-white rounded-lg overflow-hidden group border border-slate-200 shadow-sm">
                   <div className="relative h-48">
                     <Image
                       src={item.imageUrl}
@@ -328,15 +328,15 @@ export default function PortfolioManagementPage() {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-white mb-2 line-clamp-1">
+                    <h3 className="font-semibold text-slate-900 mb-2 line-clamp-1">
                       {item.title}
                     </h3>
                     {item.caption && (
-                      <p className="text-gray-300 text-sm mb-2 line-clamp-2">
+                      <p className="text-slate-600 text-sm mb-2 line-clamp-2">
                         {item.caption}
                       </p>
                     )}
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-slate-400 text-xs">
                       Added {formatDate(item.createdAt)}
                     </p>
                   </div>
