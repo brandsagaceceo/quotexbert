@@ -9,6 +9,8 @@ import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 interface IPhoneEstimatorMockupProps {
   onEstimateComplete: (result: any) => void;
   userId?: string | undefined;
+  isBlocked?: boolean;
+  onBlocked?: () => void;
 }
 
 const PROJECT_TYPES = [
@@ -33,7 +35,7 @@ interface UploadedPhoto {
   isExample?: boolean;
 }
 
-export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEstimatorMockupProps) {
+export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, onBlocked }: IPhoneEstimatorMockupProps) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("");
@@ -181,6 +183,12 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId }: IPhoneEsti
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Free-use gate: block if caller says so
+    if (isBlocked) {
+      onBlocked?.();
+      return;
+    }
 
     if (photos.length === 0 && !description.trim()) {
       setError("Please upload at least one photo or provide a description");

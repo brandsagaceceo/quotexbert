@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { IPhoneEstimatorMockup } from "@/components/IPhoneEstimatorMockup";
 import { EstimateResults } from "@/components/EstimateResults";
@@ -24,7 +24,17 @@ const TrustFAQ = lazy(() => import("@/components/TrustFAQ"));
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [hasUsedFree, setHasUsedFree] = useState(false);
+  const [showSignUpGate, setShowSignUpGate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
+
+  // Read localStorage on mount to know if this visitor already used their free estimate
+  useEffect(() => {
+    setHasUsedFree(localStorage.getItem('estimateUsed') === '1');
+  }, []);
+
+  // Block the estimator for unauthenticated visitors who have already used their 1 free estimate
+  const isEstimatorBlocked = !isSignedIn && hasUsedFree;
 
   // In production, fetch real reviews from API
   const realReviews: Review[] = []; // Empty for now - will show examples
@@ -65,6 +75,12 @@ export default function Home() {
   const handleEstimateComplete = (result: any) => {
     setEstimateResult(result);
     trackEstimateComplete(result?.total);
+
+    // Mark free estimate as used for unauthenticated visitors
+    if (!isSignedIn) {
+      localStorage.setItem('estimateUsed', '1');
+      setHasUsedFree(true);
+    }
     
     // Show review modal after successful estimate (5 second delay)
     setTimeout(() => {
@@ -90,6 +106,64 @@ export default function Home() {
 
       {/* Sticky Mobile CTA */}
       <StickyCTA />
+
+      {/* ── Sign-Up Gate Modal ── shown when a guest tries a 2nd estimate ── */}
+      {showSignUpGate && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSignUpGate(false); }}
+        >
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+            {/* Close */}
+            <button
+              onClick={() => setShowSignUpGate(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl leading-none"
+              aria-label="Close"
+            >
+              ×
+            </button>
+
+            {/* Icon */}
+            <div className="text-5xl mb-4">🎉</div>
+
+            {/* Heading */}
+            <h2 className="text-2xl font-black text-slate-900 mb-2">
+              You've used your free estimate!
+            </h2>
+            <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+              Create a <strong>free account</strong> to unlock unlimited AI estimates, save your projects, and get bids from verified GTA contractors.
+            </p>
+
+            {/* Benefit list */}
+            <ul className="text-left text-sm text-slate-700 space-y-2 mb-7">
+              {[
+                "♾️  Unlimited AI renovation estimates",
+                "💾  Save & revisit past estimates",
+                "📬  Post jobs to 500+ verified contractors",
+                "💬  Direct messaging with contractors",
+              ].map((b) => (
+                <li key={b} className="flex items-start gap-2">
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTAs */}
+            <a
+              href="/sign-up"
+              className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-3.5 rounded-xl text-base transition mb-3"
+            >
+              Create Free Account →
+            </a>
+            <a
+              href="/sign-in"
+              className="block w-full text-slate-600 hover:text-rose-600 text-sm font-medium transition"
+            >
+              Already have an account? Sign in
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Review Capture Modal */}
       <Suspense fallback={null}>
@@ -224,6 +298,8 @@ export default function Home() {
                 <IPhoneEstimatorMockup 
                   onEstimateComplete={handleEstimateComplete}
                   userId={user?.id || undefined}
+                  isBlocked={isEstimatorBlocked}
+                  onBlocked={() => setShowSignUpGate(true)}
                 />
               </div>
             </div>
