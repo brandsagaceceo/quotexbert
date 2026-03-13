@@ -3,6 +3,7 @@ import Link from "next/link";
 import RenovationCTA from "@/components/seo/RenovationCTA";
 import FAQSection from "@/components/seo/FAQSection";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
+import EarningsCalculator from "./EarningsCalculator";
 
 export const metadata: Metadata = {
   title: "Join as a Renovation Contractor | QuoteXbert GTA",
@@ -449,6 +450,9 @@ export default function ContractorsJoinPage() {
             ))}
           </div>
         </section>
+
+        {/* Earnings calculator */}
+        <EarningsCalculator />
 
         {/* FAQs */}
         <FAQSection faqs={FAQS} title="Contractor FAQ" />

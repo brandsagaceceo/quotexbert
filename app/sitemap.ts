@@ -294,5 +294,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.92,
     },
+    // Renovation costs hub page
+    {
+      url: `${baseUrl}/renovation-costs`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.92,
+    },
   ]
 }

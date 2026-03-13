@@ -12,10 +12,11 @@ export default function SiteHeader() {
   const { isSignedIn, authUser: user } = useAuth();
   const { signOut } = useClerk();
 
-  // Navigation links - updated March 11, 2026
+  // Navigation links - updated March 12, 2026
   const navLinks = [
     { href: "/", label: "AI Estimate" },
-    { href: "/for-contractors", label: "For Contractors" },
+    { href: "/renovation-costs", label: "Renovation Costs" },
+    { href: "/contractors/join", label: "For Contractors" },
     { href: "/affiliates", label: "Affiliates" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
@@ -60,7 +61,7 @@ export default function SiteHeader() {
             {/* For Contractors CTA - visible to everyone */}
             {!isSignedIn && (
               <Link
-                href="/for-contractors"
+                href="/contractors/join"
                 className="text-rose-700 hover:text-rose-900 px-4 py-2 text-sm font-bold border-2 border-rose-600 hover:border-rose-800 rounded-lg transition-all duration-200"
               >
                 For Contractors

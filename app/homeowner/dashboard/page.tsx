@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   Camera,
   TrendingUp,
-  Clock
+  Clock,
+  BookOpen
 } from "lucide-react";
 
 export default function HomeownerDashboard() {
@@ -75,6 +76,14 @@ export default function HomeownerDashboard() {
       icon: Home,
       color: "from-rose-600 to-orange-600",
       stat: null
+    },
+    {
+      title: "Renovation Cost Guides",
+      description: "Explore real renovation costs across every GTA city",
+      href: "/renovation-costs",
+      icon: BookOpen,
+      color: "from-teal-600 to-emerald-600",
+      stat: "112 guides"
     },
     {
       title: "My Saved Estimates",

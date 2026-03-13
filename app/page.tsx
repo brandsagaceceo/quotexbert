@@ -358,13 +358,13 @@ export default function Home() {
 
                 {/* Contractor Path */}
                 <Link
-                  href="/for-contractors"
+                  href="/contractors/join"
                   className="group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-8 border-2 border-sky-200 hover:border-sky-400 hover:shadow-2xl transition-all"
                 >
                   <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">🔧</div>
                   <h3 className="text-2xl font-black text-slate-900 mb-3">Find Quality Leads</h3>
                   <p className="text-slate-600 mb-6 leading-relaxed">
-                    Get pre-qualified leads in Toronto & GTA. No bidding wars. Choose your service areas and pricing.
+                    Get pre-qualified leads in Toronto &amp; GTA. No bidding wars. AI-screened homeowners with real budgets.
                   </p>
                   <div className="flex items-center gap-2 text-sky-700 font-bold group-hover:gap-4 transition-all">
                     <span>Join as Contractor</span>
@@ -398,6 +398,61 @@ export default function Home() {
                     </svg>
                   </div>
                 </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Popular in the GTA — surfaces SEO pages */}
+          <section className="py-14 bg-white border-t border-slate-100">
+            <div className="max-w-5xl mx-auto px-4">
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-7">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-900">Popular in the GTA</h2>
+                  <p className="text-slate-600 mt-1">Explore renovation costs and find contractors across every Toronto-area city.</p>
+                </div>
+                <Link href="/renovation-costs" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">View all cost guides →</Link>
+              </div>
+
+              {/* Cost guide chips */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-8">
+                {[
+                  { href: "/renovation-cost/toronto/kitchen-renovation", emoji: "🍳", label: "Kitchen — Toronto", sub: "avg $35,000" },
+                  { href: "/renovation-cost/toronto/bathroom-renovation", emoji: "🚿", label: "Bathroom — Toronto", sub: "avg $18,000" },
+                  { href: "/renovation-cost/toronto/basement-finishing", emoji: "🏠", label: "Basement — Toronto", sub: "avg $45,000" },
+                  { href: "/renovation-cost/mississauga/kitchen-renovation", emoji: "🍳", label: "Kitchen — Mississauga", sub: "avg $33,000" },
+                  { href: "/renovation-cost/brampton/bathroom-renovation", emoji: "🚿", label: "Bathroom — Brampton", sub: "avg $17,000" },
+                  { href: "/renovation-cost/scarborough/basement-finishing", emoji: "🏠", label: "Basement — Scarborough", sub: "avg $43,000" },
+                  { href: "/renovation-cost/vaughan/deck-building", emoji: "🌳", label: "Deck — Vaughan", sub: "avg $19,000" },
+                  { href: "/renovation-cost/markham/roof-replacement", emoji: "🏗️", label: "Roof — Markham", sub: "avg $12,000" },
+                ].map((item) => (
+                  <Link key={item.href} href={item.href} className="bg-rose-50 border border-rose-100 rounded-xl p-3 hover:border-rose-300 hover:shadow-sm transition group">
+                    <div className="text-lg mb-1">{item.emoji}</div>
+                    <div className="text-xs font-semibold text-slate-800 group-hover:text-rose-700 leading-tight">{item.label}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{item.sub}</div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Contractor city chips */}
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
+                <p className="font-bold text-slate-800 text-sm">Find contractors near you:</p>
+                <Link href="/contractors/join" className="text-sky-700 font-bold text-sm hover:underline">Join as Contractor →</Link>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { city: "toronto", label: "Toronto" },
+                  { city: "mississauga", label: "Mississauga" },
+                  { city: "brampton", label: "Brampton" },
+                  { city: "vaughan", label: "Vaughan" },
+                  { city: "scarborough", label: "Scarborough" },
+                  { city: "markham", label: "Markham" },
+                  { city: "richmond-hill", label: "Richmond Hill" },
+                  { city: "oshawa", label: "Oshawa" },
+                ].map((c) => (
+                  <Link key={c.city} href={`/contractors/${c.city}`} className="bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-sky-100 hover:border-sky-400 transition">
+                    🔧 {c.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </section>
@@ -642,7 +697,7 @@ export default function Home() {
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link
-                    href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/for-contractors"}
+                    href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/contractors/join"}
                     className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-2xl text-lg"
                   >
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
