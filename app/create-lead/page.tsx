@@ -565,6 +565,7 @@ export default function CreateLeadPage() {
                 }}
                 placeholder="Describe your project in detail. Include specifics about what work needs to be done, materials, timeline, etc."
                 rows={6}
+                maxLength={3000}
                 className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all resize-none ${
                   fieldErrors.description 
                     ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
@@ -579,8 +580,11 @@ export default function CreateLeadPage() {
                   {fieldErrors.description}
                 </p>
               )}
-              <p className="mt-2 text-xs text-gray-500">
-                {formData.description.length}/1000 characters
+              <p className={`mt-2 text-xs ${
+                formData.description.length > 2700 ? 'text-red-500 font-medium' :
+                formData.description.length > 2400 ? 'text-orange-500' : 'text-gray-500'
+              }`}>
+                {formData.description.length}/3000 characters
               </p>
             </div>
 
@@ -619,6 +623,7 @@ export default function CreateLeadPage() {
                   }}
                   placeholder="K1A 0A6"
                   maxLength={7}
+                  autoComplete="postal-code"
                   className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
                     fieldErrors.zipCode 
                       ? "border-red-300 focus:border-red-500 focus:ring-red-200" 

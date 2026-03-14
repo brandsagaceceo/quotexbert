@@ -29,7 +29,7 @@ const leadSchema = z.object({
   description: z
     .string()
     .min(1, "Description is required")
-    .max(1000, "Description must be 1000 characters or less"),
+    .max(3000, "Description must be 3000 characters or less"),
   budget: z.string().optional(), // Optional budget from form
   photos: z.array(z.string()).optional().default([]), // Array of photo URLs
   website: z.string().optional(), // Honeypot field
