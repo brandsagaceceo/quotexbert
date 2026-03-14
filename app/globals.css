@@ -483,7 +483,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 .avatar-img {
   object-fit: cover;
   object-position: center top;
-  border-radius: 50%;
+  border-radius: 0;
 }
 
 .profile-hero-img {

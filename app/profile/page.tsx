@@ -585,7 +585,7 @@ export default function UnifiedProfilePage() {
                     <img 
                       src={profile.profilePhoto} 
                       alt={displayName}
-                      className="avatar-img w-full h-full object-cover"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
