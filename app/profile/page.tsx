@@ -1142,37 +1142,55 @@ export default function UnifiedProfilePage() {
 
             {activeTab === 'estimates' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Recent AI Estimates</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">My Estimates & Posted Jobs</h2>
                 {savedEstimates.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-4">
                     {savedEstimates.map((estimate) => (
                       <div key={estimate.id} className="border-2 border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50">
-                        <div className="flex items-center gap-2 mb-2">
-                          {estimate.aiPowered && (
-                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gradient-to-r from-rose-100 to-orange-100 text-rose-900">
-                              ✨ AI
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          {(estimate as any).lead ? (
+                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
+                              ✅ Posted Job
                             </span>
-                          )}
+                          ) : estimate.aiPowered ? (
+                            <span className="text-xs font-bold px-2 py-1 rounded-full bg-gradient-to-r from-rose-100 to-orange-100 text-rose-900">
+                              ✨ AI Estimate
+                            </span>
+                          ) : null}
                           {estimate.hasVoice && (
                             <span className="text-xs font-semibold px-2 py-1 rounded-full bg-teal-100 text-teal-700">
                               🎤 Voice
                             </span>
                           )}
                         </div>
-                        <p className="text-slate-700 text-sm mb-3 line-clamp-2">{estimate.description}</p>
+                        <p className="text-sm font-semibold text-slate-800 mb-1 truncate">
+                          {(estimate as any).lead?.title || estimate.enhancedDescription || 'Project'}
+                        </p>
+                        <p className="text-slate-600 text-xs mb-3 line-clamp-2">{estimate.description}</p>
                         <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-3 border border-rose-100">
                           <div className="text-lg font-bold text-rose-900">
                             ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
                           </div>
-                          <div className="text-xs text-slate-600">{estimate.confidence}% confidence</div>
+                          {estimate.confidence > 0 && (
+                            <div className="text-xs text-slate-600">{estimate.confidence}% confidence</div>
+                          )}
                         </div>
                         <div className="mt-3 flex gap-2">
-                          <button
-                            onClick={() => window.location.href = '/create-lead'}
-                            className="flex-1 text-xs bg-rose-700 text-white py-2 px-3 rounded-lg hover:bg-rose-800 transition-colors"
-                          >
-                            Post Job
-                          </button>
+                          {(estimate as any).lead ? (
+                            <Link
+                              href={`/homeowner/jobs/${(estimate as any).lead.id}`}
+                              className="flex-1 text-xs bg-emerald-700 text-white py-2 px-3 rounded-lg hover:bg-emerald-800 transition-colors text-center"
+                            >
+                              View Job
+                            </Link>
+                          ) : (
+                            <button
+                              onClick={() => window.location.href = '/create-lead'}
+                              className="flex-1 text-xs bg-rose-700 text-white py-2 px-3 rounded-lg hover:bg-rose-800 transition-colors"
+                            >
+                              Post Job
+                            </button>
+                          )}
                           <button
                             onClick={async () => {
                               if (confirm('Delete this estimate?')) {
@@ -1191,7 +1209,7 @@ export default function UnifiedProfilePage() {
                 ) : (
                   <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
                     <div className="text-6xl mb-4">🤖</div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">No AI Estimates Yet</h3>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No Estimates Yet</h3>
                     <p className="text-slate-600 mb-4">Get instant cost estimates for your renovation projects</p>
                     <a href="/" className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
                       Get Free Estimate

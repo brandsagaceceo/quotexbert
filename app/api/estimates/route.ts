@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
       },
       include: {
         items: true,
+        lead: {
+          select: { id: true, title: true, status: true },
+        },
       },
     });
 
@@ -43,6 +46,8 @@ export async function GET(request: NextRequest) {
       imageCount: estimate.imageCount,
       status: estimate.status,
       isPublic: estimate.isPublic,
+      leadId: estimate.leadId,
+      lead: estimate.lead,
       createdAt: estimate.createdAt,
       updatedAt: estimate.updatedAt,
       items: estimate.items,

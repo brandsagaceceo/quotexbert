@@ -402,6 +402,38 @@ export async function submitLead(formData: FormData) {
       };
     }
 
+    // Create an AIEstimate record linked to this lead so it shows in the user's estimates history
+    try {
+      // Parse budget string to extract min/max (e.g. "$5,000 - $10,000" or "$5,000")
+      const cleanBudget = finalBudget.replace(/\$/g, '').replace(/,/g, '');
+      const budgetParts = cleanBudget.split(/\s*[-–]\s*/);
+      const minCost = parseFloat(budgetParts[0] ?? '0') || 0;
+      const maxCost = parseFloat(budgetParts[1] ?? budgetParts[0] ?? '0') || minCost;
+
+      await prisma.aIEstimate.create({
+        data: {
+          homeownerId: user.id,
+          description: data.description,
+          minCost,
+          maxCost,
+          confidence: 0.75,
+          aiPowered: false,
+          enhancedDescription: data.title,
+          factors: JSON.stringify([data.projectType]),
+          hasVoice: false,
+          imageCount: (data.photos || []).length,
+          images: JSON.stringify(data.photos || []),
+          status: 'posted',
+          isPublic: true,
+          leadId: lead.id,
+        },
+      });
+      console.log(`[submitLead:${requestId}] AIEstimate record created for lead: ${lead.id}`);
+    } catch (estimateError) {
+      console.error(`[submitLead:${requestId}] AIEstimate creation error:`, estimateError);
+      // Don't fail lead creation if estimate record fails
+    }
+
     // Connect referral to lead if affiliate exists
     if (affiliateId && lead) {
       try {
