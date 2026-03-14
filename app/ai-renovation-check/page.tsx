@@ -99,235 +99,189 @@ If you have concerns about safety or code compliance, contact a licensed buildin
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-2 rounded-full mb-4">
-            🔍 AI Renovation Inspector
+    <div className="min-h-screen bg-white">
+
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-14 md:py-20 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-rose-600/20 border border-rose-500/40 text-rose-300 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+            🤖 AI-Powered Quality Check
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-            Ask AI About Your Renovation
+          <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight">
+            Snap Your Reno.
+            <br />
+            <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+              AI Be the Judge.
+            </span>
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Upload photos of your in-progress renovation and get AI-powered guidance on whether work looks correct.
+          <p className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Is your renovation getting done right? Take a photo, tell us the stage — our AI will tell you what looks correct, what's missing, and what to ask your contractor.
           </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-400">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>Free · No sign-up required</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>Results in ~30 seconds</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>Works mid-renovation</span>
+          </div>
         </div>
+      </section>
 
-        {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 overflow-hidden">
-          {/* Photo Upload Section */}
-          <div className="p-8 border-b border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">
-              1. Upload Renovation Photos
-            </h2>
-            
-            {photos.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                {photos.map((photo, index) => (
-                  <div key={index} className="relative group">
-                    <Image
-                      src={photo}
-                      alt={`Renovation photo ${index + 1}`}
-                      width={200}
-                      height={200}
-                      className="w-full h-40 object-cover rounded-lg border-2 border-slate-200"
-                    />
-                    <button
-                      onClick={() => removePhoto(index)}
-                      className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+      {/* Main Tool */}
+      <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
 
-            <label className="block">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePhotoUpload}
-                className="hidden"
-                disabled={uploading}
-              />
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all">
-                {uploading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span className="text-blue-600 font-semibold">Uploading...</span>
-                  </div>
-                ) : (
-                  <>
-                    <svg className="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-lg font-semibold text-slate-700 mb-2">
-                      Click to upload photos
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      Upload multiple angles of the work you want checked
-                    </p>
-                  </>
-                )}
-              </div>
-            </label>
+        {/* Step 1 — Photo upload */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-8 h-8 rounded-full bg-slate-900 text-white text-sm font-black flex items-center justify-center flex-shrink-0">1</span>
+            <h2 className="text-xl font-black text-slate-900">Upload your renovation photo</h2>
           </div>
 
-          {/* Question Section */}
-          <div className="p-8 border-b border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">
-              2. Ask Your Question
-            </h2>
-            
-            <div className="mb-4">
-              <p className="text-sm text-slate-600 mb-3">Try these common questions:</p>
-              <div className="flex flex-wrap gap-2">
-                {samplePrompts.map((prompt, index) => (
+          {photos.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {photos.map((photo, index) => (
+                <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200">
+                  <Image
+                    src={photo}
+                    alt={`Renovation photo ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="w-full h-full object-cover object-center"
+                  />
                   <button
-                    key={index}
-                    onClick={() => setQuestion(prompt)}
-                    className="text-sm bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 px-3 py-2 rounded-lg transition-colors"
+                    onClick={() => removePhoto(index)}
+                    className="absolute top-1.5 right-1.5 bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                    aria-label="Remove photo"
                   >
-                    {prompt}
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
-                ))}
-              </div>
-            </div>
-
-            <textarea
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="What do you want to know about this work?"
-              rows={4}
-              className="w-full border-2 border-slate-300 rounded-xl p-4 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all text-slate-900"
-            />
-
-            <button
-              onClick={handleAskQuestion}
-              disabled={isAnalyzing || photos.length === 0 || !question.trim()}
-              className="mt-4 w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] shadow-lg"
-            >
-              {isAnalyzing ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Analyzing...
-                </span>
-              ) : (
-                "Get AI Guidance"
-              )}
-            </button>
-          </div>
-
-          {/* Response Section */}
-          {response && (
-            <div className="p-8 bg-slate-50">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                AI Guidance
-              </h2>
-              <div className="bg-white rounded-xl p-6 border-2 border-blue-200">
-                <div className="prose prose-slate max-w-none">
-                  {response.split('\n').map((line, index) => (
-                    <p key={index} className="mb-3 text-slate-700 whitespace-pre-line">
-                      {line}
-                    </p>
-                  ))}
                 </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div>
-                    <p className="font-bold text-amber-900 mb-1">Important Disclaimer</p>
-                    <p className="text-sm text-amber-800">
-                      This AI guidance is informational only and NOT a replacement for licensed building inspections, 
-                      professional contractor assessments, or code compliance reviews. Always consult with qualified 
-                      professionals for definitive assessments of your renovation work.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           )}
+
+          <label className="block">
+            <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" disabled={uploading} />
+            <div className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${uploading ? 'border-rose-300 bg-rose-50' : 'border-slate-300 hover:border-rose-500 hover:bg-rose-50/40'}`}>
+              {uploading ? (
+                <div className="flex items-center justify-center gap-2 text-rose-600 font-semibold">
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Loading photo...
+                </div>
+              ) : (
+                <>
+                  <div className="text-5xl mb-3">📸</div>
+                  <p className="text-base font-bold text-slate-800">Tap to add photos</p>
+                  <p className="text-sm text-slate-500 mt-1">Up to 5 images · The more angles the better</p>
+                </>
+              )}
+            </div>
+          </label>
         </div>
 
-        {/* Info Section */}
-        <div className="mt-8 grid md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <div className="text-3xl mb-3">🔍</div>
-            <h3 className="font-bold text-slate-900 mb-2">Visual Analysis</h3>
-            <p className="text-sm text-slate-600">
-              AI analyzes your photos to identify potential issues or concerns with the work.
-            </p>
+        {/* Step 2 — What to check */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-8 h-8 rounded-full bg-slate-900 text-white text-sm font-black flex items-center justify-center flex-shrink-0">2</span>
+            <h2 className="text-xl font-black text-slate-900">What's happening in this photo?</h2>
           </div>
-          
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <div className="text-3xl mb-3">💬</div>
-            <h3 className="font-bold text-slate-900 mb-2">Ask Your Contractor</h3>
-            <p className="text-sm text-slate-600">
-              Get specific questions to ask your contractor about the work being done.
-            </p>
+          <p className="text-sm text-slate-500 mb-3 ml-11">Tell us what stage or concern you want checked. The more specific, the better the AI reads it.</p>
+
+          <div className="flex flex-wrap gap-2 mb-4 ml-11">
+            {samplePrompts.map((prompt, index) => (
+              <button
+                key={index}
+                onClick={() => setQuestion(prompt)}
+                className={`text-sm px-3 py-2 rounded-lg border font-medium transition-all ${question === prompt ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500 hover:bg-slate-50'}`}
+              >
+                {prompt}
+              </button>
+            ))}
           </div>
-          
-          <div className="bg-white rounded-xl p-6 border-2 border-slate-200">
-            <div className="text-3xl mb-3">📋</div>
-            <h3 className="font-bold text-slate-900 mb-2">Document Issues</h3>
-            <p className="text-sm text-slate-600">
-              Create a record of concerns to discuss with your contractor or inspector.
-            </p>
-          </div>
+
+          <textarea
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="e.g. Is this drywall installed correctly? Does the waterproofing look right? Is there anything missing before tile goes in?"
+            rows={3}
+            className="w-full border-2 border-slate-300 rounded-xl p-4 focus:border-slate-900 focus:ring-2 focus:ring-slate-200 outline-none transition-all text-slate-900 text-sm resize-none"
+          />
         </div>
 
-        {/* When to Use */}
-        <div className="mt-8 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl p-8 border-2 border-blue-200">
-          <h3 className="text-2xl font-bold text-slate-900 mb-4">When to Use This Tool</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-green-700 mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Good Uses:
-              </h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li>• Getting a second opinion on work in progress</li>
-                <li>• Learning what questions to ask your contractor</li>
-                <li>• Understanding if something looks unusual</li>
-                <li>• Documenting concerns before final payment</li>
-              </ul>
+        {/* CTA */}
+        <button
+          onClick={handleAskQuestion}
+          disabled={isAnalyzing || photos.length === 0 || !question.trim()}
+          className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-black py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all text-lg shadow-xl shadow-rose-500/20"
+        >
+          {isAnalyzing ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              AI is judging your reno...
+            </span>
+          ) : (
+            "🤖 Let AI Be the Judge →"
+          )}
+        </button>
+        <p className="text-center text-xs text-slate-400 mt-3">Free · No sign-up · ~30 seconds</p>
+
+        {/* Result */}
+        {response && (
+          <div className="mt-10 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-gradient-to-r from-rose-600 to-orange-600 px-6 py-4 flex items-center gap-3">
+              <span className="text-2xl">🤖</span>
+              <div>
+                <p className="text-white font-black text-lg leading-none">AI Verdict</p>
+                <p className="text-rose-100 text-xs mt-0.5">Based on your photo & description</p>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold text-red-700 mb-2 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                NOT a Replacement For:
-              </h4>
-              <ul className="space-y-2 text-sm text-slate-700">
-                <li>• Licensed building inspections</li>
-                <li>• Professional contractor assessments</li>
-                <li>• Code compliance verification</li>
-                <li>• Structural engineering reviews</li>
-              </ul>
+            <div className="p-6">
+              <div className="space-y-3">
+                {response.split('\n').filter(l => l.trim()).map((line, index) => (
+                  <p key={index} className="text-slate-200 text-sm leading-relaxed whitespace-pre-line">
+                    {line}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-6 flex items-start gap-3 bg-amber-900/40 border border-amber-600/40 rounded-xl p-4">
+                <span className="text-amber-400 text-lg flex-shrink-0">⚠️</span>
+                <p className="text-amber-200 text-xs leading-relaxed">
+                  AI guidance is informational only — not a substitute for a licensed building inspector or professional assessment.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* How it works — below fold */}
+        {!response && (
+          <div className="mt-14 border-t border-slate-100 pt-12">
+            <h3 className="text-center text-xl font-black text-slate-900 mb-8">How it works</h3>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-4xl mb-2">📸</div>
+                <p className="text-sm font-bold text-slate-800">Snap a photo</p>
+                <p className="text-xs text-slate-500 mt-1">Any stage of your renovation</p>
+              </div>
+              <div>
+                <div className="text-4xl mb-2">🤖</div>
+                <p className="text-sm font-bold text-slate-800">AI analyzes it</p>
+                <p className="text-xs text-slate-500 mt-1">Checks for issues, red flags, gaps</p>
+              </div>
+              <div>
+                <div className="text-4xl mb-2">✅</div>
+                <p className="text-sm font-bold text-slate-800">Get a verdict</p>
+                <p className="text-xs text-slate-500 mt-1">Know exactly what to ask your contractor</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
