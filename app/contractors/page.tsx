@@ -345,12 +345,12 @@ export default function ContractorSearchPage() {
                       {/* Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-start space-x-3 md:space-x-4 flex-1">
-                          <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                          <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
                             {contractor.profilePhoto ? (
                               <img 
                                 src={contractor.profilePhoto} 
                                 alt={contractor.companyName}
-                                className="w-full h-full object-cover rounded-full"
+                                className="w-full h-full object-cover"
                               />
                             ) : (
                               <User className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
