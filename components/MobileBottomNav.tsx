@@ -10,8 +10,7 @@ import {
   Briefcase,
   User,
   Plus,
-  FileText,
-  Scale
+  FileText
 } from "lucide-react";
 
 interface NavItem {
@@ -37,13 +36,6 @@ export default function MobileBottomNav() {
       icon: Home,
       active: pathname === "/"
     },
-    {
-      href: "/second-opinion",
-      label: "2nd Opinion",
-      icon: Scale,
-      active: pathname === "/second-opinion"
-    },
-
     {
       href: "/create-lead",
       label: "Post Job",
