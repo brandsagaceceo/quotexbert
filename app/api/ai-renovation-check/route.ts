@@ -14,9 +14,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { photo, question } = body;
 
-    if (!photo || !question) {
+    if (!question) {
       return NextResponse.json(
-        { error: "Photo and question are required" },
+        { error: "Question is required" },
         { status: 400 }
       );
     }
@@ -34,31 +34,33 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `You are an expert construction inspector and renovation quality assessor. Analyze photos of renovation work and provide detailed, accurate assessments based on construction standards, building codes, and best practices. 
+          content: `You are a knowledgeable renovation advisor. Answer the user's renovation or home improvement question directly and practically. If a photo is provided, analyze what you see and give specific feedback about that photo. If no photo is provided, give practical guidance based on their description.
 
-Your response must be in JSON format with these fields:
-- severity: "good" | "warning" | "poor"
-- assessment: Brief overall assessment (2-3 sentences)
-- observations: Array of specific things you notice in the photo
-- standards: Explanation of relevant construction standards
-- recommendations: Array of actionable recommendations
+Answer the specific question they asked. If they ask "does this room need painting?" — answer that directly. If they ask about paint prep — assess the prep. Don't deflect to "hire a professional" or "check building codes" unless there is a genuine safety concern. Be direct, helpful, and focused on what the person actually asked.
 
-Be specific, practical, and constructive. Focus on visible issues and standard practices.`,
+Your response must be in JSON format with these exact fields:
+- severity: "good" | "warning" | "poor" (based on the overall situation)
+- assessment: Direct 2-3 sentence answer to their specific question
+- observations: Array of specific things you notice (from photo or from their description)
+- standards: Relevant best practices or tips for this type of work (keep it brief and practical)
+- recommendations: Array of practical, actionable next steps`,
         },
         {
           role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please analyze this renovation work and answer: ${question}`,
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: photo,
-              },
-            },
-          ],
+          content: photo
+            ? [
+                {
+                  type: "text" as const,
+                  text: `Please analyze this renovation work and answer: ${question}`,
+                },
+                {
+                  type: "image_url" as const,
+                  image_url: {
+                    url: photo,
+                  },
+                },
+              ]
+            : `Please answer this renovation question: ${question}`,
         },
       ],
       max_tokens: 1000,

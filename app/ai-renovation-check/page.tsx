@@ -5,20 +5,29 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+interface CheckResult {
+  severity: "good" | "warning" | "poor";
+  assessment: string;
+  observations: string[];
+  standards: string;
+  recommendations: string[];
+}
+
 export default function AIRenovationCheckPage() {
   const { authUser, isSignedIn } = useAuth();
   const router = useRouter();
   const [photos, setPhotos] = useState<string[]>([]);
   const [question, setQuestion] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [response, setResponse] = useState<string | null>(null);
+  const [result, setResult] = useState<CheckResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const samplePrompts = [
+    "Does this room need painting?",
+    "Is this paint prep looking right?",
     "Does this shower prep look correct?",
-    "Should there be cement board here?",
     "Is this waterproofing done right?",
-    "Is this tile backing okay?",
     "Does this framing look proper?",
     "Is this electrical work safe?"
   ];
@@ -54,41 +63,26 @@ export default function AIRenovationCheckPage() {
   };
 
   const handleAskQuestion = async () => {
-    if (!question.trim() || photos.length === 0) {
-      alert("Please upload at least one photo and ask a question.");
+    if (!question.trim()) {
+      setError("Please describe what you want the AI to check.");
       return;
     }
 
     setIsAnalyzing(true);
+    setError(null);
+    setResult(null);
 
     try {
-      // Mock AI response for now - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setResponse(`Based on your photo, here's what I can see:
-
-**Observations:**
-Your renovation work shows signs that may need attention. I notice some areas that could use professional verification.
-
-**What to Ask Your Contractor:**
-1. Can you explain the installation method used here?
-2. Is this approach up to current building codes?
-3. What materials were specified for this area?
-4. Can I see documentation of the work plan?
-
-**Recommended Next Steps:**
-- Document this with additional photos from different angles
-- Request clarification from your contractor in writing
-- Consider getting a second opinion from a licensed building inspector
-- Check if your work requires a building permit
-
-**Important Disclaimer:**
-⚠️ This AI guidance is informational only and NOT a replacement for licensed building inspections or code compliance reviews. Always consult with qualified professionals for definitive assessments.
-
-If you have concerns about safety or code compliance, contact a licensed building inspector immediately.`);
-    } catch (error) {
-      console.error("Error analyzing photo:", error);
-      alert("Failed to analyze photo. Please try again.");
+      const res = await fetch("/api/ai-renovation-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo: photos.length > 0 ? photos[0] : null, question }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Analysis failed. Please try again.");
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to analyze. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -132,7 +126,7 @@ If you have concerns about safety or code compliance, contact a licensed buildin
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <span className="w-8 h-8 rounded-full bg-slate-900 text-white text-sm font-black flex items-center justify-center flex-shrink-0">1</span>
-            <h2 className="text-xl font-black text-slate-900">Upload your renovation photo</h2>
+            <h2 className="text-xl font-black text-slate-900">Upload a photo <span className="text-slate-400 font-normal text-base">(optional)</span></h2>
           </div>
 
           {photos.length > 0 && (
@@ -214,7 +208,7 @@ If you have concerns about safety or code compliance, contact a licensed buildin
         {/* CTA */}
         <button
           onClick={handleAskQuestion}
-          disabled={isAnalyzing || photos.length === 0 || !question.trim()}
+          disabled={isAnalyzing || !question.trim()}
           className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-black py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all text-lg shadow-xl shadow-rose-500/20"
         >
           {isAnalyzing ? (
@@ -231,28 +225,70 @@ If you have concerns about safety or code compliance, contact a licensed buildin
         </button>
         <p className="text-center text-xs text-slate-400 mt-3">Free · No sign-up · ~30 seconds</p>
 
+        {/* Error */}
+        {error && (
+          <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm font-medium">
+            {error}
+          </div>
+        )}
+
         {/* Result */}
-        {response && (
+        {result && (
           <div className="mt-10 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="bg-gradient-to-r from-rose-600 to-orange-600 px-6 py-4 flex items-center gap-3">
-              <span className="text-2xl">🤖</span>
+            <div className={`px-6 py-4 flex items-center gap-3 ${
+              result.severity === "good"
+                ? "bg-gradient-to-r from-emerald-600 to-green-600"
+                : result.severity === "poor"
+                ? "bg-gradient-to-r from-red-700 to-rose-600"
+                : "bg-gradient-to-r from-amber-600 to-orange-600"
+            }`}>
+              <span className="text-2xl">
+                {result.severity === "good" ? "✅" : result.severity === "poor" ? "🚨" : "⚠️"}
+              </span>
               <div>
-                <p className="text-white font-black text-lg leading-none">AI Verdict</p>
-                <p className="text-rose-100 text-xs mt-0.5">Based on your photo & description</p>
+                <p className="text-white font-black text-lg leading-none">
+                  {result.severity === "good" ? "Looks Good" : result.severity === "poor" ? "Needs Attention" : "Some Concerns"}
+                </p>
+                <p className="text-white/75 text-xs mt-0.5">
+                  AI Verdict · Based on your question{photos.length > 0 ? " & photo" : ""}
+                </p>
               </div>
             </div>
-            <div className="p-6">
-              <div className="space-y-3">
-                {response.split('\n').filter(l => l.trim()).map((line, index) => (
-                  <p key={index} className="text-slate-200 text-sm leading-relaxed whitespace-pre-line">
-                    {line}
-                  </p>
-                ))}
-              </div>
-              <div className="mt-6 flex items-start gap-3 bg-amber-900/40 border border-amber-600/40 rounded-xl p-4">
+            <div className="p-6 space-y-6">
+              <p className="text-slate-100 text-sm leading-relaxed">{result.assessment}</p>
+
+              {result.observations && result.observations.length > 0 && (
+                <div>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">What the AI Sees</p>
+                  <ul className="space-y-1.5">
+                    {result.observations.map((obs, i) => (
+                      <li key={i} className="text-slate-200 text-sm flex items-start gap-2">
+                        <span className="text-slate-500 mt-0.5 flex-shrink-0">•</span>
+                        {obs}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {result.recommendations && result.recommendations.length > 0 && (
+                <div>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Next Steps</p>
+                  <ol className="space-y-1.5 list-none">
+                    {result.recommendations.map((rec, i) => (
+                      <li key={i} className="text-slate-200 text-sm flex items-start gap-2">
+                        <span className="text-rose-400 font-bold flex-shrink-0">{i + 1}.</span>
+                        {rec}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              <div className="flex items-start gap-3 bg-amber-900/40 border border-amber-600/40 rounded-xl p-4">
                 <span className="text-amber-400 text-lg flex-shrink-0">⚠️</span>
                 <p className="text-amber-200 text-xs leading-relaxed">
-                  AI guidance is informational only — not a substitute for a licensed building inspector or professional assessment.
+                  AI guidance is informational only — not a substitute for a licensed inspector or professional assessment.
                 </p>
               </div>
             </div>
@@ -260,7 +296,7 @@ If you have concerns about safety or code compliance, contact a licensed buildin
         )}
 
         {/* How it works — below fold */}
-        {!response && (
+        {!result && (
           <div className="mt-14 border-t border-slate-100 pt-12">
             <h3 className="text-center text-xl font-black text-slate-900 mb-8">How it works</h3>
             <div className="grid grid-cols-3 gap-4 text-center">
