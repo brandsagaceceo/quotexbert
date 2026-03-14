@@ -43,20 +43,20 @@ export default function ForContractorsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-rose-900 via-orange-900 to-amber-900 text-white overflow-hidden">
+      <section className="relative bg-brand text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-block bg-rose-600/20 border border-rose-500/30 rounded-full px-5 py-2 mb-6">
-              <span className="text-rose-400 font-semibold text-sm uppercase tracking-wide">For Toronto & GTA Contractors</span>
+            <div className="inline-block bg-white/10 border border-white/20 rounded-full px-5 py-2 mb-6">
+              <span className="text-white/90 font-semibold text-sm uppercase tracking-wide">For Toronto & GTA Contractors</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
               Get Toronto Renovation Leads<br />
-              <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="text-rose-200">
                 Without Bidding Wars
               </span>
             </h1>
@@ -105,7 +105,7 @@ export default function ForContractorsPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
                 href={isSignedIn && authUser?.role === 'contractor' ? '/contractor/jobs' : '/sign-up?role=contractor'}
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-2xl text-lg w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 bg-brand text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-dark transition-all transform hover:scale-105 shadow-2xl text-lg w-full sm:w-auto"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -123,15 +123,15 @@ export default function ForContractorsPage() {
             {/* Trust Stats */}
             <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
-                <div className="text-3xl md:text-4xl font-black text-rose-400 mb-1">45+</div>
+                <div className="text-3xl md:text-4xl font-black text-white mb-1">45+</div>
                 <div className="text-slate-400 text-sm">Active Leads</div>
               </div>
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
-                <div className="text-3xl md:text-4xl font-black text-orange-400 mb-1">12</div>
+                <div className="text-3xl md:text-4xl font-black text-rose-200 mb-1">12</div>
                 <div className="text-slate-400 text-sm">Categories</div>
               </div>
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
-                <div className="text-3xl md:text-4xl font-black text-amber-400 mb-1">GTA</div>
+                <div className="text-3xl md:text-4xl font-black text-rose-200 mb-1">GTA</div>
                 <div className="text-slate-400 text-sm">Coverage</div>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Trust Badge Strip */}
-      <section className="bg-gradient-to-r from-rose-50 to-orange-50 border-b border-rose-200 py-6">
+      <section className="bg-brand/5 border-b border-brand/20 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Badge 1 */}
@@ -158,8 +158,8 @@ export default function ForContractorsPage() {
 
             {/* Badge 2 */}
             <div className="flex flex-col md:flex-row items-center gap-3 text-center md:text-left">
-              <div className="w-12 h-12 bg-gradient-to-br from-rose-100 to-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -200,7 +200,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Earnings Calculator */}
-      <section className="py-20 bg-gradient-to-br from-rose-50 to-orange-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -211,7 +211,7 @@ export default function ForContractorsPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-rose-200">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-brand/30">
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               {/* Input 1: Jobs per month */}
               <div>
@@ -237,7 +237,7 @@ export default function ForContractorsPage() {
                 />
                 <div className="flex justify-between text-sm text-slate-600 mt-2">
                   <span>1</span>
-                  <span id="jobsDisplay" className="font-bold text-rose-600">3</span>
+                  <span id="jobsDisplay" className="font-bold text-brand">3</span>
                   <span>20</span>
                 </div>
               </div>
@@ -267,19 +267,19 @@ export default function ForContractorsPage() {
                 />
                 <div className="flex justify-between text-sm text-slate-600 mt-2">
                   <span>$500</span>
-                  <span id="valueDisplay" className="font-bold text-rose-600">$5,000</span>
+                  <span id="valueDisplay" className="font-bold text-brand">$5,000</span>
                   <span>$50,000</span>
                 </div>
               </div>
             </div>
 
             {/* Result Display */}
-            <div className="bg-gradient-to-r from-rose-600 to-orange-600 rounded-xl p-8 text-center">
+            <div className="bg-brand rounded-xl p-8 text-center">
               <p className="text-rose-100 text-lg mb-2">Estimated Monthly Revenue</p>
               <p id="monthlyRevenue" className="text-6xl font-black text-white mb-4">
                 $15,000
               </p>
-              <p className="text-green-100 text-sm">
+              <p className="text-rose-100 text-sm">
                 Based on completing <span id="jobsCalc">3</span> jobs per month
               </p>
             </div>
@@ -295,7 +295,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Contractor Success Stories */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -321,7 +321,7 @@ export default function ForContractorsPage() {
                 The homeowners are serious and have realistic budgets. Best decision for my business."
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white font-bold text-xl">
                   J
                 </div>
                 <div>
@@ -407,7 +407,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Support Contact Section */}
-      <section className="py-16 bg-gradient-to-br from-rose-50 to-orange-50">
+      <section className="py-16 bg-brand/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black text-slate-900 mb-4">
             Questions About Joining QuoteXbert?
@@ -418,9 +418,9 @@ export default function ForContractorsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <a
               href="tel:9052429460"
-              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-rose-200"
+              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-brand/30"
             >
-              <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <div className="text-left">
@@ -430,9 +430,9 @@ export default function ForContractorsPage() {
             </a>
             <a
               href="mailto:quotexbert@gmail.com"
-              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-rose-200"
+              className="flex items-center gap-3 bg-white rounded-xl px-6 py-4 shadow-lg hover:shadow-xl transition-shadow border-2 border-brand/30"
             >
-              <svg className="w-6 h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <div className="text-left">
@@ -448,7 +448,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Recent Activity Feed */}
-      <section className="py-20 bg-gradient-to-b from-amber-50 to-orange-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <RecentActivityFeed
             maxItems={8}
@@ -460,7 +460,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Example Renovation Leads */}
-      <section className="py-20 bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -473,7 +473,7 @@ export default function ForContractorsPage() {
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {/* Example Lead 1 */}
-            <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border-2 border-rose-200 hover:shadow-xl transition-shadow">
+            <div className="bg-brand/5 rounded-xl p-6 border-2 border-brand/30 hover:shadow-xl transition-shadow">
               <div className="text-4xl mb-4">🚿</div>
               <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">Bathroom Renovation</h3>
               <div className="flex items-center gap-2 text-slate-600 mb-3">
@@ -483,7 +483,7 @@ export default function ForContractorsPage() {
                 </svg>
                 <span className="font-semibold text-sm md:text-base">Toronto</span>
               </div>
-              <div className="text-2xl md:text-3xl font-black text-rose-700 mb-3">$5,200</div>
+              <div className="text-2xl md:text-3xl font-black text-brand-dark mb-3">$5,200</div>
               <p className="text-xs md:text-sm text-slate-600">Complete bathroom remodel including fixtures, tile, and vanity</p>
             </div>
 
@@ -521,7 +521,7 @@ export default function ForContractorsPage() {
           <div className="text-center mt-10">
             <Link
               href={isSignedIn && authUser?.role === 'contractor' ? '/contractor/jobs' : '/sign-up?role=contractor'}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-lg"
+              className="inline-flex items-center gap-2 bg-brand text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-dark transition-all transform hover:scale-105 shadow-lg"
             >
               <span>Start Getting Leads Like These</span>
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -533,7 +533,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-b from-orange-50 to-rose-50">
+      <section id="how-it-works" className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -547,8 +547,8 @@ export default function ForContractorsPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-rose-300 transition-colors h-full">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-brand/40 transition-colors h-full">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
                   1
                 </div>
                 <div className="text-5xl mb-4 mt-2">📋</div>
@@ -562,8 +562,8 @@ export default function ForContractorsPage() {
 
             {/* Step 2 */}
             <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-rose-300 transition-colors h-full">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-brand/40 transition-colors h-full">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
                   2
                 </div>
                 <div className="text-5xl mb-4 mt-2">🔔</div>
@@ -577,8 +577,8 @@ export default function ForContractorsPage() {
 
             {/* Step 3 */}
             <div className="relative">
-              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-rose-300 transition-colors h-full">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-slate-200 hover:border-brand/40 transition-colors h-full">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg">
                   3
                 </div>
                 <div className="text-5xl mb-4 mt-2">💼</div>
@@ -594,7 +594,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Why Contractors Join */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -606,8 +606,8 @@ export default function ForContractorsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -618,8 +618,8 @@ export default function ForContractorsPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -630,8 +630,8 @@ export default function ForContractorsPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -643,8 +643,8 @@ export default function ForContractorsPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -655,8 +655,8 @@ export default function ForContractorsPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
@@ -667,8 +667,8 @@ export default function ForContractorsPage() {
               </div>
             </div>
 
-            <div className="flex items-start gap-5 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 border border-rose-200">
-              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="flex items-start gap-5 bg-brand/5 rounded-xl p-6 border border-brand/30">
+              <div className="flex-shrink-0 w-14 h-14 bg-brand rounded-xl flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
@@ -683,7 +683,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Service Categories */}
-      <section className="py-20 bg-gradient-to-br from-rose-50 to-orange-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -698,7 +698,7 @@ export default function ForContractorsPage() {
             {categories.map((category) => (
               <div
                 key={category}
-                className="bg-white rounded-lg p-4 text-center border-2 border-slate-200 hover:border-rose-400 hover:shadow-lg transition-all"
+                className="bg-white rounded-lg p-4 text-center border-2 border-slate-200 hover:border-brand/50 hover:shadow-lg transition-all"
               >
                 <div className="font-semibold text-slate-900">{category}</div>
               </div>
@@ -708,7 +708,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-gradient-to-br from-orange-50 to-amber-50">
+      <section className="py-20 bg-brand/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
@@ -756,7 +756,7 @@ export default function ForContractorsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={isSignedIn && authUser?.role === 'contractor' ? '/contractor/jobs' : '/sign-up?role=contractor'}
-              className="inline-flex items-center justify-center gap-2 bg-white text-rose-600 font-black px-8 py-4 rounded-xl hover:bg-slate-100 transition-all transform hover:scale-105 shadow-2xl text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand font-black px-8 py-4 rounded-xl hover:bg-slate-100 transition-all transform hover:scale-105 shadow-2xl text-lg"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />

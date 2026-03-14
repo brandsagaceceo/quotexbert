@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { GTA_CITIES, RENOVATION_TYPES } from '@/lib/seo/gta-cities'
+import { TORONTO_NEIGHBOURHOODS, TORONTO_SERVICES } from '@/lib/seo/toronto-pinpoint'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
@@ -301,5 +302,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.92,
     },
+    // ─── Toronto Pinpoint SEO pages (52 neighbourhoods × 16 services = 832 pages) ───
+    // Targeting local search: "kitchen renovation North York", "plumber Danforth", etc.
+    ...TORONTO_NEIGHBOURHOODS.flatMap(neighbourhood =>
+      TORONTO_SERVICES.map(service => ({
+        url: `${baseUrl}/toronto/${neighbourhood.slug}/${service.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 
+          // Priority boost for high-volume neighbourhoods
+          ['north-york', 'scarborough', 'etobicoke', 'willowdale', 'danforth', 'leslieville', 'high-park', 'roncesvalles', 'yonge-eglinton', 'don-mills', 'agincourt'].includes(neighbourhood.slug)
+          // Priority boost for high-volume services
+          && ['kitchen-renovation', 'bathroom-renovation', 'basement-finishing', 'home-renovation-quote', 'roofing', 'general-contractor'].includes(service.slug)
+            ? 0.87
+            : ['north-york', 'scarborough', 'etobicoke', 'willowdale', 'danforth', 'leslieville', 'high-park', 'roncesvalles', 'yonge-eglinton', 'don-mills', 'agincourt'].includes(neighbourhood.slug)
+              ? 0.82
+              : ['kitchen-renovation', 'bathroom-renovation', 'basement-finishing', 'home-renovation-quote', 'roofing', 'general-contractor'].includes(service.slug)
+                ? 0.80
+                : 0.75,
+      }))
+    ),
   ]
 }

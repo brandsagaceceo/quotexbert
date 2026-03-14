@@ -155,7 +155,7 @@ export default function ContractorSearchPage() {
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-700"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-brand"></div>
       </div>
     );
   }
@@ -165,9 +165,9 @@ export default function ContractorSearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-brand/10">
         <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Find Contractors</h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">Connect with verified professionals for your home improvement projects</p>
@@ -184,7 +184,7 @@ export default function ContractorSearchPage() {
               placeholder="Search contractors..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand/30 text-base"
             />
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -198,12 +198,12 @@ export default function ContractorSearchPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Filters Sidebar */}
           <div className="lg:w-80">
-            <div className={`bg-white rounded-lg shadow-md p-4 md:p-6 ${showFilters ? 'block' : 'hidden'} lg:block lg:sticky lg:top-6`}>
+            <div className={`bg-white rounded-xl shadow-md border border-brand/10 p-4 md:p-6 ${showFilters ? 'block' : 'hidden'} lg:block lg:sticky lg:top-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-gray-900">Filters</h2>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden text-rose-700 hover:text-rose-900"
+                  className="lg:hidden text-brand hover:text-brand-dark"
                 >
                   ✕
                 </button>
@@ -222,7 +222,7 @@ export default function ContractorSearchPage() {
                       placeholder="Company name, trade, location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand/30"
                     />
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function ContractorSearchPage() {
                   <select
                     value={filters.trade}
                     onChange={(e) => setFilters(prev => ({ ...prev, trade: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand/30"
                   >
                     <option value="">All Trades</option>
                     <option value="General Contractor">General Contractor</option>
@@ -256,7 +256,7 @@ export default function ContractorSearchPage() {
                   <select
                     value={filters.city}
                     onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand/30"
                   >
                     <option value="">All Cities</option>
                     <option value="Toronto">Toronto</option>
@@ -275,7 +275,7 @@ export default function ContractorSearchPage() {
                   <select
                     value={filters.minRating}
                     onChange={(e) => setFilters(prev => ({ ...prev, minRating: Number(e.target.value) }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand/30"
                   >
                     <option value={0}>Any Rating</option>
                     <option value={4}>4+ Stars</option>
@@ -306,7 +306,7 @@ export default function ContractorSearchPage() {
                       type="checkbox"
                       checked={filters.verified}
                       onChange={(e) => setFilters(prev => ({ ...prev, verified: e.target.checked }))}
-                      className="text-rose-700 focus:ring-blue-500 border-gray-300 rounded"
+                      className="text-brand focus:ring-brand/30 border-gray-300 rounded"
                     />
                     <span className="ml-2 text-sm text-gray-700">Verified only</span>
                   </label>
@@ -315,7 +315,7 @@ export default function ContractorSearchPage() {
                 {/* Clear Filters */}
                 <button
                   onClick={clearFilters}
-                  className="w-full text-sm text-rose-700 hover:text-rose-900 font-medium"
+                  className="w-full text-sm text-brand hover:text-brand-dark font-medium"
                 >
                   Clear all filters
                 </button>
@@ -332,7 +332,7 @@ export default function ContractorSearchPage() {
             </div>
 
             {filteredContractors.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="bg-white rounded-xl shadow-md border border-gray-100 p-12 text-center">
                 <User className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No contractors found</h3>
                 <p className="text-gray-600">Try adjusting your filters or search terms</p>
@@ -340,7 +340,7 @@ export default function ContractorSearchPage() {
             ) : (
               <div className="grid grid-cols-1 gap-4 md:gap-6">
                 {filteredContractors.map((contractor) => (
-                  <div key={contractor.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                  <div key={contractor.id} className="bg-white rounded-xl shadow-md hover:shadow-lg hover:border hover:border-brand/20 transition-all">
                     <div className="p-4 md:p-6">
                       {/* Header */}
                       <div className="flex items-start justify-between mb-4">
@@ -361,7 +361,7 @@ export default function ContractorSearchPage() {
                               <h3 className="text-base md:text-lg font-bold text-gray-900 truncate">{contractor.companyName}</h3>
                               <VerifiedBadge verified={contractor.verified} size="sm" />
                             </div>
-                            <p className="text-rose-700 font-medium text-sm md:text-base">{contractor.trade}</p>
+                            <p className="text-brand font-medium text-sm md:text-base">{contractor.trade}</p>
                             {contractor.city && (
                               <div className="flex items-center text-gray-600 text-xs md:text-sm mt-1">
                                 <MapPin className="h-3 w-3 md:h-4 md:w-4 mr-1 flex-shrink-0" />
@@ -425,14 +425,14 @@ export default function ContractorSearchPage() {
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                         <button
                           onClick={() => handleContact(contractor)}
-                          className="flex-1 bg-rose-700 text-white py-3 px-4 rounded-lg hover:bg-rose-800 flex items-center justify-center text-sm md:text-base font-medium"
+                          className="flex-1 bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark flex items-center justify-center text-sm md:text-base font-medium"
                         >
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Contact
                         </button>
                         <Link
                           href={`/contractors/profile/${contractor.userId}`}
-                          className="flex-1 sm:flex-none px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm md:text-base font-medium text-center"
+                          className="flex-1 sm:flex-none px-4 py-3 border border-brand/30 rounded-lg text-brand hover:bg-brand/5 text-sm md:text-base font-medium text-center"
                         >
                           View Profile
                         </Link>
