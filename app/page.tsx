@@ -11,6 +11,12 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { StickyCTA } from "@/components/StickyCTA";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { trackEstimateComplete, trackCTAClick } from "@/components/GoogleAnalytics";
+import {
+  trackEstimateStarted,
+  trackSignUpModalShown,
+  trackCreateAccountClicked,
+  trackContractorJoinClicked,
+} from "@/lib/tracking";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 
 // Lazy load below-the-fold components for better performance
@@ -36,11 +42,17 @@ export default function Home() {
   // Block the estimator for unauthenticated visitors who have already used their 1 free estimate
   const isEstimatorBlocked = !isSignedIn && hasUsedFree;
 
+  const handleShowSignUpGate = () => {
+    setShowSignUpGate(true);
+    trackSignUpModalShown('estimator_gate');
+  };
+
   // In production, fetch real reviews from API
   const realReviews: Review[] = []; // Empty for now - will show examples
 
   const handleGetContractorBids = () => {
     trackCTAClick('estimate_results', 'Get Contractor Bids');
+    trackCreateAccountClicked('estimate_results');
     
     // Save estimate data to localStorage before redirecting
     if (estimateResult) {
@@ -151,7 +163,9 @@ export default function Home() {
             {/* CTAs */}
             <a
               href="/sign-up"
-              className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-3.5 rounded-xl text-base transition mb-3"
+              onClick={() => trackCreateAccountClicked('signup_gate_modal')}
+              data-track="create_account_clicked"
+              className="block w-full bg-brand hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl text-base transition mb-3"
             >
               Create Free Account →
             </a>
@@ -299,7 +313,7 @@ export default function Home() {
                   onEstimateComplete={handleEstimateComplete}
                   userId={user?.id || undefined}
                   isBlocked={isEstimatorBlocked}
-                  onBlocked={() => setShowSignUpGate(true)}
+                  onBlocked={handleShowSignUpGate}
                 />
               </div>
             </div>

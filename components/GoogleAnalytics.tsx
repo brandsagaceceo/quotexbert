@@ -160,3 +160,71 @@ export const trackReviewClick = () => {
   });
   trackConversion('review_click');
 };
+
+// ── Additional conversion events (Google Ads / GA4 compatible) ───────────────
+
+export const trackEstimateStarted = (source?: string) => {
+  trackEvent('estimate_started', {
+    event_category: 'conversion',
+    source: source ?? 'homepage',
+  });
+};
+
+export const trackEstimateSubmitted = (source?: string) => {
+  trackEvent('estimate_submitted', {
+    event_category: 'conversion',
+    source: source ?? 'homepage',
+  });
+};
+
+export const trackSecondOpinionStarted = () => {
+  trackEvent('second_opinion_started', { event_category: 'conversion' });
+};
+
+export const trackSecondOpinionCompleted = (verdict?: string) => {
+  trackEvent('second_opinion_completed', {
+    verdict: verdict ?? 'unknown',
+    event_category: 'conversion',
+    event_label: 'Second Opinion Generated',
+  });
+  trackConversion('second_opinion_completed');
+};
+
+export const trackSignUpModalShown = (trigger?: string) => {
+  trackEvent('sign_up_modal_shown', {
+    trigger: trigger ?? 'gate',
+    event_category: 'auth',
+  });
+};
+
+/**
+ * User clicks any "Create Account" / "Sign Up" CTA.
+ * ← Wire Google Ads conversion tag here:
+ *   gtag('event', 'conversion', { send_to: 'AW-17979635426/XXXXXXXX' })
+ */
+export const trackCreateAccountClicked = (location?: string) => {
+  trackEvent('create_account_clicked', {
+    location: location ?? 'unknown',
+    event_category: 'auth',
+  });
+  trackConversion('create_account_clicked');
+};
+
+/**
+ * Contractor clicks "Join" CTA.
+ * ← Wire Google Ads conversion tag here.
+ */
+export const trackContractorJoinClicked = (location?: string) => {
+  trackEvent('contractor_join_clicked', {
+    location: location ?? 'unknown',
+    event_category: 'acquisition',
+  });
+  trackConversion('contractor_join_clicked');
+};
+
+export const trackContactSupportClicked = (method?: string) => {
+  trackEvent('contact_support_clicked', {
+    method: method ?? 'page',
+    event_category: 'support',
+  });
+};

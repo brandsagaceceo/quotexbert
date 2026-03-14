@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
+import { trackContractorJoinClicked } from "@/lib/tracking";
 
 export default function ForContractorsPage() {
   const { isSignedIn, authUser } = useAuth();
@@ -105,6 +106,8 @@ export default function ForContractorsPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Link
                 href={isSignedIn && authUser?.role === 'contractor' ? '/contractor/jobs' : '/sign-up?role=contractor'}
+                onClick={() => trackContractorJoinClicked('for_contractors_hero')}
+                data-track="contractor_join_clicked"
                 className="inline-flex items-center justify-center gap-2 bg-brand text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-dark transition-all transform hover:scale-105 shadow-2xl text-lg w-full sm:w-auto"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

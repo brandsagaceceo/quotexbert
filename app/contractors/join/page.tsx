@@ -226,7 +226,7 @@ export default function ContractorsJoinPage() {
             For Renovation Contractors
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Get More Renovation Jobs in the GTA
+            Get Renovation Leads in Toronto<br className="hidden md:block" /> Without Bidding Wars
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
             Stop paying $300/month for HomeStars and chasing bad leads. QuoteXbert
@@ -236,9 +236,10 @@ export default function ContractorsJoinPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/sign-up"
-              className="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-8 py-3 rounded-xl transition"
+              data-track="contractor_join_clicked"
+              className="bg-brand hover:bg-brand-dark text-white font-bold px-8 py-3 rounded-xl transition shadow-lg"
             >
-              Join Free — No Credit Card
+              Join as Contractor — Free
             </Link>
             <Link
               href="#how-it-works"
