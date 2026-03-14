@@ -164,6 +164,94 @@ export const GTA_CITIES: GTACity[] = [
       "Bowmanville is a growing community in Clarington with lower renovation costs than the western GTA. First-time buyers frequently renovate after purchase.",
     nearestCity: "Oshawa",
   },
+  {
+    slug: "oakville",
+    name: "Oakville",
+    region: "Halton Region",
+    population: "230K",
+    avgHome: "$1.3M",
+    laborPremium: 5,
+    description:
+      "Oakville is one of Canada's most affluent communities with high home values and premium renovation expectations. Contractors here command slightly above-Toronto rates for quality finishes.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "burlington",
+    name: "Burlington",
+    region: "Halton Region",
+    population: "200K",
+    avgHome: "$1.1M",
+    laborPremium: 0,
+    description:
+      "Burlington sits at the western end of the GTA with strong renovation demand. Labour rates are comparable to Toronto, with growing demand for kitchen and basement projects in older 1970s–1990s homes.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "milton",
+    name: "Milton",
+    region: "Halton Region",
+    population: "140K",
+    avgHome: "$950K",
+    laborPremium: -7,
+    description:
+      "Milton is one of Canada's fastest-growing communities. Many homeowners are upgrading builder-grade finishes in newer homes, making kitchen and bathroom renovations especially common.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "newmarket",
+    name: "Newmarket",
+    region: "York Region",
+    population: "90K",
+    avgHome: "$920K",
+    laborPremium: -8,
+    description:
+      "Newmarket is a York Region hub with a mix of older and newer housing stock. Renovation pricing is about 8–10% below Toronto, making it a value market for homeowners.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "aurora",
+    name: "Aurora",
+    region: "York Region",
+    population: "65K",
+    avgHome: "$1.05M",
+    laborPremium: -6,
+    description:
+      "Aurora is an affluent York Region community with high renovation standards. Many homes are 1990s–2010s detached houses due for kitchen and bathroom upgrades.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "thornhill",
+    name: "Thornhill",
+    region: "York Region",
+    population: "130K",
+    avgHome: "$1.15M",
+    laborPremium: -4,
+    description:
+      "Thornhill straddles Vaughan and Markham and has a dense concentration of 1980s–2000s detached homes. Contractor availability is strong and pricing is close to Toronto rates.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "stouffville",
+    name: "Stouffville",
+    region: "York Region",
+    population: "50K",
+    avgHome: "$1.0M",
+    laborPremium: -8,
+    description:
+      "Stouffville (Whitchurch-Stouffville) is a fast-growing York Region community where many new homeowners are finishing basements and upgrading kitchens in newer builds.",
+    nearestCity: "Toronto",
+  },
+  {
+    slug: "caledon",
+    name: "Caledon",
+    region: "Peel Region",
+    population: "75K",
+    avgHome: "$1.1M",
+    laborPremium: -5,
+    description:
+      "Caledon is a large rural-suburban Peel community with estate homes and growing renovation demand. Contractor travel time can add to costs compared to denser GTA areas.",
+    nearestCity: "Toronto",
+  },
 ];
 
 // Map slug → city for fast lookup
@@ -264,6 +352,26 @@ export const RENOVATION_TYPES: RenovationType[] = [
     metaVerb: "Cost",
     heroImage:
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1200&h=600&fit=crop",
+  },
+  {
+    slug: "plumbing-repair",
+    name: "Plumbing Repair",
+    baseSlug: "plumbing-repair-cost-toronto",
+    emoji: "🔧",
+    range: { low: "$150", high: "$8,000+", avg: "$900" },
+    metaVerb: "Cost",
+    heroImage:
+      "https://images.unsplash.com/photo-1558618047-f4e60b60bc62?w=1200&h=600&fit=crop",
+  },
+  {
+    slug: "electrical-work",
+    name: "Electrical Work",
+    baseSlug: "electrical-work-cost-toronto",
+    emoji: "⚡",
+    range: { low: "$200", high: "$15,000+", avg: "$1,800" },
+    metaVerb: "Cost",
+    heroImage:
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&h=600&fit=crop",
   },
 ];
 
