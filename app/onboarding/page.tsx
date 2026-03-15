@@ -71,18 +71,12 @@ export default function OnboardingPage() {
       console.log("Step 3: Response data:", data);
       
       if (!response.ok) {
-        throw new Error(data.details || data.error || "Failed to update role");
+        throw new Error(data.error || "Failed to update role");
       }
 
-      console.log("Step 4: Success! Redirecting to profile...");
-      
-      // Small delay then redirect to profile
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      console.log("Step 5: Navigating to profile...");
-      
-      // Direct navigation to profile
-      window.location.href = "/profile";
+      // Redirect based on selected role
+      const destination = roleId === "contractor" ? "/contractor/dashboard" : "/dashboard";
+      window.location.href = destination;
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";

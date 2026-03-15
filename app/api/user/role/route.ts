@@ -115,52 +115,38 @@ export async function POST(req: NextRequest) {
 
     console.log('Updating user:', { userId, email, userName, role });
 
-    // Use upsert for cleaner create-or-update logic
-    // This prevents duplicate users and avoids trying to update the immutable id field
-    const updatedUser = await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        role: role,
-        name: userName,
-        email: email,
-      },
-      create: {
-        id: userId,
-        email: email,
-        name: userName,
-        role: role,
-      },
+    // Check if a user already exists by email to avoid duplicate email constraint errors
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
 
-    console.log('User role updated successfully:', updatedUser.role);
-
-    // Return success with a flag to reload the session
-    const response = NextResponse.json({ success: true, role, refreshSession: true });
-    return response;
-  } catch (error) {
-    console.error("Error updating user role:", error);
-    
-    // Log detailed error information for debugging
-    if (error && typeof error === 'object') {
-      const prismaError = error as any;
-      console.error("Prisma error details:", {
-        code: prismaError.code,
-        meta: prismaError.meta,
-        message: prismaError.message,
+    if (existingUser) {
+      // User exists — update role (and name in case it changed)
+      await prisma.user.update({
+        where: { email },
+        data: { role, name: userName },
+      });
+    } else {
+      // No user with this email — create fresh record
+      await prisma.user.create({
+        data: {
+          id: userId,
+          email,
+          name: userName,
+          role,
+        },
       });
     }
-    
-    console.error("Error context:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'NOT SET'
-    });
-    
+
+    console.log('User role updated successfully:', role);
+
+    // Return success with a flag to reload the session
+    return NextResponse.json({ success: true, role, refreshSession: true });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+
     return NextResponse.json(
-      { 
-        error: "Failed to update role",
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: "Something went wrong while saving your role. Please try again." },
       { status: 500 },
     );
   }

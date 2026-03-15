@@ -2,26 +2,41 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/hooks/useAuth";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 export default function SelectRolePage() {
   const router = useRouter();
-  const { setUserRole, authUser } = useAuth();
   const [selectedRole, setSelectedRole] = useState<"contractor" | "homeowner" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRoleSelection = async () => {
     if (!selectedRole) return;
-    
+
     setIsLoading(true);
+    setError(null);
     try {
-      await setUserRole(selectedRole);
-      // Redirect based on role
-      router.push("/profile");
-    } catch (error) {
-      console.error("Error setting role:", error);
+      const response = await fetch("/api/user/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: selectedRole }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to set role. Please try again.");
+      }
+
+      // Redirect based on selected role
+      if (selectedRole === "homeowner") {
+        router.push("/dashboard");
+      } else {
+        router.push("/contractor/dashboard");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -141,6 +156,11 @@ export default function SelectRolePage() {
         </div>
 
         <div className="text-center">
+          {error && (
+            <p className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              {error}
+            </p>
+          )}
           <Button
             variant="primary"
             size="lg"
