@@ -22,7 +22,6 @@ export default function SignUpPage() {
               card: "shadow-2xl border-2 border-rose-100",
               headerTitle: "text-2xl font-bold text-slate-900",
               headerSubtitle: "text-slate-600",
-              socialButtonsBlockButton: "hidden",
               formButtonPrimary: "bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all",
               formFieldInput: "border-2 border-slate-300 focus:border-rose-500 rounded-lg px-4 py-3 text-slate-900 focus:ring-2 focus:ring-rose-200",
               footerActionLink: "text-rose-700 hover:text-orange-600 font-semibold"
