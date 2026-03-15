@@ -24,7 +24,7 @@ export default function AIAssistantPopup() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
-  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up'];
+  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate'];
   const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p));
 
   useEffect(() => {
@@ -240,7 +240,8 @@ export default function AIAssistantPopup() {
         <div 
           className="fixed right-4 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
-            bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 20px)',
+            bottom: 'calc(var(--bottom-nav-height, 0px) + env(safe-area-inset-bottom, 0px) + 80px)',
+            right: 'max(16px, env(safe-area-inset-right, 16px))',
             maxHeight: 'calc(70vh - env(safe-area-inset-bottom, 0px))',
           }}
         >

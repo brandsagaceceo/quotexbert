@@ -70,7 +70,7 @@ export function AIChatbot() {
     }
     
     if (lowerQuery.includes("price") || lowerQuery.includes("cost") || lowerQuery.includes("pay")) {
-      return "💰 Our pricing is simple:\n\n**For Homeowners:**\n• 100% FREE to post projects\n• FREE to get quotes\n• Only pay contractors directly\n\n**For Contractors:**\n• Starter: $99/mo (5 leads)\n• Handyman: $149/mo (10 leads)\n• Renovation Expert: $199/mo (20 leads)\n\nNo hidden fees, cancel anytime!";
+      return "💰 Our pricing is simple:\n\n**For Homeowners:**\n• 100% FREE to post projects\n• FREE to get quotes\n• Only pay contractors directly\n\n**For Contractors:**\n• Handyman: $79/mo (4 categories, 15 leads)\n• Renovation Expert: $139/mo (8 categories, 30 leads)\n• General Contractor: $199/mo (all 12 categories, 50 leads)\n\nNo hidden fees, cancel anytime!";
     }
     
     if (lowerQuery.includes("how") || lowerQuery.includes("work")) {

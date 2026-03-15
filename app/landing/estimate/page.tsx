@@ -235,12 +235,6 @@ export default function LandingEstimatePage() {
               >
                 Post Your Project — Get Real Bids <ArrowRight className="w-4 h-4" />
               </a>
-              <a
-                href="/second-opinion"
-                className="inline-flex items-center justify-center gap-2 bg-white border-2 border-brand text-brand font-semibold px-7 py-3.5 rounded-xl hover:bg-brand/5 transition-colors"
-              >
-                Compare Contractor Quote
-              </a>
             </div>
           </div>
         </section>

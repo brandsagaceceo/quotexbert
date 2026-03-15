@@ -53,45 +53,13 @@ export default function SiteHeader() {
               AI Estimate
             </Link>
 
-            {/* Tools dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => toggle("tools")}
-                className="flex items-center gap-1 text-gray-700 hover:text-[#800020] px-3 py-2 text-sm font-semibold rounded-lg hover:bg-rose-50 transition-colors"
-              >
-                Tools
-                <ChevronDown
-                  size={14}
-                  className={`transition-transform duration-200 ${openDropdown === "tools" ? "rotate-180" : ""}`}
-                />
-              </button>
-              {openDropdown === "tools" && (
-                <div className="absolute top-full left-0 mt-1.5 w-56 bg-white rounded-xl border border-gray-100 shadow-xl py-1.5 z-50">
-                  <Link
-                    href="/second-opinion"
-                    onClick={() => setOpenDropdown(null)}
-                    className="flex items-start gap-3 px-4 py-3 hover:bg-rose-50 transition-colors group"
-                  >
-                    <span className="text-xl mt-0.5">🔍</span>
-                    <div>
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-[#800020]">Second Opinion</div>
-                      <div className="text-xs text-gray-500">Review your quote</div>
-                    </div>
-                  </Link>
-                  <Link
-                    href="/renovation-costs"
-                    onClick={() => setOpenDropdown(null)}
-                    className="flex items-start gap-3 px-4 py-3 hover:bg-rose-50 transition-colors group"
-                  >
-                    <span className="text-xl mt-0.5">💰</span>
-                    <div>
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-[#800020]">Renovation Costs</div>
-                      <div className="text-xs text-gray-500">Price guides & estimates</div>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
+            {/* Renovation Costs */}
+            <Link
+              href="/renovation-costs"
+              className="text-gray-700 hover:text-[#800020] px-3 py-2 text-sm font-semibold rounded-lg hover:bg-rose-50 transition-colors"
+            >
+              Renovation Costs
+            </Link>
 
             {/* For Contractors */}
             <Link
@@ -115,7 +83,6 @@ export default function SiteHeader() {
               </button>
               {openDropdown === "more" && (
                 <div className="absolute top-full left-0 mt-1.5 w-44 bg-white rounded-xl border border-gray-100 shadow-xl py-1.5 z-50">
-                  <Link href="/affiliates" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">Affiliates</Link>
                   <Link href="/blog" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">Blog</Link>
                   <Link href="/about" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">About</Link>
                   <div className="border-t border-gray-100 mt-1 pt-1">
@@ -225,12 +192,11 @@ export default function SiteHeader() {
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 py-3 px-3 text-sm font-bold text-[#800020] bg-rose-50 rounded-lg">
                 ✨ AI Estimate
               </Link>
-              <Link href="/second-opinion" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Second Opinion</Link>
               <Link href="/renovation-costs" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Renovation Costs</Link>
-              <Link href="/contractors/join" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">For Contractors</Link>
-              <Link href="/affiliates" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-500 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Affiliates</Link>
-              <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-500 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
-              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-500 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
+              <Link href="/for-contractors" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">For Contractors</Link>
+              <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
+              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
+              <div className="border-t border-gray-100 my-1" />
               <a href="tel:9052429460" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📞 Need Help? Call Us</a>
             </div>
 

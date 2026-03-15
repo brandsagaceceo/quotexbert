@@ -613,7 +613,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   position: fixed;
   right: 1.25rem;
   z-index: 40;
-  bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 1.25rem);
+  bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 5rem);
   transition: opacity 0.25s, transform 0.25s;
 }
 @media (min-width: 768px) {

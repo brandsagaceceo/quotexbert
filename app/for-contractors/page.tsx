@@ -5,6 +5,61 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { trackContractorJoinClicked } from "@/lib/tracking";
+import { CheckCircle, Shield, TrendingUp, Clock } from "lucide-react";
+
+const pricingTiers = [
+  {
+    id: "handyman",
+    name: "Handyman",
+    price: 79,
+    categories: 4,
+    features: [
+      "4 Trade Categories",
+      "Up to 15 leads/month",
+      "Professional profile",
+      "Email & phone support",
+      "Portfolio showcase",
+      "Customer reviews"
+    ],
+    popular: false
+  },
+  {
+    id: "renovation",
+    name: "Renovation Expert",
+    price: 139,
+    categories: 8,
+    features: [
+      "8 Trade Categories",
+      "Up to 30 leads/month",
+      "Enhanced profile badge",
+      "Priority support",
+      "Featured in search",
+      "Portfolio showcase",
+      "Advanced analytics",
+      "Lead notifications"
+    ],
+    popular: true
+  },
+  {
+    id: "general-contractor",
+    name: "General Contractor",
+    price: 199,
+    categories: 12,
+    features: [
+      "ALL 12 Categories",
+      "Up to 50 leads/month",
+      "Premium profile badge",
+      "24/7 priority support",
+      "Top of search results",
+      "Portfolio showcase",
+      "Advanced analytics",
+      "Instant lead alerts",
+      "Dedicated account manager",
+      "Custom branding"
+    ],
+    popular: false
+  }
+];
 
 export default function ForContractorsPage() {
   const { isSignedIn, authUser } = useAuth();
@@ -23,7 +78,7 @@ export default function ForContractorsPage() {
     },
     {
       q: "What's the monthly subscription cost?",
-      a: "Plans start at $79/month for handymen (4 categories, 15 leads/month) and go up to $199/month for general contractors (all 12 categories, 50 leads/month). No per-lead fees."
+      a: "Plans start at $79/month for Handyman (4 categories, up to 15 leads/month), $139/month for Renovation Expert (8 categories, up to 30 leads/month), and $199/month for General Contractor (all 12 categories, up to 50 leads/month). No per-lead fees. Cancel anytime."
     },
     {
       q: "Can I cancel anytime?",
@@ -116,10 +171,10 @@ export default function ForContractorsPage() {
                 {isSignedIn && authUser?.role === 'contractor' ? 'Go to Dashboard' : 'Join as Contractor'}
               </Link>
               <a
-                href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 bg-slate-700/50 border-2 border-slate-600 text-white font-semibold px-8 py-4 rounded-xl hover:bg-slate-600/50 transition-colors w-full sm:w-auto"
+                href="#pricing"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 border-2 border-white/40 text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/20 transition-colors w-full sm:w-auto"
               >
-                See How It Works
+                See Pricing
               </a>
             </div>
             
@@ -596,14 +651,87 @@ export default function ForContractorsPage() {
         </div>
       </section>
 
+      {/* Pricing Tiers */}
+      <section id="pricing" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Flat monthly rate. No per-lead fees. Cancel anytime.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-slate-600 text-sm font-semibold">
+              <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-green-600" /><span>Stripe Secured</span></div>
+              <div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-rose-600" /><span>500+ Active Contractors</span></div>
+              <div className="flex items-center gap-2"><Clock className="w-5 h-5 text-orange-600" /><span>Cancel Anytime</span></div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {pricingTiers.map((tier) => (
+              <div
+                key={tier.id}
+                className={`relative bg-white rounded-2xl border-4 p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                  tier.popular
+                    ? "border-brand shadow-xl ring-4 ring-brand/20"
+                    : "border-slate-200 hover:border-brand/40"
+                }`}
+              >
+                {tier.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-brand text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg">
+                      ⭐ MOST POPULAR
+                    </span>
+                  </div>
+                )}
+
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-black text-slate-900 mb-3">{tier.name}</h3>
+                  <div className="flex items-baseline justify-center gap-1 mb-4">
+                    <span className="text-5xl font-black text-brand">${tier.price}</span>
+                    <span className="text-lg text-slate-500 font-semibold">/month</span>
+                  </div>
+                  <div className="bg-brand/5 border border-brand/20 px-4 py-3 rounded-xl">
+                    <p className="text-lg font-bold text-slate-900">{tier.categories} Trade Categories</p>
+                    <p className="text-sm text-slate-600 font-medium mt-0.5">Up to {tier.popular ? 30 : tier.categories === 4 ? 15 : 50} leads/month</p>
+                  </div>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {tier.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-700">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm font-medium">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href={isSignedIn && authUser?.role === "contractor" ? "/contractor/subscription" : "/sign-up?role=contractor"}
+                  onClick={() => trackContractorJoinClicked("pricing_section")}
+                  className={`block w-full py-4 rounded-xl font-bold text-lg text-center transition-all duration-300 ${
+                    tier.popular
+                      ? "bg-brand text-white hover:bg-brand-dark shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      : "bg-slate-100 text-slate-800 hover:bg-brand hover:text-white"
+                  }`}
+                >
+                  Get Started
+                </Link>
+                <p className="text-center text-xs text-slate-500 mt-3">Cancel anytime · No contracts</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Why Contractors Join */}
       <section className="py-20 bg-brand/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
               Why Contractors Choose QuoteXbert
-            </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            </h2>            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Stop wasting time on unqualified leads. Focus on what you do best: great work.
             </p>
           </div>
