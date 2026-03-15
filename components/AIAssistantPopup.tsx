@@ -24,8 +24,11 @@ export default function AIAssistantPopup() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
-  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up'];
-  const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p));
+  // HIDE_ON_PATHS: prefix match — hides on the path and all sub-paths
+  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/ai-renovation-check', '/second-opinion'];
+  // HIDE_ON_EXACT: exact match — used for '/' to avoid hiding on all pages
+  const HIDE_ON_EXACT = ['/'];
+  const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p)) || HIDE_ON_EXACT.some((p) => pathname === p);
 
   useEffect(() => {
     // Determine user type

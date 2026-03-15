@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
 import {
   Home,
-  Search,
   MessageCircle,
   Briefcase,
   User,
@@ -35,6 +34,12 @@ export default function MobileBottomNav() {
       label: "Home",
       icon: Home,
       active: pathname === "/"
+    },
+    {
+      href: "/homeowner/jobs",
+      label: "Jobs",
+      icon: FileText,
+      active: pathname.startsWith("/homeowner/jobs")
     },
     {
       href: "/create-lead",
@@ -85,31 +90,46 @@ export default function MobileBottomNav() {
   ];
 
   const navItems = authUser.role === "homeowner" ? homeownerNavItems : contractorNavItems;
+  const colCount = navItems.length === 5 ? "grid-cols-5" : "grid-cols-4";
 
   return (
-    <div 
+    <div
       className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-[0_-1px_6px_rgba(0,0,0,0.06)]"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         '--bottom-nav-height': '64px',
       } as React.CSSProperties}
     >
-      <div className={`grid h-16 items-stretch ${navItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'}`}>
+      <div className={`grid h-16 ${colCount}`}>
         {navItems.map((item) => {
           const Icon = item.icon;
+
+          if (item.isAction) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center h-full"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#800020] flex items-center justify-center shadow-md -mt-4 border-2 border-white">
+                  <Icon className="h-6 w-6 text-white shrink-0" />
+                </div>
+                <span className="text-[9px] mt-0.5 font-semibold text-[#800020] leading-tight">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          }
+
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`
-                flex flex-col items-center justify-center h-full px-0.5 transition-colors relative
-                ${item.active 
-                  ? "text-rose-600" 
-                  : "text-gray-500 hover:text-rose-600"
-                }
-                ${item.isAction 
-                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700 mx-1 my-1.5 rounded-xl" 
-                  : ""
+                flex flex-col items-center justify-center h-full px-0.5 transition-colors
+                ${item.active
+                  ? "text-[#800020]"
+                  : "text-gray-500 hover:text-[#800020]"
                 }
               `}
             >
