@@ -248,7 +248,7 @@ export default function Home() {
 
                 {/* Key Benefits - Compact for mobile */}
                 <div className="space-y-3 md:space-y-6 mb-6 md:mb-10">
-                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
                     <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -258,9 +258,9 @@ export default function Home() {
                       <div className="font-bold text-base md:text-xl text-slate-900">Get Prices in 30 Seconds</div>
                       <div className="text-slate-600 text-sm md:text-base">Detailed breakdown, not guesswork</div>
                     </div>
-                  </div>
+                  </Link>
 
-                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
                     <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -271,9 +271,9 @@ export default function Home() {
                       <div className="font-bold text-base md:text-xl text-slate-900">Just Upload Photos</div>
                       <div className="text-slate-600 text-sm md:text-base">Or describe it—works both ways</div>
                     </div>
-                  </div>
+                  </Link>
 
-                  <div className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover">
+                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
                     <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -284,7 +284,7 @@ export default function Home() {
                       <div className="font-bold text-base md:text-xl text-slate-900">Real Toronto Prices</div>
                       <div className="text-slate-600 text-sm md:text-base">What contractors actually charge here</div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
 
                 {/* Social Proof - Real faces + badges */}
@@ -292,9 +292,9 @@ export default function Home() {
                   {/* Stacked real homeowner faces */}
                   <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-rose-200">
                     <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces&q=80" className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover object-top border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
                     </div>
                     <span className="text-xs md:text-sm font-bold text-slate-700">500+ homeowners</span>
                   </div>
