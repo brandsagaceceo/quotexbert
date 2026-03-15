@@ -29,12 +29,11 @@ export default function SelectRolePage() {
         throw new Error(data.error || "Failed to set role. Please try again.");
       }
 
-      // Redirect based on selected role
-      if (selectedRole === "homeowner") {
-        router.push("/dashboard");
-      } else {
-        router.push("/contractor/dashboard");
-      }
+      // Mark first login so the profile page shows the onboarding tour
+      localStorage.setItem("show_onboarding_tour", "1");
+
+      // Always send to profile after first role selection
+      router.push("/profile");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {

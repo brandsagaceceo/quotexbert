@@ -74,9 +74,11 @@ export default function OnboardingPage() {
         throw new Error(data.error || "Failed to update role");
       }
 
-      // Redirect based on selected role
-      const destination = roleId === "contractor" ? "/contractor/dashboard" : "/dashboard";
-      window.location.href = destination;
+      // Mark first login so the profile page shows the onboarding tour
+      localStorage.setItem("show_onboarding_tour", "1");
+
+      // Always send to profile after first role selection
+      window.location.href = "/profile";
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";

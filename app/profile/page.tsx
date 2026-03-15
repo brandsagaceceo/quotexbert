@@ -11,6 +11,7 @@ import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
 import OverflowDetector from "@/components/dev/OverflowDetector";
 import LoadingState from "@/components/ui/LoadingState";
+import OnboardingTour from "@/components/OnboardingTour";
 import {
   User,
   MapPin,
@@ -543,10 +544,16 @@ export default function UnifiedProfilePage() {
       {/* Development Tool - Overflow Detection */}
       <OverflowDetector />
 
+      {/* First-login onboarding tour */}
+      {profile && (profile.role === 'contractor' || profile.role === 'homeowner') && (
+        <OnboardingTour role={profile.role as 'contractor' | 'homeowner'} />
+      )}
+
       {/* Desktop Edit/Save Button - Top Right (hidden on mobile) */}
       <div className="hidden md:block fixed right-3 md:right-8 z-50" style={{ top: 'calc(var(--header-height, 64px) + 4px)' }}>
         {!isEditing ? (
           <button
+            data-tour="edit-profile-btn"
             onClick={() => setIsEditing(true)}
             className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all flex items-center gap-1.5 md:gap-2 shadow-lg text-xs md:text-base"
           >
@@ -691,7 +698,7 @@ export default function UnifiedProfilePage() {
       <div className="bg-white sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
         <div className="container mx-auto">
           {/* Mobile: Scrollable pill tabs */}
-          <nav className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
+          <nav data-tour="profile-tabs" className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
@@ -716,7 +723,7 @@ export default function UnifiedProfilePage() {
           </nav>
 
           {/* Desktop: Full tab bar */}
-          <nav className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
+          <nav data-tour="profile-tabs" className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
@@ -800,12 +807,14 @@ export default function UnifiedProfilePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Link
+                        data-tour="post-job-link"
                         href="/create-lead"
                         className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
                       >
                         Post a Job on Job Board
                       </Link>
                       <Link
+                        data-tour="ai-estimate-link"
                         href="/ai-quote"
                         className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold border border-rose-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition-colors"
                       >
