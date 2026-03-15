@@ -222,7 +222,7 @@ export default function AIAssistantPopup() {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group${
+          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group${
             isHidden ? ' widget-hidden' : ''
           }`}
           aria-label="Open AI Assistant"

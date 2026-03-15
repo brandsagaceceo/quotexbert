@@ -611,14 +611,19 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 /* ── Floating widget safe position ── */
 .floating-widget-safe {
   position: fixed;
-  right: 1.25rem;
+  right: 1rem;
   z-index: 40;
-  bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 5rem);
+  /* On mobile: clear the sticky CTA bar (72px) + safe area + extra breathing room */
+  bottom: calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 1.5rem);
   transition: opacity 0.25s, transform 0.25s;
+  /* Slightly smaller on mobile so it intrudes less */
+  padding: 0.625rem;
 }
 @media (min-width: 768px) {
   .floating-widget-safe {
     bottom: 1.5rem;
+    right: 1.25rem;
+    padding: 0.75rem;
   }
 }
 .floating-widget-safe.widget-hidden {

@@ -322,33 +322,38 @@ export default function Home() {
 
         {/* Real Homes Photo Strip */}
         <section className="relative overflow-hidden">
-          <div className="grid grid-cols-2 md:grid-cols-4 h-56 md:h-80">
+          {/* Mobile: taller grid so faces aren't cropped; Desktop: 4-col strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 h-72 md:h-80">
             <div className="relative overflow-hidden group">
+              {/* Kitchen — no person, center crop is fine */}
               <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=1000&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Kitchen · $28k saved</span>
             </div>
             <div className="relative overflow-hidden group">
+              {/* Bathroom — no person, center is fine */}
               <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=1000&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Bathroom · $9k saved</span>
             </div>
             <div className="relative overflow-hidden group">
+              {/* Basement — no person, center is fine */}
               <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=1000&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Basement · $15k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=center&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              {/* Exterior — person visible; object-top keeps the face in frame */}
+              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=top&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Exterior · $22k saved</span>
             </div>
           </div>
-          {/* Overlay callout */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl border border-rose-100 text-center">
-              <p className="text-rose-700 font-black text-base md:text-xl">Real Toronto Homes. Real Savings.</p>
-              <p className="text-slate-600 text-xs md:text-sm mt-0.5">Homeowners saved an average of <strong>$16,400</strong> by comparing quotes first</p>
+          {/* Overlay callout — compact on mobile so it doesn't cover images */}
+          <div className="absolute inset-0 flex items-end md:items-center justify-center pointer-events-none pb-3 md:pb-0">
+            <div className="bg-white/90 backdrop-blur-md px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border border-rose-100 text-center">
+              <p className="text-rose-700 font-black text-sm md:text-xl">Real Toronto Homes. Real Savings.</p>
+              <p className="text-slate-600 text-xs mt-0.5 hidden md:block">Homeowners saved an average of <strong>$16,400</strong> by comparing quotes first</p>
             </div>
           </div>
         </section>
@@ -547,36 +552,37 @@ export default function Home() {
 
           {/* Real Homeowner Hero Photo Section */}
           <section className="relative overflow-hidden bg-slate-900">
+            {/* Background image — slightly taller on mobile so content doesn't overflow */}
             <img
-              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1600&h=800&fit=crop&crop=center&q=80"
+              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1600&h=800&fit=crop&crop=top&q=80"
               alt="Happy homeowners in their renovated Toronto starter home"
-              className="w-full h-[300px] md:h-[500px] object-cover object-center opacity-50"
+              className="absolute inset-0 w-full h-full object-cover object-top opacity-40"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/70 to-slate-900/30" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="max-w-6xl mx-auto px-6 w-full">
-                <div className="max-w-xl">
-                  <p className="text-rose-400 font-bold text-sm uppercase tracking-widest mb-3">Toronto GTA &mdash; First-Time Homeowners</p>
-                  <h2 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
-                    Stop overpaying.<br />
-                    <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">Know before you sign.</span>
-                  </h2>
-                  <p className="text-slate-300 text-base md:text-lg mb-6 leading-relaxed">
-                    First-time homeowners in the GTA saved an average of <strong className="text-white">$16,400</strong> by getting an AI estimate before hiring a contractor.
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 text-center">
-                      <div className="text-2xl font-black text-white">500+</div>
-                      <div className="text-slate-400 text-xs">GTA Homeowners</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 text-center">
-                      <div className="text-2xl font-black text-white">$16k</div>
-                      <div className="text-slate-400 text-xs">Avg. Savings</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 text-center">
-                      <div className="text-2xl font-black text-white">30 sec</div>
-                      <div className="text-slate-400 text-xs">To get estimate</div>
-                    </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/40" />
+            {/* Content — normal flow on mobile so it never gets clipped */}
+            <div className="relative z-10 max-w-6xl mx-auto px-5 py-8 md:py-16">
+              <div className="max-w-xl">
+                <p className="text-rose-400 font-bold text-xs md:text-sm uppercase tracking-widest mb-2 md:mb-3">Toronto GTA &mdash; First-Time Homeowners</p>
+                <h2 className="text-2xl md:text-5xl font-black text-white leading-tight mb-3 md:mb-4">
+                  Stop overpaying.<br />
+                  <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">Know before you sign.</span>
+                </h2>
+                <p className="text-slate-300 text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
+                  First-time homeowners in the GTA saved an average of <strong className="text-white">$16,400</strong> by getting an AI estimate before hiring a contractor.
+                </p>
+                {/* Stat cards — compact on mobile */}
+                <div className="flex flex-wrap gap-2 md:gap-4">
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
+                    <div className="text-lg md:text-2xl font-black text-white">500+</div>
+                    <div className="text-slate-400 text-xs">GTA Homeowners</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
+                    <div className="text-lg md:text-2xl font-black text-white">$16k</div>
+                    <div className="text-slate-400 text-xs">Avg. Savings</div>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
+                    <div className="text-lg md:text-2xl font-black text-white">30 sec</div>
+                    <div className="text-slate-400 text-xs">To get estimate</div>
                   </div>
                 </div>
               </div>
@@ -605,7 +611,7 @@ export default function Home() {
         <TrustSignals />
 
         {/* Recent Activity Feed */}
-        <section className="py-16 bg-white">
+        <section className="py-8 md:py-16 bg-white">
           <div className="max-w-5xl mx-auto px-4">
             <RecentActivityFeed
               maxItems={10}
@@ -617,9 +623,9 @@ export default function Home() {
         </section>
 
         {/* Trust Indicators - Testimonials */}
-        <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-slate-100">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 md:mb-12">
               <div className="flex items-center justify-center gap-2 mb-3">
                 {[1,2,3,4,5].map(s => <svg key={s} className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>)}
                 <span className="text-slate-500 text-sm font-semibold ml-1">5.0 average</span>
