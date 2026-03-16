@@ -216,7 +216,7 @@ export default function AIAssistantPopup() {
     <>
       {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
       {!isOpen && (
-      <button
+        <button
           ref={buttonRef}
           onClick={() => {
             setIsOpen(true);
@@ -237,12 +237,10 @@ export default function AIAssistantPopup() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div 
-          className="fixed right-4 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
+        <div
+          className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 mx-auto bottom-4 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
-            bottom: 'calc(var(--bottom-nav-height, 0px) + env(safe-area-inset-bottom, 0px) + 80px)',
-            right: 'max(16px, env(safe-area-inset-right, 16px))',
-            maxHeight: 'calc(70vh - env(safe-area-inset-bottom, 0px))',
+            maxHeight: '80vh',
           }}
         >
           {/* Header */}
@@ -272,7 +270,7 @@ export default function AIAssistantPopup() {
           <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-96 bg-gradient-to-b from-gray-50 to-white">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] ${msg.role === 'user' ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
+                <div className={`max-w-[85vw] sm:max-w-[85%] ${msg.role === 'user' ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
                   <p className="text-sm whitespace-pre-line">{msg.content}</p>
                   {msg.actions && (
                     <div className="mt-3 space-y-2">

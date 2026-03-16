@@ -63,45 +63,45 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
       />
       
       {/* Modal */}
-      <div className="min-h-full flex items-center justify-center p-4 py-8">
-        <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-3xl shadow-2xl max-w-lg w-full p-8 md:p-10 transform animate-scale-in">
+      <div className="min-h-full flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8 safe-area-top safe-area-bottom">
+        <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-8 md:p-10 transform animate-scale-in max-h-[90vh] overflow-y-auto">
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Close"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
 
           {/* Content */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Icon */}
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-2">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-orange-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
               <div className="relative bg-gradient-to-br from-rose-500 to-orange-500 rounded-full p-5">
-                <Camera className="w-10 h-10 text-white" />
+                <Camera className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </div>
             </div>
             </div>
 
             {/* Heading */}
-            <div className="text-center space-y-3">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+            <div className="text-center space-y-2 sm:space-y-3">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 leading-tight">
               Wait! Don't Get Ripped Off 💰
             </h2>
-            <p className="text-xl text-gray-700 font-semibold">
+            <p className="text-base sm:text-lg md:text-xl text-gray-700 font-semibold leading-relaxed">
               See <span className="text-rose-600">what your project should actually cost</span> before hiring anyone
             </p>
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-              <Sparkles className="w-4 h-4 text-amber-500" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 flex-wrap">
+              <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
               <span>Free • 30 seconds • Based on 1,000+ real GTA projects</span>
             </div>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
               <div>
                 <label htmlFor="email" className="sr-only">Email address</label>
                 <input
@@ -110,7 +110,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email (optional)"
-                  className="w-full px-6 py-4 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:outline-none text-lg transition-colors"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:outline-none text-base transition-colors"
                 />
                 <p className="text-xs text-gray-500 mt-2 text-center">
                   Optional: Get your estimate sent to your inbox
@@ -119,7 +119,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-5 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-4 sm:py-5 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
               >
                 📸 Upload Photos → Get Free Estimate
               </button>
@@ -128,19 +128,19 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
             {/* Skip option */}
             <button
               onClick={handleSkipToEstimate}
-              className="w-full text-gray-600 hover:text-gray-800 font-medium py-2 transition-colors text-sm"
+              className="w-full text-gray-600 hover:text-gray-800 font-medium py-2 transition-colors text-xs sm:text-sm"
             >
               Skip and continue to estimate →
             </button>
 
             {/* Social Proof */}
-            <div className="bg-white/80 rounded-xl p-4 text-center">
+            <div className="bg-white/80 rounded-xl p-3 sm:p-4 text-center">
               <div className="flex justify-center gap-1 mb-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star} className="text-amber-400 text-xl">★</span>
+                  <span key={star} className="text-amber-400 text-lg sm:text-xl">★</span>
                 ))}
               </div>
-              <p className="text-sm text-gray-700 font-medium">
+              <p className="text-xs sm:text-sm text-gray-700 font-medium">
                 Join 2,500+ happy Toronto homeowners
               </p>
               <p className="text-xs text-gray-500 mt-1">

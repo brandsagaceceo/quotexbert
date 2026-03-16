@@ -38,7 +38,7 @@ export default function ProfileHeader({
   return (
     <div className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-5xl mx-auto px-4 py-6">
-        <div className="flex items-start gap-4">
+        <div className="flex flex-row gap-4 items-start md:flex-row">
           {/* Avatar */}
           <div className="relative flex-shrink-0 group">
             <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-rose-100 to-orange-100 border-2 border-white shadow-md">

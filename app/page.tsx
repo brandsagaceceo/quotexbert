@@ -122,32 +122,32 @@ export default function Home() {
       {/* ── Sign-Up Gate Modal ── shown when a guest tries a 2nd estimate ── */}
       {showSignUpGate && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto safe-area-top safe-area-bottom"
           onClick={(e) => { if (e.target === e.currentTarget) setShowSignUpGate(false); }}
         >
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+          <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-8 text-center my-6 sm:my-0">
             {/* Close */}
             <button
               onClick={() => setShowSignUpGate(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-2xl leading-none"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-slate-400 hover:text-slate-600 text-2xl leading-none"
               aria-label="Close"
             >
               ×
             </button>
 
             {/* Icon */}
-            <div className="text-5xl mb-4">🎉</div>
+            <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎉</div>
 
             {/* Heading */}
-            <h2 className="text-2xl font-black text-slate-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mb-2">
               You've used your free estimate!
             </h2>
-            <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+            <p className="text-slate-600 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed">
               Create a <strong>free account</strong> to unlock unlimited AI estimates, save your projects, and get bids from verified GTA contractors.
             </p>
 
             {/* Benefit list */}
-            <ul className="text-left text-sm text-slate-700 space-y-2 mb-7">
+            <ul className="text-left text-xs sm:text-sm text-slate-700 space-y-1.5 sm:space-y-2 mb-5 sm:mb-7">
               {[
                 "♾️  Unlimited AI renovation estimates",
                 "💾  Save & revisit past estimates",
@@ -165,13 +165,13 @@ export default function Home() {
               href="/sign-up"
               onClick={() => trackCreateAccountClicked('signup_gate_modal')}
               data-track="create_account_clicked"
-              className="block w-full bg-brand hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl text-base transition mb-3"
+              className="block w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 sm:py-3.5 rounded-lg sm:rounded-xl text-sm sm:text-base transition mb-2 sm:mb-3"
             >
               Create Free Account →
             </a>
             <a
               href="/sign-in"
-              className="block w-full text-slate-600 hover:text-rose-600 text-sm font-medium transition"
+              className="block w-full text-slate-600 hover:text-rose-600 text-xs sm:text-sm font-medium transition"
             >
               Already have an account? Sign in
             </a>

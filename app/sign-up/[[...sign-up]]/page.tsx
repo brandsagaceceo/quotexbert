@@ -2,16 +2,16 @@ import { SignUp } from '@clerk/nextjs';
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-6 sm:py-12 px-4 overflow-y-auto safe-area-top safe-area-bottom">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-3">
+        <div className="text-center mb-6 sm:mb-8 animate-fade-in-up">
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-2 sm:mb-3">
             QuoteXbert
           </h1>
-          <p className="text-lg text-slate-700 font-medium">
+          <p className="text-base sm:text-lg text-slate-700 font-medium">
             Get started in seconds
           </p>
-          <p className="text-sm text-slate-600 mt-2">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 sm:mt-2">
             Enter your email to receive a verification code
           </p>
         </div>
@@ -20,10 +20,10 @@ export default function SignUpPage() {
             elements: {
               rootBox: "w-full",
               card: "shadow-2xl border-2 border-rose-100",
-              headerTitle: "text-2xl font-bold text-slate-900",
-              headerSubtitle: "text-slate-600",
+              headerTitle: "text-xl sm:text-2xl font-bold text-slate-900",
+              headerSubtitle: "text-slate-600 text-sm",
               formButtonPrimary: "bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all",
-              formFieldInput: "border-2 border-slate-300 focus:border-rose-500 rounded-lg px-4 py-3 text-slate-900 focus:ring-2 focus:ring-rose-200",
+              formFieldInput: "border-2 border-slate-300 focus:border-rose-500 rounded-lg px-4 py-3 text-slate-900 focus:ring-2 focus:ring-rose-200 text-base",
               footerActionLink: "text-rose-700 hover:text-orange-600 font-semibold"
             }
           }}
