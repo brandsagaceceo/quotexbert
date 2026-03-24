@@ -1,8 +1,8 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
@@ -24,7 +24,7 @@ interface JobFilters {
   urgency?: 'hot' | 'active' | 'older';
 }
 
-export default function ContractorJobsPage() {
+function ContractorJobsContent() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +41,8 @@ export default function ContractorJobsPage() {
   const router = useRouter();
 
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [highlightedJobId, setHighlightedJobId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   // Add toast notification
   const addToast = (toast: Omit<Toast, 'id'>) => {
@@ -51,6 +53,22 @@ export default function ContractorJobsPage() {
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
+
+  // Read highlight param and scroll+highlight after jobs load
+  useEffect(() => {
+    const highlightId = searchParams?.get('highlight');
+    if (!highlightId || loading) return;
+    setHighlightedJobId(highlightId);
+    const el = document.getElementById(`job-${highlightId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-4', 'ring-rose-500', 'ring-offset-2');
+      setTimeout(() => {
+        el.classList.remove('ring-4', 'ring-rose-500', 'ring-offset-2');
+        setHighlightedJobId(null);
+      }, 4000);
+    }
+  }, [loading, searchParams]);
 
   useEffect(() => {
     fetchJobs();
@@ -694,7 +712,7 @@ export default function ContractorJobsPage() {
               <div 
                 key={job.id} 
                 id={`job-${job.id}`}
-                className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-lg border border-white/50 transition-all duration-300"
+                className={`bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-lg border border-white/50 transition-all duration-300 ${highlightedJobId === job.id ? 'ring-4 ring-rose-500 ring-offset-2' : ''}`}
               >
                 <div className="flex justify-between items-start mb-3">
                   <div>
@@ -928,5 +946,13 @@ export default function ContractorJobsPage() {
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onClose={removeToast} />
     </div>
+  );
+}
+
+export default function ContractorJobsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContractorJobsContent />
+    </Suspense>
   );
 }

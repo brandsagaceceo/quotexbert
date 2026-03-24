@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 import { Bell, Mail, Smartphone, ArrowLeft, Loader2 } from "lucide-react";
@@ -20,12 +20,20 @@ export default function ContractorSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const pendingPrefsRef = useRef<Partial<NotificationPrefs>>({});
+  const confirmedPrefsRef = useRef<NotificationPrefs | null>(null);
+
   useEffect(() => {
     if (isSignedIn && authUser?.id) {
       fetch(`/api/notifications/settings?userId=${authUser.id}`)
         .then((res) => res.json())
         .then((data) => {
-          if (!data.error) setPrefs(data);
+          if (!data.error) {
+            setPrefs(data);
+            confirmedPrefsRef.current = data;
+          }
         })
         .catch(console.error)
         .finally(() => setLoading(false));
@@ -34,32 +42,57 @@ export default function ContractorSettingsPage() {
     }
   }, [isSignedIn, authUser?.id]);
 
-  const updatePref = async (key: keyof NotificationPrefs, value: boolean) => {
-    if (!authUser?.id || !prefs) return;
+  const updatePref = (key: keyof NotificationPrefs, value: boolean) => {
+    if (!authUser?.id) return;
 
-    const prev = prefs[key];
-    setPrefs({ ...prefs, [key]: value });
-    setSaving(true);
+    // Update UI immediately (optimistic)
+    setPrefs((prev) => (prev ? { ...prev, [key]: value } : prev));
     setSaved(false);
 
-    try {
-      const res = await fetch("/api/notifications/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: authUser.id, [key]: value }),
-      });
+    // Accumulate changes since last confirmed save
+    pendingPrefsRef.current = { ...pendingPrefsRef.current, [key]: value };
 
-      if (!res.ok) {
-        setPrefs({ ...prefs, [key]: prev });
-      } else {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+    // Cancel any pending flush
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+    // Flush after 300 ms of no further toggles
+    debounceTimerRef.current = setTimeout(async () => {
+      const changes = pendingPrefsRef.current;
+      pendingPrefsRef.current = {};
+
+      // Cancel any still-in-flight request
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setSaving(true);
+      try {
+        const res = await fetch("/api/notifications/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: authUser.id, ...changes }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          // Revert UI to last confirmed state
+          if (confirmedPrefsRef.current) setPrefs(confirmedPrefsRef.current);
+        } else {
+          // Advance confirmed baseline
+          if (confirmedPrefsRef.current) {
+            confirmedPrefsRef.current = { ...confirmedPrefsRef.current, ...changes };
+          }
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        }
+      } catch (err: any) {
+        if (err.name !== "AbortError" && confirmedPrefsRef.current) {
+          setPrefs(confirmedPrefsRef.current);
+        }
+      } finally {
+        setSaving(false);
       }
-    } catch {
-      setPrefs({ ...prefs, [key]: prev });
-    } finally {
-      setSaving(false);
-    }
+    }, 300);
   };
 
   if (!isSignedIn) {

@@ -173,7 +173,7 @@ export default function NotificationsPage() {
     }
 
     if (payload.jobId) {
-      return `/contractor/jobs`;
+      return `/contractor/jobs?highlight=${payload.jobId}`;
     }
 
     if (notification.relatedType === "conversation" && notification.relatedId) {
@@ -181,7 +181,7 @@ export default function NotificationsPage() {
     }
 
     if (notification.relatedType === "job" && notification.relatedId) {
-      return `/contractor/jobs`;
+      return `/contractor/jobs?highlight=${notification.relatedId}`;
     }
 
     return "/notifications";

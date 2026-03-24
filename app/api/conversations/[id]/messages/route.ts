@@ -134,48 +134,58 @@ export async function POST(
       data: { lastMessageAt: new Date() }
     });
 
-    // Create in-app notification for receiver
-    try {
-      await prisma.notification.create({
-        data: {
-          userId: receiverId,
-          type: 'NEW_MESSAGE',
-          title: `New message from ${message.sender.name || 'User'}`,
-          message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
-          payload: {
-            conversationId,
-            messageId: message.id,
-            senderId,
-            senderName: message.sender.name || message.sender.email
-          },
-          read: false
-        }
-      });
-    } catch (notificationError) {
-      console.error('Failed to create in-app notification:', notificationError);
+    // Fetch receiver notification preferences (default true if not found)
+    const receiverPrefs = await prisma.user.findUnique({
+      where: { id: receiverId },
+      select: { notifyMessageInApp: true, notifyMessageEmail: true }
+    }).catch(() => null);
+
+    // Create in-app notification for receiver (skipped if opted out)
+    if (receiverPrefs?.notifyMessageInApp !== false) {
+      try {
+        await prisma.notification.create({
+          data: {
+            userId: receiverId,
+            type: 'NEW_MESSAGE',
+            title: `New message from ${message.sender.name || 'User'}`,
+            message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
+            payload: {
+              conversationId,
+              messageId: message.id,
+              senderId,
+              senderName: message.sender.name || message.sender.email
+            },
+            read: false
+          }
+        });
+      } catch (notificationError) {
+        console.error('Failed to create in-app notification:', notificationError);
+      }
     }
 
-    // Send email notification to receiver
-    try {
-      const conversationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://quotexbert.com'}/messages/${conversationId}`;
-      
-      await sendEmailNotification({
-        type: 'message_received',
-        toEmail: message.receiver.email || '',
-        data: {
-          recipientId: receiverId,
-          recipientName: message.receiver.name || null,
-          senderName: message.sender.name || message.sender.email,
-          jobTitle: conversation.job?.title || 'Job Conversation',
-          messagePreview: content.substring(0, 100),
-          conversationId,
-          conversationUrl
-        }
-      });
-      console.log(`📧 Email notification sent to ${message.receiver.email}`);
-    } catch (emailError) {
-      console.error('Failed to send email notification:', emailError);
-      // Don't fail the request if email fails
+    // Send email notification to receiver (skipped if opted out)
+    if (receiverPrefs?.notifyMessageEmail !== false) {
+      try {
+        const conversationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://quotexbert.com'}/messages/${conversationId}`;
+        
+        await sendEmailNotification({
+          type: 'message_received',
+          toEmail: message.receiver.email || '',
+          data: {
+            recipientId: receiverId,
+            recipientName: message.receiver.name || null,
+            senderName: message.sender.name || message.sender.email,
+            jobTitle: conversation.job?.title || 'Job Conversation',
+            messagePreview: content.substring(0, 100),
+            conversationId,
+            conversationUrl
+          }
+        });
+        console.log(`📧 Email notification sent to ${message.receiver.email}`);
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // Don't fail the request if email fails
+      }
     }
 
     // Update contractor response time metrics if contractor sent the message
