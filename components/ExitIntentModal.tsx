@@ -62,16 +62,16 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
         onClick={handleClose}
       />
       
-      {/* Modal */}
-      <div className="min-h-full flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8 safe-area-top safe-area-bottom">
-        <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-8 md:p-10 transform animate-scale-in max-h-[90vh] overflow-y-auto">
-          {/* Close button */}
+      {/* Modal - mobile-optimized */}
+      <div className="min-h-full flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8">
+        <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-8 md:p-10 transform animate-scale-in max-h-[min(90vh,85vh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto will-change-transform">
+          {/* Close button - larger tap target for mobile */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Content */}
@@ -88,7 +88,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
 
             {/* Heading */}
             <div className="text-center space-y-2 sm:space-y-3">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 leading-tight">
               Wait! Don't Get Ripped Off 💰
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-700 font-semibold leading-relaxed">

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
+import { isGodUser } from "@/lib/god-access";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
@@ -216,17 +217,24 @@ export default function UnifiedProfilePage() {
               const subscriptionData = await subscriptionResponse.json();
               console.log("[ProfilePage] Loaded subscription:", subscriptionData);
               
-              // Set max categories based on tier
+              // Check if user is god/admin user
+              const godUser = isGodUser(authUser.email);
+              
+              // Set max categories based on tier (or unlimited for god users)
               const tierLimits: Record<string, number> = {
                 'handyman': 3,
                 'renovation': 6,
                 'general': 10
               };
-              const limit = tierLimits[subscriptionData.subscriptionPlan || ''] || 0;
+              const limit = godUser ? 999 : (tierLimits[subscriptionData.subscriptionPlan || ''] || 0);
               setMaxCategories(limit);
               
-              // Load selected categories
-              if (subscriptionData.selectedCategories) {
+              // For god users, auto-select all categories
+              if (godUser && (!subscriptionData.selectedCategories || subscriptionData.selectedCategories === '[]')) {
+                const allCategoryIds = CATEGORY_GROUPS.flatMap(g => g.categories.map(c => c.id));
+                setSelectedCategories(allCategoryIds);
+              } else if (subscriptionData.selectedCategories) {
+                // Load selected categories
                 try {
                   const categories = JSON.parse(subscriptionData.selectedCategories);
                   setSelectedCategories(categories);

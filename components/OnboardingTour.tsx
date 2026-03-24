@@ -153,6 +153,21 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
   if (!visible) return null;
 
   const PAD = 10; // px padding around spotlight
+  const MOBILE_PADDING = 12; // px padding from edges on mobile
+  const CARD_MIN_HEIGHT = 200; // Minimum card height for content
+
+  // Calculate safe positioning that keeps card visible on mobile
+  let cardTop = spotlightRect
+    ? Math.min(
+        spotlightRect.bottom + PAD + 16,
+        window.innerHeight - CARD_MIN_HEIGHT - MOBILE_PADDING
+      )
+    : "50%";
+
+  // Ensure card doesn't go above viewport on mobile
+  if (typeof cardTop === 'number' && cardTop < MOBILE_PADDING) {
+    cardTop = MOBILE_PADDING;
+  }
 
   return (
     <>
@@ -179,24 +194,17 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
         )}
       </div>
 
-      {/* Tour card */}
+      {/* Tour card - optimized for mobile */}
       <div
-        className="fixed z-[9100] left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-sm bg-white rounded-2xl shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300"
+        className="fixed z-[9100] left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-sm bg-white rounded-2xl shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 max-h-[min(90vh,520px)] overflow-y-auto"
         style={{
-          // Position below spotlight when it exists, otherwise center vertically
-          top: spotlightRect
-            ? Math.min(
-                spotlightRect.bottom + PAD + 16,
-                window.innerHeight - 220
-              )
-            : "50%",
-          transform: spotlightRect
-            ? "translateX(-50%)"
-            : "translate(-50%, -50%)",
+          top: typeof cardTop === 'number' ? `${cardTop}px` : cardTop,
+          transform: typeof cardTop === 'number' ? "translateX(-50%)" : "translate(-50%, -50%)",
+          paddingBottom: `max(1.5rem, env(safe-area-inset-bottom))`,
         }}
       >
         {/* Step indicator */}
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1 flex-shrink-0">
           <div className="flex gap-1.5">
             {steps.map((_, i) => (
               <span
@@ -209,20 +217,22 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
           </div>
           <button
             onClick={dismiss}
-            className="text-slate-400 hover:text-slate-600 text-xl leading-none ml-2"
+            className="text-slate-400 hover:text-slate-600 text-xl leading-none ml-2 flex-shrink-0"
             aria-label="Skip tour"
           >
             ×
           </button>
         </div>
 
-        {/* Content */}
-        <div className="text-3xl">{current.emoji}</div>
-        <h3 className="text-lg font-black text-slate-900 leading-tight">{current.title}</h3>
-        <p className="text-sm text-slate-600 leading-relaxed">{current.description}</p>
+        {/* Content - scrollable on mobile */}
+        <div className="flex-shrink-0">
+          <div className="text-3xl mb-2">{current.emoji}</div>
+          <h3 className="text-lg font-black text-slate-900 leading-tight mb-2">{current.title}</h3>
+          <p className="text-sm text-slate-600 leading-relaxed">{current.description}</p>
+        </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 mt-1">
+        {/* Actions - always visible at bottom */}
+        <div className="flex gap-3 mt-2 flex-shrink-0">
           {step > 0 && (
             <button
               onClick={() => setStep((s) => s - 1)}
@@ -239,11 +249,11 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
           </button>
         </div>
 
-        {/* Skip link */}
+        {/* Skip link - always visible */}
         {!isLast && (
           <button
             onClick={dismiss}
-            className="text-xs text-slate-400 hover:text-slate-600 text-center mt-0.5 transition-colors"
+            className="text-xs text-slate-400 hover:text-slate-600 text-center mt-1 flex-shrink-0 transition-colors"
           >
             Skip tour
           </button>
