@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
-import { canAccessLead as canAccessLeadGod } from "@/lib/god-access";
+import { isGodUser } from "@/lib/god-access";
 import { sendEmailNotification } from "@/lib/email-notifications";
 import { sendJobAcceptedEmail } from "@/lib/email";
 
@@ -52,13 +52,30 @@ export async function POST(
       );
     }
 
-    // Check if contractor has subscription for this category
-    const hasAccess = await canAccessLead(contractorId, currentLead.category);
-    if (!hasAccess) {
+    // Fetch contractor user to check god-access first
+    const contractor = await prisma.user.findUnique({
+      where: { id: contractorId }
+    });
+
+    if (!contractor) {
       return NextResponse.json(
-        { error: "You need an active subscription for this category to accept jobs" },
-        { status: 403 }
+        { error: "Contractor not found" },
+        { status: 404 }
       );
+    }
+
+    // God users bypass subscription checks
+    const isGod = isGodUser(contractor.email || "");
+    
+    if (!isGod) {
+      // Check if contractor has subscription for this category (only for non-god users)
+      const hasAccess = await canAccessLead(contractorId, currentLead.category);
+      if (!hasAccess) {
+        return NextResponse.json(
+          { error: "You need an active subscription for this category to accept jobs" },
+          { status: 403 }
+        );
+      }
     }
 
     // Check current accepted contractors
@@ -83,19 +100,7 @@ export async function POST(
       );
     }
 
-    // Ensure contractor exists
-    const contractor = await prisma.user.findUnique({
-      where: { id: contractorId }
-    });
-
-    if (!contractor) {
-      return NextResponse.json(
-        { error: "Contractor not found. Please sign in." },
-        { status: 404 }
-      );
-    }
-
-    // Create job acceptance record
+    // Create job acceptance record (contractor already verified above)
     const acceptance = await prisma.jobAcceptance.create({
       data: {
         leadId: jobId,
