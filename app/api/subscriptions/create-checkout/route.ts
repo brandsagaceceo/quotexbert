@@ -132,8 +132,7 @@ export async function POST(req: Request) {
       metadata: {
         contractorId: dbUserId,
         tier: tier,
-        categories: tierConfig.categories.toString(),
-        selectedCategories: Array.isArray(selectedCategories) ? JSON.stringify(selectedCategories) : '[]'
+        categories: tierConfig.categories.toString()
       }
     });
 

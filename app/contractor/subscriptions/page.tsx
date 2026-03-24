@@ -205,7 +205,12 @@ export default function SubscriptionsPage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        console.error('[Subscription] HTTP error:', response.status, errorText);
+        let parsed: any = {};
+        try { parsed = JSON.parse(errorText); } catch {}
+        alert(parsed.error || `Server error ${response.status}. Please try again.`);
+        setCheckoutLoading(null);
+        return;
       }
 
       const data = await response.json();
