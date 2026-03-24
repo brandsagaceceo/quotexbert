@@ -148,6 +148,8 @@ export default function NotificationsPage() {
       if (!response.ok) return;
 
       setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
+      // Dispatch event so MobileBottomNav badge clears immediately
+      window.dispatchEvent(new CustomEvent('notifications:allRead'));
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     } finally {
@@ -203,7 +205,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-slate-50">
+    <div className="min-h-[calc(100vh-140px)] bg-slate-50 pb-24 md:pb-8">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>

@@ -141,10 +141,12 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
           </p>
 
           {/* Mobile: horizontal snap-scroll carousel, Desktop: 3-col grid */}
-          <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory sm:overflow-visible pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+          {/* pt-4 gives room for the absolute "MOST POPULAR" badge (absolute -top-3) on mobile */}
+          <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory sm:overflow-visible pb-4 sm:pb-0 pt-4 sm:pt-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' as any }}>
             {tiers.map((tier, idx) => (
               <div
                 key={tier.id}
+                style={{ touchAction: 'pan-x' }}
                 className={`relative bg-white rounded-xl sm:rounded-2xl border-2 sm:border-4 p-4 sm:p-6 transition-all duration-300 sm:hover:scale-105 sm:hover:shadow-2xl snap-center flex-shrink-0 w-[85vw] sm:w-auto ${
                   tier.recommended
                     ? "border-rose-600 shadow-lg sm:shadow-xl"

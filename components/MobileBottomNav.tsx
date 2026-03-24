@@ -26,15 +26,23 @@ export default function MobileBottomNav() {
       fetch(`/api/notifications?userId=${authUser.id}`)
         .then((res) => res.json())
         .then((data) => {
-          const count = (data.notifications || []).filter((n: any) => !n.read).length;
-          setUnreadCount(count);
+          // Use server-computed unreadCount directly — avoids being limited by client-side take:100
+          setUnreadCount(data.unreadCount ?? 0);
         })
         .catch(() => {});
     };
 
     fetchUnread();
     const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+
+    // Clear badge immediately when the notifications page marks all as read
+    const handleAllRead = () => setUnreadCount(0);
+    window.addEventListener('notifications:allRead', handleAllRead);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notifications:allRead', handleAllRead);
+    };
   }, [isSignedIn, authUser?.id]);
 
   if (!isSignedIn || !authUser) {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendEmailNotification } from '@/lib/email-notifications';
 import { sendNewRenovationLeadEmail } from '@/lib/email';
 
 // GET - Fetch homeowner's jobs with applications
@@ -101,23 +100,32 @@ export async function POST(request: NextRequest) {
       const notificationPromises = contractors.map(async (contractor) => {
         // Create in-app notification if enabled
         if (contractor.notifyJobInApp !== false) {
-          await prisma.notification.create({
-            data: {
-              userId: contractor.id,
-              type: 'LEAD_MATCHED',
-              title: `New ${category} job available`,
-              message: `${title} - ${budget} in ${zipCode}`,
-              payload: {
-                jobId: job.id,
-                jobTitle: title,
-                location: zipCode,
-                budget: budget,
-                category: category
-              },
-              read: false
-            }
-          }).then(() => inAppCount++)
-            .catch(err => console.error('Failed to create notification:', err));
+          // Duplicate guard: skip if already notified for this job
+          const existing = await prisma.notification.findFirst({
+            where: { userId: contractor.id, relatedId: job.id, relatedType: 'job' },
+            select: { id: true },
+          });
+          if (!existing) {
+            await prisma.notification.create({
+              data: {
+                userId: contractor.id,
+                type: 'LEAD_MATCHED',
+                title: `New ${category} job available`,
+                message: `${title} - ${budget} in ${zipCode}`,
+                relatedId: job.id,
+                relatedType: 'job',
+                payload: {
+                  jobId: job.id,
+                  jobTitle: title,
+                  location: zipCode,
+                  budget: budget,
+                  category: category
+                },
+                read: false
+              }
+            }).then(() => inAppCount++)
+              .catch(err => console.error('Failed to create notification:', err));
+          }
         }
 
         // Send email notification if enabled
