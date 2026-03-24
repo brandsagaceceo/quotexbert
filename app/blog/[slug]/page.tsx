@@ -347,7 +347,7 @@ export default function BlogPostPage() {
           
           <p>Remember: this isn't a project to rush or cut corners on. Take the time to do it right, follow all City of Toronto regulations, and work with qualified professionals. Your finished basement should serve your family well for decades to come while adding significant value to your most important investment – your Toronto home.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Start Your Toronto Basement Project?</h3>
             <p class="text-slate-700 mb-4">Get connected with pre-screened, licensed contractors who specialize in Toronto basement renovations. Compare quotes, check verified reviews, and ensure all work meets City of Toronto building codes.</p>
             <p class="text-sm text-slate-600">QuotexBert verifies WSIB coverage, insurance, and Ontario licensing for all contractors in our network, giving you peace of mind throughout your basement finishing project.</p>
@@ -958,7 +958,7 @@ export default function BlogPostPage() {
           
           <p>A kitchen renovation is a significant investment, but it's one that pays dividends daily in functionality and enjoyment. Take your time in planning, choose your Toronto contractor wisely, and don't cut corners on the basics. Your kitchen is the heart of your home – make sure it beats strong for years to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Start Your Toronto Kitchen Renovation?</h3>
             <p class="text-slate-700 mb-4">Connect with pre-screened kitchen renovation specialists in the GTA. Get detailed quotes, compare pricing, and read verified reviews from Toronto homeowners.</p>
             <p class="text-sm text-slate-600">All contractors in our network are verified for WSIB coverage, insurance, and Ontario licensing. Get your free kitchen renovation estimate today.</p>
@@ -1526,7 +1526,7 @@ export default function BlogPostPage() {
           
           <p>Your home is your largest investment. Protect it by choosing contractors who respect that investment as much as you do.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Find Pre-Screened Toronto Contractors</h3>
             <p class="text-slate-700 mb-4">Skip the stress of vetting contractors yourself. QuotexBert pre-screens all contractors for WSIB coverage, insurance, and licensing before they join our network.</p>
             <p class="text-sm text-slate-600">Get matched with verified, reliable contractors in the GTA. Compare detailed quotes, read genuine reviews from Toronto homeowners, and hire with confidence.</p>
@@ -2064,7 +2064,7 @@ export default function BlogPostPage() {
           
           <p>Your condo bathroom might be small, but it doesn't have to feel small. With the right approach, even a 35 sq ft bathroom can be a comfortable, stylish retreat you'll enjoy for years.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Transform Your Toronto Condo Bathroom?</h3>
             <p class="text-slate-700 mb-4">Connect with contractors experienced in Toronto condo renovations. They understand building regulations, work-hour restrictions, and space-maximizing design.</p>
             <p class="text-sm text-slate-600">Get detailed quotes from verified Toronto contractors who specialize in small bathroom transformations. All contractors verified for WSIB, insurance, and condo experience.</p>
@@ -2567,7 +2567,7 @@ export default function BlogPostPage() {
           
           <p>A quality roof installation by a reputable Toronto contractor will protect your home for decades. Take your time choosing materials and contractors – this isn't a decision to rush.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Need a Toronto Roofing Contractor?</h3>
             <p class="text-slate-700 mb-4">Connect with pre-screened, certified roofing professionals in the GTA. All contractors verified for WSIB coverage, insurance, and manufacturer certifications.</p>
             <p class="text-sm text-slate-600">Compare detailed quotes, read verified reviews from Toronto homeowners, and ensure your roofing project is done right. Get your free roofing estimate today.</p>
@@ -3213,7 +3213,7 @@ export default function BlogPostPage() {
           
           <p>Your hardwood floor investment will reward you daily with beauty and functionality while protecting your Toronto home's value for decades to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready for Hardwood Flooring in Your Toronto Home?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced hardwood flooring contractors in the GTA. All contractors verified for WSIB coverage, insurance, and proven Toronto installations.</p>
             <p class="text-sm text-slate-600">Compare detailed quotes, view portfolios, and read verified reviews from Toronto homeowners. Get your free hardwood flooring estimate today.</p>
@@ -3859,7 +3859,7 @@ export default function BlogPostPage() {
           
           <p>With proper planning and the right team, your Toronto home addition will enhance your living space, increase your property value, and provide decades of enjoyment—all while fully compliant with city regulations.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Planning a Home Addition in Toronto?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced contractors, architects, and engineers who handle Toronto permits daily. All professionals verified for licensing, insurance, and successful permit history.</p>
             <p class="text-sm text-slate-600">Get your free consultation and permit timeline estimate today.</p>
@@ -4523,7 +4523,7 @@ export default function BlogPostPage() {
           
           <p>Your deck investment will provide countless hours of enjoyment—barbecues with friends, morning coffee in the sun, and expanding your living space in Toronto's competitive real estate market. Build it right, maintain it properly, and it will serve your family for decades.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Build Your Dream Deck?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced deck builders in Toronto and the GTA. All contractors verified for WSIB coverage, insurance, and quality Toronto deck projects.</p>
             <p class="text-sm text-slate-600">Compare detailed quotes, view portfolios, and read verified reviews. Get your free deck building estimate today.</p>
@@ -5111,7 +5111,7 @@ export default function BlogPostPage() {
           
           <p>Whether you're refreshing one room or repainting your entire Toronto home, investing in quality materials and proper application ensures beautiful, lasting results that protect and enhance your most valuable asset.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Transform Your Home with Fresh Paint?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced painting contractors in Toronto and the GTA. All painters verified for WSIB coverage, insurance, and quality Toronto projects.</p>
             <p class="text-sm text-slate-600">Compare detailed quotes, view portfolios, and read verified reviews. Get your free painting estimate today.</p>
@@ -5723,7 +5723,7 @@ export default function BlogPostPage() {
           
           <p>With carbon taxes increasing and energy costs rising, there's never been a better time to invest in energy efficiency. Your Toronto home will be more comfortable, cost less to operate, and be worth more—while reducing your environmental footprint. Start with an energy audit today and unlock thousands in rebates while slashing your utility bills for decades to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Make Your Toronto Home More Efficient?</h3>
             <p class="text-slate-700 mb-4">Connect with certified energy auditors and experienced contractors specializing in Toronto home efficiency upgrades. All professionals verified for NRCan certification, rebate program expertise, and successful GTA projects.</p>
             <p class="text-sm text-slate-600">Get your free energy assessment and discover how much you can save with available rebates. Start your efficiency journey today.</p>
@@ -6302,7 +6302,7 @@ export default function BlogPostPage() {
           
           <p>Don't wait for the next big storm to discover your basement isn't protected. Invest in waterproofing now and sleep soundly knowing your Toronto home, belongings, and family are safe from water damage for decades to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Need Basement Waterproofing in Toronto?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced waterproofing contractors in Toronto and the GTA. All contractors verified for WSIB coverage, insurance, lifetime warranties, and successful Toronto projects.</p>
             <p class="text-sm text-slate-600">Get your free waterproofing assessment and quotes today. Protect your home before the next storm.</p>
@@ -6908,7 +6908,7 @@ export default function BlogPostPage() {
           
           <p>Whether you're starting with a blank canvas or refreshing tired landscaping, investing in climate-appropriate design and plants ensures your Toronto yard thrives through every season while providing beauty, function, and value for years to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Transform Your Toronto Yard?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced landscaping professionals in Toronto and the GTA. All contractors verified for insurance, portfolio quality, and successful Toronto projects.</p>
             <p class="text-sm text-slate-600">Get your free landscaping consultation and design today. Create the yard of your dreams.</p>
@@ -7574,7 +7574,7 @@ export default function BlogPostPage() {
           
           <p>Whether you're addressing immediate failures or proactively upgrading for efficiency, quality windows installed by experienced professionals will pay dividends in comfort, savings, and home value for decades to come.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready for Energy-Efficient Windows?</h3>
             <p class="text-slate-700 mb-4">Connect with qualified window installers in Toronto and the GTA. All contractors verified for WSIB coverage, insurance, and successful Toronto installations.</p>
             <p class="text-sm text-slate-600">Get your free window replacement quote and rebate consultation today. Transform your home's comfort and efficiency.</p>
@@ -8159,7 +8159,7 @@ export default function BlogPostPage() {
           
           <p>The cost of proper renovation insurance ($100-$500 for riders, modest premium increases) is minimal compared to the risk of denied claims ($20,000-$100,000+ uncovered losses). Work with your insurance broker to create a protection plan tailored to your specific renovation project. Your dream renovation should enhance your home and lifestyle—not create insurance nightmares.</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Renovate with Proper Protection?</h3>
             <p class="text-slate-700 mb-4">Connect with verified Toronto contractors who carry proper insurance (WSIB + liability). All contractors pre-screened for coverage, quality work, and successful Toronto projects.</p>
             <p class="text-sm text-slate-600">Get your free renovation quote from fully insured professionals today. Renovate with confidence.</p>
@@ -8637,7 +8637,7 @@ export default function BlogPostPage() {
           
           <p>The condo lifestyle offers incredible benefits—downtown location, amenities, security, minimal exterior maintenance—but renovations require extra diligence. Do it right, follow the rules, and you'll enjoy your beautifully renovated space without conflict or financial penalties. Your dream condo awaits!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Renovate Your Toronto Condo?</h3>
             <p class="text-slate-700 mb-4">Connect with condo renovation specialists experienced with Toronto building rules, approval processes, and restricted work environments. All contractors verified for proper insurance, condo experience, and quality work.</p>
             <p class="text-sm text-slate-600">Get your free condo renovation quote from experienced professionals today. Transform your space the right way.</p>
@@ -9196,7 +9196,7 @@ export default function BlogPostPage() {
           
           <p>In 2025, smart homes aren't about impressing visitors with voice-controlled lights—they're about practical benefits that save money, enhance security, and improve daily life. Toronto's unique climate challenges (extreme winter cold, summer heat, variable weather) make smart home technology especially valuable. Whether you're starting with a single smart thermostat or building a comprehensive automated home, the technology is more accessible, affordable, and reliable than ever. Your smarter Toronto home awaits!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Need Help With Smart Home Installation?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced Toronto electricians and smart home integrators. From single device setup to whole-home automation, get expert installation and integration.</p>
             <p class="text-sm text-slate-600">Get your free smart home consultation today. Professional installation, custom programming, and ongoing support available.</p>
@@ -9757,7 +9757,7 @@ export default function BlogPostPage() {
           
           <p>Whether you're creating a rental suite to help with mortgage payments, a home office for your remote career, a private gym to avoid winter commutes to the gym, or an in-law suite for aging parents, your underutilized Toronto garage is valuable real estate waiting to be transformed. With proper planning, realistic budgeting, and quality execution, your garage conversion will pay dividends for years to come—both financially and in quality of life. Your dream space awaits behind that garage door!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Convert Your Toronto Garage?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced Toronto contractors specializing in garage conversions. From permits to final inspections, get expert guidance for rental suites, offices, gyms, and more.</p>
             <p class="text-sm text-slate-600">Get your free garage conversion quote today. Professional design, quality construction, full permits, and guaranteed satisfaction.</p>
@@ -10251,7 +10251,7 @@ export default function BlogPostPage() {
           
           <p>Accessible renovations aren't just about installing grab bars—they're about creating homes where Toronto residents can age gracefully, recover from injuries confidently, care for family members compassionately, and maintain independence proudly. With thoughtful design, quality execution, and appropriate professional guidance, your Toronto home can provide safety, comfort, and dignity for decades to come. Your accessible future starts today!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready for Accessible Renovations?</h3>
             <p class="text-slate-700 mb-4">Connect with CAPS-certified Toronto contractors specializing in accessible and aging-in-place renovations. Professional assessment, quality work, grant application assistance, and beautiful results.</p>
             <p class="text-sm text-slate-600">Get your free accessible renovation consultation today. Safe, functional, beautiful homes for all abilities.</p>
@@ -10697,7 +10697,7 @@ export default function BlogPostPage() {
           
           <p>Your Toronto home's foundation is literally what everything else rests upon. While foundation problems can be frightening and expensive, they're manageable with early detection, proper professional intervention, and quality repairs backed by engineering and warranties. Don't let fear prevent action—the longer you wait, the more expensive repairs become. That small crack today could be your home's structural catastrophe tomorrow. Your stable foundation future starts with today's proactive inspection!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Need Foundation Repair Assessment?</h3>
             <p class="text-slate-700 mb-4">Connect with qualified Toronto foundation specialists. Structural engineering, proven repair methods, warranties, and honest assessments from experienced professionals.</p>
             <p class="text-sm text-slate-600">Get your free foundation inspection today. Early detection saves thousands in repair costs.</p>
@@ -11281,7 +11281,7 @@ export default function BlogPostPage() {
           
           <p>An outdoor kitchen isn't just about grilling burgers—it's about creating an outdoor living experience that works with Toronto's climate, maximizes our warm-weather months, and becomes the centerpiece of summer entertaining. From simple straight-line layouts to elaborate U-shaped designs with pizza ovens and bars, your outdoor kitchen can be tailored to your budget, space, and cooking style. The smell of steaks on the grill, laughter of friends around the island, and Toronto summer sunsets from your backyard retreat—your outdoor kitchen dream starts today!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready for Your Toronto Outdoor Kitchen?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced outdoor kitchen specialists. Complete design, quality appliances, proper weatherproofing, all permits handled, and stunning results built for Toronto climate.</p>
             <p class="text-sm text-slate-600">Get your free outdoor kitchen consultation today. Transform your backyard into the ultimate entertaining space!</p>
@@ -11730,7 +11730,7 @@ export default function BlogPostPage() {
           
           <p>Fire safety upgrades aren't just about code compliance or insurance discounts—they're about protecting what matters most: your family's lives and your home investment. From simple wireless smoke alarm systems ($400-$800) to comprehensive protection with sprinklers ($15,000-$30,000), there's a fire safety solution for every Toronto budget. The best time to upgrade your fire safety was yesterday. The second-best time is today—before fire strikes. Your family's safety can't wait!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Upgrade Your Toronto Home Fire Safety</h3>
             <p class="text-slate-700 mb-4">Connect with licensed fire safety contractors. Smoke/CO systems, sprinkler installation, electrical upgrades, code compliance, and insurance documentation from experienced professionals.</p>
             <p class="text-sm text-slate-600">Get your free fire safety assessment today. Protect your family and property with professional fire safety upgrades.</p>
@@ -12243,7 +12243,7 @@ export default function BlogPostPage() {
           
           <p>Your home office isn't just where you work—it's where you spend 40+ hours weekly, build your career, and sustain your income. Investing in proper ergonomics, soundproofing, lighting, and technology isn't luxury; it's protecting your most valuable asset (your health and productivity). Whether converting a spare bedroom or building a dream addition, your professionally designed Toronto home office will pay dividends in comfort, health, and career success for years to come. Your productive work-from-home future starts today!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Build Your Dream Toronto Home Office?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced Toronto contractors specializing in home office renovations. Soundproofing, ergonomic design, technology integration, permits handled, and inspiring workspaces.</p>
             <p class="text-sm text-slate-600">Get your free home office consultation today. Transform spare space into your productivity powerhouse!</p>
@@ -12789,7 +12789,7 @@ export default function BlogPostPage() {
           
           <p>A swimming pool isn't just a hole filled with water—it's your family's summer sanctuary, neighborhood gathering spot, and decades-long investment in backyard living. From cannonballs and pool parties to quiet evening swims under Toronto stars, your pool will create memories that last long after the waves settle. Yes, Toronto's season is short and winters are harsh, but those precious May-October months? They're absolutely worth it. Your backyard oasis awaits!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Install Your Toronto Pool?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced Toronto pool contractors. Complete design, permits handled, quality installation, winterization services, and ongoing support from trusted GTA professionals.</p>
             <p class="text-sm text-slate-600">Get your free pool consultation today. Transform your backyard into summer paradise!</p>
@@ -13223,7 +13223,7 @@ export default function BlogPostPage() {
           
           <p>Your Toronto heritage home isn't just a house—it's living history, irreplaceable craftsmanship, and architectural treasure. From ornate Victorian trim to solid brick that's weathered a century, these homes offer character impossible to replicate in new construction. Yes, heritage renovation costs more and takes longer than gut-and-go modern builds. But the result—a home with soul, history, and beauty—is worth every dollar and day. Your heritage home's next century starts with today's thoughtful restoration!</p>
           
-          <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
+          <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
             <h3 class="text-lg font-bold text-slate-900 mb-2">Ready to Renovate Your Toronto Heritage Home?</h3>
             <p class="text-slate-700 mb-4">Connect with experienced heritage renovation contractors. Period craftsmanship, modern systems, heritage approvals, respectful updates, and stunning results from specialists who understand Toronto's architectural history.</p>
             <p class="text-sm text-slate-600">Get your free heritage renovation consultation today. Preserve history, embrace modern comfort!</p>
@@ -13284,7 +13284,7 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
@@ -13296,7 +13296,7 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center py-20">
             <h1 className="text-3xl font-bold text-slate-900 mb-4">Post Not Found</h1>
@@ -13361,7 +13361,7 @@ export default function BlogPostPage() {
         />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-16">
           {/* Back to Blog */}
           <Link 
@@ -13432,7 +13432,7 @@ export default function BlogPostPage() {
               />
 
               {/* Author Note / Human Guidance */}
-              <div className="mt-10 p-5 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="mt-10 p-5 bg-rose-50 border border-rose-200 rounded-lg">
                 <p className="text-sm text-slate-800 font-semibold mb-1">
                   A quick note from our Toronto team
                 </p>

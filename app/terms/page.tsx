@@ -243,7 +243,7 @@ export default function TermsOfServicePage() {
             <div className="bg-gray-50 p-6 rounded-lg">
               <p className="text-gray-700 mb-2"><strong>QuoteXbert</strong></p>
               <p className="text-gray-700 mb-2">Email: <a href="mailto:legal@quotexbert.com" className="text-rose-700 hover:underline">legal@quotexbert.com</a></p>
-              <p className="text-gray-700 mb-2">Support: <a href="mailto:support@quotexbert.com" className="text-rose-700 hover:underline">support@quotexbert.com</a></p>
+              <p className="text-gray-700 mb-2">Support: <a href="mailto:quotexbert@gmail.com" className="text-rose-700 hover:underline">quotexbert@gmail.com</a></p>
               <p className="text-gray-700">Serving the Greater Toronto Area, Canada</p>
             </div>
           </section>

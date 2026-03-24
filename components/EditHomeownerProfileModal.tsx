@@ -101,8 +101,9 @@ export default function EditHomeownerProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto my-8">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-6">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
           <div>
@@ -288,6 +289,7 @@ export default function EditHomeownerProfileModal({
             </button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );

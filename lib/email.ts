@@ -105,26 +105,30 @@ function createMessageReceivedTemplate(preview: string, threadId: string): strin
         <meta charset="utf-8">
         <title>New Message - Quotexbert</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9fafb; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .footer { padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }
+          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { padding: 30px; background: #f9fafb; }
+          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
+          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Quotexbert</h1>
+            <h1 style="margin: 0;">Quotexbert</h1>
           </div>
           <div class="content">
             <h2>You have a new message</h2>
             <p>${preview}</p>
             <a href="${baseUrl}/messages?threadId=${threadId}" class="button">View Message</a>
+            <p style="color: #6b7280; font-size: 13px;">Visit your <a href="${baseUrl}/messages" style="color: #9f1239;">messages</a> to manage notifications.</p>
           </div>
-          <div class="footer">
-            <p>This email was sent by Quotexbert. Visit your <a href="${baseUrl}/messages">messages</a> to manage notifications.</p>
+          <div class="support-footer">
+            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -140,26 +144,29 @@ function createContractSentTemplate(contractId: string): string {
         <meta charset="utf-8">
         <title>Contract Sent - Quotexbert</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9fafb; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .footer { padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }
+          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { padding: 30px; background: #f9fafb; }
+          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
+          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Quotexbert</h1>
+            <h1 style="margin: 0;">Quotexbert</h1>
           </div>
           <div class="content">
             <h2>Contract Ready for Review</h2>
             <p>A contract has been sent to you for review and acceptance.</p>
             <a href="${baseUrl}/contracts/${contractId}" class="button">Review Contract</a>
           </div>
-          <div class="footer">
-            <p>This email was sent by Quotexbert.</p>
+          <div class="support-footer">
+            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -175,18 +182,18 @@ function createContractAcceptedTemplate(contractId: string, pdfUrl?: string): st
         <meta charset="utf-8">
         <title>Contract Accepted - Quotexbert</title>
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9fafb; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .footer { padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }
+          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+          .content { padding: 30px; background: #f9fafb; }
+          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
+          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Quotexbert</h1>
+            <h1 style="margin: 0;">Quotexbert</h1>
           </div>
           <div class="content">
             <h2>Contract Fully Accepted</h2>
@@ -194,8 +201,11 @@ function createContractAcceptedTemplate(contractId: string, pdfUrl?: string): st
             <a href="${baseUrl}/contracts/${contractId}" class="button">View Contract</a>
             ${pdfUrl ? `<a href="${pdfUrl}" class="button" style="background: #10b981;">Download PDF</a>` : ''}
           </div>
-          <div class="footer">
-            <p>This email was sent by Quotexbert.</p>
+          <div class="support-footer">
+            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -246,6 +256,12 @@ export async function sendWelcomeEmail(user: { id: string; email: string; name?:
                   <a href="${baseUrl}" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Get Started</a>
                 </div>
                 <p style="color: #6b7280; font-size: 14px;">Need help? Reply to this email or visit our support page.</p>
+              </div>
+              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -310,6 +326,12 @@ export async function sendNewJobEmail(
                   <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Job Details</a>
                 </div>
                 <p style="color: #6b7280; font-size: 12px;">You're receiving this because you're subscribed to ${job.category} jobs.</p>
+              </div>
+              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -435,7 +457,7 @@ export async function sendMessageReceivedEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "New message - Quotexbert",
+      subject: "New Message — QuoteXbert",
       html: createMessageReceivedTemplate(preview, threadId),
     };
 
@@ -468,7 +490,7 @@ export async function sendContractSentEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "Contract ready for review - Quotexbert",
+      subject: "Contract Ready for Review — QuoteXbert",
       html: createContractSentTemplate(contractId),
     };
 
@@ -502,7 +524,7 @@ export async function sendContractAcceptedEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "Contract accepted - Quotexbert",
+      subject: "Contract Accepted — QuoteXbert",
       html: createContractAcceptedTemplate(contractId, pdfUrl),
     };
 
@@ -561,6 +583,12 @@ export async function sendJobAcceptedEmail(
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${baseUrl}/messages" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Message Contractor</a>
                 </div>
+              </div>
+              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -622,6 +650,12 @@ export async function sendNewRenovationLeadEmail(
                   <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px;">View Lead</a>
                 </div>
                 <p style="color: #6b7280; font-size: 13px; text-align: center;">You're receiving this because this job matches your selected categories.</p>
+              </div>
+              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -687,6 +721,12 @@ export async function sendReviewReceivedEmail(
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${baseUrl}/contractor/profile" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Your Profile</a>
                 </div>
+              </div>
+              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
+                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
+                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
               </div>
             </div>
           </body>

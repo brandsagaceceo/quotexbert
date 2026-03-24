@@ -92,9 +92,9 @@ export default function PaymentModal({
   const typeInfo = getPaymentTypeInfo();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
-      <div className="min-h-full flex items-center justify-center p-4 py-8">
-      <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-6">
+      <div className="bg-white rounded-2xl max-w-md w-full max-h-[90dvh] overflow-y-auto">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">

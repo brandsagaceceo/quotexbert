@@ -70,7 +70,8 @@ export function ReviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
+      <div className="min-h-full flex items-center justify-center p-4 py-6">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
         {/* Close Button */}
         <button
@@ -174,6 +175,7 @@ export function ReviewModal({
             </button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   );

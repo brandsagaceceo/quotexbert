@@ -41,10 +41,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
   const baseStyle = `
     <style>
       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
-      .header { background: #3b82f6; color: white; padding: 20px; text-align: center; }
+      .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
       .content { padding: 20px; }
-      .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
-      .footer { background: #f3f4f6; padding: 20px; text-align: center; font-size: 14px; color: #666; }
+      .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+      .footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
       .highlight { background: #fef3c7; padding: 10px; border-left: 4px solid #f59e0b; margin: 10px 0; }
     </style>
   `;
@@ -90,8 +90,11 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_URL}">Visit QuoteXbert</a> | <a href="#">Unsubscribe</a></p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
+            <p style="margin: 6px 0 0 0;"><a href="${process.env.NEXT_PUBLIC_URL}" style="color: #9f1239;">Visit QuoteXbert</a></p>
           </div>
         `,
         text: `Welcome to QuoteXbert! Thank you for joining our platform. Visit ${process.env.NEXT_PUBLIC_URL} to get started.`
@@ -123,8 +126,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
-            <p><a href="#">Manage Email Preferences</a> | <a href="#">Unsubscribe</a></p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: `New job available: ${data.jobTitle} in ${data.location}. Budget: $${data.budget}. Visit ${process.env.NEXT_PUBLIC_URL}/contractor/jobs/${data.jobId} to view and quote.`
@@ -156,7 +161,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: `New quote received for ${data.jobTitle} from ${data.contractorName}. Amount: $${data.quoteAmount}. View at ${process.env.NEXT_PUBLIC_URL}/homeowner/quotes/${data.quoteId}`
@@ -192,7 +200,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: `Congratulations! Your quote for ${data.jobTitle} was accepted by ${data.homeownerName}. Amount: $${data.quoteAmount}. Contact them at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
@@ -221,8 +232,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
-            <p><a href="#">Manage Email Preferences</a></p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: `New message from ${data.senderName} about ${data.jobTitle}: "${data.messagePreview}". Reply at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
@@ -252,7 +265,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: `Payment received: $${data.amount} for ${data.jobTitle}. Payment type: ${data.paymentType}. View details at ${process.env.NEXT_PUBLIC_URL}/contractor/payments`
@@ -271,7 +287,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <a href="${process.env.NEXT_PUBLIC_URL}" class="button">Visit QuoteXbert</a>
           </div>
           <div class="footer">
-            <p>© 2024 QuoteXbert. All rights reserved.</p>
+            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
+            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
+            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
+            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
         text: 'You have a new notification from QuoteXbert.'

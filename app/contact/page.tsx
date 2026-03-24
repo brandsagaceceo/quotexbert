@@ -12,17 +12,31 @@ export default function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
+    setSubmitError("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitError(data.error || "Something went wrong. Please email us directly at quotexbert@gmail.com.");
+      } else {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      }
+    } catch {
+      setSubmitError("Could not send your message. Please email us directly at quotexbert@gmail.com.");
+    } finally {
       setIsSubmitting(false);
-      setSubmitted(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -43,7 +57,7 @@ export default function ContactPage() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-slate-50 to-red-50">
+      <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 py-16">
           {/* Header */}
           <div className="text-center mb-16">
@@ -64,7 +78,13 @@ export default function ContactPage() {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                   <div className="text-3xl mb-4">✅</div>
                   <h3 className="text-xl font-semibold text-green-700 mb-2">Message Sent!</h3>
-                  <p className="text-slate-600">We'll get back to you within 2-4 hours during business hours.</p>
+                  <p className="text-slate-600 mb-4">We'll get back to you within 2-4 hours during business hours.</p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="text-sm text-red-700 hover:underline"
+                  >
+                    Send another message
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -137,6 +157,12 @@ export default function ContactPage() {
                     />
                   </div>
 
+                  {submitError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+                      {submitError}
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -158,7 +184,15 @@ export default function ContactPage() {
                     <div className="text-2xl">📧</div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-1">Support Email</h3>
-                      <p className="text-slate-600">support@quotexbert.com</p>
+                      <a href="mailto:quotexbert@gmail.com" className="text-red-700 hover:underline">quotexbert@gmail.com</a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4">
+                    <div className="text-2xl">📞</div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900 mb-1">Phone</h3>
+                      <a href="tel:+19052429460" className="text-red-700 hover:underline">905-242-9460</a>
                     </div>
                   </div>
 
