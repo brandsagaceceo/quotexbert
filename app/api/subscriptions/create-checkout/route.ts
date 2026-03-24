@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   try {
     console.log('[API] Create checkout request received');
     const { contractorId, tier, email, selectedCategories } = await req.json();
-    console.log('[API] Request data:', { contractorId, tier, email, selectedCategories });
+    console.log('[API] Request data:', { contractorId, tier, email, contractorIdType: typeof contractorId, contractorIdLength: contractorId?.length });
 
     if (!contractorId || !tier || !email) {
       console.error('[API] Missing required fields');
@@ -63,10 +63,40 @@ export async function POST(req: Request) {
     }
 
     if (!contractor) {
-      return NextResponse.json(
-        { success: false, error: "Contractor not found" },
-        { status: 404 }
-      );
+      console.error('[API] Contractor not found for id:', contractorId);
+      // Try email lookup as last resort
+      if (email) {
+        contractor = await prisma.user.findUnique({
+          where: { email },
+          include: { billing: true }
+        });
+        if (contractor) {
+          console.log('[API] Found contractor by email fallback:', contractor.id);
+        }
+      }
+    }
+
+    if (!contractor) {
+      // Auto-create DB record — user exists in Clerk but hasn't been synced to DB yet
+      console.log('[API] No DB record found — creating one for:', email);
+      try {
+        contractor = await prisma.user.create({
+          data: {
+            email,
+            clerkUserId: contractorId,
+            role: 'contractor',
+            name: email.split('@')[0],
+          },
+          include: { billing: true },
+        });
+        console.log('[API] Created DB record:', contractor.id);
+      } catch (createErr) {
+        console.error('[API] Failed to create DB record:', createErr);
+        return NextResponse.json(
+          { success: false, error: 'Account setup incomplete. Please sign out and sign back in.' },
+          { status: 404 }
+        );
+      }
     }
 
     // Use the DB primary key for all operations
