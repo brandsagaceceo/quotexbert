@@ -30,7 +30,10 @@ export default function SelectRolePage() {
       }
 
       // Mark first login so the profile page shows the onboarding tour
-      localStorage.setItem("show_onboarding_tour", "1");
+      // Only trigger tour if not already dismissed (versioned key)
+      if (localStorage.getItem("quotexbert_onboarding_dismissed_v2") !== "1") {
+        localStorage.setItem("show_onboarding_tour", "1");
+      }
 
       // Always send to profile after first role selection
       router.push("/profile");

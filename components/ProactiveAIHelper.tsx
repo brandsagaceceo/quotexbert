@@ -125,17 +125,20 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     return () => clearTimeout(timer);
   }, [delayMs, isDismissed]);
 
-  // Detect inactive user (prevent dead clicks)
+  // Detect inactive user (show help only once after extended inactivity)
   useEffect(() => {
     let inactivityTimer: NodeJS.Timeout;
+    let inactivityShown = false;
 
     const resetInactivityTimer = () => {
       clearTimeout(inactivityTimer);
+      if (inactivityShown) return; // Only show via inactivity once
       inactivityTimer = setTimeout(() => {
         if (!isDismissed && !isVisible) {
           setIsVisible(true);
+          inactivityShown = true;
         }
-      }, 15000); // Show after 15s of inactivity
+      }, 45000); // Show after 45s of inactivity
     };
 
     const trackActivity = () => {
@@ -217,7 +220,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
         }}
         className="fixed right-3 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 group pointer-events-auto"
         style={{
-          bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 12px)',
+          bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 4.5rem)',
         }}
         aria-label="Open AI Helper"
       >

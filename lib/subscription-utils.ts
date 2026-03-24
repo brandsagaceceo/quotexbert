@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isGodUser } from "@/lib/god-access";
 
 export interface EffectiveSubscription {
   tier: string | null;
@@ -17,6 +18,7 @@ export async function getEffectiveSubscription(userId: string): Promise<Effectiv
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
+      email: true,
       // Override fields
       proOverrideEnabled: true,
       proOverrideTier: true,
@@ -35,6 +37,16 @@ export async function getEffectiveSubscription(userId: string): Promise<Effectiv
       tier: null,
       status: null,
       isOverride: false
+    };
+  }
+
+  // God-user bypass — full access regardless of Stripe/DB state
+  if (isGodUser(user.email)) {
+    return {
+      tier: 'GENERAL',
+      status: 'active',
+      isOverride: true,
+      overrideReason: 'god-user-access',
     };
   }
 

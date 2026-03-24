@@ -100,6 +100,10 @@ const CONTRACTOR_STEPS: TourStep[] = [
   },
 ];
 
+// Versioned key — bump the number to invalidate old dismissed state
+const DISMISS_KEY = "quotexbert_onboarding_dismissed_v2";
+const TRIGGER_KEY = "show_onboarding_tour";
+
 export default function OnboardingTour({ role }: { role: "homeowner" | "contractor" }) {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
@@ -109,14 +113,32 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
   const current = steps[step]!;
   const isLast = step === steps.length - 1;
 
-  // Only show once per device
+  // Show tour only when explicitly triggered AND not already dismissed
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("show_onboarding_tour") === "1") {
-      // Small delay so the profile page renders first
-      const t = setTimeout(() => setVisible(true), 600);
-      return () => clearTimeout(t);
+    if (typeof window === "undefined") return;
+
+    try {
+      const alreadyDismissed = localStorage.getItem(DISMISS_KEY) === "1";
+      const shouldShow = localStorage.getItem(TRIGGER_KEY) === "1";
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("[OnboardingTour]", { alreadyDismissed, shouldShow, role });
+      }
+
+      if (alreadyDismissed) {
+        // Clean up stale trigger flag
+        localStorage.removeItem(TRIGGER_KEY);
+        return;
+      }
+
+      if (shouldShow) {
+        const t = setTimeout(() => setVisible(true), 600);
+        return () => clearTimeout(t);
+      }
+    } catch {
+      // Defensive: private browsing or storage full
     }
-  }, []);
+  }, [role]);
 
   // Update spotlight whenever step changes
   useEffect(() => {
@@ -138,8 +160,14 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
 
   const dismiss = () => {
     setVisible(false);
-    localStorage.removeItem("show_onboarding_tour");
-    localStorage.setItem("onboarding_tour_done", "1");
+    try {
+      localStorage.removeItem(TRIGGER_KEY);
+      localStorage.setItem(DISMISS_KEY, "1");
+      // Clean up legacy keys
+      localStorage.removeItem("onboarding_tour_done");
+    } catch {
+      // Ignore storage errors
+    }
   };
 
   const next = () => {
@@ -194,12 +222,20 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
         )}
       </div>
 
-      {/* Tour card - optimized for mobile */}
+      {/* Tour card — viewport-safe on all mobile browsers including in-app webviews */}
       <div
-        className="fixed z-[9100] left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-sm bg-white rounded-2xl shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 max-h-[min(90vh,520px)] overflow-y-auto"
+        className="fixed z-[9100] bg-white rounded-2xl shadow-2xl p-6 flex flex-col gap-3 transition-all duration-300 overflow-y-auto"
         style={{
-          top: typeof cardTop === 'number' ? `${cardTop}px` : cardTop,
-          transform: typeof cardTop === 'number' ? "translateX(-50%)" : "translate(-50%, -50%)",
+          /* Centered horizontally without translate — avoids off-screen on narrow viewports */
+          left: '12px',
+          right: '12px',
+          maxWidth: '420px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          /* Vertical positioning */
+          top: typeof cardTop === 'number' ? `${cardTop}px` : '50%',
+          transform: typeof cardTop === 'number' ? 'none' : 'translateY(-50%)',
+          maxHeight: 'min(90vh, 520px)',
           paddingBottom: `max(1.5rem, env(safe-area-inset-bottom))`,
         }}
       >

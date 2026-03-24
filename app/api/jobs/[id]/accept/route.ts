@@ -52,10 +52,17 @@ export async function POST(
       );
     }
 
-    // Fetch contractor user to check god-access first
-    const contractor = await prisma.user.findUnique({
+    // Fetch contractor user — try by DB id first, then by Clerk user id
+    let contractor = await prisma.user.findUnique({
       where: { id: contractorId }
     });
+
+    if (!contractor) {
+      // contractorId might be a Clerk user ID instead of DB id
+      contractor = await prisma.user.findUnique({
+        where: { clerkUserId: contractorId }
+      });
+    }
 
     if (!contractor) {
       return NextResponse.json(
@@ -67,9 +74,12 @@ export async function POST(
     // God users bypass subscription checks
     const isGod = isGodUser(contractor.email || "");
     
+    // Use the DB id for all subsequent operations (contractorId from request may be Clerk id)
+    const dbContractorId = contractor.id;
+    
     if (!isGod) {
       // Check if contractor has subscription for this category (only for non-god users)
-      const hasAccess = await canAccessLead(contractorId, currentLead.category);
+      const hasAccess = await canAccessLead(dbContractorId, currentLead.category);
       if (!hasAccess) {
         return NextResponse.json(
           { error: "You need an active subscription for this category to accept jobs" },
@@ -82,7 +92,7 @@ export async function POST(
     const currentAcceptedList = JSON.parse(currentLead.acceptedContractors || "[]");
     
     // Check if contractor already accepted
-    if (currentAcceptedList.includes(contractorId)) {
+    if (currentAcceptedList.includes(dbContractorId)) {
       return NextResponse.json(
         { error: "You have already accepted this job" },
         { status: 400 }
@@ -104,14 +114,14 @@ export async function POST(
     const acceptance = await prisma.jobAcceptance.create({
       data: {
         leadId: jobId,
-        contractorId,
+        contractorId: dbContractorId,
         message: message || null,
         status: "accepted"
       }
     });
 
     // Update acceptedContractors array
-    const updatedAccepted = [...currentAcceptedList, contractorId];
+    const updatedAccepted = [...currentAcceptedList, dbContractorId];
     
     // Determine new status based on acceptance count
     let newStatus = currentLead.status;
@@ -132,7 +142,7 @@ export async function POST(
 
     // If this is the first claim, set claiming fields
     if (isFirstClaim) {
-      leadUpdateData.claimedBy = contractorId;
+      leadUpdateData.claimedBy = dbContractorId;
       leadUpdateData.claimedAt = new Date();
     }
     

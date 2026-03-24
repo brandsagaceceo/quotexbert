@@ -14,7 +14,7 @@ export function StickyCTA() {
   return (
     <>
       {/* Mobile Only - Sticky Bottom Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
+      <div className="sticky-cta-bar md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
         <div className="bg-gradient-to-r from-rose-600 to-orange-600 shadow-2xl">
           <Link 
             href="/#get-estimate"
