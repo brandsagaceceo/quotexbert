@@ -294,7 +294,7 @@ export default function CreateLeadPage() {
         
         // Redirect after showing success message
         setTimeout(() => {
-          router.push(`/profile`);
+          router.push(`/profile?tab=jobs`);
         }, 1500);
       } else {
         console.error("Lead submission failed:", result);

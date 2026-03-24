@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/ToastProvider";
@@ -106,6 +106,7 @@ interface SavedEstimate {
 export default function UnifiedProfilePage() {
   const { isSignedIn, authUser, authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -113,7 +114,14 @@ export default function UnifiedProfilePage() {
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+    // Check for tab query parameter
+    if (typeof window !== 'undefined') {
+      const tabParam = searchParams.get('tab');
+      return tabParam || 'overview';
+    }
+    return 'overview';
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
