@@ -11,8 +11,8 @@ const pricingTiers = [
   {
     id: "handyman",
     name: "Handyman",
-    price: 79,
-    categories: 4,
+    price: 49,
+    categories: 3,
     features: [
       "4 Trade Categories",
       "Up to 15 leads/month",
@@ -25,9 +25,9 @@ const pricingTiers = [
   },
   {
     id: "renovation",
-    name: "Renovation Expert",
-    price: 139,
-    categories: 8,
+    name: "Renovation Xbert",
+    price: 99,
+    categories: 6,
     features: [
       "8 Trade Categories",
       "Up to 30 leads/month",
@@ -43,8 +43,8 @@ const pricingTiers = [
   {
     id: "general-contractor",
     name: "General Contractor",
-    price: 199,
-    categories: 12,
+    price: 149,
+    categories: 10,
     features: [
       "ALL 12 Categories",
       "Up to 50 leads/month",
@@ -78,7 +78,7 @@ export default function ForContractorsPage() {
     },
     {
       q: "What's the monthly subscription cost?",
-      a: "Plans start at $79/month for Handyman (4 categories, up to 15 leads/month), $139/month for Renovation Expert (8 categories, up to 30 leads/month), and $199/month for General Contractor (all 12 categories, up to 50 leads/month). No per-lead fees. Cancel anytime."
+      a: "Plans start at $49/month for Handyman (3 categories), $99/month for Renovation Xbert (6 categories), and $149/month for General Contractor (all categories). All plans include unlimited job applications and direct homeowner messaging. No per-lead fees. Cancel anytime."
     },
     {
       q: "Can I cancel anytime?",
@@ -694,7 +694,7 @@ export default function ForContractorsPage() {
                   </div>
                   <div className="bg-brand/5 border border-brand/20 px-4 py-3 rounded-xl">
                     <p className="text-lg font-bold text-slate-900">{tier.categories} Trade Categories</p>
-                    <p className="text-sm text-slate-600 font-medium mt-0.5">Up to {tier.popular ? 30 : tier.categories === 4 ? 15 : 50} leads/month</p>
+                    <p className="text-sm text-slate-600 font-medium mt-0.5">Unlimited job applications</p>
                   </div>
                 </div>
 

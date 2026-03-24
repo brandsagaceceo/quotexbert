@@ -30,41 +30,59 @@ export const metadata: Metadata = {
 
 const PLANS = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
+    name: "Handyman",
+    price: "$49",
+    period: "per month",
     features: [
-      "Create contractor profile",
-      "Show up in city directories",
-      "Receive job notifications",
-      "View homeowner budgets",
+      "3 Trade Categories",
+      "Unlimited job applications",
+      "Direct homeowner messaging",
+      "Profile on contractor directory",
+      "Email & in-app notifications",
+      "Cancel anytime",
     ],
-    cta: "Sign Up Free",
-    href: "/sign-up",
+    cta: "Get Started",
+    href: "/sign-up?role=contractor",
     highlighted: false,
   },
   {
-    name: "Pro",
-    price: "$29",
+    name: "Renovation Xbert",
+    price: "$99",
     period: "per month",
     features: [
-      "Everything in Free",
-      "Unlimited quote submissions",
-      "Direct homeowner messaging",
+      "6 Trade Categories",
+      "Everything in Handyman",
       "Priority placement in search",
-      "Verified badge on profile",
-      "Analytics dashboard",
+      "Featured contractor badge",
+      "Portfolio showcase",
+      "Advanced analytics",
     ],
-    cta: "Start Pro",
-    href: "/sign-up?plan=pro",
+    cta: "Get Started",
+    href: "/sign-up?role=contractor",
     highlighted: true,
+  },
+  {
+    name: "General Contractor",
+    price: "$149",
+    period: "per month",
+    features: [
+      "ALL 10+ Categories",
+      "Everything in Renovation Xbert",
+      "Top priority in search results",
+      "Premium contractor badge",
+      "Featured homepage placement",
+      "Dedicated account manager",
+    ],
+    cta: "Get Started",
+    href: "/sign-up?role=contractor",
+    highlighted: false,
   },
 ];
 
 const COMPETITOR_TABLE = [
   {
     feature: "Monthly subscription",
-    quotexbert: "Not required",
+    quotexbert: "From $49/mo",
     homestars: "$300–$600/mo",
     houzz: "$299–$799/mo",
     bidmii: "Free + commission",
@@ -92,7 +110,7 @@ const COMPETITOR_TABLE = [
   },
   {
     feature: "Direct messaging with homeowner",
-    quotexbert: "✓ Pro",
+    quotexbert: "✓ All plans",
     homestars: "✓",
     houzz: "✓ paid",
     bidmii: "✓",
@@ -133,7 +151,7 @@ const FAQS = [
   {
     question: "How much does it cost to join QuoteXbert as a contractor?",
     answer:
-      "It's free to create a profile and appear in our city contractor directories. Our Pro plan ($29/month) unlocks unlimited quote submissions, direct messaging, and a verified badge. There are no per-lead fees on top.",
+      "Plans start at $49/month for Handyman (3 categories), $99/month for Renovation Xbert (6 categories), and $149/month for General Contractor (all categories). All paid plans include unlimited job applications and direct homeowner messaging. No per-lead fees. Cancel anytime.",
   },
   {
     question: "What areas does QuoteXbert cover?",
@@ -222,7 +240,7 @@ export default function ContractorsJoinPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-amber-400 font-medium text-sm uppercase tracking-widest mb-3">
+          <p className="text-rose-400 font-medium text-sm uppercase tracking-widest mb-3">
             For Renovation Contractors
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -318,30 +336,30 @@ export default function ContractorsJoinPage() {
           <p className="text-slate-600 mb-8">
             No per-lead fees. No locked-in annual contracts. Cancel anytime.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`rounded-2xl border p-6 ${
+                className={`relative rounded-2xl border p-6 ${
                   plan.highlighted
-                    ? "bg-amber-50 border-amber-300 shadow-lg shadow-amber-100"
+                    ? "bg-rose-50 border-rose-300 shadow-lg shadow-rose-100 scale-105 z-10"
                     : "bg-white border-slate-200"
                 }`}
               >
                 {plan.highlighted && (
-                  <span className="inline-block bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
-                    MOST POPULAR
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+                    ⭐ MOST POPULAR
                   </span>
                 )}
-                <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-slate-900 mt-2">{plan.name}</h3>
                 <div className="flex items-end gap-1 my-2">
-                  <span className="text-3xl font-bold text-slate-900">{plan.price}</span>
+                  <span className="text-3xl font-bold bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">{plan.price}</span>
                   <span className="text-slate-500 text-sm mb-1">/ {plan.period}</span>
                 </div>
                 <ul className="space-y-2 my-5">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className="text-amber-500 font-bold mt-0.5">✓</span>
+                      <span className="text-rose-600 font-bold mt-0.5">✓</span>
                       {f}
                     </li>
                   ))}
@@ -350,7 +368,7 @@ export default function ContractorsJoinPage() {
                   href={plan.href}
                   className={`block w-full text-center py-2.5 rounded-xl font-semibold transition ${
                     plan.highlighted
-                      ? "bg-amber-500 hover:bg-amber-400 text-white"
+                      ? "bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white shadow-lg"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-900"
                   }`}
                 >
@@ -374,7 +392,7 @@ export default function ContractorsJoinPage() {
               <thead>
                 <tr className="bg-slate-800 text-white">
                   <th className="text-left px-4 py-3 rounded-tl-xl">Feature</th>
-                  <th className="px-4 py-3 bg-amber-500 text-slate-900 font-bold">
+                  <th className="px-4 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold">
                     QuoteXbert
                   </th>
                   <th className="px-4 py-3">HomeStars</th>
@@ -391,7 +409,7 @@ export default function ContractorsJoinPage() {
                     <td className="px-4 py-3 font-medium text-slate-800 border-b border-slate-100">
                       {row.feature}
                     </td>
-                    <td className="px-4 py-3 text-center text-amber-700 font-semibold border-b border-slate-100 bg-amber-50">
+                    <td className="px-4 py-3 text-center text-rose-700 font-semibold border-b border-slate-100 bg-rose-50">
                       {row.quotexbert}
                     </td>
                     <td className="px-4 py-3 text-center text-slate-500 border-b border-slate-100">
