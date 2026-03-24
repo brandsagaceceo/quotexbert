@@ -23,6 +23,31 @@ const nextConfig = {
       },
     ];
   },
+  // Cache-control headers — prevent stale mobile/PWA caches from serving old pages
+  async headers() {
+    return [
+      {
+        // HTML pages: always revalidate, never serve stale
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, must-revalidate',
+          },
+        ],
+      },
+      {
+        // Static assets: cache aggressively (content-hashed filenames)
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

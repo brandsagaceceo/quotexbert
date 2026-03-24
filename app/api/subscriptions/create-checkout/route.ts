@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { isGodUser } from "@/lib/god-access";
+import { ALL_CATEGORIES } from "@/lib/categories";
 
 // Subscription tier pricing
 const TIER_PRICING = {
@@ -101,6 +103,58 @@ export async function POST(req: Request) {
 
     // Use the DB primary key for all operations
     const dbUserId = contractor.id;
+
+    // ── GOD USER BYPASS ────────────────────────────────────────────────────────
+    // Admin/testing accounts skip Stripe entirely — activate subscription directly
+    if (isGodUser(contractor.email)) {
+      console.log('[API] God user detected — activating subscription without Stripe');
+      const categoriesToActivate = selectedCategories && selectedCategories.length > 0
+        ? selectedCategories
+        : ALL_CATEGORIES.map((c: { id: string }) => c.id);
+
+      const now = new Date();
+      const periodEnd = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year for god users
+
+      for (const category of categoriesToActivate) {
+        await prisma.contractorSubscription.upsert({
+          where: { contractorId_category: { contractorId: dbUserId, category } },
+          create: {
+            contractorId: dbUserId,
+            category,
+            status: "active",
+            monthlyPrice: 0,
+            stripeSubscriptionId: null,
+            stripeCustomerId: null,
+            currentPeriodStart: now,
+            currentPeriodEnd: periodEnd,
+            canClaimLeads: true,
+            canViewLeads: true,
+          },
+          update: {
+            status: "active",
+            currentPeriodStart: now,
+            currentPeriodEnd: periodEnd,
+            canClaimLeads: true,
+            canViewLeads: true,
+          },
+        });
+      }
+
+      // Update user's subscription plan and categories
+      await prisma.user.update({
+        where: { id: dbUserId },
+        data: {
+          subscriptionPlan: tier,
+          subscriptionStatus: "active",
+          selectedCategories: JSON.stringify(categoriesToActivate),
+        },
+      });
+
+      const successUrl = `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?success=true&tier=${tier}&god=1`;
+      console.log('[API] God user subscription activated. Redirecting to:', successUrl);
+      return NextResponse.json({ success: true, checkoutUrl: successUrl, godMode: true });
+    }
+    // ── END GOD USER BYPASS ────────────────────────────────────────────────────
 
     let customerId = contractor.billing?.stripeCustomerId;
 

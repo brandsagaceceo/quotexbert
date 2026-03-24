@@ -404,6 +404,14 @@ function ContractorJobsContent() {
           <p className="text-xl text-gray-600">
             Welcome {user.name}! Browse home improvement projects in your area
           </p>
+
+          {/* God Mode Badge */}
+          {isGodUser(user?.email) && (
+            <div className="mt-3 inline-flex items-center gap-2 bg-purple-100 border border-purple-300 text-purple-800 text-sm font-semibold px-4 py-2 rounded-full">
+              <span>🧪</span>
+              <span>Admin Test Access Active — All features unlocked, no payment required</span>
+            </div>
+          )}
           
           {message && (
             <div className={`mt-4 p-4 rounded-lg border ${

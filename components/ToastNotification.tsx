@@ -45,7 +45,7 @@ export function ToastNotification({ toast, onClose }: ToastNotificationProps) {
   }[toast.type || 'info'];
 
   return (
-    <div className={`${bgColor} ${textColor} border-l-4 rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in-right`}>
+    <div className={`${bgColor} ${textColor} border-l-4 rounded-lg shadow-lg p-4 w-full max-w-md animate-slide-in-right`}>
       <div className="flex items-start gap-3">
         <BellAlertIcon className="w-6 h-6 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
@@ -81,7 +81,7 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onClose }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-3 pointer-events-none">
+    <div className="fixed top-4 left-4 right-4 md:left-auto md:right-4 md:w-auto md:max-w-md z-50 space-y-3 pointer-events-none">
       <div className="pointer-events-auto">
         {toasts.map((toast) => (
           <div key={toast.id} className="mb-3">

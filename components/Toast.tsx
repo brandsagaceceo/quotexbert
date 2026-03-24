@@ -42,7 +42,7 @@ export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
   };
 
   return (
-    <div className={`${colors[type]} border-l-4 rounded-lg shadow-2xl p-4 flex items-start gap-3 min-w-[320px] max-w-md animate-slide-in-right`}>
+    <div className={`${colors[type]} border-l-4 rounded-lg shadow-2xl p-4 flex items-start gap-3 w-full max-w-md animate-slide-in-right`}>
       <div className={iconColors[type]}>
         {icons[type]}
       </div>

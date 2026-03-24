@@ -83,11 +83,14 @@ export function useJobNotifications(options: UseJobNotificationsOptions = {}) {
       newJobs.forEach((job) => seenJobIdsRef.current.add(job.id));
 
       if (newJobs.length > 0) {
-        // Play notification sound
-        try {
-          audioRef.current?.play();
-        } catch (error) {
-          console.error('Failed to play notification sound:', error);
+        // Play notification sound (only if not disabled by user preference)
+        const soundEnabled = localStorage.getItem('notifySoundEnabled') !== 'false';
+        if (soundEnabled) {
+          try {
+            audioRef.current?.play();
+          } catch (error) {
+            console.error('Failed to play notification sound:', error);
+          }
         }
 
         // Trigger callback for each new job

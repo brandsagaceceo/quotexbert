@@ -556,7 +556,7 @@ export default function UnifiedProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-white" style={{ paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 8px)' }}>
       {/* Development Tool - Overflow Detection */}
       <OverflowDetector />
 

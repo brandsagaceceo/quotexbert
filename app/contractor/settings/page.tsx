@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
-import { Bell, Mail, Smartphone, ArrowLeft, Loader2 } from "lucide-react";
+import { Bell, Mail, Smartphone, ArrowLeft, Loader2, Volume2, VolumeX } from "lucide-react";
 
 interface NotificationPrefs {
   notifyJobEmail: boolean;
@@ -24,6 +24,38 @@ export default function ContractorSettingsPage() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const pendingPrefsRef = useRef<Partial<NotificationPrefs>>({});
   const confirmedPrefsRef = useRef<NotificationPrefs | null>(null);
+
+  // Sound notification preference — stored in localStorage (client-side pref)
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('notifySoundEnabled');
+    setSoundEnabled(stored !== 'false'); // Default ON unless explicitly disabled
+  }, []);
+
+  const handleSoundToggle = (value: boolean) => {
+    setSoundEnabled(value);
+    localStorage.setItem('notifySoundEnabled', String(value));
+
+    // Play a test chime so the user knows sound is working
+    if (value) {
+      try {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+      } catch {
+        // AudioContext not available — silently ignore
+      }
+    }
+  };
 
   useEffect(() => {
     if (isSignedIn && authUser?.id) {
@@ -224,6 +256,36 @@ export default function ContractorSettingsPage() {
                   description="Occasional tips to grow your contracting business"
                   checked={prefs.notifyMarketingEmail}
                   onChange={(v) => updatePref("notifyMarketingEmail", v)}
+                />
+              </div>
+            </div>
+
+            {/* Sound Notifications */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  {soundEnabled ? (
+                    <Volume2 className="w-5 h-5 text-purple-700" />
+                  ) : (
+                    <VolumeX className="w-5 h-5 text-purple-700" />
+                  )}
+                </div>
+                <div>
+                  <h2 className="font-bold text-gray-900">Sound Alerts</h2>
+                  <p className="text-sm text-gray-500">
+                    Play a chime when new jobs or messages arrive
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pl-1">
+                <ToggleRow
+                  icon={soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  label="Sound notifications"
+                  description="A short chime plays when you receive a new job or message"
+                  helperText={soundEnabled ? "Toggling ON plays a test chime to confirm sound works." : undefined}
+                  checked={soundEnabled}
+                  onChange={handleSoundToggle}
                 />
               </div>
             </div>
