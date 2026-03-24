@@ -49,32 +49,71 @@ export default function SubscriptionsPage() {
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priceFilter, setPriceFilter] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');  
   const [categoryGroupFilter, setCategoryGroupFilter] = useState<string>('all');
+
+  // Category picker modal state
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [pendingTier, setPendingTier] = useState<'handyman' | 'renovation' | 'general' | null>(null);
+  const [pickedCategories, setPickedCategories] = useState<string[]>([]);
+  const [modalSearch, setModalSearch] = useState('');
 
   // Check for success/cancel URL parameters
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
     const tier = searchParams.get('tier');
+    const sessionId = searchParams.get('session_id');
 
     if (success === 'true') {
       setShowSuccessMessage(true);
-      // Auto-hide after 10 seconds
       setTimeout(() => setShowSuccessMessage(false), 10000);
-      
-      // Clean URL
+
+      // Activate selected categories stored before Stripe redirect
+      const pendingKey = `pending_categories_${tier}`;
+      const pendingCategories = (() => {
+        try { return JSON.parse(localStorage.getItem(pendingKey) || '[]'); } catch { return []; }
+      })();
+
+      if (sessionId && pendingCategories.length > 0) {
+        // Wait for authUser to be available
+        const activate = (userId: string) => {
+          fetch('/api/subscriptions/activate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, contractorId: userId, selectedCategories: pendingCategories }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.success) {
+                localStorage.removeItem(pendingKey);
+                fetchSubscriptions();
+              }
+            })
+            .catch((err) => console.error('[Activate] Error:', err));
+        };
+
+        // authUser may not be loaded yet — poll briefly
+        if (authUser) {
+          activate(authUser.id);
+        } else {
+          const poll = setInterval(() => {
+            const u = authUser;
+            if (u) { clearInterval(poll); activate(u.id); }
+          }, 300);
+          setTimeout(() => clearInterval(poll), 5000);
+        }
+      }
+
       window.history.replaceState({}, '', '/contractor/subscriptions');
     }
 
     if (canceled === 'true') {
       setShowCancelMessage(true);
-      // Auto-hide after 8 seconds
       setTimeout(() => setShowCancelMessage(false), 8000);
-      
-      // Clean URL
       window.history.replaceState({}, '', '/contractor/subscriptions');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   // Fetch subscription data
@@ -122,51 +161,58 @@ export default function SubscriptionsPage() {
     }
   }, [authUser, authLoading]);
 
-  // Subscribe to a tier (create Stripe Checkout session)
-  const handleTierSubscription = async (tier: 'handyman' | 'renovation' | 'general') => {
-    console.log('[Subscription] Button clicked for tier:', tier);
-    
+  // Open category picker modal (or go straight to checkout for general tier)
+  const handleTierSubscription = (tier: 'handyman' | 'renovation' | 'general') => {
     if (!authUser) {
-      console.error('[Subscription] No authUser found');
       alert('Please sign in to subscribe to a plan');
       return;
     }
+    if (tier === 'general') {
+      // All categories auto-selected — go directly to checkout
+      const allCategories = CATEGORY_GROUPS.flatMap((g) => g.categories.map((c) => c.id));
+      handleProceedToCheckout(tier, allCategories);
+      return;
+    }
+    setPendingTier(tier);
+    setPickedCategories([]);
+    setModalSearch('');
+    setShowCategoryModal(true);
+  };
 
-    console.log('[Subscription] Auth user:', authUser.id, authUser.email);
+  // Called from modal "Continue to Payment" button
+  const handleProceedToCheckout = async (tier: 'handyman' | 'renovation' | 'general', categories: string[]) => {
+    if (!authUser) return;
+
+    setShowCategoryModal(false);
 
     try {
       setCheckoutLoading(tier);
       setError(null);
-      console.log('[Subscription] Calling API...');
-      
-      // Create Stripe Checkout session
+
+      // Save selected categories to localStorage before Stripe redirect
+      localStorage.setItem(`pending_categories_${tier}`, JSON.stringify(categories));
+
       const response = await fetch('/api/subscriptions/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contractorId: authUser.id,
-          tier: tier,
-          email: authUser.email
-        })
+          tier,
+          email: authUser.email,
+          selectedCategories: categories,
+        }),
       });
 
-      console.log('[Subscription] API response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[Subscription] HTTP error:', response.status, errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-      
+
       const data = await response.json();
-      console.log('[Subscription] API response data:', data);
 
       if (data.success && data.checkoutUrl) {
-        console.log('[Subscription] Redirecting to Stripe:', data.checkoutUrl);
-        // Redirect to Stripe Checkout
         window.location.href = data.checkoutUrl;
       } else {
-        console.error('[Subscription] API error:', data.error);
         alert(data.error || 'Failed to create checkout session. Please try again.');
         setCheckoutLoading(null);
       }
@@ -175,6 +221,15 @@ export default function SubscriptionsPage() {
       alert('Failed to start checkout process. Please check your connection and try again.');
       setCheckoutLoading(null);
     }
+  };
+
+  // Toggle a category in the picker modal
+  const togglePickedCategory = (categoryId: string, maxAllowed: number) => {
+    setPickedCategories((prev) => {
+      if (prev.includes(categoryId)) return prev.filter((c) => c !== categoryId);
+      if (prev.length >= maxAllowed) return prev; // at limit
+      return [...prev, categoryId];
+    });
   };
 
   // Subscribe to a category
@@ -1051,6 +1106,144 @@ export default function SubscriptionsPage() {
           )}
         </div>
       </div>
+
+      {/* ─── Category Picker Modal ───────────────────────────────── */}
+      {showCategoryModal && pendingTier && (() => {
+        const maxAllowed = pendingTier === 'handyman' ? 3 : 6;
+        const tierLabel = pendingTier === 'handyman' ? 'Handyman' : 'Renovation Xbert';
+        const tierColor = pendingTier === 'handyman' ? 'green' : 'orange';
+        const filteredGroups = CATEGORY_GROUPS.map((g) => ({
+          ...g,
+          categories: g.categories.filter((c) =>
+            !modalSearch || c.name.toLowerCase().includes(modalSearch.toLowerCase())
+          ),
+        })).filter((g) => g.categories.length > 0);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+              {/* Modal Header */}
+              <div className={`px-6 py-5 border-b border-gray-200 bg-gradient-to-r ${
+                tierColor === 'green' ? 'from-green-500 to-emerald-600' : 'from-orange-500 to-rose-600'
+              } text-white`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-black">Pick Your {maxAllowed} Categories</h2>
+                    <p className="text-sm text-white/80 mt-0.5">
+                      {tierLabel} Plan — Choose exactly {maxAllowed} categories you want to receive jobs from
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowCategoryModal(false)}
+                    className="text-white/70 hover:text-white text-3xl leading-none ml-4"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Progress counter */}
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="flex-1 bg-white/20 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="h-full bg-white rounded-full transition-all duration-300"
+                      style={{ width: `${(pickedCategories.length / maxAllowed) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-black whitespace-nowrap">
+                    {pickedCategories.length} / {maxAllowed} selected
+                  </span>
+                </div>
+              </div>
+
+              {/* Search */}
+              <div className="px-6 py-3 border-b border-gray-100">
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={modalSearch}
+                  onChange={(e) => setModalSearch(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                />
+              </div>
+
+              {/* Category list */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+                {filteredGroups.map((group) => (
+                  <div key={group.id}>
+                    <p className="text-xs font-black text-gray-500 uppercase tracking-wide mb-2">{group.name}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {group.categories.map((cat) => {
+                        const isSelected = pickedCategories.includes(cat.id);
+                        const isDisabled = !isSelected && pickedCategories.length >= maxAllowed;
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => togglePickedCategory(cat.id, maxAllowed)}
+                            disabled={isDisabled}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all text-sm font-semibold ${
+                              isSelected
+                                ? tierColor === 'green'
+                                  ? 'bg-green-50 border-green-500 text-green-800'
+                                  : 'bg-orange-50 border-orange-500 text-orange-800'
+                                : isDisabled
+                                ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+                              isSelected
+                                ? tierColor === 'green'
+                                  ? 'bg-green-500 border-green-500'
+                                  : 'bg-orange-500 border-orange-500'
+                                : 'border-gray-300'
+                            }`}>
+                              {isSelected && (
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="flex-1">{cat.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-4">
+                <button
+                  onClick={() => setShowCategoryModal(false)}
+                  className="px-5 py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+
+                <div className="flex items-center gap-3">
+                  {pickedCategories.length < maxAllowed && (
+                    <p className="text-sm text-gray-500">
+                      Select {maxAllowed - pickedCategories.length} more
+                    </p>
+                  )}
+                  <button
+                    onClick={() => handleProceedToCheckout(pendingTier, pickedCategories)}
+                    disabled={pickedCategories.length !== maxAllowed}
+                    className={`px-6 py-3 rounded-xl font-black text-white shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                      tierColor === 'green'
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-green-200 hover:shadow-xl'
+                        : 'bg-gradient-to-r from-orange-500 to-rose-600 hover:shadow-orange-200 hover:shadow-xl'
+                    }`}
+                  >
+                    Continue to Payment →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </Elements>
   );
 }

@@ -31,13 +31,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get contractor
-    const contractor = await prisma.user.findUnique({
+    // Get contractor (try DB id first, fallback to clerkUserId)
+    let contractor = await prisma.user.findUnique({
       where: { id: contractorId },
       include: {
         contractorProfile: true
       }
     });
+
+    if (!contractor) {
+      contractor = await prisma.user.findUnique({
+        where: { clerkUserId: contractorId },
+        include: {
+          contractorProfile: true
+        }
+      });
+    }
 
     if (!contractor || contractor.role !== "contractor") {
       return NextResponse.json(
@@ -46,11 +55,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const dbUserId = contractor.id;
+
     // Check if already subscribed to this category
     const existingSubscription = await prisma.contractorSubscription.findUnique({
       where: {
         contractorId_category: {
-          contractorId,
+          contractorId: dbUserId,
           category
         }
       }
@@ -78,12 +89,12 @@ export async function POST(request: NextRequest) {
 
       const subscription = await prisma.contractorSubscription.create({
         data: {
-          contractorId,
+          contractorId: dbUserId,
           category,
           status: 'active',
           monthlyPrice: categoryConfig.monthlyPrice,
           stripeSubscriptionId: `demo_sub_${Date.now()}`,
-          stripeCustomerId: `demo_cust_${contractorId}`,
+          stripeCustomerId: `demo_cust_${dbUserId}`,
           stripePriceId: stripePriceId,
           currentPeriodStart: now,
           currentPeriodEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days
@@ -97,7 +108,7 @@ export async function POST(request: NextRequest) {
       // Create notification
       await prisma.notification.create({
         data: {
-          userId: contractorId,
+          userId: dbUserId,
           type: 'SUBSCRIPTION_CREATED',
           title: 'Subscription Created (Demo)',
           message:

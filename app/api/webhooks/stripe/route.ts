@@ -165,6 +165,60 @@ async function handleCheckoutSessionCompleted(session: any) {
 
     console.log(`[STRIPE WEBHOOK] Updated user ${contractorId} with tier ${tierInfo.normalizedTier} (status: active)`);
 
+    // Activate selected categories from metadata
+    const selectedCategoriesRaw = session.metadata?.selectedCategories;
+    if (selectedCategoriesRaw) {
+      try {
+        const selectedCategories: string[] = JSON.parse(selectedCategoriesRaw);
+        const now = new Date();
+        const periodEnd = currentPeriodEnd || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        for (const category of selectedCategories) {
+          await prisma.contractorSubscription.upsert({
+            where: {
+              contractorId_category: { contractorId, category },
+            },
+            create: {
+              contractorId,
+              category,
+              status: "active",
+              monthlyPrice: 0,
+              stripeSubscriptionId: session.subscription as string | null,
+              stripeCustomerId: session.customer as string | null,
+              currentPeriodStart: now,
+              currentPeriodEnd: periodEnd,
+              canClaimLeads: true,
+              canViewLeads: true,
+            },
+            update: {
+              status: "active",
+              stripeSubscriptionId: session.subscription as string | null,
+              stripeCustomerId: session.customer as string | null,
+              currentPeriodStart: now,
+              currentPeriodEnd: periodEnd,
+              canClaimLeads: true,
+              canViewLeads: true,
+            },
+          });
+        }
+
+        // Update user's selectedCategories
+        const existingUser = await prisma.user.findUnique({ where: { id: contractorId }, select: { selectedCategories: true } });
+        const existing: string[] = (() => {
+          try { return JSON.parse(existingUser?.selectedCategories || "[]"); } catch { return []; }
+        })();
+        const merged = Array.from(new Set([...existing, ...selectedCategories]));
+        await prisma.user.update({
+          where: { id: contractorId },
+          data: { selectedCategories: JSON.stringify(merged) },
+        });
+
+        console.log(`[STRIPE WEBHOOK] Activated ${selectedCategories.length} categories for contractor ${contractorId}`);
+      } catch (catError) {
+        console.error("[STRIPE WEBHOOK] Error activating categories:", catError);
+      }
+    }
+
     // Create notification
     await prisma.notification.create({
       data: {

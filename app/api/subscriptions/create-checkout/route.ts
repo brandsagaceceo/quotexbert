@@ -27,8 +27,8 @@ const TIER_PRICING = {
 export async function POST(req: Request) {
   try {
     console.log('[API] Create checkout request received');
-    const { contractorId, tier, email } = await req.json();
-    console.log('[API] Request data:', { contractorId, tier, email });
+    const { contractorId, tier, email, selectedCategories } = await req.json();
+    console.log('[API] Request data:', { contractorId, tier, email, selectedCategories });
 
     if (!contractorId || !tier || !email) {
       console.error('[API] Missing required fields');
@@ -49,11 +49,18 @@ export async function POST(req: Request) {
 
     const tierConfig = TIER_PRICING[tier as keyof typeof TIER_PRICING];
 
-    // Get or create Stripe customer
-    const contractor = await prisma.user.findUnique({
+    // Get or create Stripe customer (try DB id first, fallback to clerkUserId)
+    let contractor = await prisma.user.findUnique({
       where: { id: contractorId },
       include: { billing: true }
     });
+
+    if (!contractor) {
+      contractor = await prisma.user.findUnique({
+        where: { clerkUserId: contractorId },
+        include: { billing: true }
+      });
+    }
 
     if (!contractor) {
       return NextResponse.json(
@@ -61,6 +68,9 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
+
+    // Use the DB primary key for all operations
+    const dbUserId = contractor.id;
 
     let customerId = contractor.billing?.stripeCustomerId;
 
@@ -70,7 +80,7 @@ export async function POST(req: Request) {
         email: email,
         ...(contractor.name && { name: contractor.name }),
         metadata: {
-          userId: contractorId,
+          userId: dbUserId,
           role: "contractor"
         }
       });
@@ -85,7 +95,7 @@ export async function POST(req: Request) {
       } else {
         await prisma.contractorBilling.create({
           data: {
-            userId: contractorId,
+            userId: dbUserId,
             stripeCustomerId: customerId
           }
         });
@@ -117,12 +127,13 @@ export async function POST(req: Request) {
           quantity: 1
         }
       ],
-      success_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?success=true&tier=${tier}`,
+      success_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?success=true&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?canceled=true`,
       metadata: {
-        contractorId: contractorId,
+        contractorId: dbUserId,
         tier: tier,
-        categories: tierConfig.categories.toString()
+        categories: tierConfig.categories.toString(),
+        selectedCategories: Array.isArray(selectedCategories) ? JSON.stringify(selectedCategories) : '[]'
       }
     });
 
