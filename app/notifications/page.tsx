@@ -220,6 +220,12 @@ export default function NotificationsPage() {
               {markingAll ? "Marking..." : "Mark all as read"}
             </button>
           )}
+          <Link
+            href="/contractor/settings"
+            className="text-sm text-slate-500 hover:text-rose-700 font-medium hidden sm:inline-block"
+          >
+            Settings
+          </Link>
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
@@ -247,7 +253,20 @@ export default function NotificationsPage() {
           {loading ? (
             <div className="p-8 text-center text-gray-500">Loading notifications...</div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No notifications yet.</div>
+            <div className="p-8 text-center">
+              <div className="text-4xl mb-3">🔔</div>
+              <p className="font-semibold text-gray-900 mb-1">No notifications yet</p>
+              <p className="text-sm text-gray-500 max-w-sm mx-auto">
+                When new matching homeowner jobs are posted, you&apos;ll see them here instantly.
+                Keep your email alerts on for first pick.
+              </p>
+              <Link
+                href="/contractor/settings"
+                className="inline-block mt-4 text-sm text-rose-700 font-semibold hover:underline"
+              >
+                Manage notification settings →
+              </Link>
+            </div>
           ) : (
             <div>
               {(["Today", "Yesterday", "Earlier"] as const).map((groupName) => {

@@ -140,11 +140,12 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
             Simple, transparent pricing. Cancel anytime. No contracts.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            {tiers.map((tier) => (
+          {/* Mobile: horizontal snap-scroll carousel, Desktop: 3-col grid */}
+          <div className="flex sm:grid sm:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory sm:overflow-visible pb-4 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            {tiers.map((tier, idx) => (
               <div
                 key={tier.id}
-                className={`relative bg-white rounded-xl sm:rounded-2xl border-2 sm:border-4 p-4 sm:p-6 transition-all duration-300 sm:hover:scale-105 sm:hover:shadow-2xl ${
+                className={`relative bg-white rounded-xl sm:rounded-2xl border-2 sm:border-4 p-4 sm:p-6 transition-all duration-300 sm:hover:scale-105 sm:hover:shadow-2xl snap-center flex-shrink-0 w-[85vw] sm:w-auto ${
                   tier.recommended
                     ? "border-rose-600 shadow-lg sm:shadow-xl"
                     : "border-slate-200 hover:border-slate-300"
@@ -212,7 +213,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
               </button>
             </p>
             <p className="text-sm text-slate-500">
-              ?? Money-back guarantee · Cancel anytime · No hidden fees
+              ✅ Money-back guarantee · Cancel anytime · No hidden fees
             </p>
           </div>
           </div>
@@ -220,6 +221,9 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
       </div>
 
       <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
         @keyframes fade-in {
           from {
             opacity: 0;

@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       const contractors = await prisma.user.findMany({
         where: {
           role: 'contractor',
+          isActive: true,
           subscriptions: {
             some: {
               category: category,
@@ -80,6 +81,8 @@ export async function POST(request: NextRequest) {
           id: true,
           email: true,
           name: true,
+          notifyJobEmail: true,
+          notifyJobInApp: true,
           contractorProfile: {
             select: {
               companyName: true
@@ -88,50 +91,62 @@ export async function POST(request: NextRequest) {
         }
       });
 
+      console.log(`[JOB ALERT] Job ${job.id} posted — ${contractors.length} matching contractors found for category "${category}"`);
+
+      let inAppCount = 0;
+      let emailCount = 0;
+      let emailFails = 0;
+
       // Create in-app notifications and send emails to all subscribed contractors
       const notificationPromises = contractors.map(async (contractor) => {
-        // Create in-app notification
-        await prisma.notification.create({
-          data: {
-            userId: contractor.id,
-            type: 'LEAD_MATCHED',
-            title: `New ${category} job available`,
-            message: `${title} - ${budget} in ${zipCode}`,
-            payload: {
-              jobId: job.id,
-              jobTitle: title,
-              location: zipCode,
-              budget: budget,
-              category: category
-            },
-            read: false
-          }
-        }).catch(err => console.error('Failed to create notification:', err));
-
-        // Send email notification using new template
-        try {
-          await sendNewRenovationLeadEmail(
-            {
-              id: contractor.id,
-              email: contractor.email,
-              companyName: contractor.contractorProfile?.companyName || contractor.name || 'Contractor',
-            },
-            {
-              id: job.id,
-              title,
-              category,
-              city: zipCode,
-              description,
+        // Create in-app notification if enabled
+        if (contractor.notifyJobInApp !== false) {
+          await prisma.notification.create({
+            data: {
+              userId: contractor.id,
+              type: 'LEAD_MATCHED',
+              title: `New ${category} job available`,
+              message: `${title} - ${budget} in ${zipCode}`,
+              payload: {
+                jobId: job.id,
+                jobTitle: title,
+                location: zipCode,
+                budget: budget,
+                category: category
+              },
+              read: false
             }
-          );
-        } catch (emailError) {
-          console.error(`Failed to send email to contractor ${contractor.id}:`, emailError);
-          // Don't fail the request if individual emails fail
+          }).then(() => inAppCount++)
+            .catch(err => console.error('Failed to create notification:', err));
+        }
+
+        // Send email notification if enabled
+        if (contractor.notifyJobEmail !== false) {
+          try {
+            await sendNewRenovationLeadEmail(
+              {
+                id: contractor.id,
+                email: contractor.email,
+                companyName: contractor.contractorProfile?.companyName || contractor.name || 'Contractor',
+              },
+              {
+                id: job.id,
+                title,
+                category,
+                city: zipCode,
+                description,
+              }
+            );
+            emailCount++;
+          } catch (emailError) {
+            emailFails++;
+            console.error(`[JOB ALERT] Email failed for contractor ${contractor.id}:`, emailError);
+          }
         }
       });
 
       await Promise.allSettled(notificationPromises);
-      console.log(`📧 Sent ${contractors.length} job notifications (email + in-app) for new job: ${title}`);
+      console.log(`[JOB ALERT] Pipeline complete — ${inAppCount} in-app, ${emailCount} emails sent, ${emailFails} email failures for job: ${title}`);
     } catch (emailError) {
       console.error('Error sending job notifications:', emailError);
       // Don't fail job creation if notifications fail

@@ -42,6 +42,13 @@ model User {
   clerkUserId          String?  @unique
   isActive             Boolean  @default(true)
   
+  // Notification preferences (JSON) — defaults applied in app code
+  notifyJobEmail       Boolean @default(true)
+  notifyJobInApp       Boolean @default(true)
+  notifyMessageEmail   Boolean @default(true)
+  notifyMessageInApp   Boolean @default(true)
+  notifyMarketingEmail Boolean @default(false)
+
   // Relations
   contractorProfile    ContractorProfile?
   homeownerProfile     HomeownerProfile?
