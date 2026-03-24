@@ -197,7 +197,8 @@ export default function SiteHeader() {
               <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
               <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
               <div className="border-t border-gray-100 my-1" />
-              <a href="tel:9052429460" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📞 Need Help? Call Us</a>
+              <a href="tel:9052429460" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📞 Call Us: 905-242-9460</a>
+              <a href="mailto:quotexbert@gmail.com" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📧 Email Us: quotexbert@gmail.com</a>
             </div>
 
             <div className="border-t border-gray-100 mt-3 px-2 pt-3">
