@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateContractorResponseTime, updateAllContractorResponseTimes } from '@/lib/responseTime';
 
+export const dynamic = "force-dynamic";
+
 /**
  * API endpoint to manually trigger response time calculations
  * 

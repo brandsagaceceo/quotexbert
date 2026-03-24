@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendNewRenovationLeadEmail } from '@/lib/email';
 
+export const dynamic = "force-dynamic";
+
 // GET - Fetch homeowner's jobs with applications
 export async function GET(request: NextRequest) {
   try {

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getCategoryById, ALL_CATEGORIES } from "@/lib/categories";
 
+export const dynamic = "force-dynamic";
+
 // Helper function to generate Stripe price ID for a category
 function getStripePriceId(categoryId: string, price: number): string {
   return `price_${categoryId.replace(/-/g, '_')}_${price}_monthly`;

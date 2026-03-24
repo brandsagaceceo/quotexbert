@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { PostHog } from "posthog-node";
 
+export const dynamic = "force-dynamic";
+
 // Initialize PostHog server client conditionally
 let postHogClient: PostHog | null = null;
 

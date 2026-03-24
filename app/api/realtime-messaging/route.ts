@@ -1,6 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+
 // Store active connections for real-time updates
 const connections = new Map<string, Response>();
 

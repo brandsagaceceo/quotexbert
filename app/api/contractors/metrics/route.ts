@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { updateContractorResponseTime } from "@/lib/responseTime";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/contractors/metrics
  * Fetch contractor performance metrics
