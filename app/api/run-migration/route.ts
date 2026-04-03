@@ -1,7 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const secret = request.nextUrl.searchParams.get("secret");
+  if (!process.env.MIGRATION_SECRET || secret !== process.env.MIGRATION_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     console.log("Running production migration...");
 

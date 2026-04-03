@@ -10,9 +10,11 @@ interface ToastProps {
   type: ToastType;
   onClose: () => void;
   duration?: number;
+  title?: string;
+  action?: { label: string; onClick: () => void };
 }
 
-export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
+export function Toast({ message, type, onClose, duration = 5000, title, action }: ToastProps) {
   useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(onClose, duration);
@@ -47,7 +49,16 @@ export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
         {icons[type]}
       </div>
       <div className="flex-1">
-        <p className="font-semibold text-sm">{message}</p>
+        {title && <p className="font-bold text-sm mb-0.5">{title}</p>}
+        <p className={`text-sm ${title ? '' : 'font-semibold'}`}>{message}</p>
+        {action && (
+          <button
+            onClick={action.onClick}
+            className="mt-2 text-xs font-semibold underline hover:no-underline"
+          >
+            {action.label}
+          </button>
+        )}
       </div>
       <button
         onClick={onClose}

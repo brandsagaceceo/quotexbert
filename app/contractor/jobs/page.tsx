@@ -10,7 +10,7 @@ import { ALL_CATEGORIES } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
 import { canAcceptJob, isUnlimitedTestContractor } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
-import { ToastContainer, type Toast } from "@/components/ToastNotification";
+import { useToast } from "@/components/ToastProvider";
 import LoadingState from "@/components/ui/LoadingState";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { formatDistanceToNow } from "date-fns";
@@ -37,24 +37,14 @@ function ContractorJobsContent() {
   const [filters, setFilters] = useState<JobFilters>({});
   const [showFilters, setShowFilters] = useState(false);
   const [showOnboardingPopup, setShowOnboardingPopup] = useState(false);
-  const [toasts, setToasts] = useState<Toast[]>([]);
   const [newJobAlert, setNewJobAlert] = useState<any | null>(null);
   const { authUser: user, isSignedIn } = useAuth();
   const router = useRouter();
+  const toast = useToast();
 
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [highlightedJobId, setHighlightedJobId] = useState<string | null>(null);
   const searchParams = useSearchParams();
-
-  // Add toast notification
-  const addToast = (toast: Omit<Toast, 'id'>) => {
-    const id = `toast-${Date.now()}-${Math.random()}`;
-    setToasts(prev => [...prev, { ...toast, id }]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
 
   // Read highlight param and scroll+highlight after jobs load
   useEffect(() => {
@@ -240,18 +230,14 @@ function ContractorJobsContent() {
       }
       
       // Show toast notification
-      addToast({
+      toast.success(`${job.title} - ${job.budget} in ${job.location}`, {
         title: '🎉 New Job Available!',
-        message: `${job.title} - ${job.budget} in ${job.location}`,
-        type: 'success',
         duration: 10000,
         action: {
           label: 'View Job',
           onClick: () => {
-            // Scroll to the job
             const element = document.getElementById(`job-${job.id}`);
             element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Highlight briefly
             element?.classList.add('ring-4', 'ring-green-500');
             setTimeout(() => {
               element?.classList.remove('ring-4', 'ring-green-500');
@@ -268,12 +254,7 @@ function ContractorJobsContent() {
     // Find the job to check its category
     const job = jobs.find(j => j.id === jobId);
     if (!job) {
-      addToast({
-        title: 'Error',
-        message: 'Job not found',
-        type: 'error',
-        duration: 5000
-      });
+      toast.error('Job not found', { title: 'Error', duration: 5000 });
       setAccepting(null);
       return;
     }
@@ -289,27 +270,17 @@ function ContractorJobsContent() {
     const hasAccess = canAcceptJob(user?.email, isSubscribed);
 
     if (!hasAccess) {
-      addToast({
+      toast.warning(`You must be subscribed to the "${job.category}" category to accept jobs.`, {
         title: 'Subscription Required',
-        message: `You must be subscribed to the "${job.category}" category to accept jobs.`,
-        type: 'warning',
         duration: 6000,
-        action: {
-          label: 'View Subscriptions',
-          onClick: () => router.push('/contractor/subscriptions')
-        }
+        action: { label: 'View Subscriptions', onClick: () => router.push('/contractor/subscriptions') }
       });
       setAccepting(null);
       return;
     }
 
     if (!user?.id) {
-      addToast({
-        title: 'Authentication Required',
-        message: 'Please sign in to accept jobs',
-        type: 'warning',
-        duration: 5000
-      });
+      toast.warning('Please sign in to accept jobs', { title: 'Authentication Required', duration: 5000 });
       setAccepting(null);
       return;
     }
@@ -334,10 +305,8 @@ function ContractorJobsContent() {
         setAcceptanceModal(null);
         
         // Show success toast
-        addToast({
+        toast.success('You can now send quotes through messages. Redirecting to conversation...', {
           title: '✅ Job Accepted Successfully!',
-          message: 'You can now send quotes through messages. Redirecting to conversation...',
-          type: 'success',
           duration: 4000
         });
         
@@ -348,19 +317,15 @@ function ContractorJobsContent() {
         }, 1500);
       } else {
         console.error('Job acceptance failed:', result);
-        addToast({
+        toast.error(result.error || 'An unknown error occurred. Please try again.', {
           title: 'Failed to Accept Job',
-          message: result.error || 'An unknown error occurred. Please try again.',
-          type: 'error',
           duration: 6000
         });
       }
     } catch (error) {
       console.error('Error accepting job:', error);
-      addToast({
+      toast.error('Failed to accept job. Please check your connection and try again.', {
         title: 'Error',
-        message: 'Failed to accept job. Please check your connection and try again.',
-        type: 'error',
         duration: 5000
       });
     } finally {
@@ -947,8 +912,7 @@ function ContractorJobsContent() {
         contractorName={user?.name}
       />
 
-      {/* Toast Notifications */}
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+
     </div>
   );
 }
