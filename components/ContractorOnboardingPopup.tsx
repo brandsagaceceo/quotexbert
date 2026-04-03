@@ -189,7 +189,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
                 </ul>
 
                 <Link
-                  href="/contractor/subscription"
+                  href="/contractor/subscriptions"
                   onClick={onClose}
                   className={`block w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-lg text-center transition-all duration-300 ${
                     tier.recommended

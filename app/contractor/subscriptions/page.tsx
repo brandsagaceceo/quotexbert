@@ -1,4 +1,7 @@
-﻿"use client";
+﻿// PRODUCTION PRICING ROUTE — /contractor/subscriptions (plural)
+// This is the LIVE subscription/pricing page. All internal links must point here.
+// DO NOT confuse with /contractor/subscription (singular) — that is a deprecated redirect.
+"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
