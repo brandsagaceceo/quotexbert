@@ -1,3 +1,5 @@
+// LIVE PRODUCTION ROUTE — /homeowner/dashboard
+// Homeowner dashboard: overview of jobs, estimates, activity.
 "use client";
 
 import { useEffect, useState } from "react";

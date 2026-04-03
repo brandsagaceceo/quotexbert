@@ -1,3 +1,5 @@
+// LIVE PRODUCTION ROUTE — /profile
+// Shared profile page for both contractors and homeowners.
 "use client";
 
 import { useState, useEffect } from "react";

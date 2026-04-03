@@ -1,4 +1,6 @@
-﻿"use client";
+﻿// LIVE PRODUCTION ROUTE — /contractor/jobs
+// Contractor job board: browse and accept leads.
+"use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";

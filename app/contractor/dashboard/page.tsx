@@ -1,3 +1,5 @@
+// LIVE PRODUCTION ROUTE — /contractor/dashboard
+// Contractor dashboard: overview, metrics, quick links.
 "use client";
 
 import { useEffect, useState } from "react";
@@ -126,7 +128,7 @@ export default function ContractorDashboard() {
     },
     {
       label: "Subscription",
-      href: "/contractor/subscription",
+      href: "/contractor/subscriptions",
       icon: CreditCard,
       color: "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700",
       description: "Manage your plan",

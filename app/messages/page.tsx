@@ -1,3 +1,5 @@
+// LIVE PRODUCTION ROUTE — /messages
+// Messaging inbox for both contractors and homeowners.
 "use client";
 
 export const dynamic = 'force-dynamic';

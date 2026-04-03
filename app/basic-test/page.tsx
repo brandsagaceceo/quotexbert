@@ -1,41 +1,11 @@
+// DEBUG/TEST PAGE — /basic-test
+// Server connectivity diagnostic page. NOT linked from production UI.
+// NOT LIVE — do not edit for production features.
 export default function BasicTest() {
   return (
     <div style={{ padding: "20px", fontSize: "18px" }}>
-      <h1>ðŸŸ¢ BASIC TEST PAGE</h1>
-      <p>If you can see this, the server is working!</p>
-      <div
-        style={{ backgroundColor: "yellow", padding: "10px", margin: "10px 0" }}
-      >
-        <strong>Server Status: ONLINE</strong>
-      </div>
-      <div>
-        <a
-          href="/messages"
-          style={{
-            display: "block",
-            padding: "10px",
-            backgroundColor: "blue",
-            color: "white",
-            textDecoration: "none",
-            margin: "5px 0",
-          }}
-        >
-          ðŸ“¨ Messages Page
-        </a>
-        <a
-          href="/simple-debug"
-          style={{
-            display: "block",
-            padding: "10px",
-            backgroundColor: "green",
-            color: "white",
-            textDecoration: "none",
-            margin: "5px 0",
-          }}
-        >
-          ðŸ”§ Debug Page
-        </a>
-      </div>
+      <h1>DEBUG: Basic Test Page</h1>
+      <p>Server is reachable. This page exists only for connectivity checks.</p>
     </div>
   );
 }

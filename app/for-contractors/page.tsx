@@ -708,7 +708,7 @@ export default function ForContractorsPage() {
                 </ul>
 
                 <Link
-                  href={isSignedIn && authUser?.role === "contractor" ? "/contractor/subscription" : "/sign-up?role=contractor"}
+                  href={isSignedIn && authUser?.role === "contractor" ? "/contractor/subscriptions" : "/sign-up?role=contractor"}
                   onClick={() => trackContractorJoinClicked("pricing_section")}
                   className={`block w-full py-4 rounded-xl font-bold text-lg text-center transition-all duration-300 ${
                     tier.popular

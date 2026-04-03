@@ -1,4 +1,8 @@
-﻿'use client';
+﻿// LIVE PRODUCTION ROUTE — /dashboard
+// Generic role-agnostic dashboard. Used as landing page after onboarding role selection.
+// For the full contractor experience → /contractor/dashboard
+// For the full homeowner experience → /homeowner/dashboard
+'use client';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 import Link from "next/link";

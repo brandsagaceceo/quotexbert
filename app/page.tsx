@@ -1,3 +1,5 @@
+// LIVE PRODUCTION ROUTE — /
+// Homepage with AI estimator (IPhoneEstimatorMockup). Edit THIS file for homepage changes.
 "use client";
 
 import { useState, lazy, Suspense, useEffect } from "react";
