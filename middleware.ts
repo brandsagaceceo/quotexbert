@@ -1,8 +1,30 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
+  // Profile & user API (original)
   "/profile(.*)",
   "/api/user(.*)",
+
+  // Contractor authenticated area.
+  // NOTE: /contractor/[id]/portfolio is intentionally excluded (public portfolio view).
+  "/contractor/dashboard(.*)",
+  "/contractor/jobs(.*)",
+  "/contractor/leads-map(.*)",
+  "/contractor/portfolio(.*)",
+  "/contractor/quotes(.*)",
+  "/contractor/settings(.*)",
+  "/contractor/subscriptions(.*)",
+  "/contractor/subscription(.*)",
+
+  // All homeowner routes require auth
+  "/homeowner(.*)",
+
+  // Other authenticated routes
+  "/messages(.*)",
+  "/dashboard",
+  "/notifications(.*)",
+  "/create-lead(.*)",
+  "/project/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
