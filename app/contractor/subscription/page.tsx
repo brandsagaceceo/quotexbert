@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useToast } from "@/components/ToastProvider";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { Shield, TrendingUp, Clock, CheckCircle } from "lucide-react";
@@ -75,28 +76,10 @@ const packages: Package[] = [
 
 export default function ContractorSubscription() {
   const { authUser: user, authLoading } = useAuth();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const { error: toastError } = useToast();
 
-
-
-  const handleSubscribe = async () => {
-    if (selectedCategories.length === 0) {
-      alert('Please select a plan');
-      return;
-    }
-
-    // Determine which package was selected based on categories
-    const selectedPackage = packages.find(pkg => 
-      pkg.categories.length === selectedCategories.length &&
-      pkg.categories.every(cat => selectedCategories.includes(cat))
-    );
-
-    if (!selectedPackage) {
-      alert('Please select one of the package plans');
-      return;
-    }
-
+  const handleSubscribe = async (selectedPkg: Package) => {
     setLoading(true);
     try {
       const response = await fetch('/api/contractor/subscribe', {
@@ -104,9 +87,9 @@ export default function ContractorSubscription() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user?.id,
-          categories: selectedCategories,
-          packageId: selectedPackage.id,
-          amount: selectedPackage.price,
+          categories: selectedPkg.categories,
+          packageId: selectedPkg.id,
+          amount: selectedPkg.price,
         })
       });
 
@@ -115,11 +98,11 @@ export default function ContractorSubscription() {
         const stripe = await stripePromise;
         await stripe?.redirectToCheckout({ sessionId });
       } else {
-        alert('Failed to create subscription. Please try again.');
+        toastError('Failed to create subscription. Please try again.');
       }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+    } catch (err) {
+      console.error('Error:', err);
+      toastError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -232,12 +215,9 @@ export default function ContractorSubscription() {
                   </ul>
 
                   <button
-                    onClick={() => {
-                      setSelectedCategories(pkg.categories);
-                      handleSubscribe();
-                    }}
+                    onClick={() => handleSubscribe(pkg)}
                     disabled={loading}
-                    className={`w-full py-4 rounded-2xl font-bold text-base transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`w-full py-4 rounded-2xl font-bold text-base transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${`
                       pkg.popular
                         ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-xl'
                         : 'bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-rose-600 hover:to-orange-600 shadow-lg'
@@ -314,12 +294,9 @@ export default function ContractorSubscription() {
                 </ul>
                 
                 <button
-                  onClick={() => {
-                    setSelectedCategories(pkg.categories);
-                    handleSubscribe();
-                  }}
+                  onClick={() => handleSubscribe(pkg)}
                   disabled={loading}
-                  className={`w-full py-5 rounded-2xl font-bold text-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group ${
+                  className={`w-full py-5 rounded-2xl font-bold text-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group ${`
                     pkg.popular
                       ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-2xl hover:shadow-3xl transform hover:-translate-y-1'
                       : 'bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-rose-600 hover:to-orange-600 shadow-xl hover:shadow-2xl transform hover:-translate-y-1'

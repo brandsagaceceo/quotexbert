@@ -121,10 +121,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingUser) {
-      // User exists — update role (and name in case it changed)
+      // User exists — update role, name, and ensure clerkUserId is stored
       await prisma.user.update({
         where: { email },
-        data: { role, name: userName },
+        data: { role, name: userName, clerkUserId: userId },
       });
     } else {
       // No user with this email — create fresh record
