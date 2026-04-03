@@ -1,10 +1,10 @@
 // LIVE PRODUCTION ROUTE — /
-// Homepage with AI estimator (IPhoneEstimatorMockup). Edit THIS file for homepage changes.
+// Homepage with AI estimator (EstimatorMain). Edit THIS file for homepage changes.
 "use client";
 
 import { useState, lazy, Suspense, useEffect } from "react";
 import Link from "next/link";
-import { IPhoneEstimatorMockup } from "@/components/IPhoneEstimatorMockup";
+import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { ReviewsSection, Review } from "@/components/ReviewsSection";
@@ -314,7 +314,7 @@ export default function Home() {
 
               {/* Right Column - iPhone Estimator Mockup */}
               <div className="lg:pl-8" data-estimator>
-                <IPhoneEstimatorMockup 
+                <EstimatorMain 
                   onEstimateComplete={handleEstimateComplete}
                   userId={user?.id || undefined}
                   isBlocked={isEstimatorBlocked}

@@ -1,3 +1,4 @@
+// LIVE PRODUCTION COMPONENT — renamed for clarity (was IPhoneEstimatorMockup.tsx)
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
@@ -6,7 +7,7 @@ import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, Sparkles
 import { IPhoneFrame } from "./IPhoneFrame";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
-interface IPhoneEstimatorMockupProps {
+interface EstimatorMainProps {
   onEstimateComplete: (result: any) => void;
   userId?: string | undefined;
   isBlocked?: boolean;
@@ -35,7 +36,7 @@ interface UploadedPhoto {
   isExample?: boolean;
 }
 
-export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, onBlocked }: IPhoneEstimatorMockupProps) {
+export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked }: EstimatorMainProps) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("");

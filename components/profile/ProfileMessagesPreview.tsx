@@ -1,3 +1,4 @@
+// LIVE PRODUCTION COMPONENT — renamed for clarity (was MessagesTab.tsx)
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -16,7 +17,7 @@ interface Conversation {
   homeownerPhoto?: string;
 }
 
-export default function MessagesTab({ contractorId }: { contractorId: string }) {
+export default function ProfileMessagesPreview({ contractorId }: { contractorId: string }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -11,7 +11,7 @@ import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
 import { isUnlimitedTestContractor } from "@/lib/god-access";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
-import MessagesTab from "@/components/profile/MessagesTab";
+import ProfileMessagesPreview from "@/components/profile/ProfileMessagesPreview";
 import OverflowDetector from "@/components/dev/OverflowDetector";
 import LoadingState from "@/components/ui/LoadingState";
 import OnboardingTour from "@/components/OnboardingTour";
@@ -970,7 +970,7 @@ export default function UnifiedProfilePage() {
                   <p className="text-sm md:text-base text-slate-600">Chat with homeowners about your accepted jobs.</p>
                 </div>
 
-                <MessagesTab contractorId={authUser?.id || ''} />
+                <ProfileMessagesPreview contractorId={authUser?.id || ''} />
               </div>
             )}
 

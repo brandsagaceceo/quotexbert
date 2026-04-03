@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { IPhoneEstimatorMockup } from "@/components/IPhoneEstimatorMockup";
+import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { useAuth } from "@/lib/hooks/useAuth";
 import {
@@ -197,7 +197,7 @@ export default function LandingEstimatePage() {
                   <span className="text-white/70 text-xs">Powered by AI</span>
                 </div>
                 <div className="p-4">
-                  <IPhoneEstimatorMockup
+                  <EstimatorMain
                     onEstimateComplete={handleEstimateComplete}
                     userId={authUser?.id}
                     isBlocked={isBlocked}
