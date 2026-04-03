@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useToast } from "@/components/ToastProvider";
 import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -36,6 +37,7 @@ interface Transaction {
 
 export default function SubscriptionsPage() {
   const { authUser, authLoading } = useAuth();
+  const { error: toastError } = useToast();
   const searchParams = useSearchParams();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -98,8 +100,10 @@ export default function SubscriptionsPage() {
           activate(authUser.id);
         } else {
           const poll = setInterval(() => {
-            const u = authUser;
-            if (u) { clearInterval(poll); activate(u.id); }
+            // Re-read authUser each tick to detect when it loads
+            void (function check() {
+              if (authUser) { clearInterval(poll); activate(authUser.id); }
+            }());
           }, 300);
           setTimeout(() => clearInterval(poll), 5000);
         }
@@ -164,7 +168,7 @@ export default function SubscriptionsPage() {
   // Open category picker modal (or go straight to checkout for general tier)
   const handleTierSubscription = (tier: 'handyman' | 'renovation' | 'general') => {
     if (!authUser) {
-      alert('Please sign in to subscribe to a plan');
+      toastError('Please sign in to subscribe to a plan');
       return;
     }
     if (tier === 'general') {
@@ -208,7 +212,7 @@ export default function SubscriptionsPage() {
         console.error('[Subscription] HTTP error:', response.status, errorText);
         let parsed: any = {};
         try { parsed = JSON.parse(errorText); } catch {}
-        alert(parsed.error || `Server error ${response.status}. Please try again.`);
+        toastError(parsed.error || `Server error ${response.status}. Please try again.`);
         setCheckoutLoading(null);
         return;
       }
@@ -218,12 +222,12 @@ export default function SubscriptionsPage() {
       if (data.success && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        alert(data.error || 'Failed to create checkout session. Please try again.');
+        toastError(data.error || 'Failed to create checkout session. Please try again.');
         setCheckoutLoading(null);
       }
     } catch (err) {
       console.error('[Subscription] Catch error:', err);
-      alert('Failed to start checkout process. Please check your connection and try again.');
+      toastError('Failed to start checkout process. Please check your connection and try again.');
       setCheckoutLoading(null);
     }
   };
@@ -589,9 +593,9 @@ export default function SubscriptionsPage() {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-6">
+              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-6 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-8 md:max-w-6xl md:mx-auto md:pt-6 md:overflow-x-visible md:pb-0" style={{WebkitOverflowScrolling:'touch'}}>
                 {/* Handyman Tier */}
-                <div className="group relative">
+                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
                   <div className="absolute -inset-1 bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
                   <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-green-400">
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -664,7 +668,7 @@ export default function SubscriptionsPage() {
                 </div>
 
                 {/* Renovation Xbert Tier */}
-                <div className="group relative scale-105 z-20">
+                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none md:scale-105 z-20">
                   <div className="absolute -inset-1 bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-90 transition duration-500"></div>
                   <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-orange-400">
                     <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-30">
@@ -742,7 +746,7 @@ export default function SubscriptionsPage() {
                 </div>
 
                 {/* General Contractor Tier */}
-                <div className="group relative">
+                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
                   <div className="absolute -inset-1 bg-gradient-to-br from-rose-400 via-orange-600 to-rose-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
                   <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-rose-400">
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -822,6 +826,13 @@ export default function SubscriptionsPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Mobile swipe dots indicator */}
+              <div className="flex md:hidden justify-center gap-2 mt-3 mb-2">
+                <div className="w-4 h-2 rounded-full bg-green-500"></div>
+                <div className="w-6 h-2 rounded-full bg-orange-500"></div>
+                <div className="w-4 h-2 rounded-full bg-rose-700"></div>
               </div>
 
               {/* Trust Badges */}
