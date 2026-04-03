@@ -644,6 +644,15 @@ body:has(.sticky-cta-bar) .floating-widget-safe {
   transform: scale(0.8) translateY(8px);
 }
 
+/* ── Hide scrollbars (used by pricing carousel and horizontal scroll areas) ── */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari/Opera */
+}
+
 /* ── Footer mobile layout ── */
 @media (max-width: 767px) {
   .footer-grid {

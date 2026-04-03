@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/ToastProvider";
 import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
-import { isGodUser } from "@/lib/god-access";
+import { isUnlimitedTestContractor } from "@/lib/god-access";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
 import MessagesTab from "@/components/profile/MessagesTab";
@@ -226,7 +226,7 @@ export default function UnifiedProfilePage() {
               console.log("[ProfilePage] Loaded subscription:", subscriptionData);
               
               // Check if user is god/admin user
-              const godUser = isGodUser(authUser.email);
+              const godUser = isUnlimitedTestContractor(authUser.email);
               
               // Set max categories based on tier (or unlimited for god users)
               const tierLimits: Record<string, number> = {

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
-import { canAcceptJob, isGodUser } from "@/lib/god-access";
+import { canAcceptJob, isUnlimitedTestContractor } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
 import { ToastContainer, type Toast } from "@/components/ToastNotification";
 import LoadingState from "@/components/ui/LoadingState";
