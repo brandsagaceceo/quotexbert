@@ -279,15 +279,15 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, o
         <div className="text-center mb-4 pt-2">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold mb-2">
             <SparklesIcon className="w-4 h-4" />
-            AI Instant Estimate
+            AI Instant Estimate — 100% Free
           </div>
-          <h3 className="text-lg md:text-xl font-black text-slate-900 mb-1">
-            Upload Phone Photos
+          <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-1">
+            Upload Photos → Get Instant AI Estimate
           </h3>
           <p className="text-xs md:text-sm text-slate-600">
-            Get your detailed estimate in 30 seconds
+            Snap your project. Know the fair price in 30 seconds.
           </p>
-          <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+          <div className="mt-2 flex flex-wrap gap-1.5 text-xs justify-center">
             <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✓ No signup required</span>
             <span className="bg-rose-50 text-rose-900 px-2 py-0.5 rounded-full font-semibold">✓ 100% free</span>
             <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full font-semibold">✓ No spam</span>
@@ -299,9 +299,9 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, o
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
               <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-              Add Photos (Optional)
+              Upload Project Photos
             </label>
-            <p className="text-xs text-slate-600 mb-3">💡 2-3 photos recommended for best results</p>
+            <p className="text-xs text-slate-500 mb-3">📏 Max 5MB per photo · JPEG, PNG, WebP · 2–3 photos recommended</p>
             
             <div
               onDragOver={handleDragOver}
@@ -309,30 +309,37 @@ export function IPhoneEstimatorMockup({ onEstimateComplete, userId, isBlocked, o
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`
-                border-3 border-dashed rounded-xl p-8 text-center cursor-pointer
-                transition-all duration-200 relative min-h-[120px] flex flex-col items-center justify-center
+                border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer
+                transition-all duration-200 relative min-h-[140px] flex flex-col items-center justify-center
+                shadow-sm
                 ${isDragging
-                  ? "border-orange-500 bg-orange-50 scale-[1.02]"
-                  : "border-slate-300 hover:border-orange-500 hover:bg-orange-50/50"
+                  ? "border-orange-500 bg-orange-50 scale-[1.02] shadow-lg"
+                  : "border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50 hover:border-orange-500 hover:shadow-md"
                 }
               `}
             >
-              <CloudArrowUpIcon className="w-12 h-12 mx-auto mb-3 text-orange-500" />
-              <p className="text-base font-bold text-slate-900">
-                Drag & drop photos here
+              {/* Camera icon with background */}
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-600 to-orange-500 flex items-center justify-center mb-3 shadow-lg">
+                <CloudArrowUpIcon className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-base font-black text-slate-900 mb-1">
+                📷 Upload Your Photos Here
               </p>
-              <p className="text-sm text-slate-600 mt-1">
-                or click to browse
+              <p className="text-sm font-semibold text-rose-700">
+                Tap to browse or drag &amp; drop
+              </p>
+              <p className="text-xs text-slate-500 mt-2 bg-white/70 px-3 py-1 rounded-full">
+                Photos = faster &amp; more accurate estimates
               </p>
               
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 multiple
                 onChange={handleFileInput}
                 className="hidden"
-                aria-label="Upload photos"
+                aria-label="Upload project photos"
               />
             </div>
 

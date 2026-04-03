@@ -210,8 +210,24 @@ description: "Complete front yard update, 1,800 sq ft. Remove overgrown shrubs, 
 ];
 
 export async function GET(request: Request) {
+  // Safety: only allow in non-production OR when explicitly forced
+  const url = new URL(request.url);
+  const force = url.searchParams.get('force') === 'true';
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // In production, require explicit force flag to prevent accidental re-seeding
+  if (isProduction && !force) {
+    return NextResponse.json({
+      success: false,
+      message: 'Seed endpoint disabled in production. Pass ?force=true to override only if intentional.',
+    }, { status: 403 });
+  }
+
+  // Hard cap: maximum seeded jobs per category to keep the marketplace realistic
+  const MAX_SEEDED_PER_CATEGORY = 3;
+
   try {
-    console.log("Starting Toronto GTA job seeding...");
+    console.log("Starting Toronto GTA job seeding (idempotent run)...");
 
     // Find or create homeowners
     let homeowners = await prisma.user.findMany({
@@ -247,18 +263,43 @@ export async function GET(request: Request) {
       }
     }
 
-    // Refetch homeowners
     homeowners = await prisma.user.findMany({
       where: { role: "homeowner" },
       take: 10,
     });
 
+    // Build a map of category → existing seeded job count (by matching seeded titles)
+    // We identify seeded jobs by checking if the title matches any known seed title
+    const seedTitles = jobLeads.map(j => j.title);
+    const existingSeededCounts: Record<string, number> = {};
+
+    for (const title of seedTitles) {
+      const existing = await prisma.lead.findFirst({ where: { title } });
+      if (existing) {
+        existingSeededCounts[existing.category] = (existingSeededCounts[existing.category] || 0) + 1;
+      }
+    }
+
     const created = [];
+    const skipped = [];
     const errors = [];
 
-    // Create jobs
     for (const jobTemplate of jobLeads) {
       try {
+        // Skip if this exact title already exists (strict deduplication)
+        const alreadyExists = await prisma.lead.findFirst({ where: { title: jobTemplate.title } });
+        if (alreadyExists) {
+          skipped.push({ title: jobTemplate.title, reason: 'already exists' });
+          continue;
+        }
+
+        // Enforce per-category cap
+        const categoryCount = existingSeededCounts[jobTemplate.category] || 0;
+        if (categoryCount >= MAX_SEEDED_PER_CATEGORY) {
+          skipped.push({ title: jobTemplate.title, reason: `category cap (${MAX_SEEDED_PER_CATEGORY}) reached` });
+          continue;
+        }
+
         const location = torontoLocations[Math.floor(Math.random() * torontoLocations.length)];
         const homeowner = homeowners[Math.floor(Math.random() * homeowners.length)];
 
@@ -280,6 +321,8 @@ export async function GET(request: Request) {
           },
         });
 
+        existingSeededCounts[jobTemplate.category] = (existingSeededCounts[jobTemplate.category] || 0) + 1;
+
         created.push({
           title: lead.title,
           location: location.name,
@@ -295,23 +338,22 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully created ${created.length} Toronto GTA job leads!`,
+      message: `Seeding complete. Created: ${created.length}, Skipped: ${skipped.length}`,
       created,
+      skipped,
       errors: errors.length > 0 ? errors : undefined,
       stats: {
         totalCreated: created.length,
+        totalSkipped: skipped.length,
         homeowners: homeowners.length,
         locations: torontoLocations.length,
-        categories: [...new Set(jobLeads.map((j) => j.category))].length,
+        maxPerCategory: MAX_SEEDED_PER_CATEGORY,
       },
     });
   } catch (error: any) {
     console.error("Seeding error:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-      },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }

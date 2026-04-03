@@ -347,7 +347,7 @@ export default function UnifiedProfilePage() {
         setIsEditing(false);
         
         // Show success message
-        alert('Profile updated successfully!');
+        toast.success('Profile updated successfully!');
         
         // Refetch profile to ensure data is in sync
         setTimeout(async () => {
@@ -365,7 +365,7 @@ export default function UnifiedProfilePage() {
       }
     } catch (error) {
       console.error("[ProfilePage] Error saving profile:", error);
-      alert(`Failed to save profile: ${error instanceof Error ? error.message : 'Please try again'}`);
+      toast.error(`Failed to save profile: ${error instanceof Error ? error.message : 'Please try again'}`);
     }
   };
 
@@ -417,11 +417,9 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        toast.success('Profile picture updated successfully!');
-        // Force page reload to ensure image updates everywhere
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        toast.success('Profile picture updated!');
+        // Update profile state in-place instead of reloading the page
+        setProfile(prev => prev ? { ...prev, profilePhoto: uploadResult.url } : prev);
       } else {
         throw new Error('Failed to update profile');
       }
@@ -450,7 +448,7 @@ export default function UnifiedProfilePage() {
         console.log('Portfolio item added:', newItem);
         setPortfolio(prev => [newItem, ...prev]);
         setShowPortfolioForm(false);
-        alert('Portfolio item added successfully!');
+        toast.success('Portfolio item added!');
       } else {
         const errorData = await response.json();
         console.error('Portfolio API error:', errorData);
@@ -458,7 +456,7 @@ export default function UnifiedProfilePage() {
       }
     } catch (error) {
       console.error('Error adding portfolio item:', error);
-      alert(`Failed to add portfolio item: ${error instanceof Error ? error.message : 'Please try again'}`);
+      toast.error(`Failed to add portfolio item: ${error instanceof Error ? error.message : 'Please try again'}`);
     }
   };
 
@@ -474,13 +472,13 @@ export default function UnifiedProfilePage() {
         const updatedItem = await response.json();
         setPortfolio(prev => prev.map(item => item.id === id ? updatedItem : item));
         setEditingPortfolioItem(null);
-        alert('Portfolio item updated successfully!');
+        toast.success('Portfolio item updated!');
       } else {
         throw new Error('Failed to update portfolio item');
       }
     } catch (error) {
       console.error('Error updating portfolio item:', error);
-      alert('Failed to update portfolio item. Please try again.');
+      toast.error('Failed to update portfolio item. Please try again.');
     }
   };
 
@@ -496,13 +494,13 @@ export default function UnifiedProfilePage() {
 
       if (response.ok) {
         setPortfolio(prev => prev.filter(item => item.id !== id));
-        alert('Portfolio item deleted successfully!');
+        toast.success('Portfolio item deleted.');
       } else {
         throw new Error('Failed to delete portfolio item');
       }
     } catch (error) {
       console.error('Error deleting portfolio item:', error);
-      alert('Failed to delete portfolio item. Please try again.');
+      toast.error('Failed to delete portfolio item. Please try again.');
     }
   };
 
@@ -1685,6 +1683,7 @@ interface PortfolioFormProps {
 }
 
 function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFormProps) {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
@@ -1705,14 +1704,14 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      alert('Please upload a valid image file (JPEG, PNG, or WebP)');
+      toast.error('Please upload a valid image file (JPEG, PNG, or WebP)');
       return;
     }
 
     // Validate file size (5MB max)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert('Image file is too large. Maximum size is 5MB');
+      toast.error('Image is too large. Maximum size is 5MB. Please compress it and try again.');
       return;
     }
 
@@ -1734,11 +1733,11 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
         console.log('Image uploaded successfully:', result.url);
       } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to upload image');
+        toast.error(errorData.error || 'Failed to upload image');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload image. Please check your connection and try again.');
+      toast.error('Upload failed. Please check your connection and try again.');
     } finally {
       setUploading(false);
     }
@@ -1747,7 +1746,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) {
-      alert('Please enter a project title');
+      toast.error('Please enter a project title');
       return;
     }
     onSubmit(formData);

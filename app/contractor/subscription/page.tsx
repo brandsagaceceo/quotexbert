@@ -183,7 +183,88 @@ export default function ContractorSubscription() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Mobile: horizontal swipe carousel — desktop: 3-column grid */}
+          {/* Mobile carousel wrapper */}
+          <div className="md:hidden -mx-4 px-4">
+            <div
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-hide"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {packages.map((pkg, index) => (
+                <div
+                  key={pkg.id}
+                  className={`relative bg-white rounded-3xl shadow-2xl border-4 p-7 flex-shrink-0 snap-center transition-all duration-300 flex flex-col ${
+                    pkg.popular
+                      ? 'border-rose-500 ring-4 ring-rose-200'
+                      : 'border-slate-200'
+                  }`}
+                  style={{ width: 'calc(85vw - 2rem)', minWidth: '280px', maxWidth: '340px' }}
+                >
+                  {pkg.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl animate-pulse whitespace-nowrap">
+                      ⭐ MOST POPULAR
+                    </div>
+                  )}
+
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-black text-slate-900 mb-3">{pkg.name}</h3>
+                    <div className="flex items-baseline justify-center gap-1 mb-3">
+                      <span className="text-5xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
+                        ${pkg.price}
+                      </span>
+                      <span className="text-lg text-slate-600 font-bold">/mo</span>
+                    </div>
+                    <div className="bg-gradient-to-r from-rose-50 to-orange-50 px-4 py-3 rounded-2xl border-2 border-rose-200">
+                      <p className="text-lg font-black text-rose-700 text-center mb-1">
+                        {pkg.categories.length} Trade {pkg.categories.length === 1 ? 'Category' : 'Categories'}
+                      </p>
+                      <p className="text-xs text-slate-600 font-semibold text-center">Unlimited leads • Flat monthly rate</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 mb-6 flex-1">
+                    {pkg.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2 text-slate-700">
+                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm font-medium leading-tight">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => {
+                      setSelectedCategories(pkg.categories);
+                      handleSubscribe();
+                    }}
+                    disabled={loading}
+                    className={`w-full py-4 rounded-2xl font-bold text-base transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      pkg.popular
+                        ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-xl'
+                        : 'bg-gradient-to-r from-slate-700 to-slate-900 text-white hover:from-rose-600 hover:to-orange-600 shadow-lg'
+                    }`}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      Get Started Now
+                    </span>
+                  </button>
+                  <p className="text-center text-xs text-slate-500 mt-3 font-medium">Cancel anytime • No contracts</p>
+                </div>
+              ))}
+            </div>
+            {/* Swipe hint dots */}
+            <div className="flex justify-center gap-2 mt-2">
+              {packages.map((pkg) => (
+                <div
+                  key={pkg.id}
+                  className={`w-2 h-2 rounded-full transition-all ${pkg.popular ? 'bg-rose-600 w-4' : 'bg-slate-300'}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop grid (unchanged) */}
+          <div className="hidden md:grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {packages.map((pkg, index) => (
               <div
                 key={pkg.id}

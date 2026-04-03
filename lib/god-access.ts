@@ -1,58 +1,67 @@
 /**
- * God Access Override System
- * Grants special "Pro MAX" tier access to specific admin/testing emails
+ * Unlimited Test Contractor Access
+ * Grants full premium contractor access to specific internal testing accounts.
+ * These accounts behave like a fully-subscribed contractor — no admin UI, no banners.
  */
 
-const GOD_EMAILS = [
+// Internal list — do not expose to UI or logs
+const UNLIMITED_TEST_EMAILS = [
   'brandsagaceo@gmail.com',
-  'brandsagaCEO@gmail.com', // Case variations
 ];
 
 /**
- * Check if an email has God access (admin override)
+ * Returns true if the email belongs to an internal test account that should
+ * receive full unlimited premium contractor access without a paid subscription.
+ * Never shows admin UI or debug banners for these accounts.
  */
-export function isGodUser(email: string | null | undefined): boolean {
+export function isUnlimitedTestContractor(email: string | null | undefined): boolean {
   if (!email) return false;
-  const normalizedEmail = email.toLowerCase().trim();
-  return GOD_EMAILS.some(godEmail => godEmail.toLowerCase() === normalizedEmail);
+  const normalized = email.toLowerCase().trim();
+  return UNLIMITED_TEST_EMAILS.some(e => e.toLowerCase() === normalized);
 }
 
 /**
- * Get effective subscription tier with God override
- * If user is a God user, return highest tier regardless of actual subscription
+ * @deprecated use isUnlimitedTestContractor instead
+ */
+export function isGodUser(email: string | null | undefined): boolean {
+  return isUnlimitedTestContractor(email);
+}
+
+/**
+ * Get effective subscription tier — unlimited test accounts get highest tier.
  */
 export function getEffectiveTier(email: string | null | undefined, actualTier: string | null): string {
-  if (isGodUser(email)) {
-    return 'GENERAL'; // Highest tier: unlimited access to all categories
+  if (isUnlimitedTestContractor(email)) {
+    return 'GENERAL'; // Highest tier: access to all categories
   }
   return actualTier || 'FREE';
 }
 
 /**
- * Check if user can accept any job (God users bypass all restrictions)
+ * Check if user can accept any job (unlimited test contractors bypass subscription gate).
  */
 export function canAcceptJob(email: string | null | undefined, hasSubscription: boolean = false): boolean {
-  if (isGodUser(email)) {
-    return true; // God users can accept ANY job
+  if (isUnlimitedTestContractor(email)) {
+    return true;
   }
   return hasSubscription;
 }
 
 /**
- * Check if user can access a specific lead/category (God users bypass tier gating)
+ * Check if user can access a specific lead/category.
  */
 export function canAccessLead(email: string | null | undefined, hasAccess: boolean = false): boolean {
-  if (isGodUser(email)) {
-    return true; // God users can access ALL leads
+  if (isUnlimitedTestContractor(email)) {
+    return true;
   }
   return hasAccess;
 }
 
 /**
- * Get subscription features with God override
+ * Get subscription feature set for unlimited test contractor accounts.
  */
 export function getGodFeatures(email: string | null | undefined) {
-  if (isGodUser(email)) {
+  if (isUnlimitedTestContractor(email)) {
     return {
       canClaimLeads: true,
       maxLeadsPerMonth: 999,
@@ -67,3 +76,4 @@ export function getGodFeatures(email: string | null | undefined) {
   }
   return null;
 }
+
