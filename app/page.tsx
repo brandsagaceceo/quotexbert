@@ -18,6 +18,7 @@ import {
   trackContractorJoinClicked,
 } from "@/lib/tracking";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
+import { useToast } from "@/components/ToastProvider";
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
@@ -33,6 +34,7 @@ export default function Home() {
   const [hasUsedFree, setHasUsedFree] = useState(false);
   const [showSignUpGate, setShowSignUpGate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
+  const toast = useToast();
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
@@ -76,11 +78,10 @@ export default function Home() {
 
   const handleSaveEstimate = () => {
     if (isSignedIn) {
-      // Save to database
-      alert("Feature coming soon: Save and email estimates!");
+      toast.success('Coming soon — save & email estimates!');
     } else {
-      alert("Please sign in to save your estimate");
-      window.location.href = '/sign-in';
+      toast.error('Please sign in to save your estimate');
+      setTimeout(() => { window.location.href = '/sign-in'; }, 1200);
     }
   };
 
@@ -215,6 +216,8 @@ export default function Home() {
         )}
 
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
+        {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
+        <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
         <section id="get-estimate" className="relative py-4 md:py-16 lg:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
