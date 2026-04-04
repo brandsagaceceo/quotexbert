@@ -330,8 +330,27 @@ export default function UnifiedProfilePage() {
   }, [isSignedIn, authUser, authLoading, router]);
 
   const handleSaveProfile = async () => {
+    if (!authUser?.id) {
+      toast.error('Not signed in. Please refresh and try again.');
+      return;
+    }
     try {
-      const savePayload = { userId: authUser?.id, ...editData };
+      // Double-source profilePhoto: prefer editData, fall back to current profile state
+      // This guards against any stale-closure scenario where editData.profilePhoto was lost
+      const photoUrl = editData.profilePhoto || profile?.profilePhoto || '';
+      const savePayload = {
+        userId: authUser.id,
+        companyName: editData.companyName,
+        trade: editData.trade,
+        bio: editData.bio,
+        city: editData.city,
+        phone: editData.phone,
+        website: editData.website,
+        serviceRadiusKm: editData.serviceRadiusKm,
+        displayName: editData.displayName,
+        name: editData.displayName,
+        profilePhoto: photoUrl,
+      };
       console.log('[ProfilePage] Save payload:', JSON.stringify(savePayload));
       const response = await fetch('/api/profile', {
         method: 'PUT',
@@ -340,29 +359,14 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        // Do not use the raw Prisma response (nested shape) as profile state –
-        // the UI expects a flat shape. Merge editData directly instead.
-        setProfile(prev => prev ? {
-          ...prev,
-          companyName: editData.companyName || prev.companyName,
-          trade: editData.trade || prev.trade,
-          bio: editData.bio,
-          city: editData.city,
-          phone: editData.phone,
-          website: editData.website,
-          serviceRadiusKm: editData.serviceRadiusKm,
-          displayName: editData.displayName,
-          name: editData.displayName || prev.name,
-        } : prev);
         setIsEditing(false);
-
         toast.success('Profile updated successfully!');
 
-        // Refetch immediately to confirm DB write and sync any server-side defaults
-        const refetchResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
+        // Refetch from DB to confirm persistence
+        const refetchResponse = await fetch(`/api/profile?userId=${authUser.id}`);
         if (refetchResponse.ok) {
           const refetchedProfile = await refetchResponse.json();
-          console.log('[ProfilePage] Refetch after save — profilePhoto:', refetchedProfile.profilePhoto, 'bio:', refetchedProfile.bio);
+          console.log('[ProfilePage] Post-save DB values — profilePhoto:', refetchedProfile.profilePhoto, 'bio:', refetchedProfile.bio);
           setProfile(refetchedProfile);
           setEditData({
             companyName: refetchedProfile.companyName || '',
@@ -377,7 +381,7 @@ export default function UnifiedProfilePage() {
           });
         }
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         console.error('[ProfilePage] Profile save failed:', errorData);
         throw new Error(errorData.error || 'Failed to save profile');
       }
@@ -811,7 +815,7 @@ export default function UnifiedProfilePage() {
                   {isEditing ? (
                     <textarea
                       value={editData.bio}
-                      onChange={(e) => setEditData({...editData, bio: e.target.value})}
+                      onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, bio: v})); }}
                       className="w-full p-3 md:p-4 border-2 border-rose-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm md:text-base"
                       rows={5}
                       placeholder="Tell people about your experience, specialties, and what makes you unique..."
@@ -1512,7 +1516,7 @@ export default function UnifiedProfilePage() {
                         <input
                           type="text"
                           value={editData.companyName || ''}
-                          onChange={(e) => setEditData({...editData, companyName: e.target.value})}
+                          onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, companyName: v})); }}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="Your Company Name"
                           required
@@ -1523,7 +1527,7 @@ export default function UnifiedProfilePage() {
                         <input
                           type="text"
                           value={editData.trade}
-                          onChange={(e) => setEditData({...editData, trade: e.target.value})}
+                          onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, trade: v})); }}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="e.g., General Contractor, Plumber, Electrician"
                         />
@@ -1533,7 +1537,7 @@ export default function UnifiedProfilePage() {
                         <input
                           type="tel"
                           value={editData.phone}
-                          onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                          onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, phone: v})); }}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="(555) 123-4567"
                         />
@@ -1543,7 +1547,7 @@ export default function UnifiedProfilePage() {
                         <input
                           type="text"
                           value={editData.city}
-                          onChange={(e) => setEditData({...editData, city: e.target.value})}
+                          onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, city: v})); }}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="Toronto"
                         />
@@ -1553,7 +1557,7 @@ export default function UnifiedProfilePage() {
                         <input
                           type="url"
                           value={editData.website}
-                          onChange={(e) => setEditData({...editData, website: e.target.value})}
+                          onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, website: v})); }}
                           className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                           placeholder="https://yourwebsite.com"
                         />
@@ -1568,7 +1572,7 @@ export default function UnifiedProfilePage() {
                             <input
                               type="text"
                               value={editData.displayName}
-                              onChange={(e) => setEditData({...editData, displayName: e.target.value})}
+                              onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, displayName: v})); }}
                               className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                               placeholder="e.g., Alex or HomeRenovator2025"
                               style={{ fontSize: '16px' }}
@@ -1579,7 +1583,7 @@ export default function UnifiedProfilePage() {
                             <input
                               type="tel"
                               value={editData.phone}
-                              onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                              onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, phone: v})); }}
                               className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                               placeholder="(555) 123-4567"
                               style={{ fontSize: '16px' }}
@@ -1590,7 +1594,7 @@ export default function UnifiedProfilePage() {
                             <input
                               type="text"
                               value={editData.city}
-                              onChange={(e) => setEditData({...editData, city: e.target.value})}
+                              onChange={(e) => { const v = e.target.value; setEditData(prev => ({...prev, city: v})); }}
                               className="w-full p-4 border-2 border-rose-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
                               placeholder="Toronto"
                               style={{ fontSize: '16px' }}

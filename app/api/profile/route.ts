@@ -32,6 +32,14 @@ async function findUserById(userId: string, includeExtended = false) {
   return user;
 }
 
+/** Strip old fake placeholder URLs that were saved before BLOB was configured */
+function sanitizePhotoUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  // Old code returned https://images.unsplash.com/photo-{integer}?... — not a valid user photo
+  if (/^https:\/\/images\.unsplash\.com\/photo-\d+/.test(url)) return null;
+  return url;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
@@ -71,8 +79,8 @@ export async function GET(request: NextRequest) {
         website: user.contractorProfile.website,
         phone: user.contractorProfile.phone,
         verified: user.contractorProfile.verified,
-        profilePhoto: user.contractorProfile.profilePhoto,
-        coverPhoto: user.contractorProfile.coverPhoto,
+        profilePhoto: sanitizePhotoUrl(user.contractorProfile.profilePhoto),
+        coverPhoto: sanitizePhotoUrl(user.contractorProfile.coverPhoto),
         avgRating,
         reviewCount: reviewsReceived.length,
         completedJobs: user._count?.acceptedLeads ?? 0,
@@ -82,8 +90,8 @@ export async function GET(request: NextRequest) {
         name: user.homeownerProfile.name,
         city: user.homeownerProfile.city,
         phone: user.homeownerProfile.phone,
-        profilePhoto: user.homeownerProfile.profilePhoto,
-        coverPhoto: user.homeownerProfile.coverPhoto,
+        profilePhoto: sanitizePhotoUrl(user.homeownerProfile.profilePhoto),
+        coverPhoto: sanitizePhotoUrl(user.homeownerProfile.coverPhoto),
         bio: user.homeownerProfile.bio,
         homeType: user.homeownerProfile.homeType,
         preferredRenovationTypes: JSON.parse(user.homeownerProfile.preferredRenovationTypes || "[]"),
@@ -143,6 +151,10 @@ export async function PUT(request: NextRequest) {
         update: contractorData,
         create: { userId: resolvedId, ...contractorData },
       });
+
+      // Verify the write actually persisted
+      const verify = await prisma.contractorProfile.findUnique({ where: { userId: resolvedId } });
+      console.log(`[API/profile] DB verify — profilePhoto:${verify?.profilePhoto ?? 'null'} bio:${verify?.bio ?? 'null'}`);
     } else if (user.role === "homeowner") {
       const homeownerData = {
         name: updateData.name !== undefined ? updateData.name : (user.homeownerProfile?.name ?? null),
@@ -166,6 +178,10 @@ export async function PUT(request: NextRequest) {
         update: homeownerData,
         create: { userId: resolvedId, ...homeownerData },
       });
+
+      // Verify the write actually persisted
+      const verifyHo = await prisma.homeownerProfile.findUnique({ where: { userId: resolvedId } });
+      console.log(`[API/profile] DB verify homeowner — profilePhoto:${verifyHo?.profilePhoto ?? 'null'} bio:${verifyHo?.bio ?? 'null'}`);
     }
 
     const updatedUser = await prisma.user.findUnique({
