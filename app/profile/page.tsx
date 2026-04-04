@@ -138,6 +138,7 @@ export default function UnifiedProfilePage() {
     website: '',
     serviceRadiusKm: 25,
     displayName: '',
+    profilePhoto: '', // tracked so Save always sends the current photo URL
   });
 
   useEffect(() => {
@@ -203,7 +204,7 @@ export default function UnifiedProfilePage() {
             console.log("[ProfilePage] Loaded profileData:", profileData);
             setProfile(profileData);
             
-            // Initialize edit data
+            // Initialize edit data (profilePhoto included so Save always sends it)
             setEditData({
               companyName: profileData.companyName || '',
               trade: profileData.trade || '',
@@ -213,6 +214,7 @@ export default function UnifiedProfilePage() {
               website: profileData.website || '',
               serviceRadiusKm: profileData.serviceRadiusKm || 25,
               displayName: profileData.displayName || profileData.name || '',
+              profilePhoto: profileData.profilePhoto || '',
             });
           }
         } catch (error) {
@@ -329,14 +331,12 @@ export default function UnifiedProfilePage() {
 
   const handleSaveProfile = async () => {
     try {
-      console.log('[ProfilePage] Saving profile with data:', editData);
+      const savePayload = { userId: authUser?.id, ...editData };
+      console.log('[ProfilePage] Save payload:', JSON.stringify(savePayload));
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: authUser?.id,
-          ...editData
-        })
+        body: JSON.stringify(savePayload)
       });
 
       if (response.ok) {
@@ -362,6 +362,7 @@ export default function UnifiedProfilePage() {
         const refetchResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
         if (refetchResponse.ok) {
           const refetchedProfile = await refetchResponse.json();
+          console.log('[ProfilePage] Refetch after save — profilePhoto:', refetchedProfile.profilePhoto, 'bio:', refetchedProfile.bio);
           setProfile(refetchedProfile);
           setEditData({
             companyName: refetchedProfile.companyName || '',
@@ -372,6 +373,7 @@ export default function UnifiedProfilePage() {
             website: refetchedProfile.website || '',
             serviceRadiusKm: refetchedProfile.serviceRadiusKm || 25,
             displayName: refetchedProfile.displayName || refetchedProfile.name || '',
+            profilePhoto: refetchedProfile.profilePhoto || '',
           });
         }
       } else {
@@ -421,8 +423,13 @@ export default function UnifiedProfilePage() {
       }
 
       const uploadResult = await uploadResponse.json();
-      
-      // Update profile with new photo URL
+      console.log('[ProfilePage] Upload result URL:', uploadResult.url);
+
+      if (!uploadResult.url) {
+        throw new Error('Upload returned no URL. Check storage configuration.');
+      }
+
+      // Persist the photo URL to DB immediately
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -434,10 +441,13 @@ export default function UnifiedProfilePage() {
 
       if (response.ok) {
         toast.success('Profile picture updated!');
-        // Update profile state in-place instead of reloading the page
+        // Sync both profile display state and editData so Save includes this URL
         setProfile(prev => prev ? { ...prev, profilePhoto: uploadResult.url } : prev);
+        setEditData(prev => ({ ...prev, profilePhoto: uploadResult.url }));
       } else {
-        throw new Error('Failed to update profile');
+        const errBody = await response.json().catch(() => ({}));
+        console.error('[ProfilePage] Photo DB save failed:', errBody);
+        throw new Error(errBody.error || 'Failed to save photo to profile');
       }
     } catch (error) {
       console.error('Error uploading profile picture:', error);

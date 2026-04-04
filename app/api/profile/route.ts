@@ -92,6 +92,7 @@ export async function GET(request: NextRequest) {
       }),
     };
 
+    console.log(`[API/profile] GET returning — role:${profile.role} profilePhoto:${(profile as any).profilePhoto ?? 'null'} bio:${(profile as any).bio ?? 'null'}`);
     return NextResponse.json(profile);
   } catch (error) {
     console.error("[API/profile] Error fetching profile:", error);
@@ -103,6 +104,8 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { userId, ...updateData } = body;
+
+    console.log(`[API/profile] PUT received — userId:${userId} keys:[${Object.keys(updateData).join(',')}] profilePhoto:${updateData.profilePhoto ?? 'not-sent'} bio:${updateData.bio ?? 'not-sent'}`);
 
     if (!userId) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
@@ -128,9 +131,12 @@ export async function PUT(request: NextRequest) {
         serviceRadiusKm: updateData.serviceRadiusKm || user.contractorProfile?.serviceRadiusKm || 25,
         website: updateData.website !== undefined ? updateData.website : (user.contractorProfile?.website ?? null),
         phone: updateData.phone !== undefined ? updateData.phone : (user.contractorProfile?.phone ?? null),
-        profilePhoto: updateData.profilePhoto !== undefined ? updateData.profilePhoto : (user.contractorProfile?.profilePhoto ?? null),
-        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : (user.contractorProfile?.coverPhoto ?? null),
+        // Use truthy check: empty string or missing field both fall back to existing DB value
+        profilePhoto: updateData.profilePhoto || user.contractorProfile?.profilePhoto || null,
+        coverPhoto: updateData.coverPhoto || user.contractorProfile?.coverPhoto || null,
       };
+
+      console.log(`[API/profile] Writing contractor — profilePhoto:${contractorData.profilePhoto ?? 'null'} bio:${contractorData.bio ?? 'null'}`);
 
       await prisma.contractorProfile.upsert({
         where: { userId: resolvedId },
@@ -142,8 +148,9 @@ export async function PUT(request: NextRequest) {
         name: updateData.name !== undefined ? updateData.name : (user.homeownerProfile?.name ?? null),
         city: updateData.city !== undefined ? updateData.city : (user.homeownerProfile?.city ?? null),
         phone: updateData.phone !== undefined ? updateData.phone : (user.homeownerProfile?.phone ?? null),
-        profilePhoto: updateData.profilePhoto !== undefined ? updateData.profilePhoto : (user.homeownerProfile?.profilePhoto ?? null),
-        coverPhoto: updateData.coverPhoto !== undefined ? updateData.coverPhoto : (user.homeownerProfile?.coverPhoto ?? null),
+        // Use truthy check: empty string or missing field both fall back to existing DB value
+        profilePhoto: updateData.profilePhoto || user.homeownerProfile?.profilePhoto || null,
+        coverPhoto: updateData.coverPhoto || user.homeownerProfile?.coverPhoto || null,
         bio: updateData.bio !== undefined ? updateData.bio : (user.homeownerProfile?.bio ?? null),
         homeType: updateData.homeType !== undefined ? updateData.homeType : (user.homeownerProfile?.homeType ?? null),
         preferredRenovationTypes: updateData.preferredRenovationTypes !== undefined
@@ -151,6 +158,8 @@ export async function PUT(request: NextRequest) {
           : (user.homeownerProfile?.preferredRenovationTypes ?? "[]"),
         budgetRange: updateData.budgetRange !== undefined ? updateData.budgetRange : (user.homeownerProfile?.budgetRange ?? null),
       };
+
+      console.log(`[API/profile] Writing homeowner — profilePhoto:${homeownerData.profilePhoto ?? 'null'} bio:${homeownerData.bio ?? 'null'}`);
 
       await prisma.homeownerProfile.upsert({
         where: { userId: resolvedId },
