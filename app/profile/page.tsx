@@ -451,7 +451,12 @@ export default function UnifiedProfilePage() {
       }
     } catch (error) {
       console.error('Error uploading profile picture:', error);
-      toast.error(`Failed to upload: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      if (msg === 'IMAGE_UPLOAD_NOT_CONFIGURED' || msg.includes('IMAGE_UPLOAD_NOT_CONFIGURED')) {
+        toast.error('Image upload is not configured. Please contact support.');
+      } else {
+        toast.error(`Failed to upload: ${msg}`);
+      }
     } finally {
       setIsUploading(false);
     }
