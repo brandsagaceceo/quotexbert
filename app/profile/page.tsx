@@ -352,6 +352,7 @@ export default function UnifiedProfilePage() {
         profilePhoto: photoUrl,
       };
       console.log('[ProfilePage] Save payload:', JSON.stringify(savePayload));
+      console.log("SAVE payload:", savePayload);
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -428,6 +429,7 @@ export default function UnifiedProfilePage() {
 
       const uploadResult = await uploadResponse.json();
       console.log('[ProfilePage] Upload result URL:', uploadResult.url);
+      console.log("UPLOAD result:", uploadResult);
 
       if (!uploadResult.url) {
         throw new Error('Upload returned no URL. Check storage configuration.');

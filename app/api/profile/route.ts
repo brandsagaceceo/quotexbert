@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
     };
 
     console.log(`[API/profile] GET returning — role:${profile.role} profilePhoto:${(profile as any).profilePhoto ?? 'null'} bio:${(profile as any).bio ?? 'null'}`);
+    console.log("[GET] returning profile:", profile);
     return NextResponse.json(profile);
   } catch (error) {
     console.error("[API/profile] Error fetching profile:", error);
@@ -113,6 +114,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { userId, ...updateData } = body;
 
+    console.log("[PUT] received body:", body);
     console.log(`[API/profile] PUT received — userId:${userId} keys:[${Object.keys(updateData).join(',')}] profilePhoto:${updateData.profilePhoto ?? 'not-sent'} bio:${updateData.bio ?? 'not-sent'}`);
 
     if (!userId) {
@@ -145,6 +147,7 @@ export async function PUT(request: NextRequest) {
       };
 
       console.log(`[API/profile] Writing contractor — profilePhoto:${contractorData.profilePhoto ?? 'null'} bio:${contractorData.bio ?? 'null'}`);
+      console.log("[PUT] writing:", contractorData);
 
       await prisma.contractorProfile.upsert({
         where: { userId: resolvedId },
@@ -155,6 +158,7 @@ export async function PUT(request: NextRequest) {
       // Verify the write actually persisted
       const verify = await prisma.contractorProfile.findUnique({ where: { userId: resolvedId } });
       console.log(`[API/profile] DB verify — profilePhoto:${verify?.profilePhoto ?? 'null'} bio:${verify?.bio ?? 'null'}`);
+      console.log("[PUT] DB verify:", verify);
     } else if (user.role === "homeowner") {
       const homeownerData = {
         name: updateData.name !== undefined ? updateData.name : (user.homeownerProfile?.name ?? null),
