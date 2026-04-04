@@ -256,7 +256,7 @@ export default function RootLayout({
             id="main-content" 
             className="min-h-screen"
             style={{
-              paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px))',
+              paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))',
             }}
           >
             {children}

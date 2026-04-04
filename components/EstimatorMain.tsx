@@ -307,7 +307,6 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
               Upload Project Photos
             </label>
-            <p className="text-xs text-slate-500 mb-3">📏 Max 5MB per photo · JPEG, PNG, WebP · 2–3 photos recommended</p>
             
             <div
               onDragOver={handleDragOver}
@@ -390,7 +389,6 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
               Describe Your Project
             </label>
-            <p className="text-xs text-slate-600 mb-2">💡 More details = more accurate pricing</p>
             <div className="relative">
               <textarea
                 id="description"
@@ -427,7 +425,6 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
               Project Type <span className="text-red-500">*</span>
             </label>
-            <p className="text-xs text-slate-600 mb-2">Helps us calculate accurate pricing</p>
             <select
               id="projectType"
               value={projectType}
@@ -447,9 +444,8 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           {/* Postal Code */}
           <div>
             <label htmlFor="postalCode" className="block text-xs font-bold text-slate-700 mb-1">
-              Postal Code (optional)
+              Postal Code <span className="text-slate-400 font-normal">(optional, for GTA pricing)</span>
             </label>
-            <p className="text-xs text-slate-500 mb-1.5">For accurate GTA pricing • We never share your location</p>
             <input
               id="postalCode"
               type="text"

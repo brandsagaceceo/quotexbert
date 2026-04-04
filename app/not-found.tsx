@@ -9,12 +9,20 @@ export default function NotFound() {
       <p className="text-gray-600 mb-6 max-w-sm">
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
-      <a
-        href="/"
-        className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
-      >
-        Back to Home →
-      </a>
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <a
+          href="/#get-estimate"
+          className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+        >
+          📸 Get Free Estimate →
+        </a>
+        <a
+          href="/"
+          className="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-bold hover:border-rose-400 hover:text-rose-700 transition-all"
+        >
+          Back to Home
+        </a>
+      </div>
     </main>
   );
 }

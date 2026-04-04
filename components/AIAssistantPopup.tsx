@@ -117,6 +117,36 @@ export default function AIAssistantPopup() {
     return () => observer.disconnect();
   }, [shouldHideForPath, pathname, isOpen]);
 
+  // On mobile: hide widget when any input/textarea/select is focused (user is interacting with a form)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleFocusIn = (e: FocusEvent) => {
+      if (window.innerWidth >= 768) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        setIsHidden(true);
+        if (isOpen) setIsOpen(false);
+      }
+    };
+    const handleFocusOut = () => {
+      if (window.innerWidth >= 768) return;
+      // Small delay to allow new focus to settle — if another field is focused, handleFocusIn will re-hide
+      setTimeout(() => {
+        const active = document.activeElement;
+        const tag = active?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && !shouldHideForPath) {
+          setIsHidden(false);
+        }
+      }, 200);
+    };
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, [shouldHideForPath, isOpen]);
+
   const initializeChat = () => {
     const welcomeMessage: Message = {
       role: 'assistant',

@@ -189,16 +189,25 @@ export default function SiteHeader() {
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-100 bg-white pb-4">
             <div className="px-2 pt-2 space-y-0.5">
+              {/* GET A QUOTE */}
+              <p className="px-3 pt-2 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Get a Quote</p>
               <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 py-3 px-3 text-sm font-bold text-[#800020] bg-rose-50 rounded-lg">
                 ✨ AI Estimate
               </Link>
-              <Link href="/renovation-costs" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Renovation Costs</Link>
-              <Link href="/for-contractors" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">For Contractors</Link>
+              <Link href="/renovation-costs" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Renovation Cost Guides</Link>
+
+              {/* FOR CONTRACTORS */}
+              <p className="px-3 pt-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">For Contractors</p>
+              <Link href="/contractors/join" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">🔧 Join as Contractor</Link>
+              <Link href="/contractor/jobs" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">📋 Browse Jobs</Link>
+
+              {/* COMPANY */}
+              <p className="px-3 pt-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Company</p>
               <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
               <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
               <div className="border-t border-gray-100 my-1" />
               <a href="tel:9052429460" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📞 Call Us: 905-242-9460</a>
-              <a href="mailto:quotexbert@gmail.com" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📧 Email Us: quotexbert@gmail.com</a>
+              <a href="mailto:quotexbert@gmail.com" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📧 Email Us</a>
             </div>
 
             <div className="border-t border-gray-100 mt-3 px-2 pt-3">

@@ -556,7 +556,7 @@ export default function UnifiedProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ paddingBottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 8px)' }}>
+    <div className="min-h-screen bg-white" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
       {/* Development Tool - Overflow Detection */}
       <OverflowDetector />
 
@@ -649,7 +649,7 @@ export default function UnifiedProfilePage() {
             <div className="flex-1">
               <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-5 md:p-6 border border-slate-200">
                   {/* Mobile Edit/Save Buttons - Inline (shown only on mobile) */}
-                  <div className="md:hidden flex justify-end gap-2 mb-5">
+                  <div className="md:hidden flex justify-end gap-2 mb-3">
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
