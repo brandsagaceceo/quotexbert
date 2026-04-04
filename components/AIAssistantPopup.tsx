@@ -281,14 +281,14 @@ export default function AIAssistantPopup() {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-2 group${
+          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-1.5 md:gap-2 group${
             isHidden ? ' widget-hidden' : ''
           }`}
           aria-label="Open AI Assistant"
         >
-          <Sparkles className="h-5 w-5" />
-          <MessageCircle className="h-5 w-5" />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-semibold text-sm">
+          <Sparkles className="h-4 w-4 md:h-5 md:w-5" />
+          <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
+          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-semibold text-xs md:text-sm">
             Need Help?
           </span>
         </button>

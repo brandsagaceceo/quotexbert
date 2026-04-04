@@ -441,28 +441,28 @@ export default function SubscriptionsPage() {
           )}
 
           {/* Introduction Section */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-8 border-2 border-rose-100">
+          <div className="bg-white rounded-3xl shadow-xl p-4 md:p-10 mb-6 border-2 border-rose-100">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold text-lg mb-6 shadow-lg">
                   <span className="text-2xl">👷</span>
                   <span>Welcome, Contractor!</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-3">
                   Get More Jobs, Keep 100% of Your Profits
                 </h2>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-base md:text-xl text-gray-600 leading-relaxed">
                   Unlike other platforms, we <span className="font-bold text-rose-600">never take a percentage of your job earnings</span>. 
                   Pay a simple monthly subscription per category and keep every dollar you earn.
                 </p>
               </div>
 
               {/* Key Benefits Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-green-500 rounded-full p-3 flex-shrink-0">
-                      <span className="text-3xl">💰</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-8">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 md:p-6 border-2 border-green-200">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-green-500 rounded-full p-2 md:p-3 flex-shrink-0">
+                      <span className="text-2xl md:text-3xl">💰</span>
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-gray-900 mb-2">Zero Commission</h3>
@@ -473,10 +473,10 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-rose-700 rounded-full p-3 flex-shrink-0">
-                      <span className="text-3xl">🎯</span>
+                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-4 md:p-6 border-2 border-rose-200">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-rose-700 rounded-full p-2 md:p-3 flex-shrink-0">
+                      <span className="text-2xl md:text-3xl">🎯</span>
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-gray-900 mb-2">Choose Your Categories</h3>
@@ -487,10 +487,10 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-rose-500 rounded-full p-3 flex-shrink-0">
-                      <span className="text-3xl">📬</span>
+                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-4 md:p-6 border-2 border-rose-200">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-rose-500 rounded-full p-2 md:p-3 flex-shrink-0">
+                      <span className="text-2xl md:text-3xl">📬</span>
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-gray-900 mb-2">Unlimited Applications</h3>
@@ -501,10 +501,10 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-6 border-2 border-orange-200">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-orange-500 rounded-full p-3 flex-shrink-0">
-                      <span className="text-3xl">💬</span>
+                <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 md:p-6 border-2 border-orange-200">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-orange-500 rounded-full p-2 md:p-3 flex-shrink-0">
+                      <span className="text-2xl md:text-3xl">💬</span>
                     </div>
                     <div>
                       <h3 className="text-xl font-black text-gray-900 mb-2">Direct Messaging</h3>
@@ -517,34 +517,34 @@ export default function SubscriptionsPage() {
               </div>
 
               {/* How It Works */}
-              <div className="bg-gradient-to-r from-rose-500 to-orange-500 rounded-2xl p-8 text-white">
-                <h3 className="text-2xl font-black mb-6 text-center">How It Works</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-r from-rose-500 to-orange-500 rounded-2xl p-5 md:p-8 text-white">
+                <h3 className="text-xl font-black mb-4 text-center">How It Works</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-4xl">📋</span>
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-3xl">📋</span>
                     </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
                       <span className="text-sm font-black">STEP 1</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Choose Your Plan</h4>
                     <p className="text-white text-opacity-90">Select how many categories you want access to (3, 6, or 10)</p>
                   </div>
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-4xl">🎯</span>
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-3xl">🎯</span>
                     </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
                       <span className="text-sm font-black">STEP 2</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Pick Categories</h4>
                     <p className="text-white text-opacity-90">After subscribing, select your job categories from 30+ options</p>
                   </div>
                   <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-4xl">🚀</span>
+                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
+                      <span className="text-3xl">🚀</span>
                     </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-3">
+                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
                       <span className="text-sm font-black">STEP 3</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2">Start Bidding</h4>
@@ -554,8 +554,8 @@ export default function SubscriptionsPage() {
               </div>
 
               {/* Category Examples */}
-              <div className="mt-8 text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Available Categories Include:</h3>
+              <div className="mt-4 text-center">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Available Categories Include:</h3>
                 <div className="flex flex-wrap justify-center gap-3">
                   {[
                     '🏠 Roofing', '⚡ Electrical', '🚰 Plumbing', '🎨 Painting', 
