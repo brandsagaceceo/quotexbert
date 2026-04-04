@@ -598,7 +598,7 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Profile Identity Section */}
-      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-8 md:pb-10" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 24px)' }}>
+      <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-4 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-row items-start gap-3 md:gap-6">
             {/* Profile Picture */}
