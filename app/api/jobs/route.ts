@@ -38,9 +38,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       jobs,
       total: jobs.length,
-      message: jobs.length === 0 
-        ? 'No jobs available at the moment.' 
-        : `Found ${jobs.length} available jobs. Subscribe to categories to apply for jobs.`
+      message: jobs.length === 0
+        ? 'No leads available at the moment.'
+        : 'Jobs available in your categories — subscribe to a category to apply.'
     });
   } catch (error) {
     console.error('Error:', error);

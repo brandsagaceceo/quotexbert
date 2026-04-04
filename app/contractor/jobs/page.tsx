@@ -632,7 +632,9 @@ function ContractorJobsContent() {
                   Clear Filters
                 </button>
                 <div className="text-sm text-gray-600 flex items-center sm:justify-end">
-                  Showing {filteredJobs.length} of {jobs.length} jobs
+                  {filteredJobs.length === jobs.length
+                    ? `${filteredJobs.length} jobs in your categories`
+                    : `Showing ${filteredJobs.length} of ${jobs.length} matching jobs`}
                 </div>
               </div>
             </div>

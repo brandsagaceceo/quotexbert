@@ -340,26 +340,40 @@ export default function UnifiedProfilePage() {
       });
 
       if (response.ok) {
-        const body = await response.json();
-        // API returns { success: true, profile: updatedUser }
-        const updatedProfile = body?.profile ?? body;
-        console.debug('[ProfilePage] Save response body:', body);
-        console.log('[ProfilePage] Profile saved successfully:', updatedProfile);
-        setProfile(updatedProfile);
+        // Do not use the raw Prisma response (nested shape) as profile state –
+        // the UI expects a flat shape. Merge editData directly instead.
+        setProfile(prev => prev ? {
+          ...prev,
+          companyName: editData.companyName || prev.companyName,
+          trade: editData.trade || prev.trade,
+          bio: editData.bio,
+          city: editData.city,
+          phone: editData.phone,
+          website: editData.website,
+          serviceRadiusKm: editData.serviceRadiusKm,
+          displayName: editData.displayName,
+          name: editData.displayName || prev.name,
+        } : prev);
         setIsEditing(false);
-        
-        // Show success message
+
         toast.success('Profile updated successfully!');
-        
-        // Refetch profile to ensure data is in sync
-        setTimeout(async () => {
-          const refetchResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
-          if (refetchResponse.ok) {
-            const refetchedProfile = await refetchResponse.json();
-            console.log('[ProfilePage] Refetched profile:', refetchedProfile);
-            setProfile(refetchedProfile);
-          }
-        }, 500);
+
+        // Refetch immediately to confirm DB write and sync any server-side defaults
+        const refetchResponse = await fetch(`/api/profile?userId=${authUser?.id}`);
+        if (refetchResponse.ok) {
+          const refetchedProfile = await refetchResponse.json();
+          setProfile(refetchedProfile);
+          setEditData({
+            companyName: refetchedProfile.companyName || '',
+            trade: refetchedProfile.trade || '',
+            bio: refetchedProfile.bio || '',
+            city: refetchedProfile.city || '',
+            phone: refetchedProfile.phone || '',
+            website: refetchedProfile.website || '',
+            serviceRadiusKm: refetchedProfile.serviceRadiusKm || 25,
+            displayName: refetchedProfile.displayName || refetchedProfile.name || '',
+          });
+        }
       } else {
         const errorData = await response.json();
         console.error('[ProfilePage] Profile save failed:', errorData);

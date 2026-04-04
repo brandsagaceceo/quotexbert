@@ -25,6 +25,15 @@ export default function SiteHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Notify AIAssistantPopup when mobile menu opens/closes so it can hide
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("mobileMenuToggle", { detail: { open: isMobileMenuOpen } })
+      );
+    }
+  }, [isMobileMenuOpen]);
+
   const toggle = (name: string) =>
     setOpenDropdown((prev) => (prev === name ? null : name));
 

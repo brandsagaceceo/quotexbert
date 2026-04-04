@@ -21,11 +21,23 @@ export default function AIAssistantPopup() {
   const [userType, setUserType] = useState<'homeowner' | 'contractor' | null>(null);
   const [showTerms, setShowTerms] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
   const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate', '/profile', '/contractor/subscriptions', '/contractor/jobs', '/ai-quote', '/ai-renovation-check', '/billing'];
   const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p));
+
+  // Hide widget when site-header mobile menu opens
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ open: boolean }>).detail;
+      setMobileMenuOpen(detail.open);
+      if (detail.open && isOpen) setIsOpen(false);
+    };
+    window.addEventListener('mobileMenuToggle', handler);
+    return () => window.removeEventListener('mobileMenuToggle', handler);
+  }, [isOpen]);
 
   useEffect(() => {
     // Determine user type
@@ -274,7 +286,7 @@ export default function AIAssistantPopup() {
   return (
     <>
       {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
-      {!isOpen && (
+      {!isOpen && !mobileMenuOpen && (
         <button
           ref={buttonRef}
           onClick={() => {
