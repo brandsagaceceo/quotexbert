@@ -288,10 +288,15 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           <p className="text-xs md:text-sm text-slate-600">
             Snap your project. Know the fair price in 30 seconds.
           </p>
+          {/* Trust stat */}
+          <p className="mt-1.5 text-xs font-semibold text-slate-500">
+            🏠 Used by <span className="text-rose-600 font-bold">1,000+ homeowners</span> across Toronto &amp; GTA
+          </p>
           <div className="mt-2 flex flex-wrap gap-1.5 text-xs justify-center">
-            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✓ No signup required</span>
-            <span className="bg-rose-50 text-rose-900 px-2 py-0.5 rounded-full font-semibold">✓ 100% free</span>
-            <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full font-semibold">✓ No spam</span>
+            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✔ Instant price</span>
+            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✔ No signup</span>
+            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✔ 100% free</span>
+            <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">✔ No spam</span>
           </div>
         </div>
 
