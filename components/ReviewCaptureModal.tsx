@@ -20,9 +20,10 @@ export function ReviewCaptureModal({ isOpen, onClose, googleReviewUrl }: ReviewC
 
   if (!isOpen) return null;
 
+  // Use env var if set; otherwise fall back to Google Maps search (set NEXT_PUBLIC_GOOGLE_REVIEW_URL in Vercel to the writereview URL)
   const defaultReviewUrl = (googleReviewUrl && !googleReviewUrl.includes('YOUR_'))
     ? googleReviewUrl
-    : 'https://www.google.com/search?q=QuoteXbert+Toronto+reviews';
+    : 'https://www.google.com/maps/search/QuoteXbert+Toronto+renovation+quotes';
 
   const handleLeaveReview = () => {
     window.open(defaultReviewUrl, '_blank');

@@ -438,79 +438,59 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Who Are You? Split Path Section */}
-        {/* Who Are You? Split Path — desktop only (estimator above serves homeowners on mobile) */}
+        {/* Quick-start paths — desktop only, homeowner-first */}
         {!estimateResult && (
           <div className="hidden md:block">
-          <section className="py-16 bg-gradient-to-br from-white to-orange-50">
-            <div className="max-w-6xl mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-                  I'm here to...
+          <section className="py-10 bg-gradient-to-br from-white to-orange-50">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-black text-slate-900 mb-2">
+                  What would you like to do?
                 </h2>
-                <p className="text-xl text-slate-600">
-                  Choose your path to get started
+                <p className="text-base text-slate-600">
+                  Pick a tool to get started — everything is free for homeowners
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
                 {/* Homeowner Path */}
                 <Link
                   href="/#get-estimate"
-                  className="group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-8 border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all"
+                  className="group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200 hover:border-rose-400 hover:shadow-xl transition-all"
                 >
-                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">🏠</div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-3">Get a Project Quote</h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">
-                    Upload photos, get instant AI estimates, and connect with verified contractors in your area.
+                  <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">🏠</div>
+                  <h3 className="text-xl font-black text-slate-900 mb-2">Get a Project Quote</h3>
+                  <p className="text-slate-600 text-sm mb-4 leading-relaxed">
+                    Upload photos, get instant AI estimates, and connect with verified GTA contractors.
                   </p>
-                  <div className="flex items-center gap-2 text-rose-700 font-bold group-hover:gap-4 transition-all">
+                  <div className="flex items-center gap-2 text-rose-700 font-bold text-sm group-hover:gap-4 transition-all">
                     <span>Get My Estimate</span>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
                 </Link>
 
-                {/* Contractor Path */}
-                <Link
-                  href="/contractors/join"
-                  className="group bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-8 border-2 border-sky-200 hover:border-sky-400 hover:shadow-2xl transition-all"
-                >
-                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">🔧</div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-3">Find Quality Leads</h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">
-                    Get pre-qualified leads in Toronto &amp; GTA. No bidding wars. AI-screened homeowners with real budgets.
-                  </p>
-                  <div className="flex items-center gap-2 text-sky-700 font-bold group-hover:gap-4 transition-all">
-                    <span>Join as Contractor</span>
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </Link>
-              </div>
-
-              {/* Mid-Renovation Tool */}
-              <div className="mt-8 max-w-4xl mx-auto">
-                {/* AI Inspector Card */}
+                {/* AI Inspector */}
                 <Link
                   href="/ai-renovation-check"
-                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all flex items-center gap-4"
+                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all flex flex-col justify-between"
                 >
-                  <div className="text-4xl group-hover:scale-110 transition-transform flex-shrink-0">🔍</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded-full mb-1">
-                      QUALITY CHECK
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-4xl group-hover:scale-110 transition-transform">🔍</span>
+                      <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded-full">
+                        QUALITY CHECK
+                      </div>
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 mb-1">AI Renovation Inspector</h3>
+                    <h3 className="text-xl font-black text-slate-900 mb-2">AI Renovation Inspector</h3>
                     <p className="text-slate-600 text-sm leading-snug">
-                      Upload photos — AI checks if the work looks correct.
+                      Upload photos — AI checks if the work looks correct and flags issues.
                     </p>
-                    <span className="inline-flex items-center gap-1 text-purple-700 font-bold text-sm mt-2 group-hover:gap-2 transition-all">
-                      Try Free →
-                    </span>
                   </div>
+                  <span className="inline-flex items-center gap-1 text-purple-700 font-bold text-sm mt-4 group-hover:gap-2 transition-all">
+                    Try Free →
+                  </span>
                 </Link>
               </div>
             </div>
