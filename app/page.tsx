@@ -245,11 +245,19 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-6 md:mb-10 leading-relaxed font-medium">
+                <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-4 md:mb-10 leading-relaxed font-medium">
                   <span className="text-rose-700 font-bold">Upload photos</span> of your project. 
                   Get a detailed, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
                   Compare before you commit, then post your project to the job board for contractor bids.
                 </p>
+
+                {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
+                <a
+                  href="#estimator-tool"
+                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-black text-base py-4 px-6 rounded-2xl shadow-xl active:scale-95 transition-all mb-6"
+                >
+                  📸 Upload Photos — Free AI Estimate ↓
+                </a>
 
                 {/* Key Benefits - Compact for mobile */}
                 <div className="space-y-3 md:space-y-6 mb-6 md:mb-10">
@@ -312,8 +320,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Column - iPhone Estimator Mockup */}
-              <div className="lg:pl-8" data-estimator>
+              {/* Right Column - iPhone Estimator */}
+              <div className="lg:pl-8" id="estimator-tool" data-estimator>
                 <EstimatorMain 
                   onEstimateComplete={handleEstimateComplete}
                   userId={user?.id || undefined}

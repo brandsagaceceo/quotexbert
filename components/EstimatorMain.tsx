@@ -299,7 +299,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           {/* Photo Upload Area - Big Drag & Drop */}
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              <span className="bg-orange-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span>
               Upload Project Photos
             </label>
             <p className="text-xs text-slate-500 mb-3">📏 Max 5MB per photo · JPEG, PNG, WebP · 2–3 photos recommended</p>
@@ -311,11 +311,11 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               onClick={() => fileInputRef.current?.click()}
               className={`
                 border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer
-                transition-all duration-200 relative min-h-[140px] flex flex-col items-center justify-center
-                shadow-sm
+                transition-all duration-200 relative min-h-[175px] flex flex-col items-center justify-center
+                shadow-md
                 ${isDragging
                   ? "border-orange-500 bg-orange-50 scale-[1.02] shadow-lg"
-                  : "border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50 hover:border-orange-500 hover:shadow-md"
+                  : "border-orange-400 bg-gradient-to-br from-orange-50 to-amber-50 hover:border-orange-500 hover:shadow-lg ring-2 ring-orange-200"
                 }
               `}
             >
@@ -323,11 +323,11 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-600 to-orange-500 flex items-center justify-center mb-3 shadow-lg">
                 <CloudArrowUpIcon className="w-8 h-8 text-white" />
               </div>
-              <p className="text-base font-black text-slate-900 mb-1">
+              <p className="text-lg md:text-base font-black text-slate-900 mb-1">
                 📷 Upload Your Photos Here
               </p>
-              <p className="text-sm font-semibold text-rose-700">
-                Tap to browse or drag &amp; drop
+              <p className="text-sm font-bold text-rose-600">
+                Tap here to browse · or drag &amp; drop
               </p>
               <p className="text-xs text-slate-500 mt-2 bg-white/70 px-3 py-1 rounded-full">
                 Photos = faster &amp; more accurate estimates
@@ -382,7 +382,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           {/* Description - Compact for mobile */}
           <div>
             <label htmlFor="description" className="block text-xs md:text-sm font-bold text-slate-900 mb-1.5 md:mb-2 flex items-center gap-1.5">
-              <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+              <span className="bg-orange-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
               Describe Your Project
             </label>
             <p className="text-xs text-slate-600 mb-2">💡 More details = more accurate pricing</p>
