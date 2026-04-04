@@ -187,7 +187,7 @@ export default function Home() {
         <ReviewCaptureModal 
           isOpen={showReviewModal} 
           onClose={() => setShowReviewModal(false)}
-          googleReviewUrl="YOUR_GOOGLE_REVIEW_URL_HERE"
+          googleReviewUrl={process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL || undefined}
         />
       </Suspense>
 
@@ -259,8 +259,15 @@ export default function Home() {
                   📸 Upload Photos — Free AI Estimate ↓
                 </a>
 
-                {/* Key Benefits - Compact for mobile */}
-                <div className="space-y-3 md:space-y-6 mb-6 md:mb-10">
+                {/* Mobile-only compact benefits (desktop shows full cards below) */}
+                <div className="lg:hidden flex flex-wrap gap-2 mb-3">
+                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
+                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
+                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Real Toronto prices</span>
+                </div>
+
+                {/* Key Benefits - Desktop only */}
+                <div className="hidden lg:block space-y-3 md:space-y-6 mb-6 md:mb-10">
                   <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
                     <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
                       <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -432,8 +439,9 @@ export default function Home() {
         </section>
 
         {/* Who Are You? Split Path Section */}
+        {/* Who Are You? Split Path — desktop only (estimator above serves homeowners on mobile) */}
         {!estimateResult && (
-          <>
+          <div className="hidden md:block">
           <section className="py-16 bg-gradient-to-br from-white to-orange-50">
             <div className="max-w-6xl mx-auto px-4">
               <div className="text-center mb-12">
@@ -601,7 +609,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          </>
+          </div>
         )}
 
         {/* Estimate Results */}

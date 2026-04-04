@@ -967,7 +967,51 @@ export default function SubscriptionsPage() {
                   What's Included in Each Plan
                 </h2>
                 
-                <div className="overflow-x-auto">
+                {/* Mobile: stacked feature rows */}
+                <div className="md:hidden space-y-0 border border-gray-200 rounded-2xl overflow-hidden">
+                  {/* Plan headers */}
+                  <div className="grid grid-cols-4 bg-gray-50 border-b-2 border-gray-200">
+                    <div className="py-3 px-2 text-xs font-bold text-gray-500 uppercase">Feature</div>
+                    <div className="py-3 px-1 text-center border-l border-gray-200">
+                      <div className="text-base">🔧</div>
+                      <div className="text-xs font-black text-gray-800 leading-tight">Handyman</div>
+                      <div className="text-xs font-bold text-green-700">$49/mo</div>
+                    </div>
+                    <div className="py-3 px-1 text-center border-l border-gray-200 bg-orange-50">
+                      <div className="text-base">🏗️</div>
+                      <div className="text-xs font-black text-gray-800 leading-tight">Renovation</div>
+                      <div className="text-xs font-bold text-orange-700">$99/mo</div>
+                    </div>
+                    <div className="py-3 px-1 text-center border-l border-gray-200">
+                      <div className="text-base">👷</div>
+                      <div className="text-xs font-black text-gray-800 leading-tight">General</div>
+                      <div className="text-xs font-bold text-rose-700">$149/mo</div>
+                    </div>
+                  </div>
+                  {[
+                    { label: 'Categories', vals: ['3', '6', 'ALL'] },
+                    { label: 'Job Applications', vals: ['✓', '✓', '✓'] },
+                    { label: 'Messaging', vals: ['✓', '✓', '✓'] },
+                    { label: 'Profile Page', vals: ['✓', '✓', '✓'] },
+                    { label: 'Priority Search', vals: ['—', '✓', '✓'] },
+                    { label: 'Featured Badge', vals: ['—', '✓', '✓'] },
+                    { label: 'Portfolio', vals: ['—', '✓', '✓'] },
+                    { label: 'Homepage Spot', vals: ['—', '—', '✓'] },
+                    { label: 'Acct Manager', vals: ['—', '—', '✓'] },
+                  ].map((row, i) => (
+                    <div key={row.label} className={`grid grid-cols-4 border-b border-gray-100 last:border-0 ${i % 2 === 1 ? 'bg-gray-50/60' : ''}`}>
+                      <div className="py-3 px-2 text-xs font-semibold text-gray-700 flex items-center">{row.label}</div>
+                      {row.vals.map((v, j) => (
+                        <div key={j} className={`py-3 px-1 text-center border-l border-gray-100 flex items-center justify-center ${j === 1 ? 'bg-orange-50/60' : ''}`}>
+                          <span className={`text-sm font-bold ${v === '✓' && j === 0 ? 'text-green-600' : v === '✓' && j === 1 ? 'text-orange-600' : v === '✓' ? 'text-rose-700' : v === '—' ? 'text-gray-300' : j === 0 ? 'text-green-700 text-xs' : j === 1 ? 'text-orange-700 text-xs' : 'text-rose-700 text-xs'}`}>{v}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop: full table */}
+                <div className="overflow-x-auto hidden md:block">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b-2 border-gray-300">

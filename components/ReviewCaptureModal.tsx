@@ -20,7 +20,9 @@ export function ReviewCaptureModal({ isOpen, onClose, googleReviewUrl }: ReviewC
 
   if (!isOpen) return null;
 
-  const defaultReviewUrl = googleReviewUrl || "https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review";
+  const defaultReviewUrl = (googleReviewUrl && !googleReviewUrl.includes('YOUR_'))
+    ? googleReviewUrl
+    : 'https://www.google.com/search?q=QuoteXbert+Toronto+reviews';
 
   const handleLeaveReview = () => {
     window.open(defaultReviewUrl, '_blank');

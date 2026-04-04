@@ -24,7 +24,7 @@ export default function AIAssistantPopup() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
-  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate', '/profile', '/contractor/subscriptions'];
+  const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate', '/profile', '/contractor/subscriptions', '/ai-quote', '/ai-renovation-check', '/second-opinion', '/billing'];
   const shouldHideForPath = HIDE_ON_PATHS.some((p) => pathname?.startsWith(p));
 
   useEffect(() => {
@@ -53,11 +53,18 @@ export default function AIAssistantPopup() {
     // Auto-open disabled — widget button remains visible for users to click
   }, [isSignedIn, authUser]);
 
-  // Auto-hide on form/messaging pages and near bottom CTAs on mobile
+  // Auto-hide on form/messaging pages and when estimator/form is in viewport on mobile
   useEffect(() => {
     if (shouldHideForPath) {
       setIsHidden(true);
       if (isOpen) setIsOpen(false);
+      return;
+    }
+
+    // Hide on pages that opt-out via data attribute (e.g. not-found page)
+    const hasOptOut = typeof document !== 'undefined' && !!document.querySelector('[data-no-ai-widget]');
+    if (hasOptOut) {
+      setIsHidden(true);
       return;
     }
 
@@ -86,7 +93,29 @@ export default function AIAssistantPopup() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [shouldHideForPath]);
+  }, [shouldHideForPath, pathname]);
+
+  // On mobile: hide widget when the estimator tool is scrolled into view
+  useEffect(() => {
+    if (shouldHideForPath || typeof window === 'undefined') return;
+    const estimatorEl = document.querySelector('[data-estimator]');
+    if (!estimatorEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (window.innerWidth >= 768) return; // desktop: no-op
+        if (entry.isIntersecting) {
+          setIsHidden(true);
+          if (isOpen) setIsOpen(false);
+        } else {
+          setIsHidden(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(estimatorEl);
+    return () => observer.disconnect();
+  }, [shouldHideForPath, pathname, isOpen]);
 
   const initializeChat = () => {
     const welcomeMessage: Message = {
@@ -238,9 +267,10 @@ export default function AIAssistantPopup() {
       {/* Chat Window */}
       {isOpen && (
         <div
-          className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 mx-auto bottom-4 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
+          className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 sm:left-auto sm:right-4 mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
             maxHeight: '80vh',
+            bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem)',
           }}
         >
           {/* Header */}

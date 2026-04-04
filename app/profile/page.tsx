@@ -600,10 +600,10 @@ export default function UnifiedProfilePage() {
       {/* Profile Identity Section */}
       <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-8 md:pb-10" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 24px)' }}>
         <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+          <div className="flex flex-row items-start gap-3 md:gap-6">
             {/* Profile Picture */}
             <div className="relative group flex-shrink-0">
-                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -612,7 +612,7 @@ export default function UnifiedProfilePage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
-                      <User className="h-12 w-12 md:h-16 md:w-16 text-white" />
+                      <User className="h-10 w-10 md:h-16 md:w-16 text-white" />
                     </div>
                   )}
                   
