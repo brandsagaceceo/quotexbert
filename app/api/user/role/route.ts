@@ -120,12 +120,15 @@ export async function POST(req: NextRequest) {
       where: { email },
     });
 
+    let resolvedUserId: string;
+
     if (existingUser) {
       // User exists — update role, name, and ensure clerkUserId is stored
       await prisma.user.update({
         where: { email },
         data: { role, name: userName, clerkUserId: userId },
       });
+      resolvedUserId = existingUser.id;
     } else {
       // No user with this email — create fresh record
       await prisma.user.create({
@@ -136,6 +139,25 @@ export async function POST(req: NextRequest) {
           role,
         },
       });
+      resolvedUserId = userId;
+    }
+
+    // Ensure the role-specific profile row exists so saves never fail on first attempt.
+    // Uses upsert (no-op if already exists).
+    if (role === "contractor") {
+      await prisma.contractorProfile.upsert({
+        where: { userId: resolvedUserId },
+        update: {},
+        create: { userId: resolvedUserId, companyName: userName || "My Company", trade: "General" },
+      });
+      console.log('[API/user/role] contractor profile ensured for', resolvedUserId);
+    } else if (role === "homeowner") {
+      await prisma.homeownerProfile.upsert({
+        where: { userId: resolvedUserId },
+        update: {},
+        create: { userId: resolvedUserId, name: userName || "" },
+      });
+      console.log('[API/user/role] homeowner profile ensured for', resolvedUserId);
     }
 
     console.log('User role updated successfully:', role);

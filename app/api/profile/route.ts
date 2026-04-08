@@ -65,12 +65,20 @@ export async function GET(request: NextRequest) {
       avgRating = totalRating / reviewsReceived.length;
     }
 
+    // Determine the authoritative role for this request.
+    // Some dual-role accounts have BOTH profiles; we must only spread the
+    // profile that matches user.role to avoid homeowner nulls overwriting
+    // contractor bio/profilePhoto (or vice-versa).
+    const getRole = user.role
+      || (user.contractorProfile ? "contractor" : null)
+      || (user.homeownerProfile ? "homeowner" : null);
+
     const profile = {
       id: user.id,
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
-      ...(user.contractorProfile && {
+      ...(getRole === "contractor" && user.contractorProfile && {
         companyName: user.contractorProfile.companyName,
         trade: user.contractorProfile.trade,
         bio: user.contractorProfile.bio,
@@ -86,7 +94,7 @@ export async function GET(request: NextRequest) {
         completedJobs: user._count?.acceptedLeads ?? 0,
         isActive: user.contractorProfile.isActive,
       }),
-      ...(user.homeownerProfile && {
+      ...(getRole === "homeowner" && user.homeownerProfile && {
         name: user.homeownerProfile.name,
         city: user.homeownerProfile.city,
         phone: user.homeownerProfile.phone,
