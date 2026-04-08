@@ -334,6 +334,10 @@ export default function UnifiedProfilePage() {
       toast.error('Not signed in. Please refresh and try again.');
       return;
     }
+    if (isUploading) {
+      toast.error('Please wait for the photo upload to finish before saving.');
+      return;
+    }
     try {
       // Double-source profilePhoto: prefer editData, fall back to current profile state
       // This guards against any stale-closure scenario where editData.profilePhoto was lost
@@ -351,8 +355,7 @@ export default function UnifiedProfilePage() {
         name: editData.displayName,
         profilePhoto: photoUrl,
       };
-      console.log('[ProfilePage] Save payload:', JSON.stringify(savePayload));
-      console.log("SAVE payload:", savePayload);
+      console.log('[PROFILE UI] Before save payload:', JSON.stringify(savePayload));
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -408,6 +411,7 @@ export default function UnifiedProfilePage() {
       return;
     }
 
+    console.log('[PROFILE UI] Before upload:', file.name, file.size, 'bytes');
     setIsUploading(true);
 
     try {
@@ -428,8 +432,7 @@ export default function UnifiedProfilePage() {
       }
 
       const uploadResult = await uploadResponse.json();
-      console.log('[ProfilePage] Upload result URL:', uploadResult.url);
-      console.log("UPLOAD result:", uploadResult);
+      console.log('[PROFILE UI] After upload URL:', uploadResult.url);
 
       if (!uploadResult.url) {
         throw new Error('Upload returned no URL. Check storage configuration.');

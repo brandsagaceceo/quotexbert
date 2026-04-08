@@ -20,13 +20,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (files.length === 0) {
-      console.error('[Upload] No files found in FormData. Keys:', Array.from(data.keys()));
+      console.error('[UPLOAD] No files found in FormData. Keys:', Array.from(data.keys()));
       return NextResponse.json({ 
         error: "No files uploaded. Please select at least one image." 
       }, { status: 400 });
     }
 
-    console.log(`[Upload] Processing ${files.length} file(s)`);
+    console.log(`[UPLOAD] Processing ${files.length} file(s), type=${uploadType}, userId=${userId}`);
 
 
     // Validate file types and sizes
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     for (const fileItem of files) {
       if (!allowedTypes.includes(fileItem.type)) {
-        console.error(`[Upload] Invalid file type: ${fileItem.type} for ${fileItem.name}`);
+        console.error(`[UPLOAD] Invalid file type: ${fileItem.type} for ${fileItem.name}`);
         return NextResponse.json({ 
           error: `Invalid file type: ${fileItem.type}. Please upload JPEG, PNG, or WebP images only.` 
         }, { status: 400 });
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       
       if (fileItem.size > maxSize) {
         const sizeMB = (fileItem.size / (1024 * 1024)).toFixed(2);
-        console.error(`[Upload] File too large: ${fileItem.name} (${sizeMB}MB)`);
+        console.error(`[UPLOAD] File too large: ${fileItem.name} (${sizeMB}MB)`);
         return NextResponse.json({ 
           error: `File "${fileItem.name}" is ${sizeMB}MB. Maximum size is 5MB per file.` 
         }, { status: 400 });
@@ -78,17 +78,17 @@ export async function POST(request: NextRequest) {
       const extension = fileItem.name.split('.').pop();
       const filename = `${folderPath}/${uploadType || 'file'}_${timestamp}_${randomStr}.${extension}`;
       
-      console.log(`[Upload] Uploading to S3: ${filename} (${buffer.length} bytes)`);
+      console.log(`[UPLOAD] Uploading to Vercel Blob: ${filename} (${buffer.length} bytes)`);
       
-      // Upload to S3
+      // Upload to Vercel Blob
       const publicUrl = await uploadImage(buffer, filename, fileItem.type);
       
-      console.log(`[Upload] Uploaded successfully: ${publicUrl}`);
+      console.log(`[UPLOAD] Uploaded successfully: ${publicUrl}`);
       
       uploadedFiles.push(publicUrl);
     }
 
-    console.log(`[Upload] Successfully uploaded ${uploadedFiles.length} file(s)`);
+    console.log(`[UPLOAD] Successfully uploaded ${uploadedFiles.length} file(s)`);
 
     // Return appropriate response based on upload type
     if (uploadType === 'profile') {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error("[Upload] Error:", error);
+    console.error("[UPLOAD] Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ 
       error: `Failed to upload files: ${errorMessage}` 

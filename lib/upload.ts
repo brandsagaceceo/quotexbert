@@ -10,7 +10,7 @@ export async function uploadImage(
   const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
   
   if (!hasToken) {
-    console.error('[Upload] BLOB_READ_WRITE_TOKEN is not configured. Image upload is disabled.');
+    console.error('[UPLOAD] BLOB_READ_WRITE_TOKEN is not configured. Image upload is disabled.');
     throw new Error('IMAGE_UPLOAD_NOT_CONFIGURED');
   }
 
@@ -21,10 +21,10 @@ export async function uploadImage(
       contentType: contentType,
     });
 
-    console.log('[Upload] Successfully uploaded to Vercel Blob:', blob.url);
+    console.log('[UPLOAD] Successfully uploaded to Vercel Blob:', blob.url);
     return blob.url;
   } catch (error) {
-    console.error('[Upload] Vercel Blob upload failed:', error);
+    console.error('[UPLOAD] Vercel Blob upload failed:', error);
     throw new Error(`Failed to upload to storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

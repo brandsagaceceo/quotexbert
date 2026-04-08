@@ -100,8 +100,8 @@ export async function GET(request: NextRequest) {
       }),
     };
 
-    console.log(`[API/profile] GET returning — role:${profile.role} profilePhoto:${(profile as any).profilePhoto ?? 'null'} bio:${(profile as any).bio ?? 'null'}`);
-    console.log("[GET] returning profile:", profile);
+    console.log(`[API/profile GET] returning — role:${profile.role} profilePhoto:${(profile as any).profilePhoto ?? 'null'} bio:${(profile as any).bio ?? 'null'}`);
+    console.log("[API/profile GET] full object:", JSON.stringify({id: (profile as any).id, profilePhoto: (profile as any).profilePhoto, bio: (profile as any).bio}));
     return NextResponse.json(profile);
   } catch (error) {
     console.error("[API/profile] Error fetching profile:", error);
@@ -114,8 +114,8 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { userId, ...updateData } = body;
 
-    console.log("[PUT] received body:", body);
-    console.log(`[API/profile] PUT received — userId:${userId} keys:[${Object.keys(updateData).join(',')}] profilePhoto:${updateData.profilePhoto ?? 'not-sent'} bio:${updateData.bio ?? 'not-sent'}`);
+    console.log("[API/profile PUT] full body:", body);
+    console.log(`[API/profile PUT] received — userId:${userId} keys:[${Object.keys(updateData).join(',')}] profilePhoto:${updateData.profilePhoto ?? 'not-sent'} bio:${updateData.bio ?? 'not-sent'}`);
 
     if (!userId) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
@@ -146,8 +146,8 @@ export async function PUT(request: NextRequest) {
         coverPhoto: updateData.coverPhoto || user.contractorProfile?.coverPhoto || null,
       };
 
-      console.log(`[API/profile] Writing contractor — profilePhoto:${contractorData.profilePhoto ?? 'null'} bio:${contractorData.bio ?? 'null'}`);
-      console.log("[PUT] writing:", contractorData);
+      console.log(`[API/profile PUT] writing contractor — profilePhoto:${contractorData.profilePhoto ?? 'null'} bio:${contractorData.bio ?? 'null'}`);
+      console.log("[API/profile PUT] contractorData:", JSON.stringify(contractorData));
 
       await prisma.contractorProfile.upsert({
         where: { userId: resolvedId },
@@ -157,8 +157,8 @@ export async function PUT(request: NextRequest) {
 
       // Verify the write actually persisted
       const verify = await prisma.contractorProfile.findUnique({ where: { userId: resolvedId } });
-      console.log(`[API/profile] DB verify — profilePhoto:${verify?.profilePhoto ?? 'null'} bio:${verify?.bio ?? 'null'}`);
-      console.log("[PUT] DB verify:", verify);
+      console.log(`[API/profile PUT] DB verify — profilePhoto:${verify?.profilePhoto ?? 'null'} bio:${verify?.bio ?? 'null'}`);
+      console.log("[API/profile PUT] DB verify:", JSON.stringify({profilePhoto: verify?.profilePhoto, bio: verify?.bio}));
     } else if (user.role === "homeowner") {
       const homeownerData = {
         name: updateData.name !== undefined ? updateData.name : (user.homeownerProfile?.name ?? null),
@@ -175,7 +175,7 @@ export async function PUT(request: NextRequest) {
         budgetRange: updateData.budgetRange !== undefined ? updateData.budgetRange : (user.homeownerProfile?.budgetRange ?? null),
       };
 
-      console.log(`[API/profile] Writing homeowner — profilePhoto:${homeownerData.profilePhoto ?? 'null'} bio:${homeownerData.bio ?? 'null'}`);
+      console.log(`[API/profile PUT] writing homeowner — profilePhoto:${homeownerData.profilePhoto ?? 'null'} bio:${homeownerData.bio ?? 'null'}`);
 
       await prisma.homeownerProfile.upsert({
         where: { userId: resolvedId },
@@ -185,7 +185,8 @@ export async function PUT(request: NextRequest) {
 
       // Verify the write actually persisted
       const verifyHo = await prisma.homeownerProfile.findUnique({ where: { userId: resolvedId } });
-      console.log(`[API/profile] DB verify homeowner — profilePhoto:${verifyHo?.profilePhoto ?? 'null'} bio:${verifyHo?.bio ?? 'null'}`);
+      console.log(`[API/profile PUT] DB verify homeowner — profilePhoto:${verifyHo?.profilePhoto ?? 'null'} bio:${verifyHo?.bio ?? 'null'}`);
+      console.log("[API/profile PUT] DB verify homeowner:", JSON.stringify({profilePhoto: verifyHo?.profilePhoto, bio: verifyHo?.bio}));
     }
 
     const updatedUser = await prisma.user.findUnique({
