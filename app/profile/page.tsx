@@ -710,8 +710,10 @@ export default function UnifiedProfilePage() {
       <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-4 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-row items-start gap-3 md:gap-6">
-            {/* Profile Picture */}
-            <div className="relative group flex-shrink-0">
+            {/* Profile Picture + Business Logo stacked */}
+            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+              {/* Profile Picture */}
+              <div className="relative group">
                 <div className="relative w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
@@ -754,39 +756,43 @@ export default function UnifiedProfilePage() {
                 </div>
               </div>
 
-            {/* Business Logo — contractors only, smaller secondary logo below profile pic */}
-            {isContractor && (
-              <div className="relative group flex-shrink-0 mt-2 self-start">
-                <div className="relative w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 border-white/80 shadow-md bg-white">
-                  {profile?.businessLogo ? (
-                    <img src={profile.businessLogo} alt="Business logo" className="w-full h-full object-contain p-1" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                      <svg className="w-5 h-5 md:w-6 md:h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                  )}
-                  {isEditing && (
-                    <>
-                      <input type="file" id="businessLogoInput" accept="image/*" onChange={handleBusinessLogoUpload} className="hidden" />
-                      <button
-                        onClick={() => document.getElementById('businessLogoInput')?.click()}
-                        disabled={isUploadingLogo}
-                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                      >
-                        {isUploadingLogo ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        ) : (
-                          <Camera className="h-4 w-4 text-white" />
-                        )}
-                      </button>
-                    </>
-                  )}
+              {/* Business Logo — same width as profile pic, directly below */}
+              {isContractor && (
+                <div className="relative group w-20 md:w-32">
+                  <div className="relative w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white/80 shadow-md bg-white">
+                    {profile?.businessLogo ? (
+                      <img src={profile.businessLogo} alt="Business logo" className="w-full h-full object-contain p-2" />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-white/90">
+                        <svg className="w-6 h-6 md:w-10 md:h-10 text-white/50 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span className="text-white/60 text-[9px] md:text-xs font-semibold text-center leading-tight px-1">Business Logo</span>
+                      </div>
+                    )}
+                    {isEditing && (
+                      <>
+                        <input type="file" id="businessLogoInput" accept="image/*" onChange={handleBusinessLogoUpload} className="hidden" />
+                        <button
+                          onClick={() => document.getElementById('businessLogoInput')?.click()}
+                          disabled={isUploadingLogo}
+                          className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:bg-black/80"
+                        >
+                          {isUploadingLogo ? (
+                            <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-4 border-white border-t-transparent" />
+                          ) : (
+                            <>
+                              <Camera className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
+                              <span className="text-white text-xs md:text-sm font-bold">Logo</span>
+                            </>
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <p className="text-white/70 text-[10px] text-center mt-1 font-medium">Logo</p>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Profile Info Card */}
             <div className="flex-1">

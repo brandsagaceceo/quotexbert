@@ -23,6 +23,8 @@ export default function NotificationBell() {
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>("all");
   const audioContextRef = useRef<AudioContext | null>(null);
   const prevUnreadCountRef = useRef<number | null>(null); // null = first fetch
+  const bellRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
 
   // Initialize AudioContext and resume it on first user interaction (browser autoplay policy)
   useEffect(() => {
@@ -276,7 +278,26 @@ export default function NotificationBell() {
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={bellRef}
+        onClick={() => {
+          if (!isOpen && bellRef.current) {
+            const rect = bellRef.current.getBoundingClientRect();
+            const dropdownWidth = 384; // w-96
+            // Align right edge of dropdown to right edge of button, but clamp to viewport
+            let right = window.innerWidth - rect.right;
+            if (right < 8) right = 8;
+            // On very small screens, use left-aligned instead
+            const left = rect.left + window.scrollX;
+            const useLeft = rect.right - dropdownWidth < 8;
+            setDropdownStyle({
+              position: 'fixed',
+              top: rect.bottom + 8,
+              ...(useLeft ? { left: Math.max(8, left) } : { right }),
+              width: Math.min(dropdownWidth, window.innerWidth - 16),
+            });
+          }
+          setIsOpen(!isOpen);
+        }}
         className="relative p-2.5 text-gray-700 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rose-500"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,8 +317,10 @@ export default function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-[500px] overflow-hidden">
-          <div className="px-5 py-4 bg-gradient-to-r from-rose-50 to-orange-50 flex justify-between items-center">
+        <div
+          style={dropdownStyle}
+          className="bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999] max-h-[80vh] overflow-hidden flex flex-col"
+        >          <div className="px-5 py-4 bg-gradient-to-r from-rose-50 to-orange-50 flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
             {unreadCount > 0 && (
               <button
@@ -330,7 +353,7 @@ export default function NotificationBell() {
             ))}
           </div>
 
-          <div className="max-h-[340px] overflow-y-auto">
+          <div className="flex-1 overflow-y-auto min-h-0 max-h-[55vh]">
             {filteredNotifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <svg className="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

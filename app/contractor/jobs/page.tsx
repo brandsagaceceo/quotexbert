@@ -38,6 +38,7 @@ function ContractorJobsContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [showOnboardingPopup, setShowOnboardingPopup] = useState(false);
   const [newJobAlert, setNewJobAlert] = useState<any | null>(null);
+  const [showEmailNudge, setShowEmailNudge] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -65,6 +66,7 @@ function ContractorJobsContent() {
   useEffect(() => {
     fetchJobs();
     fetchSubscriptions();
+    fetchEmailNudge();
     
     // Check if this is a new contractor (show popup once)
     const hasSeenOnboarding = localStorage.getItem('contractor_seen_onboarding');
@@ -100,6 +102,21 @@ function ContractorJobsContent() {
       }
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
+    }
+  };
+
+  const fetchEmailNudge = async () => {
+    if (!user?.id) return;
+    // Only show nudge once per session; dismissed state persisted in sessionStorage
+    if (sessionStorage.getItem('emailNudgeDismissed')) return;
+    try {
+      const res = await fetch(`/api/notifications/settings?userId=${user.id}`);
+      if (res.ok) {
+        const prefs = await res.json();
+        if (prefs.notifyJobEmail === false) setShowEmailNudge(true);
+      }
+    } catch {
+      // non-critical — ignore
     }
   };
 
@@ -399,6 +416,34 @@ function ContractorJobsContent() {
         {user?.id && (
           <div className="mb-6">
             <ContractorMetricsCard contractorId={user.id} />
+          </div>
+        )}
+
+        {/* Email Notifications Nudge — shown when job email alerts are off */}
+        {showEmailNudge && (
+          <div className="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-2xl flex-shrink-0">📧</span>
+              <div className="min-w-0">
+                <p className="font-bold text-amber-900 text-sm">Don't miss a job — turn on email alerts</p>
+                <p className="text-amber-700 text-xs mt-0.5">Get notified by email every time a matching job is posted.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <a
+                href="/contractor/settings"
+                className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Turn On
+              </a>
+              <button
+                onClick={() => { setShowEmailNudge(false); sessionStorage.setItem('emailNudgeDismissed', '1'); }}
+                className="text-amber-400 hover:text-amber-600 text-xl leading-none font-bold px-1"
+                aria-label="Dismiss"
+              >
+                ×
+              </button>
+            </div>
           </div>
         )}
 
