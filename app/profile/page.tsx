@@ -2,7 +2,7 @@
 // Shared profile page for both contractors and homeowners.
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -141,6 +141,10 @@ export default function UnifiedProfilePage() {
     profilePhoto: '', // tracked so Save always sends the current photo URL
   });
 
+  // Prevent authUser reference-churn (Clerk lifecycle re-fires) from wiping
+  // editData that the user is actively typing. Only seed editData ONCE from DB.
+  const editDataInitialized = useRef(false);
+
   useEffect(() => {
     const loadProfile = async () => {
       // Wait for auth to load
@@ -204,18 +208,25 @@ export default function UnifiedProfilePage() {
             console.log("[ProfilePage] Loaded profileData:", profileData);
             setProfile(profileData);
             
-            // Initialize edit data (profilePhoto included so Save always sends it)
-            setEditData({
-              companyName: profileData.companyName || '',
-              trade: profileData.trade || '',
-              bio: profileData.bio || '',
-              city: profileData.city || '',
-              phone: profileData.phone || '',
-              website: profileData.website || '',
-              serviceRadiusKm: profileData.serviceRadiusKm || 25,
-              displayName: profileData.displayName || profileData.name || '',
-              profilePhoto: profileData.profilePhoto || '',
-            });
+            // Initialize edit data ONCE — skip if already set to avoid wiping
+            // user input when authUser reference changes mid-session (Clerk re-fires).
+            if (!editDataInitialized.current) {
+              editDataInitialized.current = true;
+              console.log('[PROFILE UI] Seeding editData from DB — bio:', profileData.bio);
+              setEditData({
+                companyName: profileData.companyName || '',
+                trade: profileData.trade || '',
+                bio: profileData.bio || '',
+                city: profileData.city || '',
+                phone: profileData.phone || '',
+                website: profileData.website || '',
+                serviceRadiusKm: profileData.serviceRadiusKm || 25,
+                displayName: profileData.displayName || profileData.name || '',
+                profilePhoto: profileData.profilePhoto || '',
+              });
+            } else {
+              console.log('[PROFILE UI] editData already initialized — skipping re-seed (authUser re-fire)');
+            }
           }
         } catch (error) {
           console.log("[ProfilePage] Error fetching extended profile, using basic profile");
