@@ -125,6 +125,7 @@ export default function UnifiedProfilePage() {
     return 'overview';
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -141,9 +142,11 @@ export default function UnifiedProfilePage() {
     profilePhoto: '', // tracked so Save always sends the current photo URL
   });
 
-  // Prevent authUser reference-churn (Clerk lifecycle re-fires) from wiping
-  // editData that the user is actively typing. Only seed editData ONCE from DB.
-  const editDataInitialized = useRef(false);
+  // Track isEditing in a ref so loadProfile can read the current value inside
+  // the useEffect closure without adding isEditing as a dependency.
+  // Rule: only re-seed editData from DB when the user is NOT actively editing.
+  const isEditingRef = useRef(false);
+  useEffect(() => { isEditingRef.current = isEditing; }, [isEditing]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -208,10 +211,10 @@ export default function UnifiedProfilePage() {
             console.log("[ProfilePage] Loaded profileData:", profileData);
             setProfile(profileData);
             
-            // Initialize edit data ONCE — skip if already set to avoid wiping
-            // user input when authUser reference changes mid-session (Clerk re-fires).
-            if (!editDataInitialized.current) {
-              editDataInitialized.current = true;
+            // Only seed editData from DB when the user is NOT actively editing.
+            // This prevents auth re-fires from wiping values the user is typing,
+            // while still updating editData on every background refresh when idle.
+            if (!isEditingRef.current) {
               console.log('[PROFILE UI] Seeding editData from DB — bio:', profileData.bio);
               setEditData({
                 companyName: profileData.companyName || '',
@@ -225,7 +228,7 @@ export default function UnifiedProfilePage() {
                 profilePhoto: profileData.profilePhoto || '',
               });
             } else {
-              console.log('[PROFILE UI] editData already initialized — skipping re-seed (authUser re-fire)');
+              console.log('[PROFILE UI] User is editing — skipping re-seed from auth re-fire');
             }
           }
         } catch (error) {
@@ -349,6 +352,8 @@ export default function UnifiedProfilePage() {
       toast.error('Please wait for the photo upload to finish before saving.');
       return;
     }
+    if (isSaving) return; // prevent double-submit
+    setIsSaving(true);
     try {
       // Double-source profilePhoto: prefer editData, fall back to current profile state
       // This guards against any stale-closure scenario where editData.profilePhoto was lost
@@ -381,7 +386,7 @@ export default function UnifiedProfilePage() {
         const refetchResponse = await fetch(`/api/profile?userId=${authUser.id}`);
         if (refetchResponse.ok) {
           const refetchedProfile = await refetchResponse.json();
-          console.log('[ProfilePage] Post-save DB values — profilePhoto:', refetchedProfile.profilePhoto, 'bio:', refetchedProfile.bio);
+          console.log('[PROFILE UI] Post-save DB — bio:', refetchedProfile.bio, 'profilePhoto:', refetchedProfile.profilePhoto);
           setProfile(refetchedProfile);
           setEditData({
             companyName: refetchedProfile.companyName || '',
@@ -397,12 +402,15 @@ export default function UnifiedProfilePage() {
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('[ProfilePage] Profile save failed:', errorData);
-        throw new Error(errorData.error || 'Failed to save profile');
+        const msg = errorData.error || `Server error (${response.status})`;
+        console.error('[PROFILE UI] Save failed — API response:', errorData);
+        toast.error(`Save failed: ${msg}`);
       }
     } catch (error) {
-      console.error("[ProfilePage] Error saving profile:", error);
-      toast.error(`Failed to save profile: ${error instanceof Error ? error.message : 'Please try again'}`);
+      console.error("[PROFILE UI] Save exception:", error);
+      toast.error(`Save failed: ${error instanceof Error ? error.message : 'Please try again'}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -630,10 +638,15 @@ export default function UnifiedProfilePage() {
           <div className="flex gap-1.5 md:gap-2">
             <button
               onClick={handleSaveProfile}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-1.5 shadow-lg text-xs md:text-base"
+              disabled={isSaving}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold hover:shadow-lg flex items-center justify-center gap-1.5 shadow-lg text-xs md:text-base disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Save className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="hidden sm:inline">Save</span>
+              {isSaving ? (
+                <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" />
+              ) : (
+                <Save className="h-3 w-3 md:h-4 md:w-4" />
+              )}
+              <span className="hidden sm:inline">{isSaving ? 'Saving...' : 'Save'}</span>
             </button>
             <button
               onClick={() => setIsEditing(false)}
@@ -711,10 +724,15 @@ export default function UnifiedProfilePage() {
                       <>
                         <button
                           onClick={handleSaveProfile}
-                          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg flex items-center gap-2 shadow-md text-sm"
+                          disabled={isSaving}
+                          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg flex items-center gap-2 shadow-md text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                          <Save className="h-4 w-4" />
-                          Save
+                          {isSaving ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                          {isSaving ? 'Saving...' : 'Save'}
                         </button>
                         <button
                           onClick={() => setIsEditing(false)}

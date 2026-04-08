@@ -132,7 +132,21 @@ export async function PUT(request: NextRequest) {
     // Use the resolved DB id for all subsequent operations
     const resolvedId = user.id;
 
-    if (user.role === "contractor") {
+    // Derive effective role: user.role may be null for some accounts where the role
+    // was not written into the users table but a profile record already exists.
+    // In that case, detect role from presence of contractorProfile/homeownerProfile.
+    const effectiveRole = user.role
+      || (user.contractorProfile ? "contractor" : null)
+      || (user.homeownerProfile ? "homeowner" : null);
+
+    if (!effectiveRole) {
+      console.error("[API/profile PUT] Cannot determine role for userId:", userId, "user.role:", user.role);
+      return NextResponse.json({ error: "User role could not be determined. Please log out and log back in." }, { status: 400 });
+    }
+
+    console.log(`[API/profile PUT] effectiveRole:${effectiveRole} (user.role was:${user.role ?? 'null'})`);
+
+    if (effectiveRole === "contractor") {
       const contractorData = {
         companyName: updateData.companyName || user.contractorProfile?.companyName || "Company Name",
         trade: updateData.trade || user.contractorProfile?.trade || "General",
@@ -159,7 +173,7 @@ export async function PUT(request: NextRequest) {
       const verify = await prisma.contractorProfile.findUnique({ where: { userId: resolvedId } });
       console.log(`[API/profile PUT] DB verify — profilePhoto:${verify?.profilePhoto ?? 'null'} bio:${verify?.bio ?? 'null'}`);
       console.log("[API/profile PUT] DB verify:", JSON.stringify({profilePhoto: verify?.profilePhoto, bio: verify?.bio}));
-    } else if (user.role === "homeowner") {
+    } else if (effectiveRole === "homeowner") {
       const homeownerData = {
         name: updateData.name !== undefined ? updateData.name : (user.homeownerProfile?.name ?? null),
         city: updateData.city !== undefined ? updateData.city : (user.homeownerProfile?.city ?? null),
