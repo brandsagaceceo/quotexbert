@@ -89,6 +89,7 @@ export async function GET(request: NextRequest) {
         verified: user.contractorProfile.verified,
         profilePhoto: sanitizePhotoUrl(user.contractorProfile.profilePhoto),
         coverPhoto: sanitizePhotoUrl(user.contractorProfile.coverPhoto),
+        businessLogo: sanitizePhotoUrl(user.contractorProfile.businessLogo),
         avgRating,
         reviewCount: reviewsReceived.length,
         completedJobs: user._count?.acceptedLeads ?? 0,
@@ -166,6 +167,7 @@ export async function PUT(request: NextRequest) {
         // Use truthy check: empty string or missing field both fall back to existing DB value
         profilePhoto: updateData.profilePhoto || user.contractorProfile?.profilePhoto || null,
         coverPhoto: updateData.coverPhoto || user.contractorProfile?.coverPhoto || null,
+        businessLogo: updateData.businessLogo || user.contractorProfile?.businessLogo || null,
       };
 
       console.log(`[API/profile PUT] writing contractor — profilePhoto:${contractorData.profilePhoto ?? 'null'} bio:${contractorData.bio ?? 'null'}`);

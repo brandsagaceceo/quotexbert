@@ -174,6 +174,20 @@ export default function SiteHeader() {
             )}
           </div>
 
+          {/* Mobile: auth shortcut — always visible next to hamburger */}
+          <div className="lg:hidden flex items-center gap-2 mr-1">
+            {isSignedIn && user ? (
+              <NotificationBell />
+            ) : (
+              <Link
+                href="/sign-in"
+                className="text-[#800020] border border-[#800020] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+
           {/* Mobile hamburger */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -210,50 +224,50 @@ export default function SiteHeader() {
               <Link href="/contractors/join" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">🔧 Join as Contractor</Link>
               <Link href="/contractor/jobs" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">📋 Browse Jobs</Link>
 
-              {/* COMPANY */}
-              <p className="px-3 pt-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Company</p>
-              <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
-              <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-800 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
-              <div className="border-t border-gray-100 my-1" />
-              <a href="tel:9052429460" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📞 Call Us: 905-242-9460</a>
-              <a href="mailto:quotexbert@gmail.com" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">📧 Email Us</a>
-            </div>
+              {/* ACCOUNT */}
+              <div className="border-t border-gray-100 mt-2 pt-2">
+                {isSignedIn && user ? (
+                  <>
+                    <p className="px-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Account</p>
+                    {user.role === "homeowner" ? (
+                      <Link href="/create-lead" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors mb-1">
+                        + Post Project
+                      </Link>
+                    ) : (
+                      <Link href="/contractor/jobs" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors mb-1">
+                        Browse Jobs
+                      </Link>
+                    )}
+                    <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Messages</Link>
+                    <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Notifications</Link>
+                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Profile</Link>
+                    <button
+                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                      className="w-full text-left py-3 px-3 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="px-3 pb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Account</p>
+                    <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors mb-1">
+                      Create Free Account
+                    </Link>
+                    <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)} className="block text-center py-3 px-4 text-sm font-semibold text-gray-700 border border-gray-200 hover:border-[#800020] hover:text-[#800020] rounded-xl transition-colors">
+                      Sign In
+                    </Link>
+                  </>
+                )}
+              </div>
 
-            <div className="border-t border-gray-100 mt-3 px-2 pt-3">
-              {isSignedIn && user ? (
-                <div className="space-y-1">
-                  <p className="px-3 pb-1 text-xs text-gray-400 font-medium uppercase tracking-wide">
-                    {user.name || "My Account"} · {user.role === "contractor" ? "Contractor" : "Homeowner"}
-                  </p>
-                  {user.role === "homeowner" ? (
-                    <Link href="/create-lead" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-                      + Post Project
-                    </Link>
-                  ) : (
-                    <Link href="/contractor/jobs" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-                      Browse Jobs
-                    </Link>
-                  )}
-                  <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Messages</Link>
-                  <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Notifications</Link>
-                  <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Profile</Link>
-                  <button
-                    onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
-                    className="w-full text-left py-3 px-3 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)} className="block text-center py-3 px-4 text-sm font-semibold text-gray-700 border-2 border-gray-200 hover:border-[#800020] hover:text-[#800020] rounded-xl transition-colors">
-                    Sign In
-                  </Link>
-                  <Link href="/sign-up" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-                    Get Started Free
-                  </Link>
-                </div>
-              )}
+              {/* COMPANY */}
+              <div className="border-t border-gray-100 mt-2 pt-2">
+                <p className="px-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Company</p>
+                <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
+                <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
+                <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Contact</Link>
+              </div>
             </div>
           </div>
         )}

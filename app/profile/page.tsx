@@ -45,6 +45,7 @@ interface ProfileData {
   city?: string;
   profilePhoto?: string;
   coverPhoto?: string;
+  businessLogo?: string;
   isEmailVerified?: boolean;
   companyName?: string;
   trade?: string;
@@ -125,6 +126,7 @@ export default function UnifiedProfilePage() {
     return 'overview';
   });
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPortfolioForm, setShowPortfolioForm] = useState(false);
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
@@ -140,6 +142,7 @@ export default function UnifiedProfilePage() {
     serviceRadiusKm: 25,
     displayName: '',
     profilePhoto: '', // tracked so Save always sends the current photo URL
+    businessLogo: '', // secondary business logo (contractors only)
   });
 
   // Track isEditing in a ref so loadProfile can read the current value inside
@@ -226,6 +229,7 @@ export default function UnifiedProfilePage() {
                 serviceRadiusKm: profileData.serviceRadiusKm || 25,
                 displayName: profileData.displayName || profileData.name || '',
                 profilePhoto: profileData.profilePhoto || '',
+                businessLogo: profileData.businessLogo || '',
               });
             } else {
               console.log('[PROFILE UI] User is editing — skipping re-seed from auth re-fire');
@@ -370,6 +374,7 @@ export default function UnifiedProfilePage() {
         displayName: editData.displayName,
         name: editData.displayName,
         profilePhoto: photoUrl,
+        businessLogo: editData.businessLogo || profile?.businessLogo || '',
       };
       console.log('[PROFILE UI] Before save payload:', JSON.stringify(savePayload));
       const response = await fetch('/api/profile', {
@@ -398,6 +403,7 @@ export default function UnifiedProfilePage() {
             serviceRadiusKm: refetchedProfile.serviceRadiusKm || 25,
             displayName: refetchedProfile.displayName || refetchedProfile.name || '',
             profilePhoto: refetchedProfile.profilePhoto || '',
+            businessLogo: refetchedProfile.businessLogo || '',
           });
         }
       } else {
@@ -487,6 +493,47 @@ export default function UnifiedProfilePage() {
       }
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleBusinessLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('File size must be less than 5MB'); return; }
+
+    setIsUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', authUser?.id || '');
+      formData.append('type', 'logo');
+
+      const uploadResponse = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!uploadResponse.ok) {
+        const err = await uploadResponse.json();
+        throw new Error(err.error || 'Upload failed');
+      }
+      const { url } = await uploadResponse.json();
+      if (!url) throw new Error('Upload returned no URL');
+
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: authUser?.id, businessLogo: url }),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || 'Failed to save logo');
+      }
+      toast.success('Business logo updated!');
+      setProfile(prev => prev ? { ...prev, businessLogo: url } : prev);
+      setEditData(prev => ({ ...prev, businessLogo: url }));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to upload logo: ${msg}`);
+    } finally {
+      setIsUploadingLogo(false);
     }
   };
 
@@ -706,6 +753,40 @@ export default function UnifiedProfilePage() {
                   )}
                 </div>
               </div>
+
+            {/* Business Logo — contractors only, smaller secondary logo below profile pic */}
+            {isContractor && (
+              <div className="relative group flex-shrink-0 mt-2 self-start">
+                <div className="relative w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 border-white/80 shadow-md bg-white">
+                  {profile?.businessLogo ? (
+                    <img src={profile.businessLogo} alt="Business logo" className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                      <svg className="w-5 h-5 md:w-6 md:h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                  )}
+                  {isEditing && (
+                    <>
+                      <input type="file" id="businessLogoInput" accept="image/*" onChange={handleBusinessLogoUpload} className="hidden" />
+                      <button
+                        onClick={() => document.getElementById('businessLogoInput')?.click()}
+                        disabled={isUploadingLogo}
+                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                      >
+                        {isUploadingLogo ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        ) : (
+                          <Camera className="h-4 w-4 text-white" />
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
+                <p className="text-white/70 text-[10px] text-center mt-1 font-medium">Logo</p>
+              </div>
+            )}
 
             {/* Profile Info Card */}
             <div className="flex-1">

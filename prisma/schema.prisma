@@ -112,6 +112,7 @@ model ContractorProfile {
   isActive        Boolean  @default(true)
   profilePhoto    String?  // Added for profile photo storage
   coverPhoto      String?  // Added for cover photo storage
+  businessLogo    String?  // Secondary business/company logo (separate from profile photo)
   
   // Response time tracking
   avgResponseTimeMinutes Int?     // Average response time in minutes
