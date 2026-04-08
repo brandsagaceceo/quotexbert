@@ -192,31 +192,6 @@ export default function Home() {
       </Suspense>
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
-        {/* Contractor CTA Banner - shown only to signed-in contractors */}
-        {user?.role === 'contractor' && (
-          <section className="relative bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-4 md:py-6 overflow-hidden">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="max-w-7xl mx-auto px-4 relative z-10">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                <div className="text-center md:text-left">
-                  <h2 className="text-xl md:text-2xl font-black mb-1">
-                    🎯 Ready to Grow Your Business?
-                  </h2>
-                  <p className="text-sm md:text-base text-rose-100">
-                    Browse active leads in Toronto &amp; GTA &bull; Get qualified projects today
-                  </p>
-                </div>
-                <Link
-                  href="/contractor/jobs"
-                  className="flex-shrink-0 bg-white text-rose-700 font-bold px-6 py-3 rounded-xl hover:bg-rose-50 transition-all shadow-xl text-sm whitespace-nowrap"
-                >
-                  Browse Available Leads &rarr;
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
         {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
         <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
@@ -437,6 +412,27 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Contractor CTA Banner - shown only to signed-in contractors, below trust strip */}
+        {user?.role === 'contractor' && (
+          <section className="relative bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-4 md:py-5 overflow-hidden">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="max-w-7xl mx-auto px-4 relative z-10">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-center sm:text-left">
+                  <p className="font-black text-base md:text-lg">🎯 Ready to Grow Your Business?</p>
+                  <p className="text-sm text-rose-100">Browse active leads in Toronto &amp; GTA &bull; Get qualified projects today</p>
+                </div>
+                <Link
+                  href="/contractor/jobs"
+                  className="flex-shrink-0 bg-white text-rose-700 font-bold px-6 py-2.5 rounded-xl hover:bg-rose-50 transition-all shadow-xl text-sm whitespace-nowrap"
+                >
+                  Browse Available Leads &rarr;
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Quick-start paths — desktop only, homeowner-first */}
         {!estimateResult && (
