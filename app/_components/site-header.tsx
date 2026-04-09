@@ -94,8 +94,9 @@ export default function SiteHeader() {
                 <div className="absolute top-full left-0 mt-1.5 w-44 bg-white rounded-xl border border-gray-100 shadow-xl py-1.5 z-50">
                   <Link href="/blog" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">Blog</Link>
                   <Link href="/about" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">About</Link>
+                  <Link href="/contact" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">Contact Us</Link>
                   <div className="border-t border-gray-100 mt-1 pt-1">
-                    <Link href="/contact" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">📞 Contact Us</Link>
+                    <Link href="/affiliates" onClick={() => setOpenDropdown(null)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#800020] transition-colors">💰 Affiliate Program</Link>
                   </div>
                 </div>
               )}
@@ -227,18 +228,8 @@ export default function SiteHeader() {
                 {isSignedIn && user ? (
                   <>
                     <p className="px-3 pb-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Account</p>
-                    {user.role === "homeowner" ? (
-                      <Link href="/create-lead" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors mb-1">
-                        + Post Project
-                      </Link>
-                    ) : (
-                      <Link href="/contractor/jobs" onClick={() => setIsMobileMenuOpen(false)} className="block text-center bg-[#800020] hover:bg-[#6d001b] text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors mb-1">
-                        Browse Jobs
-                      </Link>
-                    )}
-                    <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Messages</Link>
-                    <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">🔔 Notifications</Link>
-                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Profile</Link>
+                    <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">💬 Messages</Link>
+                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">👤 Profile</Link>
                     <button
                       onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
                       className="w-full text-left py-3 px-3 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -265,6 +256,7 @@ export default function SiteHeader() {
                 <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Blog</Link>
                 <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">About</Link>
                 <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Contact</Link>
+                <Link href="/affiliates" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 px-3 text-sm font-semibold text-gray-600 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">💰 Affiliate Program</Link>
               </div>
             </div>
           </div>

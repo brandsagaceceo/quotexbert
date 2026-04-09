@@ -1,5 +1,7 @@
 // Email notification system for QuoteXbert
-// Note: In production, you would install and use nodemailer or similar email service
+// Uses Resend (configured via RESEND_API_KEY env var) for actual delivery.
+// sendNotificationEmail() below routes job/message types to lib/email.ts → Resend.
+// Other notification types log and return true until implemented.
 
 // Email templates and notification types
 export type NotificationType = 
@@ -26,8 +28,8 @@ interface EmailTemplate {
   text: string;
 }
 
-// Mock email transporter for demo purposes
-const createTransporter = () => {
+// (Dead code below — real email delivery is handled by sendNotificationEmail() via lib/email.ts + Resend)
+const _unusedMockTransporter = () => {
   return {
     sendMail: async (options: any) => {
       console.log('📧 [DEMO] Email would be sent:', options);
