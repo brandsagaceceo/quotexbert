@@ -356,40 +356,40 @@ export default function NotificationsPage() {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Alert Preferences */}
-      <div id="alert-settings" className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Alert Preferences</h2>
-          <span className={`text-xs font-medium transition-opacity ${savingPrefs ? 'text-gray-400 opacity-100' : prefsSaved ? 'text-green-600 opacity-100' : 'opacity-0'}`}>
-            {savingPrefs ? 'Saving…' : 'Saved ✓'}
-          </span>
-        </div>
-        {!prefs ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-sm text-gray-400">Loading preferences…</div>
-        ) : (
-          <div className="space-y-3">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Job Alerts</p>
-              <div className="space-y-3">
-                <PrefRow label="Email me new matching jobs" checked={prefs.notifyJobEmail} onChange={(v) => updatePref('notifyJobEmail', v)} />
-                <PrefRow label="Show in-app job alerts" checked={prefs.notifyJobInApp} onChange={(v) => updatePref('notifyJobInApp', v)} />
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Message Alerts</p>
-              <div className="space-y-3">
-                <PrefRow label="Email me new messages" checked={prefs.notifyMessageEmail} onChange={(v) => updatePref('notifyMessageEmail', v)} />
-                <PrefRow label="Show in-app message alerts" checked={prefs.notifyMessageInApp} onChange={(v) => updatePref('notifyMessageInApp', v)} />
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-2">Marketing</p>
-              <PrefRow label="Platform tips & updates (email)" checked={prefs.notifyMarketingEmail} onChange={(v) => updatePref('notifyMarketingEmail', v)} />
-            </div>
+        {/* Alert Preferences — inside the same centered container */}
+        <div id="alert-settings" className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Alert Preferences</h2>
+            <span className={`text-xs font-medium transition-opacity ${savingPrefs ? 'text-gray-400 opacity-100' : prefsSaved ? 'text-green-600 opacity-100' : 'opacity-0'}`}>
+              {savingPrefs ? 'Saving…' : 'Saved ✓'}
+            </span>
           </div>
-        )}
+          {!prefs ? (
+            <div className="bg-white rounded-xl border border-gray-200 p-4 text-sm text-gray-400">Loading preferences…</div>
+          ) : (
+            <div className="space-y-3">
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Job Alerts</p>
+                <div className="space-y-3">
+                  <PrefRow label="Email me new matching jobs" checked={prefs.notifyJobEmail} onChange={(v) => updatePref('notifyJobEmail', v)} />
+                  <PrefRow label="Show in-app job alerts" checked={prefs.notifyJobInApp} onChange={(v) => updatePref('notifyJobInApp', v)} />
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Message Alerts</p>
+                <div className="space-y-3">
+                  <PrefRow label="Email me new messages" checked={prefs.notifyMessageEmail} onChange={(v) => updatePref('notifyMessageEmail', v)} />
+                  <PrefRow label="Show in-app message alerts" checked={prefs.notifyMessageInApp} onChange={(v) => updatePref('notifyMessageInApp', v)} />
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-2">Marketing</p>
+                <PrefRow label="Platform tips & updates (email)" checked={prefs.notifyMarketingEmail} onChange={(v) => updatePref('notifyMarketingEmail', v)} />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

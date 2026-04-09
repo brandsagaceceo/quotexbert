@@ -714,7 +714,7 @@ export default function UnifiedProfilePage() {
             <div className="flex flex-col items-center gap-4 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-28 h-28 md:w-40 md:h-40 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -756,43 +756,7 @@ export default function UnifiedProfilePage() {
                 </div>
               </div>
 
-              {/* Business Logo — same width as profile pic, directly below */}
-              {isContractor && (
-                <div className="relative group w-28 md:w-36">
-                  <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-md bg-white">
-                    {profile?.businessLogo ? (
-                      <img src={profile.businessLogo} alt="Business logo" className="w-full h-full object-contain p-2" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50">
-                        <svg className="w-8 h-8 md:w-11 md:h-11 text-slate-400 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        <span className="text-slate-500 text-[10px] md:text-xs font-semibold text-center leading-tight px-1">Add Logo</span>
-                      </div>
-                    )}
-                    {isEditing && (
-                      <>
-                        <input type="file" id="businessLogoInput" accept="image/*" onChange={handleBusinessLogoUpload} className="hidden" />
-                        <button
-                          onClick={() => document.getElementById('businessLogoInput')?.click()}
-                          disabled={isUploadingLogo}
-                          className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:bg-black/80"
-                        >
-                          {isUploadingLogo ? (
-                            <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-4 border-white border-t-transparent" />
-                          ) : (
-                            <>
-                              <Camera className="h-6 w-6 md:h-8 md:w-8 text-white mb-1" />
-                              <span className="text-white text-xs md:text-sm font-bold">Logo</span>
-                            </>
-                          )}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <p className="text-white/70 text-[10px] font-semibold text-center mt-1 leading-tight">Business Logo</p>
-                </div>
-              )}
+
             </div>
 
             {/* Profile Info Card */}
@@ -838,24 +802,32 @@ export default function UnifiedProfilePage() {
                     <p className="text-rose-900 font-semibold text-sm md:text-base lg:text-lg capitalize mb-3">
                       {profile?.trade || authUser.role}
                     </p>
-                    <div className="flex flex-wrap items-center gap-2 md:gap-4 text-slate-600 text-xs md:text-sm">
-                      {profile?.city && (
-                        <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-3 w-3 md:h-4 md:w-4 text-rose-700 flex-shrink-0" />
-                          <span className="truncate">{profile.city}</span>
-                        </div>
+                    <div className="flex flex-wrap items-center gap-1.5 text-slate-500 text-xs md:text-sm mt-1">
+                      {(profile?.avgRating ?? 0) > 0 && (
+                        <>
+                          <span className="flex items-center gap-0.5">
+                            <Star className="h-3 w-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                            <span className="font-medium text-slate-700">{Number(profile?.avgRating).toFixed(1)}</span>
+                          </span>
+                          <span className="text-slate-300">•</span>
+                        </>
                       )}
-                      {profile?.email && (
-                        <div className="flex items-center gap-1 min-w-0 max-w-full">
-                          <Mail className="h-3 w-3 md:h-4 md:w-4 text-slate-400 flex-shrink-0" />
-                          <span className="truncate text-xs md:text-sm">{profile.email}</span>
-                        </div>
+                      {profile?.city && (
+                        <>
+                          <span className="flex items-center gap-0.5">
+                            <MapPin className="h-3 w-3 text-rose-600 flex-shrink-0" />
+                            <span>{profile.city}</span>
+                          </span>
+                        </>
                       )}
                       {isContractor && profile?.verified && (
-                        <div className="flex items-center gap-1 text-green-600">
-                          <Award className="h-3 w-3 md:h-4 md:w-4" />
-                          <span className="font-medium">Verified Contractor</span>
-                        </div>
+                        <>
+                          {profile?.city && <span className="text-slate-300">•</span>}
+                          <span className="flex items-center gap-0.5 text-green-600 font-medium">
+                            <CheckCircle2 className="h-3 w-3 flex-shrink-0" />
+                            <span>Verified</span>
+                          </span>
+                        </>
                       )}
                     </div>
                   </div>
@@ -1845,11 +1817,6 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
     title: initialData?.title || '',
     description: initialData?.description || '',
     projectType: initialData?.projectType || 'general',
-    projectCost: initialData?.projectCost || '',
-    duration: initialData?.duration || '',
-    location: initialData?.location || '',
-    materials: initialData?.materials || '',
-    clientStory: initialData?.clientStory || '',
     imageUrl: initialData?.imageUrl || ''
   });
   const [uploading, setUploading] = useState(false);
@@ -1910,36 +1877,43 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">
-            {initialData ? 'Edit Portfolio Item' : 'Add Portfolio Item'}
-          </h2>
-          
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-gray-900">
+              {initialData ? 'Edit Project' : 'Add Portfolio Project'}
+            </h2>
+            <button type="button" onClick={onCancel} className="text-gray-400 hover:text-gray-600 p-1">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Project Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Project Title *
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Project Title <span className="text-rose-600">*</span>
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 placeholder="e.g., Modern Kitchen Renovation"
                 required
               />
             </div>
 
+            {/* Project Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Project Type
               </label>
               <select
                 value={formData.projectType}
                 onChange={(e) => setFormData(prev => ({ ...prev, projectType: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
               >
                 <option value="general">General</option>
                 <option value="kitchen">Kitchen</option>
@@ -1948,101 +1922,48 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
                 <option value="painting">Painting</option>
                 <option value="electrical">Electrical</option>
                 <option value="plumbing">Plumbing</option>
+                <option value="roofing">Roofing</option>
+                <option value="hvac">HVAC</option>
+                <option value="landscaping">Landscaping</option>
                 <option value="outdoor">Outdoor</option>
+                <option value="handyman">Handyman</option>
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Cost
-                </label>
-                <input
-                  type="text"
-                  value={formData.projectCost}
-                  onChange={(e) => setFormData(prev => ({ ...prev, projectCost: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., $5,000 - $10,000"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Duration
-                </label>
-                <input
-                  type="text"
-                  value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., 2 weeks"
-                />
-              </div>
-            </div>
-
+            {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Toronto, ON"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Description
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 rows={3}
-                placeholder="Describe the project details..."
+                placeholder="Brief description of the project scope and results..."
               />
             </div>
 
+            {/* Photo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Materials Used
-              </label>
-              <input
-                type="text"
-                value={formData.materials}
-                onChange={(e) => setFormData(prev => ({ ...prev, materials: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Oak flooring, granite countertops"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Client Story
-              </label>
-              <textarea
-                value={formData.clientStory}
-                onChange={(e) => setFormData(prev => ({ ...prev, clientStory: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={2}
-                placeholder="What did the client say about this project?"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Project Photo
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 bg-gray-50">
                 {formData.imageUrl ? (
                   <div className="relative">
-                    <img src={formData.imageUrl} alt="Project" className="w-full h-48 object-cover rounded" />
+                    <img src={formData.imageUrl} alt="Project" className="w-full h-44 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                      className="absolute top-2 right-2 bg-white/90 text-gray-600 hover:text-red-600 p-1 rounded-full shadow"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
                 ) : (
                   <div className="text-center">
-                    <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <Camera className="h-10 w-10 text-gray-300 mx-auto mb-2" />
                     <input
                       type="file"
                       accept="image/*"
@@ -2052,28 +1973,30 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
                     />
                     <label
                       htmlFor="portfolioImageUpload"
-                      className="cursor-pointer bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700"
+                      className="cursor-pointer inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-md transition-all"
                     >
                       {uploading ? 'Uploading...' : 'Upload Photo'}
                     </label>
+                    <p className="text-xs text-gray-400 mt-1.5">JPEG, PNG or WebP · max 5MB</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4 border-t">
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-md transition-all"
               >
-                {initialData ? 'Update Project' : 'Add Project'}
+                {initialData ? 'Save Changes' : 'Add Project'}
               </button>
             </div>
           </form>

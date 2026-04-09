@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { contractorId, title, description, projectType, projectCost, duration, location, materials, clientStory, imageUrl } = body;
+    const { contractorId, title, description, projectType, imageUrl } = body;
 
     if (!contractorId || !title) {
       return NextResponse.json(
@@ -15,17 +15,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Look up the ContractorProfile by userId — the caller passes the User ID,
+    // but portfolioItems.contractorId references ContractorProfile.id.
+    const contractorProfile = await prisma.contractorProfile.findUnique({
+      where: { userId: contractorId },
+    });
+
+    if (!contractorProfile) {
+      console.error("[PORTFOLIO POST] ContractorProfile not found for userId:", contractorId);
+      return NextResponse.json(
+        { error: "Contractor profile not found" },
+        { status: 404 }
+      );
+    }
+
     const portfolioItem = await prisma.portfolioItem.create({
       data: {
-        contractorId,
+        contractorId: contractorProfile.id,
         title,
         description: description || null,
         projectType: projectType || 'general',
-        projectCost: projectCost || null,
-        duration: duration || null,
-        location: location || null,
-        materials: materials || null,
-        clientStory: clientStory || null,
         imageUrl: imageUrl || null,
         isPublic: true,
         isPinned: false,
