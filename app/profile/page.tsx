@@ -714,7 +714,7 @@ export default function UnifiedProfilePage() {
             <div className="flex flex-col items-center gap-4 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -859,6 +859,7 @@ export default function UnifiedProfilePage() {
                  tab === 'estimates' ? 'AI Estimates' : 
                  tab === 'quotes' ? 'AI Quotes' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
+                 tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
                  tab}
               </button>
@@ -868,7 +869,7 @@ export default function UnifiedProfilePage() {
           {/* Desktop: Full tab bar */}
           <nav data-tour="profile-tabs" className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
-              ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
+              ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button
@@ -884,6 +885,7 @@ export default function UnifiedProfilePage() {
                  tab === 'estimates' ? 'AI Estimates' : 
                  tab === 'quotes' ? 'AI Quotes' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
+                 tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
                  tab}
               </button>
@@ -969,110 +971,75 @@ export default function UnifiedProfilePage() {
               </>
             )}
 
-            {activeTab === 'portfolio' && (
-              <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
-                <div className="flex justify-between items-center mb-5 md:mb-6">
-                  <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">Portfolio</h2>
-                  <button 
+            {activeTab === 'work' && (
+              <div className="space-y-4">
+                {/* Add post button */}
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-bold text-slate-900">Recent Work</h2>
+                  <button
                     onClick={() => setShowPortfolioForm(true)}
-                    className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-3 md:px-4 lg:px-5 py-2 md:py-2.5 lg:py-3 rounded-lg md:rounded-xl hover:from-rose-700 hover:to-orange-700 flex items-center gap-1.5 md:gap-2 font-semibold shadow-md md:shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-xs md:text-sm lg:text-base"
+                    className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-xl flex items-center gap-1.5 font-semibold shadow text-sm hover:shadow-md transition-all"
                   >
-                    <Plus className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5" />
-                    <span className="hidden sm:inline">Add Project</span>
-                    <span className="sm:hidden">Add</span>
+                    <Plus className="h-4 w-4" />
+                    Post Work
                   </button>
                 </div>
-                
+
                 {portfolio.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-4">
                     {portfolio.map((item) => (
-                      <div key={item.id} className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                        {/* Project Image */}
-                        <div className="relative h-64 overflow-hidden">
-                          {item.imageUrl ? (
-                            <img 
-                              src={item.imageUrl} 
-                              alt={item.title}
-                              className="content-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80';
-                              }}
-                            />
-                          ) : (
-                            <img 
-                              src='https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=400&fit=crop&q=80' 
-                              alt={item.title}
-                              className="content-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
-                          )}
-                          {/* Gradient overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          
-                          {/* Project Type Badge */}
-                          <div className="absolute top-4 left-4">
-                            <span className="inline-flex items-center gap-1 bg-white/95 backdrop-blur-sm text-rose-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                              {item.projectType}
-                            </span>
-                          </div>
-
-                          {/* Edit/Delete buttons - show on hover */}
-                          <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button
-                              onClick={() => setEditingPortfolioItem(item)}
-                              className="bg-white/95 backdrop-blur-sm text-rose-700 p-2 rounded-full hover:bg-rose-700 hover:text-white transition-colors shadow-lg"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeletePortfolioItem(item.id)}
-                              className="bg-white/95 backdrop-blur-sm text-red-600 p-2 rounded-full hover:bg-red-600 hover:text-white transition-colors shadow-lg"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Project Details */}
-                        <div className="p-5">
-                          <h3 className="font-bold text-slate-900 text-lg mb-2 line-clamp-1">{item.title}</h3>
-                          <p className="text-sm text-slate-600 mb-4 line-clamp-2">{item.description}</p>
-                          
-                          {/* Project Stats */}
-                          <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                            {item.projectCost && (
-                              <div className="flex items-center gap-1 text-green-600 font-semibold">
-                                <DollarSign className="h-4 w-4" />
-                                <span className="text-sm">{item.projectCost}</span>
+                      <div key={item.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        {/* Feed image */}
+                        {item.imageUrl && (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            className="w-full object-cover max-h-72"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        )}
+                        <div className="p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full capitalize">{item.projectType}</span>
+                                <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                               </div>
-                            )}
-                            {item.duration && (
-                              <div className="text-xs text-slate-500 flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {item.duration}
-                              </div>
-                            )}
+                              <h3 className="font-semibold text-slate-900 text-base leading-snug">{item.title}</h3>
+                              {item.description && (
+                                <p className="text-sm text-slate-600 mt-1 leading-relaxed">{item.description}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-1 flex-shrink-0">
+                              <button
+                                onClick={() => setEditingPortfolioItem(item)}
+                                className="text-slate-400 hover:text-rose-700 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeletePortfolioItem(item.id)}
+                                className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 md:py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-xl md:rounded-2xl border-2 border-dashed border-slate-300">
-                    <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mb-4 md:mb-6">
-                      <Camera className="h-8 w-8 md:h-10 md:w-10 text-rose-700" />
-                    </div>
-                    <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-2 md:mb-3 px-4">Showcase Your Best Work</h3>
-                    <p className="text-sm md:text-base text-slate-600 mb-4 md:mb-6 max-w-md mx-auto px-4">
-                      {isContractor 
-                        ? "Add photos and details of completed projects to attract more clients"
-                        : "Share AI estimates and past projects you're proud of"}
-                    </p>
-                    <button 
+                  <div className="text-center py-12 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    <Camera className="h-10 w-10 text-rose-300 mx-auto mb-3" />
+                    <h3 className="font-bold text-slate-900 mb-1">Share your completed work</h3>
+                    <p className="text-sm text-slate-500 mb-4 max-w-xs mx-auto">Post photos of finished projects to attract more clients</p>
+                    <button
                       onClick={() => setShowPortfolioForm(true)}
-                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2 text-sm md:text-base"
+                      className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-md transition-all inline-flex items-center gap-2"
                     >
-                      <Camera className="h-4 w-4 md:h-5 md:w-5" />
-                      Add Your First {isContractor ? "Project" : "Estimate"}
+                      <Camera className="h-4 w-4" />
+                      Post Your First Project
                     </button>
                   </div>
                 )}
@@ -1878,8 +1845,9 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto" style={{ paddingBottom: 'env(safe-area-inset-bottom, 16px)' }}>
-        <div className="p-5 sm:p-6">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg flex flex-col" style={{ maxHeight: 'calc(92dvh - env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        {/* Scrollable body */}
+        <div className="overflow-y-auto flex-1 p-5 sm:p-6 pb-2">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-gray-900">
               {initialData ? 'Edit Project' : 'Add Portfolio Project'}
@@ -1889,7 +1857,7 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="portfolioModalForm" onSubmit={handleSubmit} className="space-y-4">
             {/* Project Title */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -1983,23 +1951,25 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-md transition-all"
-              >
-                {initialData ? 'Save Changes' : 'Add Project'}
-              </button>
-            </div>
           </form>
+        </div>
+
+        {/* Sticky action bar — always visible above bottom nav */}
+        <div className="flex gap-3 px-5 pb-4 pt-3 border-t border-gray-100 bg-white flex-shrink-0">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => { const f = document.getElementById('portfolioModalForm') as HTMLFormElement; f?.requestSubmit(); }}
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-md transition-all"
+          >
+            {initialData ? 'Save Changes' : 'Post Project'}
+          </button>
         </div>
       </div>
     </div>

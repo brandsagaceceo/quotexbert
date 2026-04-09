@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { sendNewMessageEmail } from "@/lib/email";
+import { sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail } from "@/lib/email";
 
 // Email data interface
 interface EmailData {
@@ -8,11 +8,22 @@ interface EmailData {
   html: string;
 }
 
-// Send email using Resend service
-async function sendEmail({ to, subject, html }: EmailData) {
-  console.log(`📧 Sending email to ${to}: ${subject}`);
-  // Note: For message notifications, we use sendNewMessageEmail
-  // For other types, we can extend this function
+// Resend-based fallback email send (for types not covered by lib/email helpers)
+async function sendEmailViaResend({ to, subject, html }: EmailData) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured — skipping email to', to);
+    return;
+  }
+  try {
+    const { Resend } = await import('resend');
+    const resend = new Resend(apiKey);
+    const from = process.env.EMAIL_FROM || 'QuoteXbert <noreply@quotexbert.com>';
+    const result = await resend.emails.send({ from, to, subject, html });
+    console.log(`[EMAIL] Sent to ${to}: ${subject} → id=${JSON.stringify(result)}`);
+  } catch (err) {
+    console.error(`[EMAIL] Failed to send to ${to}: ${subject}`, err);
+  }
 }
 
 export type NotificationType = 
@@ -168,7 +179,7 @@ export class NotificationService {
   }
 
   /**
-   * Send email notification
+   * Send email notification — checks user preference flags before sending
    */
   private static async sendEmailNotification(
     user: any,
@@ -176,36 +187,85 @@ export class NotificationService {
     payload: NotificationPayload
   ) {
     try {
-      // For NEW_MESSAGE type, use the proper email service
-      if (type === 'NEW_MESSAGE' && payload.messageId) {
-        await sendNewMessageEmail(
-          {
-            id: user.id,
-            email: user.email,
-            name: user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || null
-          },
-          {
-            name: payload.senderName || 'A user'
-          },
-          payload.message || 'You have a new message',
-          payload.threadId || payload.conversationId || payload.messageId
-        );
-        console.log(`📧 Sent email notification to ${user.email} for new message`);
-      } else {
-        // For other notification types, use the template-based email
-        const emailData = this.getEmailTemplate(type, payload, user);
-        
-        if (emailData) {
-          await sendEmail({
-            to: user.email,
-            subject: emailData.subject,
-            html: emailData.html
-          });
-          console.log(`📧 Sent email notification to ${user.email} for ${type}`);
+      // Load notification preferences for this user
+      const prefs = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          notifyJobEmail: true,
+          notifyMessageEmail: true,
+          notifyMarketingEmail: true,
+        },
+      });
+
+      if (type === 'NEW_MESSAGE') {
+        // Check message email preference
+        if (prefs && prefs.notifyMessageEmail === false) {
+          console.log(`[EMAIL] Skipping message email for ${user.email} — preference disabled`);
+          return;
         }
+        if (payload.messageId) {
+          await sendNewMessageEmail(
+            {
+              id: user.id,
+              email: user.email,
+              name: user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || null
+            },
+            { name: payload.senderName || 'A user' },
+            payload.message || 'You have a new message',
+            payload.threadId || payload.conversationId || payload.messageId
+          );
+          console.log(`[EMAIL] Message email sent to ${user.email}`);
+        }
+        return;
+      }
+
+      if (type === 'LEAD_MATCHED') {
+        // Check job email preference
+        if (prefs && prefs.notifyJobEmail === false) {
+          console.log(`[EMAIL] Skipping job email for ${user.email} — preference disabled`);
+          return;
+        }
+        await sendNewJobEmail(
+          { id: user.id, email: user.email, name: user.contractorProfile?.companyName || user.name || null },
+          {
+            id: payload.leadId || '',
+            title: payload.title || 'New Job',
+            category: payload.category || 'Home Improvement',
+            description: typeof payload.description === 'string' ? payload.description : 'A new job matching your services is available.',
+            budget: typeof payload.budget === 'string' ? payload.budget : null,
+          }
+        );
+        console.log(`[EMAIL] Lead-matched job email sent to ${user.email} for lead ${payload.leadId}`);
+        return;
+      }
+
+      if (type === 'WELCOME') {
+        await sendWelcomeEmail({ id: user.id, email: user.email, name: user.name });
+        console.log(`[EMAIL] Welcome email sent to ${user.email}`);
+        return;
+      }
+
+      if (type === 'REVIEW_RECEIVED') {
+        await sendReviewReceivedEmail({
+          contractor: { id: user.id, email: user.email, name: user.contractorProfile?.companyName || user.name || null },
+          review: {
+            rating: payload.rating || 5,
+            comment: payload.comment || '',
+            reviewerName: payload.reviewerName || 'A client',
+          },
+        });
+        console.log(`[EMAIL] Review email sent to ${user.email}`);
+        return;
+      }
+
+      // Fallback for remaining types using branded template
+      const emailData = this.getEmailTemplate(type, payload, user);
+      if (emailData) {
+        await sendEmailViaResend({ to: user.email, subject: emailData.subject, html: emailData.html });
+        console.log(`[EMAIL] Fallback email sent to ${user.email} for type ${type}`);
       }
     } catch (error) {
-      console.error("Failed to send email notification:", error);
+      console.error(`[EMAIL] Failed to send ${type} email to ${user.email}:`, error);
     }
   }
 
