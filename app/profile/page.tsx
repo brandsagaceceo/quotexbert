@@ -1867,8 +1867,10 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
 
       if (response.ok) {
         const result = await response.json();
-        setFormData(prev => ({ ...prev, imageUrl: result.url }));
-        console.log('Image uploaded successfully:', result.url);
+        // Upload API returns `url` for profile uploads and `files[0]` for portfolio uploads
+        const uploadedUrl = result.url || result.files?.[0] || '';
+        setFormData(prev => ({ ...prev, imageUrl: uploadedUrl }));
+        console.log('[PORTFOLIO] Image uploaded successfully:', uploadedUrl);
       } else {
         const errorData = await response.json();
         toast.error(errorData.error || 'Failed to upload image');
@@ -1892,9 +1894,9 @@ function PortfolioForm({ onSubmit, onCancel, userId, initialData }: PortfolioFor
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg flex flex-col" style={{ maxHeight: 'calc(92dvh - env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        {/* Scrollable body */}
-        <div className="overflow-y-auto flex-1 p-5 sm:p-6 pb-2">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg flex flex-col max-h-[85dvh]">
+        {/* Scrollable body — pb-28 ensures content clears the sticky bottom nav */}
+        <div className="overflow-y-auto flex-1 p-5 sm:p-6 pb-28">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-gray-900">
               {initialData ? 'Edit Project' : 'Add Portfolio Project'}

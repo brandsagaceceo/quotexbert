@@ -220,10 +220,23 @@ export async function submitLead(formData: FormData) {
     console.log(`[submitLead:${requestId}] Authenticated user: ${userId}`);
 
     // Verify user exists in database, create if not
+    // Try clerkUserId first (webhook-created users), then id directly
+    // (/api/user/role creates users with id: clerkUserId and no clerkUserId field)
     let user = await prisma.user.findUnique({
       where: { clerkUserId: userId },
       select: { role: true, id: true, email: true, name: true }
     });
+
+    if (!user) {
+      // Fallback: user created by /api/user/role stores Clerk ID as primary id
+      user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true, id: true, email: true, name: true }
+      });
+      if (user) {
+        console.log(`[submitLead:${requestId}] Found user by id fallback: ${userId}`);
+      }
+    }
 
     if (!user) {
       console.log(`[submitLead:${requestId}] User not found in database, creating user: ${userId}`);
@@ -324,6 +337,7 @@ export async function submitLead(formData: FormData) {
     }
 
     console.log(`[submitLead:${requestId}] Creating lead for user: ${user.id}`);
+    console.log(`CREATED JOB homeownerId: ${user.id} (clerkUserId: ${userId})`);
 
     // Save lead to database
     let lead;

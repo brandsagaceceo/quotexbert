@@ -84,14 +84,16 @@ interface LeadEmailPayload {
   affiliateId?: string;
 }
 
-// Utility function to get user email by ID (you'll need to implement this based on your user storage)
+// Utility function to get user email by ID
 async function getUserEmail(userId: string): Promise<string | null> {
   try {
-    // For now, return a placeholder - you'll need to implement actual user lookup
-    // This would typically query your user database or Clerk
-    return `user-${userId}@example.com`;
+    const user = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { email: true },
+    });
+    return user?.email || null;
   } catch (error) {
-    console.error("Failed to get user email:", error);
+    console.error("[EMAIL] Failed to get user email for userId:", userId, error);
     return null;
   }
 }

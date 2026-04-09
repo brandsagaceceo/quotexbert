@@ -203,19 +203,18 @@ export class NotificationService {
           console.log(`[EMAIL] Skipping message email for ${user.email} — preference disabled`);
           return;
         }
-        if (payload.messageId) {
-          await sendNewMessageEmail(
-            {
-              id: user.id,
-              email: user.email,
-              name: user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || null
-            },
-            { name: payload.senderName || 'A user' },
-            payload.message || 'You have a new message',
-            payload.threadId || payload.conversationId || payload.messageId
-          );
-          console.log(`[EMAIL] Message email sent to ${user.email}`);
-        }
+        const threadId = payload.threadId || payload.conversationId || payload.messageId || '';
+        await sendNewMessageEmail(
+          {
+            id: user.id,
+            email: user.email,
+            name: user.contractorProfile?.companyName || user.homeownerProfile?.name || user.name || null
+          },
+          { name: payload.senderName || 'A user' },
+          payload.message || 'You have a new message',
+          threadId
+        );
+        console.log(`EMAIL SENT TO: ${user.email} | type=NEW_MESSAGE | thread=${threadId}`);
         return;
       }
 
@@ -235,13 +234,13 @@ export class NotificationService {
             budget: typeof payload.budget === 'string' ? payload.budget : null,
           }
         );
-        console.log(`[EMAIL] Lead-matched job email sent to ${user.email} for lead ${payload.leadId}`);
+        console.log(`EMAIL SENT TO: ${user.email} | type=LEAD_MATCHED | lead=${payload.leadId}`);
         return;
       }
 
       if (type === 'WELCOME') {
         await sendWelcomeEmail({ id: user.id, email: user.email, name: user.name });
-        console.log(`[EMAIL] Welcome email sent to ${user.email}`);
+        console.log(`EMAIL SENT TO: ${user.email} | type=WELCOME`);
         return;
       }
 

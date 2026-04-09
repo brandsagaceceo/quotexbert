@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Homeowner ID is required' }, { status: 400 });
     }
 
+    console.log(`FETCH homeownerId: ${homeownerId}`);
+
     const jobs = await prisma.lead.findMany({
       where: {
         homeownerId: homeownerId
