@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Link from "next/link";
 
@@ -24,6 +24,18 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>("all");
+
+  // Notification preferences
+  const [prefs, setPrefs] = useState<{
+    notifyJobEmail: boolean;
+    notifyJobInApp: boolean;
+    notifyMessageEmail: boolean;
+    notifyMessageInApp: boolean;
+    notifyMarketingEmail: boolean;
+  } | null>(null);
+  const [savingPrefs, setSavingPrefs] = useState(false);
+  const [prefsSaved, setPrefsSaved] = useState(false);
+  const prefsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const unreadCount = useMemo(
     () => notifications.filter((notification) => !notification.read).length,
@@ -86,10 +98,41 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (isSignedIn && authUser?.id) {
       fetchNotifications();
+      fetchPrefs();
     } else {
       setLoading(false);
     }
   }, [isSignedIn, authUser?.id]);
+
+  const fetchPrefs = async () => {
+    if (!authUser?.id) return;
+    try {
+      const res = await fetch(`/api/notifications/settings?userId=${authUser.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.error) setPrefs(data);
+      }
+    } catch {}
+  };
+
+  const updatePref = (key: string, value: boolean) => {
+    if (!authUser?.id || !prefs) return;
+    setPrefs((prev) => (prev ? { ...prev, [key]: value } : prev));
+    if (prefsTimerRef.current) clearTimeout(prefsTimerRef.current);
+    prefsTimerRef.current = setTimeout(async () => {
+      setSavingPrefs(true);
+      try {
+        await fetch('/api/notifications/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: authUser.id, [key]: value }),
+        });
+        setPrefsSaved(true);
+        setTimeout(() => setPrefsSaved(false), 2000);
+      } catch {}
+      finally { setSavingPrefs(false); }
+    }, 400);
+  };
 
   const fetchNotifications = async () => {
     if (!authUser?.id) return;
@@ -209,25 +252,18 @@ export default function NotificationsPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-            <p className="text-gray-600 mt-1">Message and job alerts in one place.</p>
+            <h1 className="text-3xl font-bold text-gray-900">Alerts</h1>
+            <p className="text-gray-600 mt-1">Your notifications and alert preferences.</p>
           </div>
-
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
               disabled={markingAll}
               className="bg-white border border-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-60"
             >
-              {markingAll ? "Marking..." : "Mark all as read"}
+              {markingAll ? "Marking..." : "Mark all read"}
             </button>
           )}
-          <Link
-            href="/contractor/settings"
-            className="text-sm text-slate-500 hover:text-rose-700 font-medium hidden sm:inline-block"
-          >
-            Settings
-          </Link>
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
@@ -262,12 +298,12 @@ export default function NotificationsPage() {
                 When new matching homeowner jobs are posted, you&apos;ll see them here instantly.
                 Keep your email alerts on for first pick.
               </p>
-              <Link
-                href="/contractor/settings"
+              <button
+                onClick={() => document.getElementById('alert-settings')?.scrollIntoView({ behavior: 'smooth' })}
                 className="inline-block mt-4 text-sm text-rose-700 font-semibold hover:underline"
               >
-                Manage notification settings →
-              </Link>
+                Manage alert preferences ↓
+              </button>
             </div>
           ) : (
             <div>
@@ -321,6 +357,71 @@ export default function NotificationsPage() {
           )}
         </div>
       </div>
+
+      {/* Alert Preferences */}
+      <div id="alert-settings" className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">Alert Preferences</h2>
+          <span className={`text-xs font-medium transition-opacity ${savingPrefs ? 'text-gray-400 opacity-100' : prefsSaved ? 'text-green-600 opacity-100' : 'opacity-0'}`}>
+            {savingPrefs ? 'Saving…' : 'Saved ✓'}
+          </span>
+        </div>
+        {!prefs ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-4 text-sm text-gray-400">Loading preferences…</div>
+        ) : (
+          <div className="space-y-3">
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Job Alerts</p>
+              <div className="space-y-3">
+                <PrefRow label="Email me new matching jobs" checked={prefs.notifyJobEmail} onChange={(v) => updatePref('notifyJobEmail', v)} />
+                <PrefRow label="Show in-app job alerts" checked={prefs.notifyJobInApp} onChange={(v) => updatePref('notifyJobInApp', v)} />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-3">Message Alerts</p>
+              <div className="space-y-3">
+                <PrefRow label="Email me new messages" checked={prefs.notifyMessageEmail} onChange={(v) => updatePref('notifyMessageEmail', v)} />
+                <PrefRow label="Show in-app message alerts" checked={prefs.notifyMessageInApp} onChange={(v) => updatePref('notifyMessageInApp', v)} />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 mb-2">Marketing</p>
+              <PrefRow label="Platform tips & updates (email)" checked={prefs.notifyMarketingEmail} onChange={(v) => updatePref('notifyMarketingEmail', v)} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PrefRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-sm text-gray-700">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
+          checked ? 'bg-rose-600' : 'bg-gray-200'
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
+            checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
     </div>
   );
 }

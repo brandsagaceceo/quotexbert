@@ -237,10 +237,7 @@ export default function SiteHeader() {
                       </Link>
                     )}
                     <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Messages</Link>
-                    <div className="flex items-center justify-between rounded-lg hover:bg-rose-50 transition-colors">
-                      <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] transition-colors">🔔 Notifications</Link>
-                      <div className="pr-2"><NotificationBell /></div>
-                    </div>
+                    <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">🔔 Notifications</Link>
                     <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Profile</Link>
                     <button
                       onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
