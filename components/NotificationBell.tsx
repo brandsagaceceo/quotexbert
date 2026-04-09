@@ -289,11 +289,15 @@ export default function NotificationBell() {
             // On very small screens, use left-aligned instead
             const left = rect.left + window.scrollX;
             const useLeft = rect.right - dropdownWidth < 8;
+            const topPos = rect.bottom + 8;
+            // Reserve space for bottom nav (64px) + safe area (~20px) so popup never runs off screen
+            const maxH = Math.max(200, window.innerHeight - topPos - 84);
             setDropdownStyle({
               position: 'fixed',
-              top: rect.bottom + 8,
+              top: topPos,
               ...(useLeft ? { left: Math.max(8, left) } : { right }),
               width: Math.min(dropdownWidth, window.innerWidth - 16),
+              maxHeight: maxH,
             });
           }
           setIsOpen(!isOpen);
@@ -319,17 +323,26 @@ export default function NotificationBell() {
       {isOpen && (
         <div
           style={dropdownStyle}
-          className="bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999] max-h-[80vh] overflow-hidden flex flex-col"
-        >          <div className="px-5 py-4 bg-gradient-to-r from-rose-50 to-orange-50 flex justify-between items-center">
+          className="bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999] overflow-hidden flex flex-col"
+        >          <div className="px-5 py-4 bg-gradient-to-r from-rose-50 to-orange-50 flex justify-between items-center gap-2">
             <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
-            {unreadCount > 0 && (
+            <div className="flex items-center gap-1 flex-shrink-0">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-sm text-rose-600 hover:text-rose-700 font-semibold hover:bg-white px-3 py-1 rounded-lg transition-all"
+                >
+                  Mark all read
+                </button>
+              )}
               <button
-                onClick={markAllAsRead}
-                className="text-sm text-rose-600 hover:text-rose-700 font-semibold hover:bg-white px-3 py-1 rounded-lg transition-all"
+                onClick={() => setIsOpen(false)}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-white rounded-lg transition-all text-xl font-bold"
+                aria-label="Close notifications"
               >
-                Mark all read
+                ×
               </button>
-            )}
+            </div>
           </div>
 
           <div className="px-3 py-3 bg-white flex flex-wrap gap-2">
@@ -353,7 +366,7 @@ export default function NotificationBell() {
             ))}
           </div>
 
-          <div className="flex-1 overflow-y-auto min-h-0 max-h-[55vh]">
+          <div className="flex-1 overflow-y-auto min-h-0">
             {filteredNotifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <svg className="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -11,7 +11,7 @@ import { ChevronDown } from "lucide-react";
 export default function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const { isSignedIn, authUser: user } = useAuth();
+  const { isSignedIn, authLoading, authUser: user } = useAuth();
   const { signOut } = useClerk();
   const headerRef = useRef<HTMLElement>(null);
 
@@ -174,19 +174,17 @@ export default function SiteHeader() {
             )}
           </div>
 
-          {/* Mobile: auth shortcut — always visible next to hamburger */}
-          <div className="lg:hidden flex items-center gap-2 mr-1">
-            {isSignedIn && user ? (
-              <NotificationBell />
-            ) : (
+          {/* Mobile: Sign In shortcut — gated on authLoading to prevent Sign In ↔ bell flicker */}
+          {!authLoading && !isSignedIn && (
+            <div className="lg:hidden flex items-center mr-1">
               <Link
                 href="/sign-in"
                 className="text-[#800020] border border-[#800020] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
               >
                 Sign In
               </Link>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Mobile hamburger */}
           <button
@@ -239,7 +237,10 @@ export default function SiteHeader() {
                       </Link>
                     )}
                     <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Messages</Link>
-                    <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Notifications</Link>
+                    <div className="flex items-center justify-between rounded-lg hover:bg-rose-50 transition-colors">
+                      <Link href="/notifications" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] transition-colors">🔔 Notifications</Link>
+                      <div className="pr-2"><NotificationBell /></div>
+                    </div>
                     <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="block py-3 px-3 text-sm font-semibold text-gray-700 hover:text-[#800020] hover:bg-rose-50 rounded-lg transition-colors">Profile</Link>
                     <button
                       onClick={() => { signOut(); setIsMobileMenuOpen(false); }}

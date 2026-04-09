@@ -711,10 +711,10 @@ export default function UnifiedProfilePage() {
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-row items-start gap-3 md:gap-6">
             {/* Profile Picture + Business Logo stacked */}
-            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+            <div className="flex flex-col items-center gap-4 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-28 h-28 md:w-40 md:h-40 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -723,7 +723,7 @@ export default function UnifiedProfilePage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
-                      <User className="h-10 w-10 md:h-16 md:w-16 text-white" />
+                      <User className="h-12 w-12 md:h-20 md:w-20 text-white" />
                     </div>
                   )}
                   
@@ -758,16 +758,16 @@ export default function UnifiedProfilePage() {
 
               {/* Business Logo — same width as profile pic, directly below */}
               {isContractor && (
-                <div className="relative group w-20 md:w-32">
-                  <div className="relative w-20 h-20 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white/80 shadow-md bg-white">
+                <div className="relative group w-28 md:w-36">
+                  <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-md bg-white">
                     {profile?.businessLogo ? (
                       <img src={profile.businessLogo} alt="Business logo" className="w-full h-full object-contain p-2" />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-white/90">
-                        <svg className="w-6 h-6 md:w-10 md:h-10 text-white/50 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50">
+                        <svg className="w-8 h-8 md:w-11 md:h-11 text-slate-400 mb-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
-                        <span className="text-white/60 text-[9px] md:text-xs font-semibold text-center leading-tight px-1">Business Logo</span>
+                        <span className="text-slate-500 text-[10px] md:text-xs font-semibold text-center leading-tight px-1">Add Logo</span>
                       </div>
                     )}
                     {isEditing && (
@@ -790,6 +790,7 @@ export default function UnifiedProfilePage() {
                       </>
                     )}
                   </div>
+                  <p className="text-white/70 text-[10px] font-semibold text-center mt-1 leading-tight">Business Logo</p>
                 </div>
               )}
             </div>
