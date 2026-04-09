@@ -714,7 +714,7 @@ export default function UnifiedProfilePage() {
             <div className="flex flex-col items-center gap-4 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
+                <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 

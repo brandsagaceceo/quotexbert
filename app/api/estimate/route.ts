@@ -18,9 +18,20 @@ interface EstimateRequest {
 
 // AI estimate using real OpenAI API with multimodal support
 export async function POST(req: NextRequest) {
+  // Hoist parsed body so catch block can reference it without re-consuming the stream
+  let description: string | undefined;
+  let photos: string[] | undefined;
+  let projectType: string = '';
+  let postalCode: string | undefined;
+  let userId: string | undefined;
+
   try {
     const body: EstimateRequest = await req.json();
-    const { description, photos, projectType, postalCode, userId } = body;
+    description = body.description;
+    photos = body.photos;
+    projectType = body.projectType;
+    postalCode = body.postalCode;
+    userId = body.userId;
 
     // Validation
     if (!projectType) {
@@ -99,9 +110,8 @@ export async function POST(req: NextRequest) {
     
     // Fallback to basic estimate if OpenAI fails
     try {
-      const body = await req.json();
       const fallbackEstimate = generateFallbackEstimate(
-        body.description?.toLowerCase() || body.projectType?.toLowerCase() || "home repair"
+        description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
       );
       return NextResponse.json({
         ...fallbackEstimate,

@@ -171,7 +171,7 @@ export async function POST(
     await prisma.message.create({
       data: {
         threadId: thread.id,
-        fromUserId: contractorId,
+        fromUserId: dbContractorId,
         toUserId: currentLead.homeownerId,
         body: `Hello! I've accepted your project "${currentLead.title}". I'm interested in providing you with a quote. Let's discuss the details so I can give you an accurate estimate.`
       }
@@ -182,7 +182,7 @@ export async function POST(
       data: {
         threadId: thread.id,
         fromUserId: currentLead.homeownerId,
-        toUserId: contractorId,
+        toUserId: dbContractorId,
         body: `Thank you for accepting my project! I look forward to discussing the details and receiving your quote for "${currentLead.title}".`
       }
     });
@@ -203,7 +203,7 @@ export async function POST(
     try {
       // Get contractor details for email
       const contractorProfile = await prisma.contractorProfile.findUnique({
-        where: { userId: contractorId },
+        where: { userId: dbContractorId },
         select: { companyName: true, trade: true }
       });
 
@@ -231,7 +231,7 @@ export async function POST(
     // Create notification for contractor
     await prisma.notification.create({
       data: {
-        userId: contractorId,
+        userId: dbContractorId,
         type: "JOB_ACCEPTED",
         title: "Job Accepted Successfully", 
         message: `You've accepted the project: "${currentLead.title}". You can now send quotes and discuss details with the homeowner through Messages.`,
