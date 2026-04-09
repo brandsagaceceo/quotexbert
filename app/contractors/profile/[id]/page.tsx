@@ -307,6 +307,37 @@ export default function ContractorProfilePage() {
               </div>
             )}
 
+            {/* Recent Work Section */}
+            {contractor.portfolio && contractor.portfolio.length > 0 && (
+              <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Work</h2>
+                <div className="space-y-5">
+                  {contractor.portfolio.map((item: any) => (
+                    <div key={item.id} className="rounded-xl border border-gray-100 overflow-hidden">
+                      {item.imageUrl && (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-full object-cover max-h-72"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      )}
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full capitalize">{item.projectType}</span>
+                          <span className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-base leading-snug">{item.title}</h3>
+                        {item.description && (
+                          <p className="text-sm text-gray-600 mt-1 leading-relaxed">{item.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Reviews Section */}
             <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>

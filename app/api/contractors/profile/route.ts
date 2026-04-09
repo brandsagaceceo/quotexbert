@@ -26,6 +26,19 @@ export async function GET(request: NextRequest) {
             createdAt: true,
           },
         },
+        portfolio: {
+          where: { isPublic: true },
+          orderBy: { createdAt: 'desc' },
+          take: 12,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            projectType: true,
+            imageUrl: true,
+            createdAt: true,
+          },
+        },
       },
     });
 

@@ -944,6 +944,53 @@ export default function UnifiedProfilePage() {
                   </div>
                 )}
 
+                {/* Recent Work preview on overview */}
+                {isContractor && portfolio.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-bold text-slate-900">Recent Work</h2>
+                      <button
+                        onClick={() => setActiveTab('work')}
+                        className="text-sm text-rose-700 font-medium hover:underline"
+                      >
+                        See all →
+                      </button>
+                    </div>
+                    <div className="space-y-4">
+                      {portfolio.slice(0, 3).map((item) => (
+                        <div key={item.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                          {item.imageUrl && (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              className="w-full object-cover max-h-56"
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                          )}
+                          <div className="p-4">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full capitalize">{item.projectType}</span>
+                              <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            </div>
+                            <h3 className="font-semibold text-slate-900 text-base leading-snug">{item.title}</h3>
+                            {item.description && (
+                              <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {portfolio.length > 3 && (
+                      <button
+                        onClick={() => setActiveTab('work')}
+                        className="w-full py-2.5 text-sm font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-100 transition-colors"
+                      >
+                        View all {portfolio.length} posts →
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {!isContractor && (
                   <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
                     <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-3">Your Project Hub</h2>

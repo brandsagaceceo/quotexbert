@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { useMessageNotifications } from "@/lib/hooks/useMessageNotifications";
 
 interface UserProfile {
@@ -249,11 +250,23 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
       {/* Header */}
       <div className="flex-shrink-0 px-5 py-3.5 border-b border-gray-100 bg-white flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3 min-w-0">
-          <Avatar user={otherUser} size="md" />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{getDisplayName(otherUser)}</p>
-            <p className="text-xs text-slate-400 truncate">{thread.lead.title}</p>
-          </div>
+          {isHomeowner && otherUser?.contractorProfile ? (
+            <Link href={`/contractors/profile/${otherUser.id}`} className="flex items-center gap-3 min-w-0 group">
+              <Avatar user={otherUser} size="md" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 truncate leading-tight group-hover:text-rose-700 transition-colors">{getDisplayName(otherUser)}</p>
+                <p className="text-xs text-rose-500 font-medium">View Profile →</p>
+              </div>
+            </Link>
+          ) : (
+            <>
+              <Avatar user={otherUser} size="md" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 truncate leading-tight">{getDisplayName(otherUser)}</p>
+                <p className="text-xs text-slate-400 truncate">{thread.lead.title}</p>
+              </div>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {canHireContractor && (
