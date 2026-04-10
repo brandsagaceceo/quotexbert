@@ -602,11 +602,13 @@ export default function UnifiedProfilePage() {
         setPortfolio(prev => prev.filter(item => item.id !== id));
         toast.success('Portfolio item deleted.');
       } else {
-        throw new Error('Failed to delete portfolio item');
+        const data = await response.json().catch(() => ({}));
+        const msg = data.error || 'Failed to delete portfolio item.';
+        toast.error(response.status === 403 ? `Not allowed: ${msg}` : msg);
       }
     } catch (error) {
       console.error('Error deleting portfolio item:', error);
-      toast.error('Failed to delete portfolio item. Please try again.');
+      toast.error('Network error — could not delete portfolio item.');
     }
   };
 

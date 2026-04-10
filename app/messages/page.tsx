@@ -149,11 +149,13 @@ export default function MessagesPage() {
           setSelectedThread(null);
         }
       } else {
-        alert('Failed to delete conversation. Please try again.');
+        const data = await response.json().catch(() => ({}));
+        const msg = data.error || 'Failed to delete conversation.';
+        alert(response.status === 403 ? `Not allowed: ${msg}` : msg);
       }
     } catch (error) {
       console.error('Error deleting thread:', error);
-      alert('Failed to delete conversation. Please try again.');
+      alert('Network error — please check your connection and try again.');
     }
   };
 

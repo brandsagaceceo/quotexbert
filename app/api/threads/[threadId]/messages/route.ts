@@ -162,11 +162,11 @@ export async function POST(
       // Don't fail the request if email fails
     }
 
-    // Track analytics
-    await logEventServer("message_sent", fromUserId, {
+    // Track analytics — always log resolved DB IDs
+    await logEventServer("message_sent", dbFromUserId, {
       threadId,
       messageId: newMessage.id,
-      recipientId: toUserId,
+      recipientId: dbToUserId,
     });
 
     return NextResponse.json({ message: newMessage });
