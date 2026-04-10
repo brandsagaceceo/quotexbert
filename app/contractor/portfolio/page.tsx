@@ -221,8 +221,8 @@ export default function ContractorPortfolioPage() {
       {/* Add Project Form Modal */}
       {showAddForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center p-4 py-8">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+          <div className="min-h-full flex items-center justify-center p-4 pt-8 pb-24 md:py-8">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[calc(85dvh-5rem)] md:max-h-[85vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Add New Project</h2>

@@ -14,61 +14,97 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const contractorId = searchParams.get('contractorId');
 
-    if (!contractorId || contractorId !== userId) {
+    if (!contractorId) {
       return NextResponse.json({ error: 'Invalid contractor ID' }, { status: 403 });
     }
 
-    // Fetch conversations where contractor has accepted the job
-    const acceptedJobs = await prisma.jobApplication.findMany({
+    // Resolve all DB user IDs for this contractor (handles both UUID and Clerk ID paths)
+    const matchingUsers = await prisma.user.findMany({
       where: {
-        contractorId,
-        status: {
-          in: ['accepted', 'in_progress', 'completed']
-        }
+        OR: [
+          { id: contractorId },
+          { clerkUserId: contractorId },
+          { id: userId },
+          { clerkUserId: userId },
+        ]
       },
-      include: {
-        lead: {
-          include: {
-            homeowner: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              }
-            },
-            Thread: {
-              include: {
-                messages: {
-                  orderBy: {
-                    createdAt: 'desc'
-                  },
-                  take: 1
+      select: { id: true }
+    });
+    const contractorDbIds = matchingUsers.map(u => u.id);
+
+    if (contractorDbIds.length === 0) {
+      return NextResponse.json({ success: true, conversations: [] });
+    }
+
+    // Fetch threads via JobAcceptance (direct accept flow) and JobApplication (application flow)
+    const [jobAcceptances, jobApplications] = await Promise.all([
+      prisma.jobAcceptance.findMany({
+        where: {
+          contractorId: { in: contractorDbIds },
+          status: { in: ['accepted', 'quoted', 'selected', 'in_progress', 'completed'] }
+        },
+        include: {
+          lead: {
+            include: {
+              homeowner: { select: { id: true, name: true, email: true } },
+              Thread: {
+                include: {
+                  messages: { orderBy: { createdAt: 'desc' }, take: 1 }
                 }
               }
             }
           }
-        }
-      },
-      orderBy: {
-        updatedAt: 'desc'
-      }
-    }) as any;
+        },
+        orderBy: { updatedAt: 'desc' }
+      }),
+      prisma.jobApplication.findMany({
+        where: {
+          contractorId: { in: contractorDbIds },
+          status: { in: ['accepted', 'in_progress', 'completed'] }
+        },
+        include: {
+          lead: {
+            include: {
+              homeowner: { select: { id: true, name: true, email: true } },
+              Thread: {
+                include: {
+                  messages: { orderBy: { createdAt: 'desc' }, take: 1 }
+                }
+              }
+            }
+          }
+        },
+        orderBy: { updatedAt: 'desc' }
+      })
+    ]);
 
-    // Transform to conversation format
-    const conversations = acceptedJobs
-      .filter((app: any) => app.lead.messages.length > 0)
-      .map((app: any) => ({
-        id: `${app.lead.id}-${contractorId}`,
-        jobId: app.lead.id,
-        jobTitle: app.lead.title,
-        homeownerName: app.lead.homeowner.name || app.lead.homeowner.email.split('@')[0],
-        homeownerId: app.lead.homeowner.id,
-        lastMessage: app.lead.messages[0]?.content || 'No messages yet',
-        lastMessageAt: app.lead.messages[0]?.createdAt.toISOString() || app.updatedAt.toISOString(),
-        unreadCount: app.lead.messages.filter((m: any) => 
-          m.senderId !== contractorId && !m.isRead
-        ).length,
-      }));
+    // Combine sources, deduplicate by lead ID
+    const allAccepted: any[] = [...jobAcceptances, ...jobApplications];
+    const seenLeadIds = new Set<string>();
+    const uniqueAccepted = allAccepted.filter(item => {
+      if (seenLeadIds.has(item.lead.id)) return false;
+      seenLeadIds.add(item.lead.id);
+      return true;
+    });
+
+    // Transform to conversation format — only include leads that have a thread with messages
+    const conversations = uniqueAccepted
+      .filter(item => (item.lead.Thread?.messages?.length ?? 0) > 0)
+      .map(item => {
+        const thread = item.lead.Thread;
+        const lastMsg = thread?.messages?.[0];
+        const dbContractorId = item.contractorId;
+        return {
+          id: `${item.lead.id}-${dbContractorId}`,
+          jobId: item.lead.id,
+          jobTitle: item.lead.title,
+          homeownerName: item.lead.homeowner.name || item.lead.homeowner.email.split('@')[0],
+          homeownerId: item.lead.homeowner.id,
+          lastMessage: lastMsg?.body || 'No messages yet',
+          lastMessageAt: lastMsg?.createdAt?.toISOString() || item.updatedAt.toISOString(),
+          unreadCount: 0, // simplified — full unread count available on /messages page
+        };
+      });
 
     return NextResponse.json({ success: true, conversations });
   } catch (error) {

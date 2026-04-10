@@ -13,26 +13,37 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
+    // Resolve ALL DB user IDs for this user (handles webhook-created vs /api/user/role-created users).
+    const matchingUsers = await prisma.user.findMany({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { id: true },
+    });
+    const dbUserIds = matchingUsers.map((u) => u.id);
+    if (!dbUserIds.includes(userId)) dbUserIds.push(userId);
+
+    // The primary DB id is used for conversation partner comparison on the client
+    const selfUserId = matchingUsers[0]?.id || userId;
+
     // Get all threads where the user is involved (either as homeowner, contractor, or message participant)
     const threads = await prisma.thread.findMany({
       where: {
         OR: [
           // User is the homeowner of the lead
-          { lead: { homeownerId: userId } },
+          { lead: { homeownerId: { in: dbUserIds } } },
           // User is the contractor of the lead
-          { lead: { contractorId: userId } },
+          { lead: { contractorId: { in: dbUserIds } } },
           // User has sent or received messages in this thread
-          { 
+          {
             messages: {
               some: {
                 OR: [
-                  { fromUserId: userId },
-                  { toUserId: userId }
-                ]
-              }
-            }
-          }
-        ]
+                  { fromUserId: { in: dbUserIds } },
+                  { toUserId: { in: dbUserIds } },
+                ],
+              },
+            },
+          },
+        ],
       },
       include: {
         lead: {
@@ -69,7 +80,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ threads });
+    return NextResponse.json({ threads, selfUserId });
   } catch (error) {
     console.error("Error fetching threads:", error);
     return NextResponse.json(

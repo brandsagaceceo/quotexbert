@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail } from "@/lib/email";
+import { isGodUser } from "@/lib/god-access";
 
 // Email data interface
 interface EmailData {
@@ -132,7 +133,8 @@ export class NotificationService {
   }
 
   /**
-   * Notify ALL contractors about a new job post immediately
+   * Notify MATCHING contractors about a new job post immediately.
+   * Only contractors subscribed to the job's category (or god users) are notified.
    */
   static async notifyAllContractors(jobDetails: {
     leadId: string;
@@ -140,18 +142,39 @@ export class NotificationService {
     description: string;
     budget: string;
     city?: string;
+    category?: string;
   }): Promise<void> {
     try {
-      // Get ALL contractors (not just subscribed ones)
-      const contractors = await prisma.user.findMany({
-        where: { role: 'contractor' },
-        include: { contractorProfile: true },
+      // Fetch all active contractors with their subscriptions for category filtering
+      const allContractors = await prisma.user.findMany({
+        where: { role: 'contractor', isActive: true },
+        include: { contractorProfile: true, subscriptions: true },
       });
 
-      console.log(`🔔 Notifying ${contractors.length} contractors about new job: ${jobDetails.title}`);
+      // Filter to only contractors who match the job's category (or god users who bypass)
+      const matchingContractors = jobDetails.category
+        ? allContractors.filter((contractor) => {
+            if (isGodUser(contractor.email)) return true;
+            return contractor.subscriptions.some(
+              (sub) => sub.category === jobDetails.category && sub.canClaimLeads,
+            );
+          })
+        : allContractors; // No category → notify all (legacy fallback)
 
-      // Create notifications for all contractors in parallel
-      const notificationPromises = contractors.map(contractor =>
+      console.log(
+        `[LEADS] New lead "${jobDetails.title}" (category=${jobDetails.category || 'unknown'}): ` +
+        `${allContractors.length} total contractors, ${matchingContractors.length} matching`,
+      );
+      matchingContractors.forEach((c) => {
+        console.log(`[LEADS] Notifying contractor: ${c.email} (dbId=${c.id})`);
+      });
+
+      if (matchingContractors.length === 0) {
+        console.log(`[LEADS] No matching contractors found for category=${jobDetails.category}. Lead ID=${jobDetails.leadId}`);
+      }
+
+      // Create notifications for matching contractors in parallel
+      const notificationPromises = matchingContractors.map(contractor =>
         this.create({
           userId: contractor.id,
           type: 'LEAD_MATCHED',
@@ -161,19 +184,20 @@ export class NotificationService {
             description: jobDetails.description.substring(0, 200) + '...',
             budget: jobDetails.budget,
             city: jobDetails.city || 'Not specified',
+            category: jobDetails.category || 'Home Improvement',
           },
           sendEmail: true,
           sendSms: false,
         }).catch(err => {
-          console.error(`❌ Failed to notify contractor ${contractor.id}:`, err);
+          console.error(`[LEADS] Failed to notify contractor ${contractor.id} (${contractor.email}):`, err);
           return null; // Continue even if one fails
         })
       );
 
       await Promise.all(notificationPromises);
-      console.log(`✅ Successfully notified all contractors about job ${jobDetails.leadId}`);
+      console.log(`[LEADS] Notified ${matchingContractors.length} matching contractors for lead ${jobDetails.leadId}`);
     } catch (error) {
-      console.error('❌ Error notifying all contractors:', error);
+      console.error('[LEADS] Error notifying matching contractors:', error);
       throw error;
     }
   }

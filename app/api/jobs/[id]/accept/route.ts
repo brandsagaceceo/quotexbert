@@ -38,7 +38,9 @@ export async function POST(
       );
     }
 
-    if (currentLead.status !== "open") {
+    // Allow acceptance when status is open, claimed, or reviewing (up to 3 contractors)
+    const acceptableStatuses = ['open', 'claimed', 'reviewing'];
+    if (!acceptableStatuses.includes(currentLead.status)) {
       return NextResponse.json(
         { error: "This job is no longer accepting contractors" },
         { status: 400 }
@@ -144,6 +146,9 @@ export async function POST(
     if (isFirstClaim) {
       leadUpdateData.claimedBy = dbContractorId;
       leadUpdateData.claimedAt = new Date();
+      // Also set contractorId so the Thread's lead.contractor relation is populated,
+      // which lets the homeowner see who accepted their job in Messages.
+      leadUpdateData.contractorId = dbContractorId;
     }
     
     await prisma.lead.update({

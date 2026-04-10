@@ -756,6 +756,16 @@ export default function UnifiedProfilePage() {
                 </div>
               </div>
 
+              {/* Business Logo — shown for contractors who have uploaded one */}
+              {isContractor && profile?.businessLogo && (
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white flex-shrink-0">
+                  <img
+                    src={profile.businessLogo}
+                    alt="Business logo"
+                    className="w-full h-full object-contain p-1"
+                  />
+                </div>
+              )}
 
             </div>
 
@@ -843,7 +853,7 @@ export default function UnifiedProfilePage() {
           {/* Mobile: Scrollable pill tabs */}
           <nav data-tour="profile-tabs" className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
-              ? ['overview', 'portfolio', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
+              ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
             ).map((tab) => (
               <button

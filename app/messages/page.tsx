@@ -73,6 +73,10 @@ export default function MessagesPage() {
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  // selfUserId is the resolved DB primary key for the current user.
+  // useAuth returns the Clerk ID, which may differ from the DB id for
+  // webhook-created accounts.  The threads API resolves and returns it.
+  const [selfUserId, setSelfUserId] = useState<string>("");
 
   useEffect(() => {
     if (user) {
@@ -109,6 +113,9 @@ export default function MessagesPage() {
       if (response.ok) {
         const data = await response.json();
         setThreads(data.threads || []);
+        // Store the resolved DB user ID for accurate conversation-partner detection.
+        // This handles accounts where User.id (UUID) differs from Clerk ID.
+        if (data.selfUserId) setSelfUserId(data.selfUserId);
       }
     } catch (error) {
       console.error('Error fetching threads:', error);
@@ -147,7 +154,10 @@ export default function MessagesPage() {
 
   const getConversationPartner = (thread: Thread): UserInThread | null | undefined => {
     if (!user) return null;
-    return thread.lead.homeowner.id === user.id
+    // Compare against the resolved DB id (selfUserId) rather than the raw Clerk ID (user.id).
+    // For webhook-created users, User.id is a UUID while user.id from useAuth is the Clerk ID.
+    const myId = selfUserId || user.id;
+    return thread.lead.homeowner.id === myId
       ? thread.lead.contractor
       : thread.lead.homeowner;
   };

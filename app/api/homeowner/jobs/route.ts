@@ -14,11 +14,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Homeowner ID is required' }, { status: 400 });
     }
 
-    console.log(`FETCH homeownerId: ${homeownerId}`);
+    // Resolve ALL DB user IDs that could belong to this homeowner.
+    // Users created via webhook have id=UUID with clerkUserId=clerkId.
+    // Users created via /api/user/role have id=clerkId with no clerkUserId.
+    // Both paths may coexist, so we query with any matching ID.
+    const matchingUsers = await prisma.user.findMany({
+      where: { OR: [{ id: homeownerId }, { clerkUserId: homeownerId }] },
+      select: { id: true },
+    });
+    const homeownerDbIds = matchingUsers.map((u) => u.id);
+    // Always include the provided value in case the user is not in DB yet
+    if (!homeownerDbIds.includes(homeownerId)) homeownerDbIds.push(homeownerId);
+
+    console.log(`FETCH homeownerId: received=${homeownerId}, resolved DB ids=[${homeownerDbIds.join(', ')}]`);
 
     const jobs = await prisma.lead.findMany({
       where: {
-        homeownerId: homeownerId
+        homeownerId: { in: homeownerDbIds },
       },
       include: {
         applications: {

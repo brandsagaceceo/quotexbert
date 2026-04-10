@@ -14,14 +14,34 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const contractorId = searchParams.get('contractorId');
 
-    if (!contractorId || contractorId !== userId) {
+    if (!contractorId) {
       return NextResponse.json({ error: 'Invalid contractor ID' }, { status: 403 });
     }
+
+    // Resolve ALL DB user IDs for this contractor.
+    // Webhook-created users have id=UUID/clerkUserId=clerkId.
+    // /api/user/role-created users have id=clerkId.
+    // Both may coexist; query all matching IDs.
+    const matchingUsers = await prisma.user.findMany({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { id: true },
+    });
+    const contractorDbIds = matchingUsers.map((u) => u.id);
+    if (!contractorDbIds.includes(userId)) contractorDbIds.push(userId);
+    if (!contractorDbIds.includes(contractorId)) contractorDbIds.push(contractorId);
+
+    // Verify the requested contractorId belongs to the authenticated user
+    const isOwner = contractorDbIds.includes(contractorId) || contractorId === userId;
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Invalid contractor ID' }, { status: 403 });
+    }
+
+    console.log(`FETCH contractor accepted-jobs: clerkId=${userId}, resolvedDbIds=[${contractorDbIds.join(', ')}]`);
 
     // Fetch all applications where this contractor was accepted
     const acceptedApplications = await prisma.jobApplication.findMany({
       where: {
-        contractorId,
+        contractorId: { in: contractorDbIds },
         status: {
           in: ['accepted', 'in_progress', 'completed']
         }
@@ -47,7 +67,7 @@ export async function GET(req: Request) {
     // Also fetch JobAcceptance records (for jobs accepted directly without application)
     const jobAcceptances = await prisma.jobAcceptance.findMany({
       where: {
-        contractorId,
+        contractorId: { in: contractorDbIds },
         status: {
           in: ['accepted', 'quoted', 'selected']
         }

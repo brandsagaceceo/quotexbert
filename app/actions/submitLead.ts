@@ -466,7 +466,7 @@ export async function submitLead(formData: FormData) {
       }
     }
 
-    // Send email notification
+    // Send admin notification email (goes to quotexbert@gmail.com — intentional admin inbox)
     try {
       await sendLeadEmail({
         postalCode: data.postalCode,
@@ -475,13 +475,13 @@ export async function submitLead(formData: FormData) {
         estimate,
         source: rawData.affiliateCode ? "affiliate" : "web",
       });
-      console.log(`[submitLead:${requestId}] Email notification sent`);
+      console.log(`[submitLead:${requestId}] Admin notification email sent to quotexbert@gmail.com`);
     } catch (emailError) {
-      console.error(`[submitLead:${requestId}] Email notification error:`, emailError);
+      console.error(`[submitLead:${requestId}] Admin email notification error:`, emailError);
       // Don't fail the request if email fails
     }
 
-    // Notify contractors about the new job
+    // Notify matching contractors about the new job (filtered by category)
     try {
       await NotificationService.notifyAllContractors({
         leadId: lead.id,
@@ -489,6 +489,7 @@ export async function submitLead(formData: FormData) {
         description: data.description,
         budget: finalBudget,
         city: data.postalCode,
+        category: data.projectType,
       });
       console.log(`[submitLead:${requestId}] Contractor notifications sent`);
     } catch (notificationError) {
