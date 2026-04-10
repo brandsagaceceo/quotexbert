@@ -380,7 +380,7 @@ function ContractorJobsContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
             Available Jobs
@@ -692,24 +692,37 @@ function ContractorJobsContent() {
             subtitle="Finding projects that match your categories"
           />
         ) : filteredJobs.length === 0 ? (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Match Your Filters</h3>
-            <p className="text-gray-500 mb-4">
-              {jobs.length === 0 
-                ? "No leads have been created yet. Try logging in as a homeowner to create a lead!"
-                : "Try adjusting your filters to see more jobs."
-              }
-            </p>
-            <div className="space-x-2">
-              {jobs.length > 0 && (
-                <button 
+          <div className="text-center py-16 px-4">
+            {jobs.length === 0 ? (
+              <>
+                <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-rose-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">No jobs available right now</h3>
+                <p className="text-gray-500 text-sm max-w-xs mx-auto mb-5 leading-relaxed">
+                  New homeowner projects are added daily. Check back soon or set up alerts to be first to know.
+                </p>
+                <p className="text-xs text-gray-400">New leads are posted every day — you&apos;ll be notified instantly.</p>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No jobs match your filters</h3>
+                <p className="text-gray-500 text-sm mb-5">Try adjusting your filters to see more available projects.</p>
+                <button
                   onClick={clearFilters}
-                  className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg font-semibold"
+                  className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold text-sm transition-all shadow-md"
                 >
-                  Clear Filters
+                  Clear All Filters
                 </button>
-              )}
-            </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid gap-6">

@@ -16,6 +16,7 @@ interface Message {
   id: string;
   body: string;
   createdAt: string;
+  readAt?: string | null;
   fromUser: UserProfile;
   toUser: UserProfile;
 }
@@ -34,6 +35,7 @@ interface Thread {
 interface ChatProps {
   thread: Thread;
   currentUserId?: string;
+  onDeleteThread?: (threadId: string) => void;
 }
 
 function getDisplayName(user: UserProfile | null | undefined): string {
@@ -72,7 +74,7 @@ function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; s
   );
 }
 
-export default function Chat({ thread, currentUserId }: ChatProps) {
+export default function Chat({ thread, currentUserId, onDeleteThread }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -82,16 +84,25 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
   const [hiringContractor, setHiringContractor] = useState(false);
   const [contractorHired, setContractorHired] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
+  const hasMarkedReadRef = useRef(false);
+  const isFirstRenderRef = useRef(true);
 
   const { notifyNewMessage } = useMessageNotifications({
     enabled: true,
     soundEnabled: true,
     browserNotificationsEnabled: true,
   });
+
+  // Keep a stable ref so fetchMessages doesn't need notifyNewMessage in its deps
+  const notifyNewMessageRef = useRef(notifyNewMessage);
+  useEffect(() => { notifyNewMessageRef.current = notifyNewMessage; });
 
   if (!currentUserId) {
     return (
@@ -117,17 +128,21 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
         const data = await response.json();
         const latestMessage = data.messages[data.messages.length - 1];
         if (latestMessage && lastMessageIdRef.current && latestMessage.id !== lastMessageIdRef.current && latestMessage.fromUser.id !== currentUserId) {
-          notifyNewMessage(getDisplayName(latestMessage.fromUser), latestMessage.body.substring(0, 120), thread.id);
+          notifyNewMessageRef.current(getDisplayName(latestMessage.fromUser), latestMessage.body.substring(0, 120), thread.id);
         }
         if (latestMessage) lastMessageIdRef.current = latestMessage.id;
-        setMessages(data.messages);
+        // Only update state if messages actually changed (avoid unnecessary re-renders)
+        setMessages((prev) => {
+          if (prev.length === data.messages.length && prev[prev.length - 1]?.id === latestMessage?.id) return prev;
+          return data.messages;
+        });
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
     } finally {
       setLoading(false);
     }
-  }, [thread.id, currentUserId, notifyNewMessage]);
+  }, [thread.id, currentUserId]);
 
   const checkTyping = useCallback(async () => {
     try {
@@ -149,25 +164,68 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     } catch { /* non-critical */ }
   }, [thread.id, currentUserId]);
 
+  const shouldScrollRef = useRef(shouldScrollToBottom);
+  useEffect(() => { shouldScrollRef.current = shouldScrollToBottom; }, [shouldScrollToBottom]);
+
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    if (shouldScrollToBottom) {
+    if (shouldScrollRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior, block: "end" });
     }
-  }, [shouldScrollToBottom]);
+  }, []);
+
+  // Mark messages as read when user opens/views this thread (once per mount)
+  const markMessagesRead = useCallback(async () => {
+    if (!currentUserId || hasMarkedReadRef.current) return;
+    try {
+      const res = await fetch(`/api/threads/${thread.id}/messages`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ viewerUserId: currentUserId }),
+      });
+      if (res.ok) hasMarkedReadRef.current = true;
+    } catch { /* will retry on next mount */ }
+  }, [thread.id, currentUserId]);
+
+  const handleDeleteThread = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/threads/${thread.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        onDeleteThread?.(thread.id);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setDeleteError(res.status === 403 ? data.error || 'Not allowed' : (data.error || 'Failed to delete'));
+      }
+    } catch {
+      setDeleteError('Network error — please try again.');
+    } finally {
+      setDeleting(false);
+      if (!deleteError) setShowDeleteConfirm(false);
+    }
+  };
 
   useEffect(() => { fetchMessages(); setShouldScrollToBottom(true); }, [fetchMessages]);
   useEffect(() => {
     if (shouldScrollToBottom) {
-      // instant on first load, smooth for new messages
-      const isFirstLoad = messages.length > 0 && lastMessageIdRef.current === messages[messages.length - 1]?.id;
-      scrollToBottom(isFirstLoad ? "instant" : "smooth");
+      const behavior: ScrollBehavior = isFirstRenderRef.current ? "instant" : "smooth";
+      isFirstRenderRef.current = false;
+      scrollToBottom(behavior);
     }
   }, [messages, shouldScrollToBottom, scrollToBottom]);
   useEffect(() => {
+    markMessagesRead();
     const msgInterval = setInterval(fetchMessages, 3000);
     const typingInterval = setInterval(checkTyping, 2000);
-    return () => { clearInterval(msgInterval); clearInterval(typingInterval); };
-  }, [fetchMessages, checkTyping]);
+    return () => {
+      clearInterval(msgInterval);
+      clearInterval(typingInterval);
+      // Clear any active typing indicator so the other user doesn't see a stale "typing…" after unmount
+      sendTyping("stop");
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [fetchMessages, checkTyping, markMessagesRead]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
@@ -279,17 +337,40 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Delete chat */}
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              title="Delete chat"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-red-600 font-medium hidden sm:block">Delete?</span>
+              <button onClick={handleDeleteThread} disabled={deleting}
+                className="px-2.5 py-1 text-xs font-bold bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-60 transition-colors"
+              >{deleting ? '…' : 'Yes'}</button>
+              <button onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); }}
+                className="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
+              >No</button>
+              {deleteError && <span className="text-[10px] text-red-500 max-w-[120px] truncate">{deleteError}</span>}
+            </div>
+          )}
           {canHireContractor && (
             <button onClick={hireContractor} disabled={hiringContractor}
               className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg disabled:opacity-60 flex items-center gap-1.5 transition-colors shadow-sm"
             >
-              {hiringContractor ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "\u2713"}
+              {hiringContractor ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "✓"}
               {hiringContractor ? "Hiring..." : "Hire Contractor"}
             </button>
           )}
           {contractorHired && (
             <span className="px-3 py-1.5 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-200">
-              &#10003; Hired!
+              ✓ Hired!
             </span>
           )}
         </div>
@@ -298,7 +379,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
       {/* Messages */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 min-h-0 space-y-1"
+        className="flex-1 overflow-y-auto px-4 py-4 min-h-0 space-y-1 overscroll-none"
         style={{ scrollbarWidth: "thin", scrollbarColor: "#f97316 #f9fafb" }}
         onScroll={(e) => {
           const el = e.currentTarget;
@@ -331,6 +412,9 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
             const isMine = msg.fromUser.id === currentUserId;
             const nextItem = items[idx + 1];
             const showAvatar = !nextItem || nextItem.type === "sep" || (nextItem.type === "msg" && nextItem.msg.fromUser.id !== msg.fromUser.id);
+            // Show "Seen" only under the last outgoing message that has been read by recipient
+            const isLastOutgoing = isMine && (!items.slice(idx + 1).some(i => i.type === "msg" && i.msg.fromUser.id === currentUserId));
+            const seenByRecipient = isLastOutgoing && !!msg.readAt;
             return (
               <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group`}>
                 <div className={`w-8 flex-shrink-0 ${showAvatar ? "" : "invisible"}`}>
@@ -344,8 +428,9 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
                   }`}>
                     {msg.body}
                   </div>
-                  <span className="text-[10px] mt-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className={`text-[10px] mt-0.5 text-gray-400 flex items-center gap-1 transition-opacity ${seenByRecipient ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                     {formatTime(msg.createdAt)}
+                    {seenByRecipient && <span className="text-rose-400 font-medium">· Seen</span>}
                   </span>
                 </div>
               </div>
@@ -388,6 +473,11 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
             type="text"
             value={newMessage}
             onChange={handleInputChange}
+            onFocus={() => {
+              setShouldScrollToBottom(true);
+              // Delay accounts for iOS keyboard animation (~300ms)
+              setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' }), 320);
+            }}
             placeholder={`Message ${getDisplayName(otherUser)}...`}
             className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400"
             style={{ fontSize: '16px' }}

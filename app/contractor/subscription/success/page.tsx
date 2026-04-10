@@ -46,7 +46,7 @@ export default function SubscriptionSuccess() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-12 px-4" style={{ paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 48px)' }}>
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-3xl shadow-2xl p-12 text-center animate-scale-in">
           {/* Success Icon */}

@@ -81,7 +81,18 @@ export default function NotificationBell() {
 
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
+
+    // Sync badge when mark-all-read fires from notifications page
+    const handleAllRead = () => {
+      setUnreadCount(0);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    };
+    window.addEventListener('notifications:allRead', handleAllRead);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notifications:allRead', handleAllRead);
+    };
   }, [authUser?.id]);
 
   const fetchNotifications = async () => {
@@ -143,6 +154,7 @@ export default function NotificationBell() {
       if (response.ok) {
         setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
         setUnreadCount(0);
+        window.dispatchEvent(new CustomEvent('notifications:allRead'));
       }
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
@@ -214,14 +226,19 @@ export default function NotificationBell() {
     if (payload.threadId) return `/messages?threadId=${payload.threadId}`;
     if (payload.conversationId) return `/messages?conversationId=${payload.conversationId}`;
     if (payload.leadId) return `/messages?leadId=${payload.leadId}`;
-    if (payload.jobId) return "/contractor/jobs";
+
+    if (payload.jobId) {
+      const isLead = notification.type === 'LEAD_MATCHED';
+      return isLead ? `/contractor/jobs?highlight=${payload.jobId}` : `/messages`;
+    }
 
     if (notification.relatedType === "conversation" && notification.relatedId) {
       return `/messages?conversationId=${notification.relatedId}`;
     }
 
     if (notification.relatedType === "job" && notification.relatedId) {
-      return "/contractor/jobs";
+      if (notification.type === 'LEAD_MATCHED') return `/contractor/jobs?highlight=${notification.relatedId}`;
+      return `/messages`;
     }
 
     return "/notifications";
@@ -369,10 +386,20 @@ export default function NotificationBell() {
           <div className="flex-1 overflow-y-auto min-h-0">
             {filteredNotifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
-                <svg className="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                <p className="font-medium">No notifications</p>
+                {activeFilter === 'all' ? (
+                  <>
+                    <p className="font-medium text-gray-700">All caught up!</p>
+                    <p className="text-xs text-gray-400 mt-1">No notifications right now</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium text-gray-700">No {activeFilter} notifications</p>
+                    <button onClick={() => setActiveFilter('all')} className="text-xs text-rose-600 hover:underline mt-2 font-medium">View all</button>
+                  </>
+                )}
               </div>
             ) : (
               (["Today", "Yesterday", "Earlier"] as const).map((groupName) => {

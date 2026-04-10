@@ -28,21 +28,32 @@ interface ContractorMetricsCardProps {
 export function ContractorMetricsCard({ contractorId }: ContractorMetricsCardProps) {
   const [metrics, setMetrics] = useState<ContractorMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [noProfile, setNoProfile] = useState(false);
 
   useEffect(() => {
     fetchMetrics();
   }, [contractorId]);
 
   const fetchMetrics = async () => {
+    setError(false);
+    setNoProfile(false);
+    setLoading(true);
     try {
       const response = await fetch(`/api/contractors/metrics?contractorId=${contractorId}`);
       const data = await response.json();
-      
-      if (data.success) {
+
+      if (response.status === 404) {
+        // Contractor hasn't completed their profile yet — not an error
+        setNoProfile(true);
+      } else if (data.success) {
         setMetrics(data.metrics);
+      } else {
+        setError(true);
       }
-    } catch (error) {
-      console.error("Error fetching metrics:", error);
+    } catch (err) {
+      console.error("Error fetching metrics:", err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -64,9 +75,23 @@ export function ContractorMetricsCard({ contractorId }: ContractorMetricsCardPro
   }
 
   if (!metrics) {
+    if (noProfile) {
+      return (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <p className="text-sm text-gray-400">Complete your contractor profile to see performance metrics.</p>
+        </div>
+      );
+    }
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-500">Unable to load metrics</p>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-500 text-sm">{error ? "Could not load metrics" : "No data yet"}</p>
+          {error && (
+            <button onClick={fetchMetrics} className="text-xs text-rose-600 hover:underline font-medium">
+              Retry
+            </button>
+          )}
+        </div>
       </div>
     );
   }

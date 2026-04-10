@@ -74,13 +74,30 @@ export async function GET(request: NextRequest) {
             },
           },
         },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                toUserId: { in: dbUserIds },
+                readAt: null,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    return NextResponse.json({ threads, selfUserId });
+    // Attach unreadCount as a top-level field for convenience
+    const threadsWithUnread = threads.map((t) => ({
+      ...t,
+      unreadCount: t._count.messages,
+      _count: undefined,
+    }));
+
+    return NextResponse.json({ threads: threadsWithUnread, selfUserId });
   } catch (error) {
     console.error("Error fetching threads:", error);
     return NextResponse.json(

@@ -160,7 +160,7 @@ export default function HomeownerJobDetailPage() {
       : job.budget;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
       {/* Top bar */}
       <div className="bg-white border-b border-gray-100 px-4 py-3 sticky top-0 z-20 shadow-sm">
         <div className="max-w-3xl mx-auto flex items-center gap-3">

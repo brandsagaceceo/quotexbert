@@ -3,6 +3,18 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+/** Resolve a Clerk ID or DB UUID to all matching DB user IDs */
+async function resolveUserIds(userId: string): Promise<string[]> {
+  const matches = await prisma.user.findMany({
+    where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+    select: { id: true },
+  });
+  const ids = matches.map((u) => u.id);
+  // Always include the raw value as a fallback (e.g. already a DB UUID)
+  if (!ids.includes(userId)) ids.push(userId);
+  return ids;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -12,13 +24,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const notifications = await prisma.notification.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
+    const userIds = await resolveUserIds(userId);
 
-    const unreadCount = notifications.filter((notification) => !notification.read).length;
+    const [notifications, unreadCount] = await Promise.all([
+      prisma.notification.findMany({
+        where: { userId: { in: userIds } },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      }),
+      prisma.notification.count({
+        where: { userId: { in: userIds }, read: false },
+      }),
+    ]);
 
     return NextResponse.json({ notifications, unreadCount });
   } catch (error) {
@@ -36,10 +53,12 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
+    const userIds = await resolveUserIds(userId);
+
     if (markAllAsRead) {
       await prisma.notification.updateMany({
         where: {
-          userId,
+          userId: { in: userIds },
           read: false,
         },
         data: {
@@ -57,7 +76,7 @@ export async function PATCH(request: NextRequest) {
     const notification = await prisma.notification.findFirst({
       where: {
         id: notificationId,
-        userId,
+        userId: { in: userIds },
       },
     });
 

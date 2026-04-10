@@ -145,7 +145,7 @@ export default function ContractorSettingsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-[calc(100vh-140px)] bg-slate-50 md:pb-8" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-2xl mx-auto px-4 py-8">
         <Link
           href="/contractor/dashboard"

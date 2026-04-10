@@ -93,7 +93,7 @@ export default function MobileBottomNav() {
   // Homeowner: Home | Jobs | [Post Job center] | Messages | Profile
   const leftItems = [
     { href: "/", label: "Home", icon: Home, active: pathname === "/" },
-    { href: "/jobs", label: "Jobs", icon: Search, active: pathname.startsWith("/jobs") },
+    { href: "/notifications", label: "Alerts", icon: Bell, active: pathname === "/notifications", badge: unreadCount },
   ];
   const rightItems = [
     { href: "/messages", label: "Messages", icon: MessageCircle, active: pathname === "/messages" },
@@ -113,11 +113,18 @@ export default function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center h-full transition-colors ${
+              className={`relative flex flex-col items-center justify-center h-full transition-colors ${
                 item.active ? "text-[#800020]" : "text-gray-500 hover:text-[#800020]"
               }`}
             >
-              <Icon className="h-5 w-5 shrink-0" />
+              <span className="relative">
+                <Icon className="h-5 w-5 shrink-0" />
+                {"badge" in item && item.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-600 text-white text-[10px] font-bold rounded-full leading-none">
+                    {item.badge > 99 ? "99+" : item.badge}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] mt-0.5 font-medium leading-tight">{item.label}</span>
             </Link>
           );

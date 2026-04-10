@@ -88,6 +88,9 @@ model User {
   visualizerSubscription VisualizerSubscription?
   visualizerGenerations  VisualizerGeneration[]
   
+  // Portfolio likes
+  portfolioLikes         PortfolioLike[]
+  
   @@map("users")
 }
 
@@ -490,7 +493,20 @@ model PortfolioItem {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
+  likes        PortfolioLike[]
+  
   @@map("portfolio_items")
+}
+
+model PortfolioLike {
+  id              String        @id @default(cuid())
+  portfolioItemId String
+  userId          String
+  createdAt       DateTime      @default(now())
+  portfolioItem   PortfolioItem @relation(fields: [portfolioItemId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([portfolioItemId, userId])
+  @@map("portfolio_likes")
 }
 
 model Review {

@@ -32,9 +32,16 @@ export async function GET(request: Request) {
       );
     }
 
+    // Resolve Clerk ID or DB UUID to the canonical DB user ID
+    const resolvedUser = await prisma.user.findFirst({
+      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+      select: { id: true },
+    });
+    const resolvedContractorId = resolvedUser?.id ?? contractorId;
+
     // Get contractor profile
     const contractor = await prisma.contractorProfile.findUnique({
-      where: { userId: contractorId },
+      where: { userId: resolvedContractorId },
       select: {
         avgRating: true,
         reviewCount: true,
@@ -59,7 +66,7 @@ export async function GET(request: Request) {
           "lastResponseCalculated",
           "completedJobs"
         FROM "contractor_profiles"
-        WHERE "userId" = ${contractorId}
+        WHERE "userId" = ${resolvedContractorId}
         LIMIT 1
       `;
       responseTimeData = result[0] || null;
@@ -80,7 +87,7 @@ export async function GET(request: Request) {
 
     if (shouldRecalculate && avgResponseTimeMinutes === null) {
       // Trigger async recalculation (don't block the response)
-      updateContractorResponseTime(contractorId).catch((err: any) => {
+      updateContractorResponseTime(resolvedContractorId).catch((err: any) => {
         console.error('Error updating response time:', err);
       });
     }
@@ -92,12 +99,9 @@ export async function GET(request: Request) {
       : null;
 
     // Count leads received (any job where contractor could have seen it or been invited)
-    // This should be broader than just accepted jobs
     const leadsWhereContractorMatches = await prisma.lead.findMany({
       where: {
-        status: {
-          in: ["open", "claimed", "accepted", "in_progress", "completed"],
-        },
+        status: { in: ["open", "claimed", "accepted", "in_progress", "completed"] },
       },
       select: {
         id: true,
@@ -114,70 +118,54 @@ export async function GET(request: Request) {
 
     for (const lead of leadsWhereContractorMatches) {
       try {
-        const acceptedContractors = JSON.parse(
-          lead.acceptedContractors || "[]"
-        );
+        const acceptedContractors = JSON.parse(lead.acceptedContractors || "[]");
         
-        // Count as "received" if contractor ever interacted with it (claimed or accepted)
         const hasInteraction = 
-          acceptedContractors.includes(contractorId) ||
-          lead.acceptedById === contractorId ||
-          lead.claimedBy === contractorId;
+          acceptedContractors.includes(resolvedContractorId) ||
+          lead.acceptedById === resolvedContractorId ||
+          lead.claimedBy === resolvedContractorId;
         
         if (hasInteraction && !seenLeadIds.has(lead.id)) {
           leadsReceived++;
           seenLeadIds.add(lead.id);
         }
 
-        // Count as "accepted" only if contractor is in acceptedContractors or is the acceptedById
         const hasAccepted = 
-          acceptedContractors.includes(contractorId) ||
-          lead.acceptedById === contractorId;
+          acceptedContractors.includes(resolvedContractorId) ||
+          lead.acceptedById === resolvedContractorId;
         
         if (hasAccepted) {
           jobsAccepted++;
         }
       } catch (e) {
-        // Skip invalid JSON
         continue;
       }
     }
 
-    // Get recent activity for additional context
     const recentAcceptances = await prisma.jobAcceptance.count({
       where: {
-        contractorId,
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-        },
+        contractorId: resolvedContractorId,
+        createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },
     });
 
     const recentReviews = await prisma.review.count({
       where: {
-        contractorId,
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-        },
+        contractorId: resolvedContractorId,
+        createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },
     });
 
-    // Calculate conversion rate (jobsAccepted / leadsReceived)
     const conversionRate = leadsReceived > 0 
       ? ((jobsAccepted / leadsReceived) * 100).toFixed(1)
       : '0.0';
 
-    // Calculate average job value from accepted leads
     const acceptedLeads = await prisma.lead.findMany({
       where: {
-        acceptedById: contractorId,
-        NOT: {
-          budget: "",
-        },
+        acceptedById: resolvedContractorId,
+        NOT: { budget: "" },
       },
-      select: {
-        budget: true,
-      },
+      select: { budget: true },
     });
 
     let averageJobValue = 0;
@@ -186,10 +174,8 @@ export async function GET(request: Request) {
 
     for (const lead of acceptedLeads) {
       if (lead.budget) {
-        // Parse budget string (e.g., "$5,000 - $10,000" or "$5000")
         const numbers = lead.budget.match(/\d+/g);
         if (numbers && numbers.length > 0) {
-          // If range, take the average; if single number, use that
           const values = numbers.map(n => parseInt(n.replace(/,/g, '')));
           const avgValue = values.reduce((sum, val) => sum + val, 0) / values.length;
           totalValue += avgValue;
@@ -197,36 +183,23 @@ export async function GET(request: Request) {
         }
       }
     }
+    if (validBudgets > 0) averageJobValue = Math.round(totalValue / validBudgets);
 
-    if (validBudgets > 0) {
-      averageJobValue = Math.round(totalValue / validBudgets);
-    }
-
-    // Count leads in last 30 days
     const leadsLast30Days = await prisma.lead.count({
       where: {
         OR: [
-          { acceptedById: contractorId },
-          {
-            acceptedContractors: {
-              contains: contractorId,
-            },
-          },
+          { acceptedById: resolvedContractorId },
+          { acceptedContractors: { contains: resolvedContractorId } },
         ],
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        },
+        createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },
     });
 
-    // Count completed jobs in last 30 days (using JobAcceptance with status completed)
     const jobsCompletedLast30Days = await prisma.lead.count({
       where: {
-        acceptedById: contractorId,
+        acceptedById: resolvedContractorId,
         status: "completed",
-        updatedAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        },
+        updatedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },
     });
 
@@ -240,12 +213,10 @@ export async function GET(request: Request) {
         reviewCount: contractor.reviewCount,
         responseTime,
         avgResponseTimeHours: avgResponseTimeHours && avgResponseTimeHours > 0 ? avgResponseTimeHours : null,
-        // New metrics
         conversionRate: parseFloat(conversionRate),
         averageJobValue,
         leadsLast30Days,
         jobsCompletedLast30Days,
-        // Additional stats
         recentActivity: {
           acceptancesLast30Days: recentAcceptances,
           reviewsLast30Days: recentReviews,

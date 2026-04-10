@@ -36,7 +36,6 @@ export async function DELETE(
         },
         messages: {
           select: { fromUserId: true, toUserId: true },
-          take: 1,
         },
       },
     });

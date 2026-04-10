@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logEventServer } from "@/lib/analytics";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function GET(
   request: NextRequest,
@@ -44,6 +45,13 @@ export async function POST(
   { params }: { params: Promise<{ threadId: string }> },
 ) {
   try {
+    // Authenticate the caller
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId: callerDbId } = authResult.user;
+
     const { threadId } = await params;
     const body = await request.json();
     const { fromUserId, toUserId, message } = body;
@@ -82,6 +90,11 @@ export async function POST(
 
     const dbFromUserId = fromUser.id;
     const dbToUserId = toUser.id;
+
+    // Security: verify the authenticated caller IS the sender
+    if (dbFromUserId !== callerDbId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Prevent self-messaging
     if (dbFromUserId === dbToUserId) {
@@ -174,6 +187,70 @@ export async function POST(
     console.error("Error creating message:", error);
     return NextResponse.json(
       { error: "Failed to create message" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * PATCH /api/threads/[threadId]/messages
+ * Mark all unread messages in a thread as read for a given viewer.
+ * Requires an authenticated session. The session user must match viewerUserId.
+ * Body: { viewerUserId: string }
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ threadId: string }> },
+) {
+  try {
+    const { threadId } = await params;
+
+    // Verify authentication
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId: callerDbId } = authResult.user;
+
+    const body = await request.json();
+    const { viewerUserId } = body as { viewerUserId?: string };
+
+    if (!viewerUserId) {
+      return NextResponse.json({ error: "viewerUserId required" }, { status: 400 });
+    }
+
+    // Resolve the supplied viewerUserId to a DB UUID
+    const viewer = await prisma.user.findFirst({
+      where: { OR: [{ id: viewerUserId }, { clerkUserId: viewerUserId }] },
+      select: { id: true },
+    });
+    if (!viewer) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    const dbViewerId = viewer.id;
+
+    // Security: the authenticated session must match the viewer being marked as read
+    if (dbViewerId !== callerDbId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const now = new Date();
+
+    // Mark all messages sent TO this viewer in this thread as read
+    await prisma.message.updateMany({
+      where: {
+        threadId,
+        toUserId: dbViewerId,
+        readAt: null,
+      },
+      data: { readAt: now },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
+    return NextResponse.json(
+      { error: "Failed to mark messages as read" },
       { status: 500 },
     );
   }

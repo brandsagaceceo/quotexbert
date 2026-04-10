@@ -54,17 +54,10 @@ export async function POST(
       );
     }
 
-    // Fetch contractor user — try by DB id first, then by Clerk user id
-    let contractor = await prisma.user.findUnique({
-      where: { id: contractorId }
+    // Fetch contractor user — resolve by either DB id or Clerk user id
+    const contractor = await prisma.user.findFirst({
+      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] }
     });
-
-    if (!contractor) {
-      // contractorId might be a Clerk user ID instead of DB id
-      contractor = await prisma.user.findUnique({
-        where: { clerkUserId: contractorId }
-      });
-    }
 
     if (!contractor) {
       return NextResponse.json(
@@ -156,19 +149,12 @@ export async function POST(
       data: leadUpdateData
     });
 
-    // Check if thread already exists for this lead
-    let thread = await prisma.thread.findUnique({
-      where: { leadId: jobId }
+    // Get or create thread for this lead (upsert prevents race if two contractors accept simultaneously)
+    const thread = await prisma.thread.upsert({
+      where: { leadId: jobId },
+      update: {},
+      create: { leadId: jobId },
     });
-
-    // Create thread if it doesn't exist
-    if (!thread) {
-      thread = await prisma.thread.create({
-        data: {
-          leadId: jobId
-        }
-      });
-    }
 
     // Create initial messages in the thread for both parties
     
@@ -192,7 +178,7 @@ export async function POST(
       }
     });
 
-    // Create notification for homeowner
+    // Create notification for homeowner — includes threadId so Alerts page deep-links to /messages
     await prisma.notification.create({
       data: {
         userId: currentLead.homeownerId,
@@ -200,7 +186,12 @@ export async function POST(
         title: "Contractor Accepted Your Project!",
         message: `A professional contractor has accepted your project: "${currentLead.title}". Check your messages to discuss details and receive quotes.`,
         relatedId: jobId,
-        relatedType: "job"
+        relatedType: "job",
+        payload: {
+          threadId: thread.id,
+          jobId,
+          jobTitle: currentLead.title,
+        }
       }
     });
 
@@ -233,17 +224,9 @@ export async function POST(
       // Don't fail the request if email fails
     }
 
-    // Create notification for contractor
-    await prisma.notification.create({
-      data: {
-        userId: dbContractorId,
-        type: "JOB_ACCEPTED",
-        title: "Job Accepted Successfully", 
-        message: `You've accepted the project: "${currentLead.title}". You can now send quotes and discuss details with the homeowner through Messages.`,
-        relatedId: jobId,
-        relatedType: "job"
-      }
-    });
+    // NOTE: We intentionally do NOT create a notification for the contractor here.
+    // The actor should not receive an in-app alert for their own action — the UI
+    // (redirect to /messages and success toast) is sufficient feedback.
 
     return NextResponse.json({
       success: true,

@@ -21,6 +21,7 @@ import {
 export default function HomeownerDashboard() {
   const { authUser, isSignedIn } = useAuth();
   const router = useRouter();
+  const [statsLoaded, setStatsLoaded] = useState(false);
   const [stats, setStats] = useState({
     savedEstimates: 0,
     postedJobs: 0,
@@ -65,8 +66,10 @@ export default function HomeownerDashboard() {
         activeProjects: jobsData.jobs?.filter((j: any) => j.status === 'open').length || 0,
         unreadMessages: unreadMsgCount
       });
+      setStatsLoaded(true);
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error("Error fetching stats:");
+      setStatsLoaded(true);
     }
   };
 
@@ -130,7 +133,7 @@ export default function HomeownerDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)] pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)]" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
@@ -141,6 +144,27 @@ export default function HomeownerDashboard() {
             Manage your renovation projects and estimates
           </p>
         </div>
+
+        {/* First-time onboarding banner */}
+        {statsLoaded && stats.postedJobs === 0 && (
+          <div className="mb-8 bg-gradient-to-r from-rose-600 to-orange-600 rounded-2xl p-6 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xl">🏠</span>
+                <h2 className="text-lg font-bold">Ready to start your renovation?</h2>
+              </div>
+              <p className="text-sm text-rose-100 leading-snug">
+                Post your project and get quotes from verified local contractors — it only takes 2 minutes.
+              </p>
+            </div>
+            <Link
+              href="/create-lead"
+              className="flex-shrink-0 bg-white hover:bg-gray-50 text-rose-700 font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+            >
+              Post a Job →
+            </Link>
+          </div>
+        )}
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

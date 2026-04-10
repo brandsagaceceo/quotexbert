@@ -15,6 +15,7 @@ import ProfileMessagesPreview from "@/components/profile/ProfileMessagesPreview"
 import OverflowDetector from "@/components/dev/OverflowDetector";
 import LoadingState from "@/components/ui/LoadingState";
 import OnboardingTour from "@/components/OnboardingTour";
+import PortfolioLikeButton from "@/components/PortfolioLikeButton";
 import {
   User,
   MapPin,
@@ -731,9 +732,9 @@ export default function UnifiedProfilePage() {
       {/* Profile Identity Section */}
       <div className="relative bg-gradient-to-r from-rose-700 via-orange-600 to-red-700 pb-4 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
         <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-row items-start gap-3 md:gap-6">
+          <div className="flex flex-row items-center gap-3 md:gap-6">
             {/* Profile Picture + Business Logo stacked */}
-            <div className="flex flex-col items-center gap-4 flex-shrink-0">
+            <div className="flex flex-col items-center gap-2 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
                 <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-gradient-to-br from-rose-100 to-orange-100">
@@ -799,10 +800,10 @@ export default function UnifiedProfilePage() {
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-2 shadow-md text-sm"
+                        className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:shadow-lg transition-all flex items-center gap-1.5 shadow-md text-xs"
                       >
-                        <Edit3 className="h-4 w-4" />
-                        Edit Profile
+                        <Edit3 className="h-3.5 w-3.5" />
+                        Edit
                       </button>
                     ) : (
                       <>
@@ -955,28 +956,7 @@ export default function UnifiedProfilePage() {
                   )}
                 </div>
 
-                {/* Stats Cards */}
-                {isContractor && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
-                      <Briefcase className="h-7 w-7 md:h-8 md:w-8 text-rose-700 mx-auto mb-2" />
-                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
-                      <div className="text-xs md:text-sm text-gray-600">Completed Jobs</div>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
-                      <Star className="h-7 w-7 md:h-8 md:w-8 text-yellow-500 mx-auto mb-2" />
-                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.avgRating || 0}</div>
-                      <div className="text-xs md:text-sm text-gray-600">Average Rating</div>
-                    </div>
-                    <div className="bg-white rounded-lg shadow-md p-5 md:p-6 text-center">
-                      <Award className="h-7 w-7 md:h-8 md:w-8 text-green-600 mx-auto mb-2" />
-                      <div className="text-xl md:text-2xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
-                      <div className="text-xs md:text-sm text-gray-600">Reviews</div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Recent Work preview on overview */}
+                {/* Recent Work preview on overview — shown BEFORE stats so proof-of-work is immediately visible */}
                 {isContractor && portfolio.length > 0 && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -1008,6 +988,9 @@ export default function UnifiedProfilePage() {
                             {item.description && (
                               <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.description}</p>
                             )}
+                            <div className="mt-2">
+                              <PortfolioLikeButton itemId={item.id} readOnly />
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1020,6 +1003,27 @@ export default function UnifiedProfilePage() {
                         View all {portfolio.length} posts →
                       </button>
                     )}
+                  </div>
+                )}
+
+                {/* Stats Cards — shown after Recent Work */}
+                {isContractor && (
+                  <div className="grid grid-cols-3 gap-2 md:gap-4">
+                    <div className="bg-white rounded-lg shadow-sm border border-slate-100 p-3 md:p-4 text-center">
+                      <Briefcase className="h-5 w-5 text-rose-700 mx-auto mb-1" />
+                      <div className="text-lg md:text-xl font-bold text-gray-900">{profile?.completedJobs || 0}</div>
+                      <div className="text-[11px] md:text-xs text-gray-500 leading-tight">Jobs Done</div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-sm border border-slate-100 p-3 md:p-4 text-center">
+                      <Star className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
+                      <div className="text-lg md:text-xl font-bold text-gray-900">{profile?.avgRating ? Number(profile.avgRating).toFixed(1) : '—'}</div>
+                      <div className="text-[11px] md:text-xs text-gray-500 leading-tight">Avg Rating</div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-sm border border-slate-100 p-3 md:p-4 text-center">
+                      <Award className="h-5 w-5 text-green-600 mx-auto mb-1" />
+                      <div className="text-lg md:text-xl font-bold text-gray-900">{profile?.reviewCount || 0}</div>
+                      <div className="text-[11px] md:text-xs text-gray-500 leading-tight">Reviews</div>
+                    </div>
                   </div>
                 )}
 
@@ -1103,6 +1107,9 @@ export default function UnifiedProfilePage() {
                               {item.description && (
                                 <p className="text-sm text-slate-600 mt-1 leading-relaxed">{item.description}</p>
                               )}
+                              <div className="mt-2">
+                                <PortfolioLikeButton itemId={item.id} readOnly />
+                              </div>
                             </div>
                             <div className="flex gap-1 flex-shrink-0">
                               <button

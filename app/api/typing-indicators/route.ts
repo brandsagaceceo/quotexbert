@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const dbUserId = await resolveDbUserId(userId);
 
     if (action === 'start') {
-      const expiresAt = new Date(Date.now() + 3000); // 3 seconds
+      const expiresAt = new Date(Date.now() + 5000); // 5 seconds — covers 2s poll interval plus network latency
       await prisma.typingIndicator.upsert({
         where: { threadId_userId: { threadId, userId: dbUserId } },
         create: { threadId, userId: dbUserId, expiresAt },

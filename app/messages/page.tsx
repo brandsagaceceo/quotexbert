@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
 import LoadingState from "@/components/ui/LoadingState";
@@ -28,6 +29,7 @@ interface Message {
 
 interface Thread {
   id: string;
+  unreadCount?: number;
   lead: {
     id: string;
     title: string;
@@ -79,6 +81,14 @@ export default function MessagesPage() {
   const [selfUserId, setSelfUserId] = useState<string>("");
   const [threadsError, setThreadsError] = useState<string | null>(null);
 
+  // Select a thread and optimistically clear its unread badge
+  const selectThread = (thread: Thread) => {
+    setSelectedThread(thread);
+    if ((thread.unreadCount ?? 0) > 0) {
+      setThreads(prev => prev.map(t => t.id === thread.id ? { ...t, unreadCount: 0 } : t));
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchThreads();
@@ -100,7 +110,7 @@ export default function MessagesPage() {
           : null;
 
       if (targetThread) {
-        setSelectedThread(targetThread);
+        selectThread(targetThread);
       }
     }
   }, [threads, searchParams]);
@@ -323,19 +333,39 @@ export default function MessagesPage() {
                     </div>
                   </div>
                 ) : filteredThreads.length === 0 ? (
-                  <div className="flex items-center justify-center h-64 text-slate-500">
+                  <div className="flex items-center justify-center h-64 text-slate-500 px-4">
                     <div className="text-center">
                       <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                         <ChatBubbleLeftRightIcon className="w-8 h-8 text-slate-400" />
                       </div>
-                      <p className="font-medium">No conversations found</p>
-                      <p className="text-sm mt-1 text-slate-400">Start a conversation by accepting a project</p>
+                      {threads.length > 0 && searchTerm ? (
+                        <>
+                          <p className="font-medium text-slate-700">No results for "{searchTerm}"</p>
+                          <button onClick={() => setSearchTerm('')} className="text-xs text-rose-600 hover:underline mt-1 font-medium">Clear search</button>
+                        </>
+                      ) : user?.role === 'homeowner' ? (
+                        <>
+                          <p className="font-semibold text-slate-800">No conversations yet</p>
+                          <p className="text-sm mt-1 text-slate-400 leading-snug">Post a job to connect with<br/>verified local contractors</p>
+                          <Link href="/create-lead" className="mt-4 inline-block px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all shadow-sm">
+                            Post a Job
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-slate-800">No conversations yet</p>
+                          <p className="text-sm mt-1 text-slate-400 leading-snug">Accept a job lead to start<br/>messaging homeowners</p>
+                          <Link href="/contractor/jobs" className="mt-4 inline-block px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all shadow-sm">
+                            Browse Jobs
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 ) : (
                   <div className="p-2 space-y-1">
                     {filteredThreads.map((thread) => {
-                      const lastMessage = thread.messages[thread.messages.length - 1];
+                      const lastMessage = thread.messages[0] || null;
                       const isSelected = selectedThread?.id === thread.id;
                       const myId = selfUserId || user?.id || '';
                       const otherUser = thread.lead.homeowner.id === myId
@@ -345,34 +375,44 @@ export default function MessagesPage() {
                       return (
                         <div
                           key={thread.id}
-                          onClick={() => setSelectedThread(thread)}
+                          onClick={() => selectThread(thread)}
                           className={`group relative p-3 cursor-pointer rounded-lg transition-all duration-200 ${
                             isSelected 
                               ? 'bg-rose-50 border-l-4 border-rose-600 shadow-sm' 
                               : 'hover:bg-slate-50 border-l-4 border-transparent'
                           }`}
                         >
-                          {/* Delete Button */}
+                          {/* Delete Button — always visible on mobile, hover-reveal on desktop */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteThread(thread.id, e);
                             }}
-                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 w-7 h-7 rounded-md bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-all duration-200 z-20"
+                            className="absolute top-3 right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 w-7 h-7 rounded-md bg-red-100 hover:bg-red-500 text-red-500 hover:text-white flex items-center justify-center transition-all duration-200 z-20"
                             title="Delete conversation"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </button>
 
                           <div className="flex items-start space-x-3">
-                            <ConvAvatar user={otherUser} />
+                            {/* Avatar with unread dot */}
+                            <div className="relative flex-shrink-0">
+                              <ConvAvatar user={otherUser} />
+                              {(thread.unreadCount ?? 0) > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-600 rounded-full flex items-center justify-center">
+                                  <span className="text-[9px] font-bold text-white leading-none">
+                                    {(thread.unreadCount ?? 0) > 9 ? '9+' : thread.unreadCount}
+                                  </span>
+                                </span>
+                              )}
+                            </div>
                             
                             {/* Content */}
-                            <div className="flex-1 min-w-0 pr-6">
+                            <div className="flex-1 min-w-0 pr-8">
                               <div className="flex items-center justify-between gap-1">
-                                <p className="text-sm font-semibold text-slate-900 truncate">
+                                <p className={`text-sm truncate ${(thread.unreadCount ?? 0) > 0 ? 'font-bold text-slate-900' : 'font-semibold text-slate-900'}`}>
                                   {getDisplayName(otherUser)}
                                 </p>
                                 {lastMessage && (
@@ -387,7 +427,7 @@ export default function MessagesPage() {
                               </p>
                               
                               {lastMessage ? (
-                                <p className="text-xs text-slate-500 mt-0.5 line-clamp-1 leading-relaxed">
+                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${(thread.unreadCount ?? 0) > 0 ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
                                   {lastMessage.body}
                                 </p>
                               ) : (
@@ -420,7 +460,14 @@ export default function MessagesPage() {
                   </button>
                 </div>
                 {user?.id ? (
-                  <Chat thread={selectedThread} currentUserId={selfUserId || user.id} />
+                  <Chat
+                    thread={selectedThread}
+                    currentUserId={selfUserId || user.id}
+                    onDeleteThread={(threadId) => {
+                      setThreads(prev => prev.filter(t => t.id !== threadId));
+                      setSelectedThread(null);
+                    }}
+                  />
                 ) : (
                   <div className="flex items-center justify-center h-full p-4">
                     <div className="text-center text-slate-500">Loading user information...</div>
@@ -429,17 +476,43 @@ export default function MessagesPage() {
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-md border border-gray-200 flex items-center justify-center relative z-10 h-full">
-                <div className="text-center">
+                <div className="text-center px-6">
                   <div className="w-20 h-20 mx-auto mb-5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                     <ChatBubbleLeftRightIcon className="w-10 h-10 text-slate-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-700 mb-2">Welcome to Messages</h3>
-                  <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">
-                    Select a conversation from the sidebar to start messaging with contractors and homeowners
-                  </p>
-                  <div className="mt-6 flex items-center justify-center space-x-2 text-sm text-slate-400">
+                  {threads.length === 0 ? (
+                    user?.role === 'homeowner' ? (
+                      <>
+                        <h3 className="text-xl font-semibold text-slate-700 mb-2">Post a Job, Get Connected</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto leading-relaxed text-sm">
+                          Describe your project and get quotes from verified contractors in your area.
+                        </p>
+                        <Link href="/create-lead" className="mt-5 inline-block px-5 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-semibold rounded-lg text-sm hover:from-rose-700 hover:to-orange-700 transition-all shadow-md">
+                          Post Your First Job
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="text-xl font-semibold text-slate-700 mb-2">Start Winning Jobs</h3>
+                        <p className="text-slate-500 max-w-xs mx-auto leading-relaxed text-sm">
+                          Accept a lead to open a conversation with the homeowner.
+                        </p>
+                        <Link href="/contractor/jobs" className="mt-5 inline-block px-5 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-semibold rounded-lg text-sm hover:from-rose-700 hover:to-orange-700 transition-all shadow-md">
+                          Browse Available Jobs
+                        </Link>
+                      </>
+                    )
+                  ) : (
+                    <>
+                      <h3 className="text-xl font-semibold text-slate-700 mb-2">Select a Conversation</h3>
+                      <p className="text-slate-500 max-w-sm mx-auto leading-relaxed text-sm">
+                        Choose a conversation from the sidebar to start messaging.
+                      </p>
+                    </>
+                  )}
+                  <div className="mt-5 flex items-center justify-center space-x-2 text-xs text-slate-400">
                     <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <span>Secure & Private</span>
+                    <span>Secure &amp; Private</span>
                     <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
                     <span>Real-time Updates</span>
                     <div className="w-1 h-1 bg-slate-300 rounded-full"></div>

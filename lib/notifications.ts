@@ -269,14 +269,15 @@ export class NotificationService {
       }
 
       if (type === 'REVIEW_RECEIVED') {
-        await sendReviewReceivedEmail({
-          contractor: { id: user.id, email: user.email, name: user.contractorProfile?.companyName || user.name || null },
-          review: {
+        await sendReviewReceivedEmail(
+          { id: user.id, email: user.email, companyName: user.contractorProfile?.companyName || user.name || null },
+          {
+            id: payload.reviewId || '',
             rating: payload.rating || 5,
             comment: payload.comment || '',
             reviewerName: payload.reviewerName || 'A client',
           },
-        });
+        );
         console.log(`[EMAIL] Review email sent to ${user.email}`);
         return;
       }
@@ -347,15 +348,15 @@ export class NotificationService {
                 <tr>
                   <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
                     <div style="margin-bottom: 20px;">
-                      <a href="${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}" style="color: #800020; text-decoration: none; font-weight: 600; font-size: 16px;">
+                      <a href="${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com"}" style="color: #800020; text-decoration: none; font-weight: 600; font-size: 16px;">
                         Visit QuoteXbert
                       </a>
                     </div>
                     
                     <div style="margin-bottom: 20px;">
-                      <a href="${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/help" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Help Center</a>
-                      <a href="${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact Us</a>
-                      <a href="${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy Policy</a>
+                      <a href="${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com"}/help" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Help Center</a>
+                      <a href="${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com"}/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact Us</a>
+                      <a href="${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com"}/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy Policy</a>
                     </div>
                     
                     <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.4;">
@@ -365,7 +366,7 @@ export class NotificationService {
                     
                     <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 11px;">
                       You're receiving this email because you have an account with QuoteXbert.
-                      <a href="${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/unsubscribe" style="color: #64748b; text-decoration: underline;">Unsubscribe</a>
+                      <a href="${process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com"}/unsubscribe" style="color: #64748b; text-decoration: underline;">Unsubscribe</a>
                     </p>
                   </td>
                 </tr>
@@ -389,7 +390,7 @@ export class NotificationService {
     const userName = user.contractorProfile?.companyName || 
                     user.homeownerProfile?.name || 'User';
 
-    const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_URL || "https://quotexbert.com";
 
     let content = '';
     let subject = '';

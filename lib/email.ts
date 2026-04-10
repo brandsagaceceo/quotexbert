@@ -98,121 +98,123 @@ async function getUserEmail(userId: string): Promise<string | null> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared email layout builder
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface EmailBlock {
+  type: 'heading' | 'text' | 'card' | 'cta' | 'tag';
+  content: string;
+  href?: string;    // for 'cta'
+  label?: string;   // for 'card' section labels
+  rawHtml?: boolean; // skip HTML escaping when content is pre-sanitized
+}
+
+/** Escape user-supplied values before injecting into HTML email templates */
+function escHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function buildEmail(subject: string, blocks: EmailBlock[]): string {
+  const renderedBlocks = blocks.map((b) => {
+    // When rawHtml is set, the caller has already sanitised the content (e.g. email
+    // templates that compose their own inner HTML). Otherwise, escape by default.
+    const c = b.rawHtml ? b.content : escHtml(b.content);
+    if (b.type === 'heading') {
+      return `<h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#1e293b;line-height:1.3;">${c}</h2>`;
+    }
+    if (b.type === 'text') {
+      return `<p style="margin:0 0 14px;font-size:14px;color:#475569;line-height:1.6;">${c}</p>`;
+    }
+    if (b.type === 'tag') {
+      return `<span style="display:inline-block;background:#fef2f2;color:#9f1239;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">${c}</span>`;
+    }
+    if (b.type === 'card') {
+      return `
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:0 0 20px;">
+          ${b.label ? `<p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">${escHtml(b.label)}</p>` : ''}
+          <div style="font-size:14px;color:#334155;line-height:1.6;">${b.rawHtml ? b.content : c}</div>
+        </div>`;
+    }
+    if (b.type === 'cta') {
+      return `
+        <div style="text-align:center;margin:24px 0 8px;">
+          <a href="${b.href ? escHtml(b.href) : '#'}" style="display:inline-block;background:linear-gradient(135deg,#9f1239,#ea580c);color:#fff;font-size:15px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;letter-spacing:.2px;">${c}</a>
+        </div>`;
+    }
+    return '';
+  }).join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 0;">
+  <tr><td align="center">
+    <table width="100%" style="max-width:560px;" cellpadding="0" cellspacing="0">
+
+      <!-- Header -->
+      <tr><td style="background:linear-gradient(135deg,#9f1239 0%,#ea580c 100%);border-radius:12px 12px 0 0;padding:24px 32px;text-align:center;">
+        <span style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;">QuoteXbert</span>
+      </td></tr>
+
+      <!-- Body -->
+      <tr><td style="background:#fff;padding:28px 32px 24px;">
+        ${renderedBlocks}
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;padding:18px 32px;text-align:center;">
+        <p style="margin:0 0 6px;font-size:13px;color:#64748b;">Need help? Reach us at
+          <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
+          or call <a href="tel:9052429460" style="color:#9f1239;text-decoration:none;font-weight:600;">905-242-9460</a>
+        </p>
+        <p style="margin:0;font-size:11px;color:#94a3b8;">© ${new Date().getFullYear()} QuoteXbert · All rights reserved</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
 // Email templates
 function createMessageReceivedTemplate(preview: string, threadId: string): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Message - Quotexbert</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { padding: 30px; background: #f9fafb; }
-          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1 style="margin: 0;">Quotexbert</h1>
-          </div>
-          <div class="content">
-            <h2>You have a new message</h2>
-            <p>${preview}</p>
-            <a href="${baseUrl}/messages?threadId=${threadId}" class="button">View Message</a>
-            <p style="color: #6b7280; font-size: 13px;">Visit your <a href="${baseUrl}/messages" style="color: #9f1239;">messages</a> to manage notifications.</p>
-          </div>
-          <div class="support-footer">
-            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
+  const safePreview = escHtml(preview);
+  return buildEmail('New Message — QuoteXbert', [
+    { type: 'tag', content: 'New Message' },
+    { type: 'heading', content: 'You have a new message' },
+    { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Preview', rawHtml: true },
+    { type: 'cta', content: 'Reply Now', href: `${baseUrl}/messages?threadId=${threadId}` },
+    { type: 'text', content: `Manage all your messages at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>.`, rawHtml: true },
+  ]);
 }
 
 function createContractSentTemplate(contractId: string): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Contract Sent - Quotexbert</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { padding: 30px; background: #f9fafb; }
-          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1 style="margin: 0;">Quotexbert</h1>
-          </div>
-          <div class="content">
-            <h2>Contract Ready for Review</h2>
-            <p>A contract has been sent to you for review and acceptance.</p>
-            <a href="${baseUrl}/contracts/${contractId}" class="button">Review Contract</a>
-          </div>
-          <div class="support-footer">
-            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
+  return buildEmail('Contract Ready for Review — QuoteXbert', [
+    { type: 'tag', content: 'Contract' },
+    { type: 'heading', content: 'A contract is ready for your review' },
+    { type: 'text', content: 'A contract has been sent to you. Please review it and sign to move forward.' },
+    { type: 'cta', content: 'Review Contract', href: `${baseUrl}/contracts/${contractId}` },
+  ]);
 }
 
 function createContractAcceptedTemplate(contractId: string, pdfUrl?: string): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Contract Accepted - Quotexbert</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { padding: 30px; background: #f9fafb; }
-          .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0; }
-          .support-footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1 style="margin: 0;">Quotexbert</h1>
-          </div>
-          <div class="content">
-            <h2>Contract Fully Accepted</h2>
-            <p>Great news! Both parties have accepted the contract and it's now active.</p>
-            <a href="${baseUrl}/contracts/${contractId}" class="button">View Contract</a>
-            ${pdfUrl ? `<a href="${pdfUrl}" class="button" style="background: #10b981;">Download PDF</a>` : ''}
-          </div>
-          <div class="support-footer">
-            <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
+  const blocks: EmailBlock[] = [
+    { type: 'tag', content: 'Contract Signed' },
+    { type: 'heading', content: 'Your contract is now active' },
+    { type: 'text', content: 'Both parties have signed. The contract is now in effect — you can view the full details below.' },
+    { type: 'cta', content: 'View Contract', href: `${baseUrl}/contracts/${contractId}` },
+  ];
+  if (pdfUrl) {
+    blocks.push({ type: 'text', content: `<a href="${pdfUrl}" style="color:#9f1239;font-weight:600;text-decoration:none;">Download PDF copy</a>` });
+  }
+  return buildEmail('Contract Accepted — QuoteXbert', blocks);
 }
 
 interface LeadEmailPayload {
@@ -236,39 +238,12 @@ export async function sendWelcomeEmail(user: { id: string; email: string; name?:
       from: fromEmail,
       to: user.email,
       subject: 'Welcome to QuoteXbert! 🎉',
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">Welcome to QuoteXbert!</h1>
-              </div>
-              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                <h2>Hi ${user.name || 'there'}! 👋</h2>
-                <p>Thanks for joining QuoteXbert - your AI-powered home renovation platform!</p>
-                <p><strong>What you can do now:</strong></p>
-                <ul>
-                  <li>✨ Get instant AI estimates by uploading photos</li>
-                  <li>👷 Connect with verified contractors</li>
-                  <li>💰 Compare quotes and save money</li>
-                  <li>📄 Generate professional contracts</li>
-                </ul>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${baseUrl}" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Get Started</a>
-                </div>
-                <p style="color: #6b7280; font-size: 14px;">Need help? Reply to this email or visit our support page.</p>
-              </div>
-              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `
+      html: buildEmail('Welcome to QuoteXbert!', [
+        { type: 'heading', content: `Welcome, ${user.name || 'there'}!` },
+        { type: 'text', content: "Thanks for joining QuoteXbert — your AI-powered home renovation platform." },
+        { type: 'card', label: 'What you can do now', content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Get instant AI estimates by uploading photos</li><li style="margin-bottom:6px;">Connect with verified local contractors</li><li style="margin-bottom:6px;">Compare quotes and save money</li><li>Generate professional contracts</li></ul>' },
+        { type: 'cta', content: 'Get Started', href: baseUrl },
+      ])
     });
 
     await logEmailEvent('welcome', user.email, user.id, undefined, undefined, 'sent');
@@ -306,39 +281,15 @@ export async function sendNewJobEmail(
     await resend.emails.send({
       from: fromEmail,
       to: contractor.email,
-      subject: `New ${job.category} Job Available! 🔔`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">New Job Match!</h1>
-              </div>
-              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                <h2>Hi ${contractor.name || 'there'}! 👷</h2>
-                <p>A new job matching your services just posted:</p>
-                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9f1239;">
-                  <h3 style="margin-top: 0;">${job.title}</h3>
-                  <p><strong>Category:</strong> ${job.category}</p>
-                  <p><strong>Description:</strong> ${job.description.substring(0, 150)}${job.description.length > 150 ? '...' : ''}</p>
-                  ${job.budget ? `<p><strong>Budget:</strong> ${job.budget}</p>` : ''}
-                </div>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Job Details</a>
-                </div>
-                <p style="color: #6b7280; font-size: 12px;">You're receiving this because you're subscribed to ${job.category} jobs.</p>
-              </div>
-              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `
+      subject: `New ${escHtml(job.category)} Job Available! 🔔`,
+      html: buildEmail(`New ${escHtml(job.category)} Job Match — QuoteXbert`, [
+        { type: 'tag', content: job.category },
+        { type: 'heading', content: job.title },
+        { type: 'text', content: job.description.substring(0, 160) + (job.description.length > 160 ? '…' : '') },
+        { type: 'card', rawHtml: true, content: `<strong>Category:</strong> ${escHtml(job.category)}${job.budget ? `<br><strong>Budget:</strong> ${escHtml(job.budget)}` : ''}`, label: 'Job Details' },
+        { type: 'cta', content: 'View Job', href: `${baseUrl}/contractor/jobs` },
+        { type: 'text', content: `<span style="font-size:12px;color:#94a3b8;">You're receiving this because you're subscribed to ${escHtml(job.category)} jobs.</span>`, rawHtml: true },
+      ])
     });
 
     await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'sent');
@@ -558,44 +509,15 @@ export async function sendJobAcceptedEmail(
     await resend.emails.send({
       from: fromEmail,
       to: homeowner.email,
-      subject: `${contractor.companyName} Accepted Your Job! ✅`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">Good News!</h1>
-              </div>
-              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                <h2>Hi ${homeowner.name || 'there'}! 🎉</h2>
-                <p><strong>${contractor.companyName}</strong> has accepted your job request!</p>
-                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-                  <h3 style="margin-top: 0;">${job.title}</h3>
-                  <p><strong>Contractor:</strong> ${contractor.companyName}</p>
-                  <p><strong>Category:</strong> ${job.category}</p>
-                  ${job.city ? `<p><strong>Location:</strong> ${job.city}</p>` : ''}
-                </div>
-                <p><strong>Next Steps:</strong></p>
-                <ul>
-                  <li>Message the contractor to discuss details</li>
-                  <li>Schedule a site visit if needed</li>
-                  <li>Request and review their quote</li>
-                </ul>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${baseUrl}/messages" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">Message Contractor</a>
-                </div>
-              </div>
-              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `
+      subject: `${escHtml(contractor.companyName)} Accepted Your Job! ✅`,
+      html: buildEmail(`${escHtml(contractor.companyName)} Accepted Your Job — QuoteXbert`, [
+        { type: 'tag', content: 'Job Accepted' },
+        { type: 'heading', content: `${escHtml(contractor.companyName)} is on your job!` },
+        { type: 'text', content: `<strong>${escHtml(contractor.companyName)}</strong> has accepted your job request for <strong>${escHtml(job.title)}</strong>.`, rawHtml: true },
+        { type: 'card', label: 'Job Details', rawHtml: true, content: `<strong>Category:</strong> ${escHtml(job.category)}${job.city ? `<br><strong>Location:</strong> ${escHtml(job.city)}` : ''}` },
+        { type: 'card', label: 'Suggested next steps', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Message the contractor to discuss details</li><li style="margin-bottom:6px;">Schedule a site visit if needed</li><li>Request and review their formal quote</li></ul>' },
+        { type: 'cta', content: 'Message Contractor', href: `${baseUrl}/messages` },
+      ])
     });
 
     await logEmailEvent('job_accepted', homeowner.email, homeowner.id, job.id, undefined, 'sent');
@@ -631,38 +553,14 @@ export async function sendNewRenovationLeadEmail(
     await resend.emails.send({
       from: fromEmail,
       to: contractor.email,
-      subject: `New ${job.category} Lead on QuoteXbert`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">New Renovation Lead</h1>
-                <p style="margin: 10px 0 0 0; opacity: 0.9;">QuoteXbert</p>
-              </div>
-              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                <div style="background: white; padding: 25px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9f1239;">
-                  <h2 style="margin-top: 0; color: #9f1239;">${job.title || job.category}</h2>
-                  ${job.city ? `<p style="font-size: 16px; margin: 10px 0;"><strong>📍 Location:</strong> ${job.city}</p>` : ''}
-                  ${job.estimatedPrice ? `<p style="font-size: 18px; margin: 10px 0; color: #10b981;"><strong>💰 Estimated:</strong> ${job.estimatedPrice}</p>` : ''}
-                  ${job.description ? `<p style="margin: 15px 0; color: #666;">${job.description.substring(0, 200)}${job.description.length > 200 ? '...' : ''}</p>` : ''}
-                </div>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${baseUrl}/contractor/jobs" style="background: #9f1239; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px;">View Lead</a>
-                </div>
-                <p style="color: #6b7280; font-size: 13px; text-align: center;">You're receiving this because this job matches your selected categories.</p>
-              </div>
-              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `
+      subject: `New ${escHtml(job.category)} Lead on QuoteXbert`,
+      html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
+        { type: 'tag', content: job.category },
+        { type: 'heading', content: job.title || job.category },
+        { type: 'card', label: 'Lead Details', rawHtml: true, content: `${job.city ? `<strong>Location:</strong> ${escHtml(job.city)}<br>` : ''}${job.estimatedPrice ? `<strong>Est. Value:</strong> ${escHtml(job.estimatedPrice)}<br>` : ''}${job.description ? `<span style="color:#64748b;">${escHtml(job.description.substring(0, 200))}${job.description.length > 200 ? '…' : ''}</span>` : ''}` },
+        { type: 'cta', content: 'View Lead', href: `${baseUrl}/contractor/jobs` },
+        { type: 'text', content: '<span style="font-size:12px;color:#94a3b8;">You\'re receiving this because this project matches your selected service categories.</span>', rawHtml: true },
+      ])
     });
 
     await logEmailEvent('new_lead', contractor.email, contractor.id, job.id, undefined, 'sent');
@@ -693,47 +591,12 @@ export async function sendReviewReceivedEmail(
       from: fromEmail,
       to: contractor.email,
       subject: `New ${review.rating}-Star Review Received! ⭐`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">New Review!</h1>
-              </div>
-              <div style="padding: 30px; background: #f9fafb; border-radius: 0 0 10px 10px;">
-                <h2>Great news, ${contractor.companyName || 'there'}! 🎉</h2>
-                <p>You've received a new review on QuoteXbert:</p>
-                <div style="background: white; padding: 25px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
-                  <div style="font-size: 24px; margin-bottom: 10px;">${stars}</div>
-                  <p style="margin: 10px 0;"><strong>Rating:</strong> ${review.rating}/5</p>
-                  ${review.reviewerName ? `<p style="margin: 10px 0;"><strong>From:</strong> ${review.reviewerName}</p>` : ''}
-                  ${review.comment ? `
-                    <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin-top: 15px;">
-                      <p style="margin: 0; font-style: italic;">"${review.comment}"</p>
-                    </div>
-                  ` : ''}
-                </div>
-                <p><strong>Why reviews matter:</strong></p>
-                <ul>
-                  <li>Build trust with potential clients</li>
-                  <li>Improve your ranking in search results</li>
-                  <li>Showcase your quality work</li>
-                </ul>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${baseUrl}/contractor/profile" style="background: #9f1239; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block;">View Your Profile</a>
-                </div>
-              </div>
-              <div style="background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #555;">
-                <p style="margin: 0 0 6px 0; font-weight: bold; color: #9f1239;">QuoteXbert Support</p>
-                <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-                <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-                <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `
+      html: buildEmail(`New ${review.rating}-Star Review — QuoteXbert`, [
+        { type: 'tag', content: `${review.rating} / 5 stars` },
+        { type: 'heading', content: 'You have a new review!' },
+        { type: 'card', label: `From ${escHtml(review.reviewerName || 'a client')}`, rawHtml: true, content: `<div style="font-size:22px;letter-spacing:2px;margin-bottom:8px;">${stars}</div>${review.comment ? `<p style="margin:0;font-size:14px;color:#475569;font-style:italic;">&ldquo;${escHtml(review.comment)}&rdquo;</p>` : ''}` },
+        { type: 'cta', content: 'View Your Profile', href: `${baseUrl}/contractor/profile` },
+      ])
     });
 
     await logEmailEvent('review_received', contractor.email, contractor.id, undefined, review.id, 'sent');

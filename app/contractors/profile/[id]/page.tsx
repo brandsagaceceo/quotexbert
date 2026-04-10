@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   MessageCircle
 } from "lucide-react";
+import PortfolioLikeButton from "@/components/PortfolioLikeButton";
 
 interface ContractorProfile {
   id: string;
@@ -129,9 +130,9 @@ export default function ContractorProfilePage() {
 
   const handleContact = () => {
     if (authUser?.role === "homeowner") {
-      router.push(`/conversations?contractorId=${contractorId}`);
+      router.push(`/messages`);
     } else {
-      router.push("/create-lead");
+      router.push("/");
     }
   };
 
@@ -141,7 +142,7 @@ export default function ContractorProfilePage() {
 
   if (error && !contractor) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 pt-12" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <p className="text-red-800">{error}</p>
@@ -162,7 +163,7 @@ export default function ContractorProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 pt-12" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px) + 8px)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
@@ -200,14 +201,24 @@ export default function ContractorProfilePage() {
                     <p className="text-lg text-gray-600 capitalize">{contractor.trade}</p>
                   </div>
                   
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleContact}
-                      className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                    >
-                      <MessageCircle size={20} />
-                      <span>Contact</span>
-                    </button>
+                  <div className="flex gap-3 flex-wrap">
+                    {authUser?.role === 'homeowner' ? (
+                      <button
+                        onClick={handleContact}
+                        className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
+                      >
+                        <MessageCircle size={20} />
+                        <span>Get a Quote</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleContact}
+                        className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                      >
+                        <MessageCircle size={20} />
+                        <span>Contact</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -331,6 +342,9 @@ export default function ContractorProfilePage() {
                         {item.description && (
                           <p className="text-sm text-gray-600 mt-1 leading-relaxed">{item.description}</p>
                         )}
+                        <div className="mt-2">
+                          <PortfolioLikeButton itemId={item.id} />
+                        </div>
                       </div>
                     </div>
                   ))}
