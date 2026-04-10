@@ -15,11 +15,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up the ContractorProfile by userId — the caller passes the User ID,
-    // but portfolioItems.contractorId references ContractorProfile.id.
-    const contractorProfile = await prisma.contractorProfile.findUnique({
-      where: { userId: contractorId },
+    // Look up the User (and their ContractorProfile) by either User.id or User.clerkUserId
+    // to support both role-selection users and webhook-created users.
+    const contractorUser = await prisma.user.findFirst({
+      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+      include: { contractorProfile: true }
     });
+    const contractorProfile = contractorUser?.contractorProfile;
 
     if (!contractorProfile) {
       console.error("[PORTFOLIO POST] ContractorProfile not found for userId:", contractorId);

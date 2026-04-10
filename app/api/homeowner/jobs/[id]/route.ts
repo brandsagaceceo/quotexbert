@@ -58,12 +58,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Homeowner ID is required' }, { status: 400 });
     }
 
-    // First, verify the job belongs to this homeowner
-    const job = await prisma.lead.findUnique({
+    // Resolve the homeowner to all matching DB user IDs
+    const homeownerMatches = await prisma.user.findMany({
+      where: { OR: [{ id: homeownerId }, { clerkUserId: homeownerId }] },
+      select: { id: true },
+    });
+    const homeownerDbIds = homeownerMatches.map((u) => u.id);
+    if (!homeownerDbIds.includes(homeownerId)) homeownerDbIds.push(homeownerId);
+
+    // Verify the job belongs to this homeowner
+    const job = await prisma.lead.findFirst({
       where: {
         id: resolvedParams.id,
-        homeownerId: homeownerId
-      }
+        homeownerId: { in: homeownerDbIds },
+      },
     });
 
     if (!job) {
@@ -98,12 +106,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Homeowner ID is required' }, { status: 400 });
     }
 
-    // First, verify the job belongs to this homeowner
-    const job = await prisma.lead.findUnique({
+    // Resolve the homeowner to all matching DB user IDs
+    const homeownerMatches = await prisma.user.findMany({
+      where: { OR: [{ id: homeownerId }, { clerkUserId: homeownerId }] },
+      select: { id: true },
+    });
+    const homeownerDbIds = homeownerMatches.map((u) => u.id);
+    if (!homeownerDbIds.includes(homeownerId)) homeownerDbIds.push(homeownerId);
+
+    // Verify the job belongs to this homeowner
+    const job = await prisma.lead.findFirst({
       where: {
         id: resolvedParams.id,
-        homeownerId: homeownerId
-      }
+        homeownerId: { in: homeownerDbIds },
+      },
     });
 
     if (!job) {

@@ -544,7 +544,7 @@ export default function UnifiedProfilePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contractorId: profile?.id,
+          contractorId: authUser?.id,
           ...portfolioData
         })
       });
@@ -607,6 +607,26 @@ export default function UnifiedProfilePage() {
     } catch (error) {
       console.error('Error deleting portfolio item:', error);
       toast.error('Failed to delete portfolio item. Please try again.');
+    }
+  };
+
+  const handleDeleteHomeownerJob = async (jobId: string) => {
+    if (!confirm('Are you sure you want to delete this job? This cannot be undone.')) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${authUser?.id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        setJobs((prev: any[]) => prev.filter((j: any) => j.id !== jobId));
+        toast.success('Job deleted.');
+      } else {
+        throw new Error('Failed to delete job');
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      toast.error('Failed to delete job. Please try again.');
     }
   };
 
@@ -998,6 +1018,21 @@ export default function UnifiedProfilePage() {
                         View all {portfolio.length} posts →
                       </button>
                     )}
+                  </div>
+                )}
+
+                {/* Portfolio CTA when contractor has no posts yet */}
+                {isContractor && portfolio.length === 0 && (
+                  <div className="text-center py-8 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-200">
+                    <div className="text-5xl mb-3">📸</div>
+                    <h3 className="font-bold text-slate-900 mb-1">Showcase your work</h3>
+                    <p className="text-sm text-slate-500 mb-4">Add completed projects to attract more clients</p>
+                    <button
+                      onClick={() => setShowPortfolioForm(true)}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg transition-all text-sm"
+                    >
+                      Post Your First Project
+                    </button>
                   </div>
                 )}
 
@@ -1460,6 +1495,12 @@ export default function UnifiedProfilePage() {
                           >
                             View Applications
                           </Link>
+                          <button
+                            onClick={() => handleDeleteHomeownerJob(job.id)}
+                            className="inline-block text-sm bg-red-50 text-red-600 py-2 px-4 rounded-lg hover:bg-red-100 border border-red-200 transition-colors"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     ))}

@@ -61,7 +61,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
     const label = status.replace('_', ' ');
 
     return (
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border-2 ${styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border leading-none shrink-0 whitespace-nowrap ${styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
         {icons[status as keyof typeof icons]}
         {label.toUpperCase()}
       </span>

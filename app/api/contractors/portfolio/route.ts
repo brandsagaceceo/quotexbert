@@ -73,10 +73,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get contractor profile to verify contractor exists
-    const contractorProfile = await prisma.contractorProfile.findUnique({
-      where: { userId: contractorId },
+    // Resolve contractor via User.id OR User.clerkUserId (webhook-created users have a UUID as id)
+    const contractorUser = await prisma.user.findFirst({
+      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+      include: { contractorProfile: true },
     });
+    const contractorProfile = contractorUser?.contractorProfile ?? null;
 
     if (!contractorProfile) {
       return NextResponse.json(

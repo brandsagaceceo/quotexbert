@@ -55,12 +55,45 @@ export async function POST(
       );
     }
 
+    // Resolve both user IDs to DB UUIDs — callers may pass Clerk IDs for
+    // webhook-created accounts where User.id is a UUID and User.clerkUserId
+    // holds the Clerk ID.
+    const [fromUser, toUser] = await Promise.all([
+      prisma.user.findFirst({
+        where: { OR: [{ id: fromUserId }, { clerkUserId: fromUserId }] },
+        select: {
+          id: true, name: true, email: true,
+          contractorProfile: { select: { companyName: true } },
+          homeownerProfile: { select: { name: true } },
+        },
+      }),
+      prisma.user.findFirst({
+        where: { OR: [{ id: toUserId }, { clerkUserId: toUserId }] },
+        select: { id: true, name: true, email: true },
+      }),
+    ]);
+
+    if (!fromUser) {
+      return NextResponse.json({ error: "Sender not found" }, { status: 404 });
+    }
+    if (!toUser) {
+      return NextResponse.json({ error: "Recipient not found" }, { status: 404 });
+    }
+
+    const dbFromUserId = fromUser.id;
+    const dbToUserId = toUser.id;
+
+    // Prevent self-messaging
+    if (dbFromUserId === dbToUserId) {
+      return NextResponse.json({ error: "Cannot send message to yourself" }, { status: 400 });
+    }
+
     // Create the message
     const newMessage = await prisma.message.create({
       data: {
         threadId,
-        fromUserId,
-        toUserId,
+        fromUserId: dbFromUserId,
+        toUserId: dbToUserId,
         body: message,
       },
       include: {
@@ -69,47 +102,39 @@ export async function POST(
             id: true,
             name: true,
             email: true,
-            contractorProfile: {
-              select: { companyName: true }
-            },
-            homeownerProfile: {
-              select: { name: true }
-            }
-          }
+            contractorProfile: { select: { companyName: true, profilePhoto: true } },
+            homeownerProfile: { select: { name: true, profilePhoto: true } },
+          },
         },
         toUser: {
           select: {
             id: true,
             name: true,
             email: true,
-            contractorProfile: {
-              select: { companyName: true }
-            },
-            homeownerProfile: {
-              select: { name: true }
-            }
-          }
+            contractorProfile: { select: { companyName: true, profilePhoto: true } },
+            homeownerProfile: { select: { name: true, profilePhoto: true } },
+          },
         },
       },
     });
 
     // Get sender name for notification
-    const senderName = newMessage.fromUser.contractorProfile?.companyName || 
-                      newMessage.fromUser.homeownerProfile?.name || 
-                      newMessage.fromUser.name || 
-                      newMessage.fromUser.email;
+    const senderName = fromUser.contractorProfile?.companyName ||
+                      fromUser.homeownerProfile?.name ||
+                      fromUser.name ||
+                      fromUser.email;
 
-    // Create in-app notification for the recipient
+    // Create in-app notification for the recipient — never notify the sender
     await prisma.notification.create({
       data: {
-        userId: toUserId,
+        userId: dbToUserId,
         type: "NEW_MESSAGE",
         title: `New message from ${senderName}`,
         message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
         payload: {
           messageId: newMessage.id,
           threadId,
-          fromUserId,
+          fromUserId: dbFromUserId,
           senderName,
           preview: message.substring(0, 100),
         },

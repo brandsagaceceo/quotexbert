@@ -77,6 +77,7 @@ export default function MessagesPage() {
   // useAuth returns the Clerk ID, which may differ from the DB id for
   // webhook-created accounts.  The threads API resolves and returns it.
   const [selfUserId, setSelfUserId] = useState<string>("");
+  const [threadsError, setThreadsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -109,6 +110,7 @@ export default function MessagesPage() {
     
     try {
       setLoading(true);
+      setThreadsError(null);
       const response = await fetch(`/api/threads?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
@@ -116,9 +118,12 @@ export default function MessagesPage() {
         // Store the resolved DB user ID for accurate conversation-partner detection.
         // This handles accounts where User.id (UUID) differs from Clerk ID.
         if (data.selfUserId) setSelfUserId(data.selfUserId);
+      } else {
+        setThreadsError("Failed to load conversations. Please refresh.");
       }
     } catch (error) {
       console.error('Error fetching threads:', error);
+      setThreadsError("Network error — please check your connection.");
     } finally {
       setLoading(false);
     }
@@ -303,7 +308,19 @@ export default function MessagesPage() {
                     z-index: 1;
                   }
                 `}</style>
-                {filteredThreads.length === 0 ? (
+                {threadsError ? (
+                  <div className="flex items-center justify-center h-48 px-4">
+                    <div className="text-center">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-medium text-slate-700">{threadsError}</p>
+                      <button onClick={fetchThreads} className="mt-2 text-xs text-rose-600 hover:underline font-medium">Try again</button>
+                    </div>
+                  </div>
+                ) : filteredThreads.length === 0 ? (
                   <div className="flex items-center justify-center h-64 text-slate-500">
                     <div className="text-center">
                       <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
@@ -318,8 +335,9 @@ export default function MessagesPage() {
                     {filteredThreads.map((thread) => {
                       const lastMessage = thread.messages[thread.messages.length - 1];
                       const isSelected = selectedThread?.id === thread.id;
-                      const otherUser = thread.lead.homeowner.id === user?.id 
-                        ? thread.lead.contractor 
+                      const myId = selfUserId || user?.id || '';
+                      const otherUser = thread.lead.homeowner.id === myId
+                        ? thread.lead.contractor
                         : thread.lead.homeowner;
                       
                       return (
@@ -400,7 +418,7 @@ export default function MessagesPage() {
                   </button>
                 </div>
                 {user?.id ? (
-                  <Chat thread={selectedThread} currentUserId={user.id} />
+                  <Chat thread={selectedThread} currentUserId={selfUserId || user.id} />
                 ) : (
                   <div className="flex items-center justify-center h-full p-4">
                     <div className="text-center text-slate-500">Loading user information...</div>

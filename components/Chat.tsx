@@ -77,6 +77,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [hiringContractor, setHiringContractor] = useState(false);
   const [contractorHired, setContractorHired] = useState(false);
@@ -179,6 +180,7 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
     e.preventDefault();
     if (!newMessage.trim() || !otherUser || sending) return;
     setSending(true);
+    setSendError(null);
     sendTyping("stop");
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     try {
@@ -187,9 +189,17 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fromUserId: currentUserId, toUserId: otherUser.id, message: newMessage.trim() }),
       });
-      if (response.ok) { setNewMessage(""); setShouldScrollToBottom(true); await fetchMessages(); }
+      if (response.ok) {
+        setNewMessage("");
+        setShouldScrollToBottom(true);
+        await fetchMessages();
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        setSendError(errData.error || "Failed to send. Please try again.");
+      }
     } catch (error) {
       console.error("Error sending message:", error);
+      setSendError("Network error — please check your connection.");
     } finally {
       setSending(false);
     }
@@ -364,6 +374,15 @@ export default function Chat({ thread, currentUserId }: ChatProps) {
         className="flex-shrink-0 px-3 py-2.5 border-t border-gray-100 bg-white"
         style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))' }}
       >
+        {sendError && (
+          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600">
+            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-9v4h2V9H9zm0-4v2h2V5H9z" clipRule="evenodd" />
+            </svg>
+            <span className="flex-1">{sendError}</span>
+            <button onClick={() => setSendError(null)} className="ml-auto text-red-400 hover:text-red-600">✕</button>
+          </div>
+        )}
         <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
