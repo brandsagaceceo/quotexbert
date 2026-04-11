@@ -19,7 +19,9 @@ const isProtectedRoute = createRouteMatcher([
   // All homeowner routes require auth
   "/homeowner(.*)",
 
-  // Other authenticated routes
+  // All new conversation routes require auth
+  // NOTE: /messages(.*) is the legacy messaging system — kept protected but no new features go there.
+  "/conversations(.*)",
   "/messages(.*)",
   "/dashboard",
   "/notifications(.*)",

@@ -653,8 +653,15 @@ model Quote {
   extractedRequirements String? // Requirements extracted from chat
   confidenceScore Float       @default(0) // AI confidence in the quote (0-1)
   
+  // Phase 4 — Quote versioning (additive only, nullable/defaulted)
+  version        Int      @default(1)   // Increments on each revision; v1 = original
+  parentQuoteId  String?               // ID of the quote this revises (no FK — avoids circular ref)
+  revisionNote   String?               // Homeowner's change request text, populated on revision_requested
+
   // Quote status and workflow
-  status         String       @default("draft") // "draft" | "sent" | "accepted" | "rejected" | "expired"
+  // Valid values: "draft" | "sent" | "accepted" | "rejected" | "expired"
+  //               "revision_requested" | "superseded"
+  status         String       @default("draft")
   isEdited       Boolean      @default(false) // True if contractor edited AI-generated quote
   
   // Timeline
@@ -786,6 +793,38 @@ model Transaction {
   createdAt     DateTime @default(now())
   
   @@map("transactions")
+}
+
+// ── Phase 6: Quote Learning Signals ─────────────────────────────────────────
+// Additive-only. No FKs to other models so deleting a quote/conversation never
+// cascades into this table. Used for AI pricing intelligence.
+model QuoteLearningSignal {
+  id                String   @id @default(cuid())
+  /// "ai_estimate_shown" | "quote_sent" | "quote_revision_requested"
+  /// | "quote_revision_created" | "quote_accepted" | "quote_rejected"
+  event             String
+  quoteId           String?
+  conversationId    String?
+  leadId            String?
+  category          String?
+  city              String?
+  aiEstimateLow     Float?
+  aiEstimateHigh    Float?
+  quoteTotalCost    Float?
+  version           Int?
+  isRevision        Boolean  @default(false)
+  outcome           String?
+  createdByRole     String?  // "contractor" | "homeowner" | "system"
+  priceDelta        Float?   // quoteTotalCost minus AI estimate midpoint
+  isAcceptedVersion Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([quoteId])
+  @@index([conversationId])
+  @@index([category, createdAt])
+  @@index([city, createdAt])
+  @@map("quote_learning_signals")
 }
 
 model Analytics {

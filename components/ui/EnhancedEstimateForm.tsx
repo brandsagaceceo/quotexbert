@@ -1,3 +1,7 @@
+// ⚠️  DEPRECATED — NOT FOR PRODUCTION USE
+// This component calls /api/enhanced-estimate which uses simulated data only.
+// It is currently not imported by any page. 
+// The production estimate UI is EstimatorMain.tsx → /api/ai-estimate
 "use client";
 
 import { useState } from "react";

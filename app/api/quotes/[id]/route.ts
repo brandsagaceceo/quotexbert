@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { emitQuoteSignal } from "@/lib/quote-signals";
 
 export async function GET(
   request: NextRequest,
@@ -68,6 +69,18 @@ export async function PUT(
       status
     } = body;
 
+    // Guard: accepted quotes are frozen — prevent accidental overwrites
+    const existing = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      select: { status: true },
+    });
+    if (existing?.status === 'accepted') {
+      return NextResponse.json(
+        { error: 'Accepted quotes cannot be modified. Create a revision instead.' },
+        { status: 403 }
+      );
+    }
+
     // Update the quote
     const updatedQuote = await prisma.quote.update({
       where: { id: quoteId },
@@ -132,7 +145,15 @@ export async function PUT(
         }
       });
     }
-
+    // Phase 6: learning signal for sent/rejected transitions
+    if (status === 'sent' || status === 'rejected') {
+      void emitQuoteSignal({
+        event: status === 'sent' ? 'quote_sent' : 'quote_rejected',
+        quoteId,
+        outcome: status === 'rejected' ? 'rejected' : undefined,
+        createdByRole: status === 'sent' ? 'contractor' : 'homeowner',
+      }).catch(() => {});
+    }
     return NextResponse.json({ success: true, quote: updatedQuote });
 
   } catch (error) {

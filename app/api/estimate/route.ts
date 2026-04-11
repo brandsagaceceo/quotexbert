@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { logEventServer } from "@/lib/analytics";
+import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
 
 // Initialize OpenAI client
@@ -85,6 +86,16 @@ export async function POST(req: NextRequest) {
         aiPowered: true,
       }
     );
+
+    // Phase 6: structured learning signal
+    void emitQuoteSignal({
+      event: 'ai_estimate_shown',
+      category: projectType,
+      city: postalCode || undefined,
+      aiEstimateLow: estimate.totals?.total_low,
+      aiEstimateHigh: estimate.totals?.total_high,
+      createdByRole: 'system',
+    }).catch(() => {});
 
     return NextResponse.json(estimate);
   } catch (error: any) {

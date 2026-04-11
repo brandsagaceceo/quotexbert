@@ -1,3 +1,10 @@
+// ⚠️  DEPRECATED — NOT FOR PRODUCTION USE
+// This route uses simulated data (setTimeout delays + keyword-based heuristics).
+// It is NOT connected to OpenAI, Prisma, or any real estimate logic.
+// The production AI estimate endpoint is: POST /api/ai-estimate
+// This file is kept only to avoid a 404 for the legacy EnhancedEstimateForm component,
+// which is itself dead code (never imported by any page).
+// Do NOT add this route to any new flow.
 import { NextRequest, NextResponse } from 'next/server';
 
 interface EstimateResult {

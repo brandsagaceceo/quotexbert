@@ -19,8 +19,11 @@ import {
   PhotoIcon,
   BellIcon,
   SparklesIcon,
-  LightBulbIcon
+  LightBulbIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
+import LiveQuoteBuilder, { type QuoteData } from '@/components/LiveQuoteBuilder';
+import QuoteMessageCard, { type QuoteCardPayload } from '@/components/QuoteMessageCard';
 
 interface Conversation {
   id: string;
@@ -63,6 +66,7 @@ interface Message {
   receiverId: string;
   receiverRole: string;
   createdAt: string;
+  type?: string;
   sender: {
     id: string;
     name: string;
@@ -86,7 +90,13 @@ export default function ConversationsPage() {
   const [previousMessageCount, setPreviousMessageCount] = useState(0);
   const [aiEnhancing, setAiEnhancing] = useState(false);
   const [enhancedMessage, setEnhancedMessage] = useState<string | null>(null);
+  const [aiEnhanceError, setAiEnhanceError] = useState<string | null>(null);
   const [showQuickReplies, setShowQuickReplies] = useState(true);
+  const [showQuoteBuilder, setShowQuoteBuilder] = useState(false);
+  // Phase 4 — quote versioning
+  const [reviseQuoteId, setReviseQuoteId] = useState<string | null>(null);
+  // Map of quoteId → current DB status; used to drive QuoteMessageCard display
+  const [conversationQuotes, setConversationQuotes] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -114,6 +124,7 @@ export default function ConversationsPage() {
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.id);
+      fetchConversationQuotes(selectedConversation.id);
       // Poll for new messages every 3 seconds
       const interval = setInterval(() => {
         fetchMessages(selectedConversation.id);
@@ -174,6 +185,20 @@ export default function ConversationsPage() {
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
+    }
+  };
+
+  /** Fetch current status of all quotes in this conversation for accurate card rendering */
+  const fetchConversationQuotes = async (conversationId: string) => {
+    try {
+      const res = await fetch(`/api/quotes?conversationId=${conversationId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const map: Record<string, string> = {};
+      for (const q of data.quotes ?? []) map[q.id] = q.status;
+      setConversationQuotes(map);
+    } catch {
+      // non-fatal
     }
   };
 
@@ -292,25 +317,31 @@ export default function ConversationsPage() {
   };
 
   const enhanceMessageWithAI = async () => {
-    if (!newMessage.trim() || aiEnhancing) return;
-    
+    if (!newMessage.trim() || aiEnhancing || !selectedConversation) return;
+
     setAiEnhancing(true);
+    setAiEnhanceError(null);
     try {
       const response = await fetch('/api/ai/enhance-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: newMessage,
-          context: selectedConversation?.job.title
+          conversationId: selectedConversation.id,
+          role: user?.role ?? 'homeowner',
+          jobTitle: selectedConversation.job.title,
         })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setEnhancedMessage(data.enhanced);
+      const data = await response.json();
+      if (response.ok && data.improvedMessage) {
+        setEnhancedMessage(data.improvedMessage);
+      } else {
+        setAiEnhanceError(data.error || 'Could not improve your message. Please try again.');
       }
     } catch (error) {
       console.error('Error enhancing message:', error);
+      setAiEnhanceError('Connection error. Please try again.');
     } finally {
       setAiEnhancing(false);
     }
@@ -321,6 +352,49 @@ export default function ConversationsPage() {
       setNewMessage(enhancedMessage);
       setEnhancedMessage(null);
     }
+  };
+
+  // Called by LiveQuoteBuilder after a quote is sent
+  const handleQuoteSent = (_quote: QuoteData) => {
+    setShowQuoteBuilder(false);
+    setReviseQuoteId(null);
+    // Refresh messages and quote statuses
+    if (selectedConversation) {
+      fetchMessages(selectedConversation.id);
+      fetchConversationQuotes(selectedConversation.id);
+    }
+  };
+
+  // Called by QuoteMessageCard when homeowner accepts
+  const handleQuoteAccept = async (quoteId: string) => {
+    if (!user) return;
+    await fetch(`/api/quotes/${quoteId}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'accept', userId: user.id }),
+    });
+    if (selectedConversation) fetchConversationQuotes(selectedConversation.id);
+  };
+
+  // Called by QuoteMessageCard when homeowner requests changes
+  const handleQuoteRequestChanges = async (quoteId: string, note: string) => {
+    if (!user) return;
+    await fetch(`/api/quotes/${quoteId}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_changes', note, userId: user.id }),
+    });
+    // Refresh messages to show the system message
+    if (selectedConversation) {
+      fetchMessages(selectedConversation.id);
+      fetchConversationQuotes(selectedConversation.id);
+    }
+  };
+
+  // Called by QuoteMessageCard (contractor) when homeowner has requested changes
+  const handleQuoteRevise = (quoteId: string) => {
+    setReviseQuoteId(quoteId);
+    setShowQuoteBuilder(true);
   };
 
   const useQuickReply = (reply: string) => {
@@ -531,6 +605,17 @@ export default function ConversationsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        {/* Generate Quote button — contractor only */}
+                        {user?.role === 'contractor' && (
+                          <button
+                            type="button"
+                            onClick={() => setShowQuoteBuilder(true)}
+                            className="flex items-center gap-1.5 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-3 py-2 rounded-xl text-sm font-semibold hover:from-rose-700 hover:to-orange-600 transition-all shadow-sm hover:shadow-md mr-1"
+                          >
+                            <DocumentTextIcon className="w-4 h-4" />
+                            <span className="hidden sm:inline">Generate Quote</span>
+                          </button>
+                        )}
                         <button 
                           className="p-2.5 hover:bg-gray-50 rounded-xl transition-all hover:scale-105"
                           title="Call"
@@ -560,6 +645,58 @@ export default function ConversationsPage() {
                       const showAvatar = index === 0 || messages[index - 1]?.senderId !== message.senderId;
                       const isLastInGroup = index === messages.length - 1 || messages[index + 1]?.senderId !== message.senderId;
                       
+                      // ── Quote message card ──────────────────────────────
+                      if (message.type === 'quote') {
+                        let payload: QuoteCardPayload | null = null;
+                        try { payload = JSON.parse(message.content) as QuoteCardPayload; } catch { /* ignore */ }
+                        if (payload) {
+                          return (
+                            <div
+                              key={message.id}
+                              className={`flex items-end gap-2.5 animate-fadeIn ${isOwn ? 'justify-end' : 'justify-start'}`}
+                            >
+                              {!isOwn && (
+                                <div className="flex-shrink-0">
+                                  {showAvatar ? (
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 via-rose-600 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+                                      {message.sender.name?.[0] || message.sender.email?.[0]?.toUpperCase() || '?'}
+                                    </div>
+                                  ) : <div className="w-9" />}
+                                </div>
+                              )}
+                              <div className={`max-w-[85%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
+                                {!isOwn && showAvatar && (
+                                  <span className="text-xs text-gray-500 font-medium mb-1 px-2">
+                                    {message.sender.name || message.sender.email}
+                                  </span>
+                                )}
+                                <QuoteMessageCard
+                                  payload={payload}
+                                  isOwn={isOwn}
+                                  viewerRole={user.id === selectedConversation.homeowner.id ? 'homeowner' : 'contractor'}
+                                  quoteStatus={conversationQuotes[payload.quoteId] ?? 'sent'}
+                                  onAccept={handleQuoteAccept}
+                                  onRequestChanges={handleQuoteRequestChanges}
+                                  onRevise={handleQuoteRevise}
+                                />
+                                <span className="text-[11px] text-gray-400 mt-1 px-1">
+                                  {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
+                              {isOwn && (
+                                <div className="flex-shrink-0">
+                                  {showAvatar ? (
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+                                      {user.name?.[0] || user.email?.[0]?.toUpperCase() || '?'}
+                                    </div>
+                                  ) : <div className="w-9" />}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+                      }
+
                       return (
                         <div
                           key={message.id}
@@ -660,6 +797,21 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                       </div>
                     )}
 
+                    {/* AI Enhance Error */}
+                    {aiEnhanceError && (
+                      <div className="mb-3 bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-2">
+                        <SparklesIcon className="w-4 h-4 text-red-500 flex-shrink-0" />
+                        <span className="text-sm text-red-700 flex-1">{aiEnhanceError}</span>
+                        <button
+                          type="button"
+                          onClick={() => setAiEnhanceError(null)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <XMarkIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+
                     {/* AI Enhanced Message Preview */}
                     {enhancedMessage && (
                       <div className="mb-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
@@ -730,14 +882,16 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                           onChange={(e) => {
                             setNewMessage(e.target.value);
                             setEnhancedMessage(null);
+                            setAiEnhanceError(null);
                           }}
                           placeholder="Type your message..."
                           className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-400 text-[15px]"
                           disabled={sending}
                         />
                       </div>
-                      {/* AI Enhance Button - Only for contractors */}
-                      {newMessage.trim() && !enhancedMessage && user?.role === 'contractor' && (
+                      {/* AI Enhance Button — available for both contractor and homeowner */}
+                      {/* Prompt adapts per role: contractors get win-the-job tone; homeowners get clarity tone */}
+                      {newMessage.trim() && !enhancedMessage && (
                         <button
                           type="button"
                           onClick={enhanceMessageWithAI}
@@ -812,11 +966,25 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                     </p>
                   </div>
                 </div>
-              )}
+)}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Live Quote Builder — contractor only, slide-in panel */}
+      {showQuoteBuilder && selectedConversation && user?.role === 'contractor' && (
+        <LiveQuoteBuilder
+          conversationId={selectedConversation.id}
+          contractorId={user.id}
+          jobTitle={selectedConversation.job.title}
+          jobId={selectedConversation.jobId}
+          homeownerId={selectedConversation.homeowner.id}
+          reviseQuoteId={reviseQuoteId ?? undefined}
+          onClose={() => { setShowQuoteBuilder(false); setReviseQuoteId(null); }}
+          onQuoteSent={handleQuoteSent}
+        />
+      )}
     </div>
   );
 }
