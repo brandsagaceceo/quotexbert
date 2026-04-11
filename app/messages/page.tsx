@@ -4,13 +4,16 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
+import LiveQuoteBuilder from "@/components/LiveQuoteBuilder";
+import QuoteMessageCard from "@/components/QuoteMessageCard";
+import type { QuoteCardPayload } from "@/components/QuoteMessageCard";
 import LoadingState from "@/components/ui/LoadingState";
-import { ChatBubbleLeftRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftRightIcon, ArrowLeftIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 interface UserInThread {
   id: string;
@@ -37,6 +40,19 @@ interface Thread {
     contractor?: UserInThread | null;
   };
   messages: Message[];
+}
+
+// Phase 2: Quote data shape returned by /api/quotes
+interface QuoteResult {
+  id: string;
+  title: string;
+  totalCost: number;
+  laborCost: number;
+  materialCost: number;
+  scope: string;
+  status: string;
+  version?: number;
+  items: Array<{ id: string }>;
 }
 
 function getDisplayName(user: UserInThread | null | undefined): string {
@@ -81,6 +97,22 @@ export default function MessagesPage() {
   const [selfUserId, setSelfUserId] = useState<string>("");
   const [threadsError, setThreadsError] = useState<string | null>(null);
 
+  // Phase 2: Quote panel + LiveQuoteBuilder state
+  const [showQuoteBuilder, setShowQuoteBuilder] = useState(false);
+  const [bridgeConversationId, setBridgeConversationId] = useState<string | null>(null);
+  const [bridgeHomeownerId, setBridgeHomeownerId] = useState<string | null>(null);
+  const [bridgeContractorId, setBridgeContractorId] = useState<string | null>(null);
+  const [bridgeJobId, setBridgeJobId] = useState<string | null>(null);
+  const [bridgeLoading, setBridgeLoading] = useState(false);
+  const [bridgeError, setBridgeError] = useState<string | null>(null);
+  const [latestQuotes, setLatestQuotes] = useState<QuoteResult[]>([]);
+  const [isFetchingQuotes, setIsFetchingQuotes] = useState(false);
+  const [reviseQuoteId, setReviseQuoteId] = useState<string | undefined>(undefined);
+
+  // Phase A: Staleness guard — tracks which thread the in-flight bridge/quote fetch belongs to.
+  // If the user switches threads before the async call completes, we discard stale results.
+  const currentBridgeThreadIdRef = useRef<string | null>(null);
+
   // Select a thread and optimistically clear its unread badge
   const selectThread = (thread: Thread) => {
     setSelectedThread(thread);
@@ -97,7 +129,7 @@ export default function MessagesPage() {
     }
   }, [user]);
 
-  // Auto-select thread from URL parameter
+  // Auto-select thread from URL parameter (?threadId= or ?leadId=)
   useEffect(() => {
     const threadId = searchParams.get('threadId');
     const leadId = searchParams.get('leadId');
@@ -114,6 +146,150 @@ export default function MessagesPage() {
       }
     }
   }, [threads, searchParams]);
+
+  // Phase B: Handle ?conversationId= URL param — legacy notification links.
+  // Looks up the Conversation's jobId, then finds the matching Thread.
+  // Runs separately from the threadId/leadId effect so it doesn't interfere.
+  useEffect(() => {
+    const conversationId = searchParams.get('conversationId');
+    if (!conversationId || threads.length === 0 || selectedThread) return;
+
+    fetch(`/api/conversations/${encodeURIComponent(conversationId)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data?.jobId) return;
+        const match = threads.find(t => t.lead.id === data.jobId);
+        if (match) selectThread(match);
+      })
+      .catch(() => { /* non-critical — user lands on /messages without auto-select */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threads, searchParams]);
+
+  // Phase 2: Bridge + quotes — runs whenever the selected thread changes.
+  // Calls the bridge API to find/create a Conversation for this Thread's lead,
+  // then fetches any existing quotes. Only fires when a contractor is assigned.
+  useEffect(() => {
+    if (!selectedThread) {
+      // Clear all bridge + quote state when no thread is selected
+      setBridgeConversationId(null);
+      setBridgeHomeownerId(null);
+      setBridgeContractorId(null);
+      setBridgeJobId(null);
+      setBridgeError(null);
+      setLatestQuotes([]);
+      return;
+    }
+
+    if (!selectedThread.lead.contractor?.id) {
+      // No contractor assigned yet — bridge not needed
+      currentBridgeThreadIdRef.current = null;
+      setBridgeConversationId(null);
+      setLatestQuotes([]);
+      return;
+    }
+
+    // Stamp which thread this fetch belongs to BEFORE the async call fires
+    currentBridgeThreadIdRef.current = selectedThread.id;
+    callBridge(selectedThread.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedThread?.id]);
+
+  // Phase 2: Call the bridge API — find or create Conversation for this Thread
+  const callBridge = async (threadId: string) => {
+    setBridgeLoading(true);
+    setBridgeError(null);
+    try {
+      const res = await fetch(`/api/conversations/for-thread?threadId=${encodeURIComponent(threadId)}`);
+      // Phase A guard: discard result if thread changed while we were waiting
+      if (currentBridgeThreadIdRef.current !== threadId) return;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setBridgeError(data.error || 'Failed to load quote data');
+        return;
+      }
+      const data = await res.json();
+      if (currentBridgeThreadIdRef.current !== threadId) return;
+      setBridgeConversationId(data.conversationId);
+      setBridgeHomeownerId(data.homeownerId);
+      setBridgeContractorId(data.contractorId);
+      setBridgeJobId(data.jobId);
+      // Now fetch any existing quotes for this conversation
+      await fetchLatestQuotes(data.conversationId, threadId);
+    } catch {
+      if (currentBridgeThreadIdRef.current === threadId) {
+        setBridgeError('Network error — quote data unavailable');
+      }
+    } finally {
+      if (currentBridgeThreadIdRef.current === threadId) {
+        setBridgeLoading(false);
+      }
+    }
+  };
+
+  // Phase 2: Fetch the latest non-superseded quotes for a conversation.
+  // expectedThreadId is set by callBridge so we can discard stale results on fast thread switching.
+  const fetchLatestQuotes = async (conversationId: string, expectedThreadId?: string) => {
+    setIsFetchingQuotes(true);
+    try {
+      const res = await fetch(`/api/quotes?conversationId=${encodeURIComponent(conversationId)}`);
+      // Phase A guard: discard if thread changed
+      if (expectedThreadId && currentBridgeThreadIdRef.current !== expectedThreadId) return;
+      if (!res.ok) return;
+      const data = await res.json();
+      if (expectedThreadId && currentBridgeThreadIdRef.current !== expectedThreadId) return;
+      const active = (data.quotes as QuoteResult[]).filter(q => q.status !== 'superseded');
+      setLatestQuotes(active);
+    } catch {
+      // Non-critical — quote panel simply won't show
+    } finally {
+      setIsFetchingQuotes(false);
+    }
+  };
+
+  // Phase 2 / Phase A: Open the quote builder.
+  // Guard: prevent double-open and opening while bridge is still resolving.
+  const handleGenerateQuote = async () => {
+    if (!selectedThread || showQuoteBuilder) return;
+    if (!bridgeConversationId) {
+      await callBridge(selectedThread.id);
+    }
+    setReviseQuoteId(undefined);
+    setShowQuoteBuilder(true);
+  };
+
+  // Phase 2: Homeowner accepts a quote
+  const handleQuoteAccept = async (quoteId: string) => {
+    const userId = selfUserId || user?.id;
+    if (!userId) return;
+    const res = await fetch(`/api/quotes/${quoteId}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'accept', userId }),
+    });
+    if (res.ok && bridgeConversationId) {
+      await fetchLatestQuotes(bridgeConversationId);
+    }
+  };
+
+  // Phase 2: Homeowner requests changes on a quote
+  const handleQuoteRequestChanges = async (quoteId: string, note: string) => {
+    const userId = selfUserId || user?.id;
+    if (!userId) return;
+    const res = await fetch(`/api/quotes/${quoteId}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_changes', note, userId }),
+    });
+    if (res.ok && bridgeConversationId) {
+      await fetchLatestQuotes(bridgeConversationId);
+    }
+  };
+
+  // Phase 2: Contractor opens revision builder for a quote
+  const handleQuoteRevise = (quoteId: string) => {
+    setReviseQuoteId(quoteId);
+    setShowQuoteBuilder(true);
+  };
 
   const fetchThreads = async () => {
     if (!user) return;
@@ -459,6 +635,78 @@ export default function MessagesPage() {
                     Back to conversations
                   </button>
                 </div>
+
+                {/* Phase 2: Generate Quote — contractor only, requires contractor assigned to lead */}
+                {user?.role === 'contractor' && selectedThread?.lead?.contractor?.id && (
+                  <div className="flex-shrink-0 px-4 py-2 border-b border-gray-100 bg-slate-50 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <DocumentTextIcon className="w-4 h-4 text-slate-400" />
+                      <span className="text-xs text-slate-500 font-medium">Quotes</span>
+                      {isFetchingQuotes && (
+                        <div className="w-3 h-3 border border-slate-300 border-t-transparent rounded-full animate-spin" />
+                      )}
+                      {bridgeError && (
+                        <span className="text-xs text-red-500">{bridgeError}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleGenerateQuote}
+                      disabled={bridgeLoading || showQuoteBuilder}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
+                    >
+                      {bridgeLoading ? (
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" />
+                        </svg>
+                      )}
+                      {bridgeLoading ? 'Loading…' : 'Generate Quote'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Phase A: Empty quote state — bridge resolved, no quotes yet */}
+                {bridgeConversationId && !bridgeLoading && !isFetchingQuotes && latestQuotes.length === 0 && selectedThread?.lead?.contractor?.id && (
+                  <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-2">
+                    <p className="text-xs text-slate-400 text-center">
+                      {user?.role === 'contractor'
+                        ? 'No quotes yet. Generate one to get started.'
+                        : 'No quotes yet.'}
+                    </p>
+                  </div>
+                )}
+
+                {/* Phase 2: Quote Panel — shown for both roles when a non-superseded quote exists */}
+                {latestQuotes.length > 0 && user && (() => {
+                  // Build payload from the first (latest) active quote
+                  const q = latestQuotes[0];
+                  const payload: QuoteCardPayload = {
+                    quoteId: q.id,
+                    title: q.title,
+                    totalCost: q.totalCost,
+                    laborCost: q.laborCost,
+                    materialCost: q.materialCost,
+                    scope: q.scope,
+                    itemCount: q.items.length,
+                    version: q.version,
+                  };
+                  return (
+                    <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-3 overflow-y-auto" style={{ maxHeight: '340px' }}>
+                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Latest Quote</p>
+                      <QuoteMessageCard
+                        payload={payload}
+                        isOwn={user.role === 'contractor'}
+                        viewerRole={user.role || 'homeowner'}
+                        quoteStatus={q.status}
+                        onAccept={handleQuoteAccept}
+                        onRequestChanges={handleQuoteRequestChanges}
+                        onRevise={handleQuoteRevise}
+                      />
+                    </div>
+                  );
+                })()}
+
                 {user?.id ? (
                   <Chat
                     thread={selectedThread}
@@ -467,6 +715,9 @@ export default function MessagesPage() {
                       setThreads(prev => prev.filter(t => t.id !== threadId));
                       setSelectedThread(null);
                     }}
+                    userRole={user?.role}
+                    jobTitle={selectedThread?.lead?.title || ""}
+                    aiEnhanceEnabled={true}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full p-4">
@@ -523,6 +774,29 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
+
+      {/* Phase 2: LiveQuoteBuilder — rendered at page level so its fixed overlay covers the full viewport */}
+      {showQuoteBuilder && bridgeConversationId && bridgeContractorId && bridgeHomeownerId && selectedThread && (
+        <LiveQuoteBuilder
+          conversationId={bridgeConversationId}
+          contractorId={bridgeContractorId}
+          jobTitle={selectedThread.lead.title}
+          jobId={bridgeJobId || selectedThread.lead.id}
+          homeownerId={bridgeHomeownerId}
+          reviseQuoteId={reviseQuoteId}
+          onClose={() => {
+            setShowQuoteBuilder(false);
+            setReviseQuoteId(undefined);
+          }}
+          onQuoteSent={(quote) => {
+            setShowQuoteBuilder(false);
+            setReviseQuoteId(undefined);
+            // Append/replace latest quote in the panel immediately, then re-fetch for accuracy
+            setLatestQuotes(prev => [quote as QuoteResult, ...prev.filter(q => q.id !== quote.id)]);
+            if (bridgeConversationId) fetchLatestQuotes(bridgeConversationId);
+          }}
+        />
+      )}
     </div>
   );
 }

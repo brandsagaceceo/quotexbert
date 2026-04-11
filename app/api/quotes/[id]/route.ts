@@ -141,7 +141,9 @@ export async function PUT(
           title: "New Quote Received",
           message: `You've received a quote for "${updatedQuote.conversation.job.title}" - $${totalCost}`,
           relatedId: quoteId,
-          relatedType: "quote"
+          relatedType: "quote",
+          // payload.leadId enables NotificationBell to deep-link to /messages?leadId=
+          payload: { leadId: updatedQuote.conversation.job.id },
         }
       });
     }

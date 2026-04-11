@@ -356,6 +356,21 @@ export default function LiveQuoteBuilder({
                   )}
                 </button>
               )}
+
+              {/* Phase C: Show price suggestion before generation if available */}
+              {priceSuggestion && (
+                <div className="flex items-center gap-2.5 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 w-full max-w-xs text-left">
+                  <ChartBarIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-blue-800">
+                      Suggested range: ${priceSuggestion.low.toLocaleString()}–${priceSuggestion.high.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-blue-500 leading-snug">
+                      Based on {priceSuggestion.count} accepted {priceSuggestion.scope === 'city' ? 'local ' : ''}quotes
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

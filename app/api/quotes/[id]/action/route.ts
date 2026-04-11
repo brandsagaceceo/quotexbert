@@ -64,7 +64,7 @@ export async function POST(
             id: true,
             homeownerId: true,
             contractorId: true,
-            job: { select: { title: true } },
+            job: { select: { id: true, title: true } },
           },
         },
         contractor: { select: { id: true, name: true, email: true } },
@@ -98,6 +98,7 @@ export async function POST(
           message: `Your quote for "${quote.conversation.job.title}" was accepted.`,
           relatedId: quoteId,
           relatedType: 'quote',
+          payload: { leadId: quote.conversation.job.id },
         },
       }).catch((e: unknown) => console.error('[quote action] notification failed', e));
 
@@ -154,6 +155,7 @@ export async function POST(
         message: `The homeowner requested changes on your quote for "${quote.conversation.job.title}": ${note.trim().substring(0, 120)}`,
         relatedId: quoteId,
         relatedType: 'quote',
+        payload: { leadId: quote.conversation.job.id },
       },
     }).catch((e: unknown) => console.error('[quote action] notification failed', e));
 
