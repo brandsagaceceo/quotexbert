@@ -129,11 +129,15 @@ Respond in JSON format:
       } catch (parseError) {
         console.warn('Failed to parse AI response, creating fallback quote:', parseError);
         
-        // Create fallback quote based on project details
-        const budgetValue = typeof projectDetails.budget === 'string' 
-          ? parseFloat((projectDetails.budget as string).replace(/[^0-9.]/g, '') || '0')
-          : (projectDetails.budget as number) || 0;
-        const estimatedTotal = Math.max(budgetValue * 0.8, 1000);
+        // Create fallback quote based on project details.
+        // Budget may be a range string like "$5,000-$10,000" — extract only the
+        // first number to avoid concatenating both halves into a 10-digit integer.
+        const budgetStr = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
+        const firstNumberMatch = budgetStr.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+        const rawBudgetValue = firstNumberMatch ? parseFloat(firstNumberMatch[1] ?? '0') : 0;
+        // Sanity cap: residential jobs are almost never above $250k.
+        const budgetValue = Math.min(rawBudgetValue, 250000);
+        const estimatedTotal = Math.max(Math.min(budgetValue * 0.9, 250000), 1000);
         const laborCost = estimatedTotal * 0.6;
         const materialCost = estimatedTotal * 0.4;
         
@@ -166,6 +170,22 @@ Respond in JSON format:
           extractedRequirements: conversationText.substring(0, 500) + "...",
           confidenceScore: 0.75
         };
+      }
+
+      // Sanity-check AI values before persisting — clamp to residential max ($250k).
+      // An AI that returns 11_000_000 for a paint job gets clamped here.
+      const MAX_RESIDENTIAL = 250_000;
+      const sanitize = (v: unknown, fallback: number) => {
+        const n = typeof v === 'number' ? v : parseFloat(String(v) || '0');
+        return isNaN(n) || n <= 0 ? fallback : Math.min(n, MAX_RESIDENTIAL);
+      };
+      quoteData.totalCost    = sanitize(quoteData.totalCost, 5000);
+      quoteData.laborCost    = sanitize(quoteData.laborCost, quoteData.totalCost * 0.6);
+      quoteData.materialCost = sanitize(quoteData.materialCost, quoteData.totalCost * 0.4);
+      // Re-clamp after individual props adjust
+      if (quoteData.laborCost + quoteData.materialCost > MAX_RESIDENTIAL) {
+        quoteData.laborCost    = quoteData.totalCost * 0.6;
+        quoteData.materialCost = quoteData.totalCost * 0.4;
       }
 
       // Create quote in database
@@ -242,11 +262,12 @@ Respond in JSON format:
     } catch (aiError) {
       console.error("AI quote generation failed:", aiError);
       
-      // Create basic quote as fallback
-      const budgetValue = typeof projectDetails.budget === 'string' 
-        ? parseFloat((projectDetails.budget as string).replace(/[^0-9.]/g, '') || '0')
-        : (projectDetails.budget as number) || 0;
-      const estimatedTotal = Math.max(budgetValue * 0.8, 1000);
+      // Create basic quote as fallback.
+      // Extract only the first number from budget range strings like "$5,000-$10,000".
+      const budgetStr2 = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
+      const firstNum2 = budgetStr2.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+      const rawBudget2 = firstNum2 ? parseFloat(firstNum2[1] ?? '0') : 0;
+      const estimatedTotal = Math.max(Math.min(rawBudget2 * 0.9, 250000), 1000);
       const quote = await prisma.quote.create({
         data: {
           conversationId,

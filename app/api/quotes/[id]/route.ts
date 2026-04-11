@@ -166,3 +166,35 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: quoteId } = await params;
+
+    // Only allow deleting draft quotes — never delete sent/accepted quotes
+    const existing = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      select: { status: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
+    if (!['draft', 'revision_requested'].includes(existing.status)) {
+      return NextResponse.json(
+        { error: "Only draft quotes can be deleted" },
+        { status: 403 }
+      );
+    }
+
+    await prisma.quoteItem.deleteMany({ where: { quoteId } });
+    await prisma.quote.delete({ where: { id: quoteId } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting quote:", error);
+    return NextResponse.json({ error: "Failed to delete quote" }, { status: 500 });
+  }
+}

@@ -72,7 +72,17 @@ export default function ContractorProfilePage() {
       }
 
       const data = await response.json();
-      setContractor(data.profile || createDemoProfile());
+      const rawProfile = data.profile;
+      if (rawProfile) {
+        // categories is stored as a JSON string in DB (e.g. '["Painting","Drywall"]')
+        // parse it to an array so .map() in the render doesn't crash
+        const safeCats = typeof rawProfile.categories === 'string'
+          ? (() => { try { return JSON.parse(rawProfile.categories); } catch { return []; } })()
+          : (Array.isArray(rawProfile.categories) ? rawProfile.categories : []);
+        setContractor({ ...rawProfile, categories: safeCats });
+      } else {
+        setContractor(createDemoProfile());
+      }
     } catch (err) {
       console.error("Error fetching contractor profile:", err);
       setError("Unable to load contractor profile. Please try again.");
