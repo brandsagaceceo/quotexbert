@@ -189,6 +189,7 @@ export default function MessagesPage() {
 
     if (!selectedThread.lead.contractor?.id) {
       // No contractor assigned yet — bridge not needed
+      console.log('[DEBUG bridge] No contractor on lead — skipping bridge', { threadId: selectedThread.id, lead: { id: selectedThread.lead.id, contractor: selectedThread.lead.contractor } });
       currentBridgeThreadIdRef.current = null;
       setBridgeConversationId(null);
       setLatestQuotes([]);
@@ -198,6 +199,7 @@ export default function MessagesPage() {
     }
 
     // Stamp which thread this fetch belongs to BEFORE the async call fires
+    console.log('[DEBUG bridge] Contractor found on lead — calling bridge', { threadId: selectedThread.id, contractorId: selectedThread.lead.contractor?.id });
     currentBridgeThreadIdRef.current = selectedThread.id;
     callBridge(selectedThread.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -217,6 +219,7 @@ export default function MessagesPage() {
         return;
       }
       const data = await res.json();
+      console.log('[DEBUG bridge] Response from for-thread:', data);
       if (currentBridgeThreadIdRef.current !== threadId) return;
       setBridgeConversationId(data.conversationId);
       setBridgeHomeownerId(data.homeownerId);
@@ -248,11 +251,13 @@ export default function MessagesPage() {
       if (expectedThreadId && currentBridgeThreadIdRef.current !== expectedThreadId) return;
       // Homeowners only see sent/accepted/revision_requested quotes — drafts are private to contractor
       const isHomeowner = user?.role === 'homeowner';
+      console.log('[DEBUG fetchLatestQuotes] API returned', { count: data.quotes?.length, role: user?.role, isHomeowner, statuses: (data.quotes || []).map((q: any) => q.status) });
       const active = (data.quotes as QuoteResult[]).filter(q => {
         if (q.status === 'superseded') return false;
         if (isHomeowner && q.status === 'draft') return false;
         return true;
       });
+      console.log('[DEBUG fetchLatestQuotes] After filter', { activeCount: active.length, activeStatuses: active.map(q => q.status) });
       setLatestQuotes(active);
     } catch {
       // Non-critical — quote panel simply won't show
@@ -710,6 +715,7 @@ export default function MessagesPage() {
                 {bridgeConversationId && !bridgeLoading && !isFetchingQuotes && latestQuotes.length === 0 && selectedThread?.lead?.contractor?.id && (
                   <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-2">
                     <p className="text-xs text-slate-400 text-center">
+                      {(() => { console.log('[DEBUG render] No quotes yet banner', { bridgeConversationId, bridgeLoading, isFetchingQuotes, latestQuotesLen: latestQuotes.length, contractorId: selectedThread?.lead?.contractor?.id }); return null; })()}
                       {user?.role === 'contractor'
                         ? 'No quotes yet. Generate one to get started.'
                         : 'No quotes yet.'}
