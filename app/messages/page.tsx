@@ -108,6 +108,7 @@ export default function MessagesPage() {
   const [latestQuotes, setLatestQuotes] = useState<QuoteResult[]>([]);
   const [isFetchingQuotes, setIsFetchingQuotes] = useState(false);
   const [reviseQuoteId, setReviseQuoteId] = useState<string | undefined>(undefined);
+  const [quoteCardCollapsed, setQuoteCardCollapsed] = useState(true);
 
   // Phase A: Staleness guard — tracks which thread the in-flight bridge/quote fetch belongs to.
   // If the user switches threads before the async call completes, we discard stale results.
@@ -177,6 +178,7 @@ export default function MessagesPage() {
       setBridgeJobId(null);
       setBridgeError(null);
       setLatestQuotes([]);
+      setQuoteCardCollapsed(true);
       return;
     }
 
@@ -185,6 +187,7 @@ export default function MessagesPage() {
       currentBridgeThreadIdRef.current = null;
       setBridgeConversationId(null);
       setLatestQuotes([]);
+      setQuoteCardCollapsed(true);
       return;
     }
 
@@ -681,6 +684,7 @@ export default function MessagesPage() {
                 {latestQuotes.length > 0 && user && (() => {
                   // Build payload from the first (latest) active quote
                   const q = latestQuotes[0];
+                  if (!q) return null;
                   const payload: QuoteCardPayload = {
                     quoteId: q.id,
                     title: q.title,
@@ -691,18 +695,43 @@ export default function MessagesPage() {
                     itemCount: q.items.length,
                     version: q.version,
                   };
+                  const statusColors: Record<string, string> = {
+                    accepted: 'bg-green-100 text-green-700',
+                    sent: 'bg-blue-100 text-blue-700',
+                    draft: 'bg-gray-100 text-gray-600',
+                    revision_requested: 'bg-amber-100 text-amber-700',
+                  };
                   return (
-                    <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-3 overflow-y-auto" style={{ maxHeight: '340px' }}>
-                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Latest Quote</p>
-                      <QuoteMessageCard
-                        payload={payload}
-                        isOwn={user.role === 'contractor'}
-                        viewerRole={user.role || 'homeowner'}
-                        quoteStatus={q.status}
-                        onAccept={handleQuoteAccept}
-                        onRequestChanges={handleQuoteRequestChanges}
-                        onRevise={handleQuoteRevise}
-                      />
+                    <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50">
+                      {/* Compact header — always visible */}
+                      <div className="flex items-center justify-between px-4 py-2 gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide flex-shrink-0">Quote</p>
+                          <span className="text-xs font-semibold text-slate-700 truncate">{q.title}</span>
+                          <span className="text-xs text-slate-500 flex-shrink-0">${q.totalCost?.toLocaleString()}</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${statusColors[q.status] ?? 'bg-gray-100 text-gray-600'}`}>{q.status}</span>
+                        </div>
+                        <button
+                          onClick={() => setQuoteCardCollapsed(c => !c)}
+                          className="flex-shrink-0 text-[11px] font-semibold text-rose-600 hover:text-rose-700"
+                        >
+                          {quoteCardCollapsed ? 'Show ▾' : 'Hide ▴'}
+                        </button>
+                      </div>
+                      {/* Expanded card */}
+                      {!quoteCardCollapsed && (
+                        <div className="px-4 pb-3 overflow-y-auto" style={{ maxHeight: '300px' }}>
+                          <QuoteMessageCard
+                            payload={payload}
+                            isOwn={user.role === 'contractor'}
+                            viewerRole={user.role || 'homeowner'}
+                            quoteStatus={q.status}
+                            onAccept={handleQuoteAccept}
+                            onRequestChanges={handleQuoteRequestChanges}
+                            onRevise={handleQuoteRevise}
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })()}

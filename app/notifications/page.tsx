@@ -307,11 +307,11 @@ export default function NotificationsPage() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div>
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading notifications...</div>
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">Loading notifications...</div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="p-8 text-center">
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
               <div className="text-4xl mb-3">🔔</div>
               <p className="font-semibold text-gray-900 mb-1">
                 {activeFilter === 'unread' ? 'All caught up!' : 'No notifications yet'}
@@ -341,7 +341,7 @@ export default function NotificationsPage() {
               )}
             </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               {(["Today", "Yesterday", "Earlier"] as const).map((groupName) => {
                 const groupItems = groupedNotifications[groupName];
                 if (groupItems.length === 0) {
@@ -350,14 +350,14 @@ export default function NotificationsPage() {
 
                 return (
                   <div key={groupName}>
-                    <div className="px-5 py-3 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-600">
+                    <div className="px-1 pb-1 text-xs font-bold uppercase tracking-wide text-gray-500">
                       {groupName}
                     </div>
-                    <ul>
+                    <ul className="space-y-2">
                       {groupItems.map((notification) => (
                         <li
                           key={notification.id}
-                          className={`border-b border-gray-100 last:border-b-0 ${!notification.read ? "bg-rose-50" : "bg-white"}`}
+                          className={`rounded-xl border shadow-sm overflow-hidden ${!notification.read ? "border-rose-200 bg-rose-50" : "border-gray-200 bg-white"}`}
                         >
                           <Link
                             href={getTargetUrl(notification)}
