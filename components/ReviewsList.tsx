@@ -130,7 +130,7 @@ export function ReviewsList({ contractorId, limit }: ReviewsListProps) {
 
             {/* Reviewer */}
             <p className="text-sm text-slate-600">
-              — {review.homeowner.name || "Anonymous"}
+              — {review.homeowner?.name || "Anonymous"}
             </p>
           </div>
         ))}

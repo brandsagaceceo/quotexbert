@@ -189,7 +189,7 @@ export default function LiveQuoteBuilder({
 
   const updateItem = (index: number, field: keyof QuoteItem, value: string | number) => {
     if (!quote) return;
-    const updated = quote.items.map((item, i) => {
+    const updated = (quote.items ?? []).map((item, i) => {
       if (i !== index) return item;
       const next = { ...item, [field]: value };
       // Auto-recalc totalPrice when quantity or unitPrice changes
@@ -204,14 +204,14 @@ export default function LiveQuoteBuilder({
 
   const addItem = () => {
     if (!quote) return;
-    const updated = [...quote.items, EMPTY_ITEM()];
+    const updated = [...(quote.items ?? []), EMPTY_ITEM()];
     const { labor, materials, total } = recalcTotal(updated);
     setQuote({ ...quote, items: updated, laborCost: labor, materialCost: materials, totalCost: total });
   };
 
   const removeItem = (index: number) => {
     if (!quote) return;
-    const updated = quote.items.filter((_, i) => i !== index);
+    const updated = (quote.items ?? []).filter((_, i) => i !== index);
     const { labor, materials, total } = recalcTotal(updated);
     setQuote({ ...quote, items: updated, laborCost: labor, materialCost: materials, totalCost: total });
   };
@@ -260,7 +260,7 @@ export default function LiveQuoteBuilder({
               laborCost: quote.laborCost,
               materialCost: quote.materialCost,
               scope: quote.scope,
-              itemCount: quote.items.length,
+              itemCount: (quote.items ?? []).length,
               version: quote.version ?? 1,
             }),
             type: 'quote',
@@ -441,7 +441,7 @@ export default function LiveQuoteBuilder({
                 </div>
 
                 <div className="space-y-3">
-                  {quote.items.map((item, index) => (
+                  {(quote.items ?? []).map((item, index) => (
                     <div
                       key={index}
                       className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2"

@@ -267,7 +267,7 @@ Respond in JSON format:
 
       return NextResponse.json({
         success: true,
-        quote,
+        quote: { ...quote, items: [] },
         fallback: true,
         message: "Basic quote generated - please review and customize"
       });
