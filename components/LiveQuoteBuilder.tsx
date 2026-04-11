@@ -71,6 +71,11 @@ interface LiveQuoteBuilderProps {
    * quote ID (via POST /api/quotes/[id]/revise) instead of generating from scratch.
    */
   reviseQuoteId?: string;
+  /**
+   * When set, loads this existing draft quote for editing instead of generating a new one.
+   * The builder skips the generation step and pre-populates with the saved draft data.
+   */
+  editDraftQuoteId?: string;
 }
 
 // ─── Helper ─────────────────────────────────────────────────────────────────
@@ -107,6 +112,7 @@ export default function LiveQuoteBuilder({
   onClose,
   onQuoteSent,
   reviseQuoteId,
+  editDraftQuoteId,
 }: LiveQuoteBuilderProps) {
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -130,7 +136,24 @@ export default function LiveQuoteBuilder({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (reviseQuoteId) createRevision(); }, []);
-
+  // Load existing draft for editing (skips generation step)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!editDraftQuoteId) return;
+    setGenerating(true);
+    setError(null);
+    fetch(`/api/quotes/${encodeURIComponent(editDraftQuoteId)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data?.id) {
+          setQuote({ ...data, items: data.items ?? [] } as QuoteData);
+        } else {
+          setError('Could not load draft. Please discard and generate a new quote.');
+        }
+      })
+      .catch(() => setError('Failed to load draft quote. Please try again.'))
+      .finally(() => setGenerating(false));
+  }, []);
   // Fetch price suggestion once on mount
   useEffect(() => {
     let cancelled = false;

@@ -572,14 +572,15 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
             className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400"
             style={{ fontSize: '16px' }}
           />
-          {/* AI sparkle button — only shown when there is text and AI is enabled */}
-          {aiEnhanceEnabled && newMessage.trim() && (
+          {/* AI sparkle button — always visible when AI is enabled so users can discover it.
+               Disabled (greyed) when input is empty; activates once they start typing. */}
+          {aiEnhanceEnabled && (
             <button
               type="button"
               onClick={handleAiEnhance}
-              disabled={aiEnhancing}
-              title="Improve with AI"
-              className="w-10 h-10 flex-shrink-0 bg-violet-100 hover:bg-violet-200 disabled:opacity-50 disabled:cursor-not-allowed text-violet-600 rounded-full flex items-center justify-center transition-colors"
+              disabled={aiEnhancing || !newMessage.trim()}
+              title={newMessage.trim() ? 'Improve with AI' : 'Type a message to use AI assist'}
+              className="w-10 h-10 flex-shrink-0 bg-violet-100 hover:bg-violet-200 disabled:opacity-40 disabled:cursor-not-allowed text-violet-600 rounded-full flex items-center justify-center transition-colors"
             >
               {aiEnhancing ? (
                 <div className="w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />

@@ -108,11 +108,15 @@ export default function MessagesPage() {
   const [latestQuotes, setLatestQuotes] = useState<QuoteResult[]>([]);
   const [isFetchingQuotes, setIsFetchingQuotes] = useState(false);
   const [reviseQuoteId, setReviseQuoteId] = useState<string | undefined>(undefined);
+  // editDraftQuoteId: when set, LiveQuoteBuilder loads this existing draft instead of generating new
+  const [editDraftQuoteId, setEditDraftQuoteId] = useState<string | undefined>(undefined);
   const [quoteCardCollapsed, setQuoteCardCollapsed] = useState(true);
 
   // Phase A: Staleness guard — tracks which thread the in-flight bridge/quote fetch belongs to.
   // If the user switches threads before the async call completes, we discard stale results.
   const currentBridgeThreadIdRef = useRef<string | null>(null);
+  // Quote polling — clears when bridge conversation changes or thread is deselected
+  const quotePollRef = useRef<NodeJS.Timeout | null>(null);
 
   // Select a thread and optimistically clear its unread badge
   const selectThread = (thread: Thread) => {
@@ -179,6 +183,7 @@ export default function MessagesPage() {
       setBridgeError(null);
       setLatestQuotes([]);
       setQuoteCardCollapsed(true);
+      setEditDraftQuoteId(undefined);
       return;
     }
 
@@ -188,6 +193,7 @@ export default function MessagesPage() {
       setBridgeConversationId(null);
       setLatestQuotes([]);
       setQuoteCardCollapsed(true);
+      setEditDraftQuoteId(undefined);
       return;
     }
 
@@ -240,7 +246,13 @@ export default function MessagesPage() {
       if (!res.ok) return;
       const data = await res.json();
       if (expectedThreadId && currentBridgeThreadIdRef.current !== expectedThreadId) return;
-      const active = (data.quotes as QuoteResult[]).filter(q => q.status !== 'superseded');
+      // Homeowners only see sent/accepted/revision_requested quotes — drafts are private to contractor
+      const isHomeowner = user?.role === 'homeowner';
+      const active = (data.quotes as QuoteResult[]).filter(q => {
+        if (q.status === 'superseded') return false;
+        if (isHomeowner && q.status === 'draft') return false;
+        return true;
+      });
       setLatestQuotes(active);
     } catch {
       // Non-critical — quote panel simply won't show
@@ -249,13 +261,38 @@ export default function MessagesPage() {
     }
   };
 
+  // Quote polling — re-fetches every 8s when bridge is resolved so homeowner sees sent quotes
+  // without needing to navigate away and back to trigger the bridge effect.
+  useEffect(() => {
+    if (quotePollRef.current) clearInterval(quotePollRef.current);
+    if (!bridgeConversationId) return;
+    const convId = bridgeConversationId; // capture for closure safety
+    quotePollRef.current = setInterval(() => {
+      fetchLatestQuotes(convId);
+    }, 8000);
+    return () => {
+      if (quotePollRef.current) clearInterval(quotePollRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bridgeConversationId]);
+
   // Phase 2 / Phase A: Open the quote builder.
+  // If a draft already exists in the panel, open it for editing instead of generating a new one.
   // Guard: prevent double-open and opening while bridge is still resolving.
   const handleGenerateQuote = async () => {
     if (!selectedThread || showQuoteBuilder) return;
+    // Reuse existing draft rather than generating a second one
+    const existingDraft = latestQuotes.find(q => q.status === 'draft');
+    if (existingDraft) {
+      setEditDraftQuoteId(existingDraft.id);
+      setReviseQuoteId(undefined);
+      setShowQuoteBuilder(true);
+      return;
+    }
     if (!bridgeConversationId) {
       await callBridge(selectedThread.id);
     }
+    setEditDraftQuoteId(undefined);
     setReviseQuoteId(undefined);
     setShowQuoteBuilder(true);
   };
@@ -664,7 +701,7 @@ export default function MessagesPage() {
                           <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" />
                         </svg>
                       )}
-                      {bridgeLoading ? 'Loading…' : 'Generate Quote'}
+                      {bridgeLoading ? 'Loading…' : latestQuotes.some(q => q.status === 'draft') ? 'Edit Draft Quote' : 'Generate Quote'}
                     </button>
                   </div>
                 )}
@@ -812,14 +849,17 @@ export default function MessagesPage() {
           jobTitle={selectedThread.lead.title}
           jobId={bridgeJobId || selectedThread.lead.id}
           homeownerId={bridgeHomeownerId}
-          reviseQuoteId={reviseQuoteId}
+          {...(reviseQuoteId !== undefined ? { reviseQuoteId } : {})}
+          {...(editDraftQuoteId !== undefined ? { editDraftQuoteId } : {})}
           onClose={() => {
             setShowQuoteBuilder(false);
             setReviseQuoteId(undefined);
+            setEditDraftQuoteId(undefined);
           }}
           onQuoteSent={(quote) => {
             setShowQuoteBuilder(false);
             setReviseQuoteId(undefined);
+            setEditDraftQuoteId(undefined);
             // Append/replace latest quote in the panel immediately, then re-fetch for accuracy
             setLatestQuotes(prev => [quote as QuoteResult, ...prev.filter(q => q.id !== quote.id)]);
             if (bridgeConversationId) fetchLatestQuotes(bridgeConversationId);
