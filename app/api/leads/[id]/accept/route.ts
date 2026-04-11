@@ -38,17 +38,28 @@ export async function POST(
       });
     }
 
-    // Update the lead to assigned status
+    // Resolve contractorId to the DB primary key.
+    // The caller may pass a Clerk user ID or a DB UUID — handle both paths.
+    const contractorUser = await prisma.user.findFirst({
+      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+      select: { id: true },
+    });
+    const dbContractorId = contractorUser?.id ?? contractorId;
+
+    // Update the lead to assigned status and link the contractor.
+    // Setting contractorId is critical: it populates thread.lead.contractor,
+    // which the /messages bridge checks before calling /api/conversations/for-thread.
     const updatedLead = await prisma.lead.update({
       where: { id },
       data: {
         status: "assigned",
+        contractorId: dbContractorId,
         published: false,
       },
     });
 
     // Track analytics
-    await logEventServer("lead_accepted", contractorId, {
+    await logEventServer("lead_accepted", dbContractorId, {
       leadId: id,
       homeownerId: lead.homeownerId,
     });
