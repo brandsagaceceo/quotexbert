@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { extractQuoteContextFromConversation } from "@/lib/quote-context";
+import { normalizeQuoteDraft, sanitizeMoneyValue, RESIDENTIAL_CAP } from "@/lib/quote-validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,19 +14,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get conversation with messages and job details
+    // Get conversation with job details
     const conversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
       include: {
         job: true,
         homeowner: true,
         contractor: true,
-        messages: {
-          orderBy: { createdAt: "asc" },
-          where: {
-            type: "text" // Only analyze text messages
-          }
-        }
       }
     });
 
@@ -35,7 +31,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extract project details from job and conversation
+    // ── Fetch REAL chat messages from the Thread (where actual conversation lives) ──
+    // ConversationMessage table is typically empty because the bridge creates Conversation
+    // records on demand, but the live chat uses Thread → Message.
+    const thread = await prisma.thread.findFirst({
+      where: { leadId: conversation.jobId },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'asc' },
+          take: 100,
+          include: { fromUser: { select: { id: true, role: true } } },
+        },
+      },
+    });
+
+    const threadMessages = (thread?.messages ?? []).map(m => ({
+      id: m.id,
+      body: m.body,
+      fromUserId: m.fromUserId,
+      senderRole: m.fromUser?.role === 'contractor' ? 'contractor' : 'homeowner',
+      createdAt: m.createdAt,
+    }));
+
+    // ── Extract structured context from the conversation ───────────────────
+    const quoteContext = extractQuoteContextFromConversation(threadMessages, contractorId);
+
+    // Extract project details from job
     const projectDetails = {
       title: conversation.job.title,
       description: conversation.job.description,
@@ -44,12 +65,18 @@ export async function POST(request: NextRequest) {
       location: conversation.job.zipCode
     };
 
-    // Analyze conversation messages to extract requirements
-    const conversationText = conversation.messages
-      .map(msg => `${msg.senderRole}: ${msg.content}`)
+    // Build conversation text for the AI prompt
+    const conversationText = threadMessages
+      .map(msg => `${msg.senderRole}: ${msg.body}`)
       .join("\n");
 
-    // AI Analysis prompt
+    // AI Analysis prompt — enriched with extracted conversation context
+    const priceGuidance = quoteContext.explicitPrice
+      ? `\nIMPORTANT: The contractor and homeowner have discussed a price of $${quoteContext.explicitPrice.toLocaleString()} in the conversation. Use this as the total cost basis. Do NOT invent a different price.\n`
+      : quoteContext.notes
+        ? `\n${quoteContext.notes}\n`
+        : '';
+
     const analysisPrompt = `
 Analyze this conversation between a homeowner and contractor about a home improvement project. Extract specific requirements, materials needed, labor estimates, and create a professional quote.
 
@@ -59,9 +86,9 @@ Description: ${projectDetails.description}
 Category: ${projectDetails.category}
 Budget: $${projectDetails.budget}
 Location: ${projectDetails.location}
-
+${priceGuidance}
 CONVERSATION:
-${conversationText}
+${conversationText || '(No conversation messages yet — use project details and budget to generate a reasonable estimate.)'}
 
 Based on this information, generate a professional quote with:
 1. Detailed scope of work
@@ -129,22 +156,30 @@ Respond in JSON format:
       } catch (parseError) {
         console.warn('Failed to parse AI response, creating fallback quote:', parseError);
         
-        // Create fallback quote based on project details.
-        // Budget may be a range string like "$5,000-$10,000" — extract only the
-        // first number to avoid concatenating both halves into a 10-digit integer.
-        const budgetStr = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
-        const firstNumberMatch = budgetStr.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
-        const rawBudgetValue = firstNumberMatch ? parseFloat(firstNumberMatch[1] ?? '0') : 0;
-        // Sanity cap: residential jobs are almost never above $250k.
-        const budgetValue = Math.min(rawBudgetValue, 250000);
-        const estimatedTotal = Math.max(Math.min(budgetValue * 0.9, 250000), 1000);
+        // ── Fallback: prefer explicit price from conversation, then budget ──
+        let estimatedTotal: number;
+
+        if (quoteContext.explicitPrice) {
+          // Use the price discussed in conversation — most reliable source
+          estimatedTotal = quoteContext.explicitPrice;
+        } else {
+          // Fall back to budget parsing
+          const budgetStr = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
+          const firstNumberMatch = budgetStr.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+          const rawBudgetValue = firstNumberMatch ? parseFloat(firstNumberMatch[1] ?? '0') : 0;
+          const budgetValue = Math.min(rawBudgetValue, RESIDENTIAL_CAP);
+          estimatedTotal = Math.max(Math.min(budgetValue * 0.9, RESIDENTIAL_CAP), 1000);
+        }
+
         const laborCost = estimatedTotal * 0.6;
         const materialCost = estimatedTotal * 0.4;
         
         quoteData = {
-          title: `${projectDetails.category} Project - ${projectDetails.title}`,
+          title: quoteContext.suggestedTitle !== 'Project Quote'
+            ? quoteContext.suggestedTitle
+            : `${projectDetails.category} Project - ${projectDetails.title}`,
           description: `Professional ${projectDetails.category.toLowerCase()} services as discussed`,
-          scope: `Complete ${projectDetails.category.toLowerCase()} work including: ${projectDetails.description}`,
+          scope: quoteContext.scopeOfWork || `Complete ${projectDetails.category.toLowerCase()} work including: ${projectDetails.description}`,
           laborCost,
           materialCost,
           totalCost: estimatedTotal,
@@ -166,26 +201,35 @@ Respond in JSON format:
               notes: "Quality materials included"
             }
           ],
-          aiAnalysis: "Quote generated based on project details and conversation context",
+          aiAnalysis: quoteContext.notes || "Quote generated based on project details and conversation context",
           extractedRequirements: conversationText.substring(0, 500) + "...",
-          confidenceScore: 0.75
+          confidenceScore: quoteContext.confidence,
         };
       }
 
-      // Sanity-check AI values before persisting — clamp to residential max ($250k).
-      // An AI that returns 11_000_000 for a paint job gets clamped here.
-      const MAX_RESIDENTIAL = 250_000;
-      const sanitize = (v: unknown, fallback: number) => {
-        const n = typeof v === 'number' ? v : parseFloat(String(v) || '0');
-        return isNaN(n) || n <= 0 ? fallback : Math.min(n, MAX_RESIDENTIAL);
-      };
-      quoteData.totalCost    = sanitize(quoteData.totalCost, 5000);
-      quoteData.laborCost    = sanitize(quoteData.laborCost, quoteData.totalCost * 0.6);
-      quoteData.materialCost = sanitize(quoteData.materialCost, quoteData.totalCost * 0.4);
-      // Re-clamp after individual props adjust
-      if (quoteData.laborCost + quoteData.materialCost > MAX_RESIDENTIAL) {
-        quoteData.laborCost    = quoteData.totalCost * 0.6;
-        quoteData.materialCost = quoteData.totalCost * 0.4;
+      // ── Override AI total with explicit conversation price — ALWAYS ──
+      // If the contractor said "$900" in chat, the quote must use $900.
+      // No confidence gate: the contractor's stated price is the source of truth.
+      if (quoteContext.explicitPrice != null) {
+        const explicit = quoteContext.explicitPrice;
+        quoteData.totalCost = explicit;
+        quoteData.laborCost = Math.round(explicit * 0.6 * 100) / 100;
+        quoteData.materialCost = Math.round(explicit * 0.4 * 100) / 100;
+      }
+
+      // ── Normalize + validate all numeric values via shared utility ──
+      const normalized = normalizeQuoteDraft({
+        totalCost: quoteData.totalCost,
+        laborCost: quoteData.laborCost,
+        materialCost: quoteData.materialCost,
+        items: quoteData.items,
+        scope: quoteData.scope,
+      });
+      quoteData.totalCost = normalized.totalCost;
+      quoteData.laborCost = normalized.laborCost;
+      quoteData.materialCost = normalized.materialCost;
+      if (normalized.items.length > 0) {
+        quoteData.items = normalized.items;
       }
 
       // Create quote in database
@@ -253,7 +297,7 @@ Respond in JSON format:
         success: true,
         quote: completeQuote,
         analysis: {
-          conversationLength: conversation.messages.length,
+          conversationLength: threadMessages.length,
           extractedRequirements: quoteData.extractedRequirements,
           confidenceScore: quoteData.confidenceScore
         }
@@ -262,12 +306,26 @@ Respond in JSON format:
     } catch (aiError) {
       console.error("AI quote generation failed:", aiError);
       
-      // Create basic quote as fallback.
-      // Extract only the first number from budget range strings like "$5,000-$10,000".
-      const budgetStr2 = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
-      const firstNum2 = budgetStr2.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
-      const rawBudget2 = firstNum2 ? parseFloat(firstNum2[1] ?? '0') : 0;
-      const estimatedTotal = Math.max(Math.min(rawBudget2 * 0.9, 250000), 1000);
+      // Create basic quote as fallback — prefer explicit conversation price, then budget.
+      let estimatedTotal: number;
+      if (quoteContext.explicitPrice) {
+        estimatedTotal = quoteContext.explicitPrice;
+      } else {
+        const budgetStr2 = typeof projectDetails.budget === 'string' ? projectDetails.budget : String(projectDetails.budget || '0');
+        const firstNum2 = budgetStr2.replace(/[$,\s]/g, '').match(/^(\d+(?:\.\d+)?)/);
+        const rawBudget2 = firstNum2 ? parseFloat(firstNum2[1] ?? '0') : 0;
+        estimatedTotal = Math.max(Math.min(rawBudget2 * 0.9, RESIDENTIAL_CAP), 1000);
+      }
+
+      // Run through normalizeQuoteDraft to prevent absurd values
+      const fallbackNorm = normalizeQuoteDraft({
+        totalCost: estimatedTotal,
+        laborCost: estimatedTotal * 0.6,
+        materialCost: estimatedTotal * 0.4,
+        items: [],
+        scope: projectDetails.description || '',
+      });
+
       const quote = await prisma.quote.create({
         data: {
           conversationId,
@@ -275,13 +333,13 @@ Respond in JSON format:
           contractorId,
           title: `${projectDetails.category} Project Quote`,
           description: `Professional quote for ${projectDetails.title}`,
-          scope: `Complete ${projectDetails.category.toLowerCase()} work as discussed`,
-          laborCost: estimatedTotal * 0.6,
-          materialCost: estimatedTotal * 0.4,
-          totalCost: estimatedTotal,
+          scope: quoteContext.scopeOfWork || `Complete ${projectDetails.category.toLowerCase()} work as discussed`,
+          laborCost: fallbackNorm.laborCost,
+          materialCost: fallbackNorm.materialCost,
+          totalCost: fallbackNorm.totalCost,
           aiAnalysis: "Basic quote generated - AI service unavailable",
-          extractedRequirements: "Manual review required",
-          confidenceScore: 0.5,
+          extractedRequirements: quoteContext.notes || "Manual review required",
+          confidenceScore: quoteContext.confidence,
           status: "draft"
         }
       });

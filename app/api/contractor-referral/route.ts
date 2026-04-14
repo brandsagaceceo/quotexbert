@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         totalRewards,
       },
       referrals,
-      referralLink: `${process.env.NEXT_PUBLIC_URL || 'https://quotexbert.com'}/join-contractor?ref=${userId}`,
+      referralLink: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'}/join-contractor?ref=${userId}`,
     });
   } catch (error) {
     console.error("[CONTRACTOR_REFERRAL_GET]", error);

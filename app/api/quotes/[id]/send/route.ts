@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { sendQuoteReceivedEmail } from '@/lib/email';
 
 export async function POST(
   request: NextRequest,
@@ -23,6 +24,7 @@ export async function POST(
         contractorId: userId,
       },
       include: {
+        contractor: { select: { name: true, email: true } },
         job: {
           include: {
             homeowner: true,
@@ -57,10 +59,21 @@ export async function POST(
 
     // Send email notification to homeowner
     try {
-      // TODO: Implement email notification
-      console.log('Email notification would be sent to:', quote.job.homeowner.email);
+      const contractorName = quote.contractor?.name ?? quote.contractor?.email ?? 'Your contractor';
+      await sendQuoteReceivedEmail({
+        homeowner: {
+          id: quote.job.homeownerId,
+          email: quote.job.homeowner.email,
+          name: quote.job.homeowner.name,
+        },
+        contractorName,
+        jobTitle: quote.job.title,
+        totalCost: quote.totalCost ?? 0,
+        leadId: quote.job.id,
+      });
+      console.log('[QUOTE/SEND] Quote-received email sent to', quote.job.homeowner.email);
     } catch (emailError) {
-      console.error('Failed to send email notification:', emailError);
+      console.error('[QUOTE/SEND] Failed to send email notification (non-fatal):', emailError);
       // Don't fail the request if email fails
     }
 

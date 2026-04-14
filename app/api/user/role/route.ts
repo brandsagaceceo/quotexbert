@@ -18,10 +18,14 @@ export async function GET() {
       });
     }
     
-    // Check if user exists in database
-    let user = await prisma.user.findUnique({
-      where: { id: userId },
+    // Check if user exists in database.
+    // Must search by BOTH id and clerkUserId because webhook-created users
+    // have User.id = UUID and User.clerkUserId = clerkId, while role-selection
+    // created users have User.id = clerkId directly.
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
       select: {
+        id: true,
         role: true,
         contractorProfile: { select: { profilePhoto: true } },
         homeownerProfile: { select: { profilePhoto: true } }
@@ -38,24 +42,37 @@ export async function GET() {
           ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim() 
           : email.split('@')[0] || 'User';
 
-        // Create user WITHOUT a role - they must select during onboarding
-        user = await prisma.user.create({
-          data: {
-            id: userId,
-            email: email,
-            name: userName,
-            role: null
-          },
-          select: {
-            role: true,
-            contractorProfile: { select: { profilePhoto: true } },
-            homeownerProfile: { select: { profilePhoto: true } }
-          }
+        // Check if a user with the same email already exists (e.g. seeded data).
+        // If so, link the Clerk ID to the existing record instead of creating a duplicate.
+        const existingByEmail = await prisma.user.findUnique({
+          where: { email },
+          select: { id: true, role: true, contractorProfile: { select: { profilePhoto: true } }, homeownerProfile: { select: { profilePhoto: true } } }
         });
+        if (existingByEmail) {
+          await prisma.user.update({ where: { email }, data: { clerkUserId: userId } });
+          user = existingByEmail;
+        } else {
+          // Create user WITHOUT a role — they must select during onboarding
+          user = await prisma.user.create({
+            data: {
+              id: userId,
+              email: email,
+              name: userName,
+              clerkUserId: userId,
+              role: null
+            },
+            select: {
+              id: true,
+              role: true,
+              contractorProfile: { select: { profilePhoto: true } },
+              homeownerProfile: { select: { profilePhoto: true } }
+            }
+          });
+        }
       } catch (error) {
         console.error('Error creating user:', error);
         // Return null if creation fails - user must select role
-        user = { role: null, contractorProfile: null, homeownerProfile: null };
+        user = { id: userId, role: null, contractorProfile: null, homeownerProfile: null };
       }
     }
     
@@ -113,7 +130,9 @@ export async function POST(req: NextRequest) {
       userName = 'User';
     }
 
-    console.log('Updating user:', { userId, email, userName, role });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/user/role][POST]', { userId, email, userName, role });
+    }
 
     // Check if a user already exists by email to avoid duplicate email constraint errors
     const existingUser = await prisma.user.findUnique({
@@ -137,6 +156,7 @@ export async function POST(req: NextRequest) {
           email,
           name: userName,
           role,
+          clerkUserId: userId,
         },
       });
       resolvedUserId = userId;
@@ -161,6 +181,18 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('User role updated successfully:', role);
+
+    // Send role-specific welcome email — only on first role selection (was null before)
+    const isFirstRoleSet = !existingUser || existingUser.role === null;
+    if (isFirstRoleSet) {
+      try {
+        const { sendWelcomeEmail } = await import('@/lib/email');
+        await sendWelcomeEmail({ id: resolvedUserId, email, name: userName, role });
+        console.log(`[USER/ROLE] Role-specific welcome email sent to ${email} (role=${role})`);
+      } catch (welcomeErr) {
+        console.error('[USER/ROLE] Failed to send welcome email (non-fatal):', welcomeErr);
+      }
+    }
 
     // Return success with a flag to reload the session
     return NextResponse.json({ success: true, role, refreshSession: true });

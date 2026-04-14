@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate the caller — ensures homeownerId matches the session
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId: callerDbId } = authResult.user;
+
     const { applicationId, action, homeownerId } = await request.json();
 
-    if (!applicationId || !action || !homeownerId) {
+    if (!applicationId || !action) {
       return NextResponse.json(
-        { error: "Application ID, action, and homeowner ID are required" },
+        { error: "Application ID and action are required" },
         { status: 400 }
       );
     }
@@ -46,8 +54,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify homeowner owns this job
-    if (application.lead.homeownerId !== homeownerId) {
+    // Verify homeowner owns this job — use the resolved DB id from auth
+    if (application.lead.homeownerId !== callerDbId) {
       return NextResponse.json(
         { error: "You can only manage applications for your own jobs" },
         { status: 403 }
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     if (action === "accept") {
       // Accept this contractor and reject all others
-      await prisma.$transaction(async (tx) => {
+      const thread = await prisma.$transaction(async (tx) => {
         // Update this application to accepted
         await tx.jobApplication.update({
           where: { id: applicationId },
@@ -86,14 +94,26 @@ export async function POST(request: NextRequest) {
           where: { id: application.leadId },
           data: {
             status: "assigned",
-            acceptedById: application.contractorId
+            acceptedById: application.contractorId,
+            contractorId: application.contractorId,
           }
         });
+
+        // Create or find the messaging thread for this lead
+        const thread = await tx.thread.upsert({
+          where: { leadId: application.leadId },
+          update: {},
+          create: { leadId: application.leadId },
+        });
+
+        return thread;
       });
 
       return NextResponse.json({
         success: true,
         message: `Contractor ${application.contractor.name} has been selected for this job`,
+        threadId: thread.id,
+        redirectUrl: `/messages?threadId=${thread.id}`,
         application: {
           id: application.id,
           status: "accepted",

@@ -27,6 +27,7 @@ import {
   ArrowPathIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
+import { normalizeQuoteDraft, sanitizeMoneyValue, RESIDENTIAL_CAP } from '@/lib/quote-validation';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -70,12 +71,25 @@ interface LiveQuoteBuilderProps {
    * When set, opens in revision mode: bootstraps a new draft from the given
    * quote ID (via POST /api/quotes/[id]/revise) instead of generating from scratch.
    */
-  reviseQuoteId?: string;
+  reviseQuoteId?: string | undefined;
   /**
    * When set, loads this existing draft quote for editing instead of generating a new one.
    * The builder skips the generation step and pre-populates with the saved draft data.
    */
-  editDraftQuoteId?: string;
+  editDraftQuoteId?: string | undefined;
+  /**
+   * Pre-fill data from auto-draft CTA. When provided, the quote builder
+   * shows a "Based on your conversation" badge and populates fields.
+   */
+  autoDraftPrefill?: {
+    suggestedTitle: string;
+    scopeOfWork: string;
+    totalCost: number;
+    laborCost: number;
+    materialCost: number;
+    displayPrice: string;
+    sourceSnippets?: string[];
+  } | null;
 }
 
 // ─── Helper ─────────────────────────────────────────────────────────────────
@@ -113,6 +127,7 @@ export default function LiveQuoteBuilder({
   onQuoteSent,
   reviseQuoteId,
   editDraftQuoteId,
+  autoDraftPrefill,
 }: LiveQuoteBuilderProps) {
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -153,6 +168,13 @@ export default function LiveQuoteBuilder({
       })
       .catch(() => setError('Failed to load draft quote. Please try again.'))
       .finally(() => setGenerating(false));
+  }, []);
+  // Auto-generate when opened from auto-draft CTA (prefill provided, no revision or edit)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (autoDraftPrefill && !reviseQuoteId && !editDraftQuoteId) {
+      generateQuote();
+    }
   }, []);
   // Fetch price suggestion once on mount
   useEffect(() => {
@@ -239,6 +261,38 @@ export default function LiveQuoteBuilder({
     setQuote({ ...quote, items: updated, laborCost: labor, materialCost: materials, totalCost: total });
   };
 
+  // Directly edit labor / materials / total.
+  // When items exist, changing totalCost scales them proportionally.
+  const updateCostField = (field: 'laborCost' | 'materialCost' | 'totalCost', rawValue: number) => {
+    if (!quote) return;
+    const value = Math.max(0, Math.min(rawValue, RESIDENTIAL_CAP));
+    if (field === 'totalCost') {
+      if ((quote.items ?? []).length > 0 && quote.totalCost > 0) {
+        const ratio = value / quote.totalCost;
+        const scaled = quote.items.map(item => ({
+          ...item,
+          totalPrice: Math.round(item.totalPrice * ratio * 100) / 100,
+          unitPrice: item.quantity > 0
+            ? Math.round((item.totalPrice * ratio / item.quantity) * 100) / 100
+            : 0,
+        }));
+        const { labor, materials } = recalcTotal(scaled);
+        setQuote({ ...quote, items: scaled, laborCost: labor, materialCost: materials, totalCost: value });
+        return;
+      }
+      // No items — distribute proportionally between labor and materials
+      const currentSum = quote.laborCost + quote.materialCost;
+      const laborRatio = currentSum > 0 ? quote.laborCost / currentSum : 0.6;
+      const newLabor = Math.round(value * laborRatio * 100) / 100;
+      const newMaterial = Math.round((value - newLabor) * 100) / 100;
+      setQuote({ ...quote, totalCost: value, laborCost: newLabor, materialCost: newMaterial });
+    } else if (field === 'laborCost') {
+      setQuote({ ...quote, laborCost: value, totalCost: Math.round((value + quote.materialCost) * 100) / 100 });
+    } else {
+      setQuote({ ...quote, materialCost: value, totalCost: Math.round((quote.laborCost + value) * 100) / 100 });
+    }
+  };
+
   // ── Save/Send ─────────────────────────────────────────────────────────────
 
   const saveQuote = async (newStatus: 'draft' | 'sent') => {
@@ -246,6 +300,15 @@ export default function LiveQuoteBuilder({
     const isSending = newStatus === 'sent';
     isSending ? setSending(true) : setSaving(true);
     setError(null);
+
+    // Normalize all values before persisting to catch any client-side math issues
+    const normalized = normalizeQuoteDraft({
+      totalCost: quote.totalCost,
+      laborCost: quote.laborCost,
+      materialCost: quote.materialCost,
+      items: quote.items,
+      scope: quote.scope,
+    });
 
     try {
       const res = await fetch(`/api/quotes/${quote.id}`, {
@@ -255,10 +318,10 @@ export default function LiveQuoteBuilder({
           title: quote.title,
           description: quote.description,
           scope: quote.scope,
-          laborCost: quote.laborCost,
-          materialCost: quote.materialCost,
-          totalCost: quote.totalCost,
-          items: quote.items,
+          laborCost: normalized.laborCost,
+          materialCost: normalized.materialCost,
+          totalCost: normalized.totalCost,
+          items: normalized.items.length > 0 ? normalized.items : quote.items,
           status: newStatus,
         }),
       });
@@ -400,6 +463,30 @@ export default function LiveQuoteBuilder({
                     <p className="text-xs font-semibold text-amber-800 mb-0.5">Homeowner's Change Request</p>
                     <p className="text-xs text-amber-700 leading-relaxed">{revisionContext}</p>
                   </div>
+                </div>
+              )}
+
+              {/* "Based on your conversation" badge — shown when auto-draft prefill was used */}
+              {autoDraftPrefill && (
+                <div className="bg-rose-50 border border-rose-200 rounded-xl px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <div className="min-w-0">
+                      <p className="text-xs text-rose-800 font-medium">
+                        Based on your conversation · Using {autoDraftPrefill.displayPrice} from chat
+                      </p>
+                    </div>
+                  </div>
+                  {/* Source snippets */}
+                  {autoDraftPrefill.sourceSnippets && autoDraftPrefill.sourceSnippets.length > 0 && (
+                    <div className="mt-1.5 space-y-0.5 pl-6">
+                      {autoDraftPrefill.sourceSnippets.map((s, i) => (
+                        <p key={i} className="text-[10px] text-rose-600/70 italic truncate">&ldquo;{s}&rdquo;</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -546,7 +633,7 @@ export default function LiveQuoteBuilder({
                 </div>
               )}
 
-              {/* Cost Summary */}
+              {/* Cost Summary — all fields are directly editable */}
               <div className="bg-gradient-to-br from-slate-50 to-gray-100 border border-gray-200 rounded-xl p-4 space-y-2">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
@@ -558,18 +645,43 @@ export default function LiveQuoteBuilder({
                     </span>
                   )}
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Labor</span>
-                  <span>${quote.laborCost.toLocaleString()}</span>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-gray-600">Labor</label>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-gray-400">$</span>
+                    <input
+                      type="number" min={0} step={50}
+                      value={quote.laborCost}
+                      onChange={(e) => updateCostField('laborCost', parseFloat(e.target.value) || 0)}
+                      className="w-28 text-right text-sm border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-rose-400 focus:border-transparent outline-none bg-white"
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Materials</span>
-                  <span>${quote.materialCost.toLocaleString()}</span>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-gray-600">Materials</label>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-gray-400">$</span>
+                    <input
+                      type="number" min={0} step={50}
+                      value={quote.materialCost}
+                      onChange={(e) => updateCostField('materialCost', parseFloat(e.target.value) || 0)}
+                      className="w-28 text-right text-sm border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-rose-400 focus:border-transparent outline-none bg-white"
+                    />
+                  </div>
                 </div>
-                <div className="border-t border-gray-300 pt-2 flex justify-between font-bold text-gray-900">
-                  <span>Total</span>
-                  <span className="text-rose-700 text-lg">${quote.totalCost.toLocaleString()}</span>
+                <div className="border-t border-gray-300 pt-2 flex items-center justify-between">
+                  <label className="text-sm font-bold text-gray-900">Total</label>
+                  <div className="flex items-center gap-1">
+                    <span className="text-rose-600 font-bold">$</span>
+                    <input
+                      type="number" min={0} step={50}
+                      value={quote.totalCost}
+                      onChange={(e) => updateCostField('totalCost', parseFloat(e.target.value) || 0)}
+                      className="w-32 text-right text-lg font-bold text-rose-700 border-b-2 border-rose-200 focus:border-rose-500 bg-transparent outline-none"
+                    />
+                  </div>
                 </div>
+                <p className="text-[10px] text-gray-400 text-right pt-0.5">All fields are editable — adjust before sending</p>
               </div>
 
               {/* Status badge */}

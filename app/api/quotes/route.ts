@@ -91,9 +91,6 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    // DEBUG: Log what the API is returning
-    console.log('[DEBUG GET /api/quotes]', { where: JSON.stringify(where), count: quotes.length, statuses: quotes.map(q => ({ id: q.id.slice(0,8), status: q.status, convId: q.conversationId?.slice(0,8) })) });
-
     return NextResponse.json({ quotes });
   } catch (error) {
     console.error("[GET /api/quotes] Error:", error);

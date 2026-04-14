@@ -247,7 +247,7 @@ export default function HomeownerJobsPage() {
                     )}
                     
                     {job.status === 'assigned' && (
-                      <Link href={`/homeowner/jobs/${job.id}/chat`}>
+                      <Link href={`/messages?leadId=${job.id}`}>
                         <Button variant="secondary" size="sm">
                           <MessageCircle className="w-4 h-4 mr-2" />
                           Chat with Contractor

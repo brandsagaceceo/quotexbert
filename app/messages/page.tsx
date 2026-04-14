@@ -111,6 +111,16 @@ export default function MessagesPage() {
   // editDraftQuoteId: when set, LiveQuoteBuilder loads this existing draft instead of generating new
   const [editDraftQuoteId, setEditDraftQuoteId] = useState<string | undefined>(undefined);
   const [quoteCardCollapsed, setQuoteCardCollapsed] = useState(true);
+  // Auto-draft prefill data from CTA in Chat
+  const [autoDraftPrefill, setAutoDraftPrefill] = useState<{
+    suggestedTitle: string;
+    scopeOfWork: string;
+    totalCost: number;
+    laborCost: number;
+    materialCost: number;
+    displayPrice: string;
+    sourceSnippets?: string[];
+  } | null>(null);
 
   // Phase A: Staleness guard — tracks which thread the in-flight bridge/quote fetch belongs to.
   // If the user switches threads before the async call completes, we discard stale results.
@@ -120,11 +130,41 @@ export default function MessagesPage() {
 
   // Select a thread and optimistically clear its unread badge
   const selectThread = (thread: Thread) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[Messages][select-thread]', {
+        threadId: thread.id,
+        leadId: thread.lead.id,
+        homeownerId: thread.lead.homeowner?.id,
+        contractorId: thread.lead.contractor?.id,
+        selfUserId,
+      });
+    }
     setSelectedThread(thread);
     if ((thread.unreadCount ?? 0) > 0) {
       setThreads(prev => prev.map(t => t.id === thread.id ? { ...t, unreadCount: 0 } : t));
     }
   };
+
+  // Reset all messaging state when the authenticated user changes (account switch)
+  const prevUserIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (user?.id && prevUserIdRef.current && prevUserIdRef.current !== user.id) {
+      // User switched accounts — clear stale state
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[Messages][account-switch]', { from: prevUserIdRef.current, to: user.id });
+      }
+      setSelfUserId("");
+      setThreads([]);
+      setSelectedThread(null);
+      setBridgeConversationId(null);
+      setBridgeHomeownerId(null);
+      setBridgeContractorId(null);
+      setBridgeJobId(null);
+      setLatestQuotes([]);
+      setSearchTerm("");
+    }
+    prevUserIdRef.current = user?.id ?? null;
+  }, [user?.id]);
 
   useEffect(() => {
     if (user) {
@@ -184,22 +224,22 @@ export default function MessagesPage() {
       setLatestQuotes([]);
       setQuoteCardCollapsed(true);
       setEditDraftQuoteId(undefined);
+      setAutoDraftPrefill(null);
       return;
     }
 
     if (!selectedThread.lead.contractor?.id) {
       // No contractor assigned yet — bridge not needed
-      console.log('[DEBUG bridge] No contractor on lead — skipping bridge', { threadId: selectedThread.id, lead: { id: selectedThread.lead.id, contractor: selectedThread.lead.contractor } });
       currentBridgeThreadIdRef.current = null;
       setBridgeConversationId(null);
       setLatestQuotes([]);
       setQuoteCardCollapsed(true);
       setEditDraftQuoteId(undefined);
+      setAutoDraftPrefill(null);
       return;
     }
 
     // Stamp which thread this fetch belongs to BEFORE the async call fires
-    console.log('[DEBUG bridge] Contractor found on lead — calling bridge', { threadId: selectedThread.id, contractorId: selectedThread.lead.contractor?.id });
     currentBridgeThreadIdRef.current = selectedThread.id;
     callBridge(selectedThread.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,7 +259,6 @@ export default function MessagesPage() {
         return;
       }
       const data = await res.json();
-      console.log('[DEBUG bridge] Response from for-thread:', data);
       if (currentBridgeThreadIdRef.current !== threadId) return;
       setBridgeConversationId(data.conversationId);
       setBridgeHomeownerId(data.homeownerId);
@@ -251,13 +290,11 @@ export default function MessagesPage() {
       if (expectedThreadId && currentBridgeThreadIdRef.current !== expectedThreadId) return;
       // Homeowners only see sent/accepted/revision_requested quotes — drafts are private to contractor
       const isHomeowner = user?.role === 'homeowner';
-      console.log('[DEBUG fetchLatestQuotes] API returned', { count: data.quotes?.length, role: user?.role, isHomeowner, statuses: (data.quotes || []).map((q: any) => q.status) });
       const active = (data.quotes as QuoteResult[]).filter(q => {
         if (q.status === 'superseded') return false;
         if (isHomeowner && q.status === 'draft') return false;
         return true;
       });
-      console.log('[DEBUG fetchLatestQuotes] After filter', { activeCount: active.length, activeStatuses: active.map(q => q.status) });
       setLatestQuotes(active);
     } catch {
       // Non-critical — quote panel simply won't show
@@ -304,12 +341,11 @@ export default function MessagesPage() {
 
   // Phase 2: Homeowner accepts a quote
   const handleQuoteAccept = async (quoteId: string) => {
-    const userId = selfUserId || user?.id;
-    if (!userId) return;
+    if (!selfUserId) return;
     const res = await fetch(`/api/quotes/${quoteId}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'accept', userId }),
+      body: JSON.stringify({ action: 'accept', userId: selfUserId }),
     });
     if (res.ok && bridgeConversationId) {
       await fetchLatestQuotes(bridgeConversationId);
@@ -318,12 +354,11 @@ export default function MessagesPage() {
 
   // Phase 2: Homeowner requests changes on a quote
   const handleQuoteRequestChanges = async (quoteId: string, note: string) => {
-    const userId = selfUserId || user?.id;
-    if (!userId) return;
+    if (!selfUserId) return;
     const res = await fetch(`/api/quotes/${quoteId}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'request_changes', note, userId }),
+      body: JSON.stringify({ action: 'request_changes', note, userId: selfUserId }),
     });
     if (res.ok && bridgeConversationId) {
       await fetchLatestQuotes(bridgeConversationId);
@@ -348,7 +383,21 @@ export default function MessagesPage() {
         setThreads(data.threads || []);
         // Store the resolved DB user ID for accurate conversation-partner detection.
         // This handles accounts where User.id (UUID) differs from Clerk ID.
-        if (data.selfUserId) setSelfUserId(data.selfUserId);
+        if (data.selfUserId) {
+          setSelfUserId(data.selfUserId);
+        }
+        // ── TEMP DEBUG: full thread fetch trace ──
+        if (process.env.NODE_ENV === 'development') {
+          const threadIds = (data.threads || []).map((t: Thread) => t.id);
+          console.debug('[Messages][fetchThreads]', {
+            clerkUserId: user.id,
+            dbSelfUserId: data.selfUserId,
+            idMatch: user.id === data.selfUserId,
+            threadCount: threadIds.length,
+            threadIds,
+            role: user.role,
+          });
+        }
       } else {
         setThreadsError("Failed to load conversations. Please refresh.");
       }
@@ -394,8 +443,8 @@ export default function MessagesPage() {
     if (!user) return null;
     // Compare against the resolved DB id (selfUserId) rather than the raw Clerk ID (user.id).
     // For webhook-created users, User.id is a UUID while user.id from useAuth is the Clerk ID.
-    const myId = selfUserId || user.id;
-    return thread.lead.homeowner.id === myId
+    if (!selfUserId) return null;
+    return thread.lead.homeowner.id === selfUserId
       ? thread.lead.contractor
       : thread.lead.homeowner;
   };
@@ -447,9 +496,10 @@ export default function MessagesPage() {
       style={{
         height: 'calc(100dvh - var(--header-height, 64px) - var(--bottom-nav-height, 72px))',
         minHeight: '400px',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden min-h-0">
         {/* Modern Header */}
         <div className="mb-3 sm:mb-6 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -466,7 +516,7 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1 min-h-0 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
           <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
             <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
@@ -497,7 +547,7 @@ export default function MessagesPage() {
               </div>
               
               {/* Conversations List with Enhanced Scroll */}
-              <div className="flex-1 overflow-y-auto bg-white chat-scroll min-h-0">
+              <div className="flex-1 overflow-y-auto bg-white chat-scroll min-h-0 overscroll-contain">
                 <style jsx>{`
                   .chat-scroll {
                     scrollbar-width: thin;
@@ -588,7 +638,7 @@ export default function MessagesPage() {
                     {filteredThreads.map((thread) => {
                       const lastMessage = thread.messages[0] || null;
                       const isSelected = selectedThread?.id === thread.id;
-                      const myId = selfUserId || user?.id || '';
+                      const myId = selfUserId;
                       const otherUser = thread.lead.homeowner.id === myId
                         ? thread.lead.contractor
                         : thread.lead.homeowner;
@@ -597,10 +647,12 @@ export default function MessagesPage() {
                         <div
                           key={thread.id}
                           onClick={() => selectThread(thread)}
-                          className={`group relative p-3 cursor-pointer rounded-lg transition-all duration-200 ${
-                            isSelected 
-                              ? 'bg-rose-50 border-l-4 border-rose-600 shadow-sm' 
-                              : 'hover:bg-slate-50 border-l-4 border-transparent'
+                          className={`group relative p-3 cursor-pointer rounded-xl transition-all duration-200 ${
+                            isSelected
+                              ? 'bg-rose-100 border-l-4 border-rose-600 shadow-md'
+                              : (thread.unreadCount ?? 0) > 0
+                                ? 'bg-gradient-to-r from-rose-50 to-transparent border-l-4 border-rose-500 shadow-sm'
+                                : 'hover:bg-slate-50 border-l-4 border-transparent'
                           }`}
                         >
                           {/* Delete Button — always visible on mobile, hover-reveal on desktop */}
@@ -622,8 +674,8 @@ export default function MessagesPage() {
                             <div className="relative flex-shrink-0">
                               <ConvAvatar user={otherUser} />
                               {(thread.unreadCount ?? 0) > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-rose-600 rounded-full flex items-center justify-center">
-                                  <span className="text-[9px] font-bold text-white leading-none">
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1.5 bg-rose-600 rounded-full flex items-center justify-center">
+                                  <span className="text-[10px] font-bold text-white leading-none">
                                     {(thread.unreadCount ?? 0) > 9 ? '9+' : thread.unreadCount}
                                   </span>
                                 </span>
@@ -633,7 +685,7 @@ export default function MessagesPage() {
                             {/* Content */}
                             <div className="flex-1 min-w-0 pr-8">
                               <div className="flex items-center justify-between gap-1">
-                                <p className={`text-sm truncate ${(thread.unreadCount ?? 0) > 0 ? 'font-bold text-slate-900' : 'font-semibold text-slate-900'}`}>
+                                <p className={`text-sm truncate ${(thread.unreadCount ?? 0) > 0 ? 'font-bold text-slate-900' : 'font-medium text-slate-600'}`}>
                                   {getDisplayName(otherUser)}
                                 </p>
                                 {lastMessage && (
@@ -648,7 +700,7 @@ export default function MessagesPage() {
                               </p>
                               
                               {lastMessage ? (
-                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${(thread.unreadCount ?? 0) > 0 ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
+                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${(thread.unreadCount ?? 0) > 0 ? 'text-slate-800 font-semibold' : 'text-slate-400'}`}>
                                   {lastMessage.body}
                                 </p>
                               ) : (
@@ -668,9 +720,9 @@ export default function MessagesPage() {
           </div>
 
           {/* Modern Chat Area */}
-          <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
+          <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 overflow-hidden ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full">
+              <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full min-h-0">
                 <div className="lg:hidden px-4 py-3">
                   <button
                     onClick={() => setSelectedThread(null)}
@@ -715,7 +767,6 @@ export default function MessagesPage() {
                 {bridgeConversationId && !bridgeLoading && !isFetchingQuotes && latestQuotes.length === 0 && selectedThread?.lead?.contractor?.id && (
                   <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-2">
                     <p className="text-xs text-slate-400 text-center">
-                      {(() => { console.log('[DEBUG render] No quotes yet banner', { bridgeConversationId, bridgeLoading, isFetchingQuotes, latestQuotesLen: latestQuotes.length, contractorId: selectedThread?.lead?.contractor?.id }); return null; })()}
                       {user?.role === 'contractor'
                         ? 'No quotes yet. Generate one to get started.'
                         : 'No quotes yet.'}
@@ -736,7 +787,7 @@ export default function MessagesPage() {
                     materialCost: q.materialCost,
                     scope: q.scope,
                     itemCount: q.items.length,
-                    version: q.version,
+                    version: q.version ?? 1,
                   };
                   const statusColors: Record<string, string> = {
                     accepted: 'bg-green-100 text-green-700',
@@ -779,10 +830,10 @@ export default function MessagesPage() {
                   );
                 })()}
 
-                {user?.id ? (
+                {user?.id && selfUserId ? (
                   <Chat
                     thread={selectedThread}
-                    currentUserId={selfUserId || user.id}
+                    currentUserId={selfUserId}
                     onDeleteThread={(threadId) => {
                       setThreads(prev => prev.filter(t => t.id !== threadId));
                       setSelectedThread(null);
@@ -790,6 +841,85 @@ export default function MessagesPage() {
                     userRole={user?.role}
                     jobTitle={selectedThread?.lead?.title || ""}
                     aiEnhanceEnabled={true}
+                    onAutoDraftReview={(draft, displayPrice, sourceSnippets) => {
+                      if (!draft) return;
+                      // If a draft quote already exists, open it for editing instead
+                      const existingDraft = latestQuotes.find(q => q.status === 'draft');
+                      if (existingDraft) {
+                        setEditDraftQuoteId(existingDraft.id);
+                        setReviseQuoteId(undefined);
+                        setAutoDraftPrefill(null);
+                        setShowQuoteBuilder(true);
+                        return;
+                      }
+                      // Ensure bridge is resolved before opening builder
+                      if (!bridgeConversationId && selectedThread) {
+                        callBridge(selectedThread.id);
+                      }
+                      setAutoDraftPrefill({ ...draft, displayPrice, sourceSnippets });
+                      setEditDraftQuoteId(undefined);
+                      setReviseQuoteId(undefined);
+                      setShowQuoteBuilder(true);
+                    }}
+                    onSendInstantly={async (draft, displayPrice) => {
+                      // Send Instantly: generate a quote via existing API, then immediately send it.
+                      // Reuses the same backend flow as LiveQuoteBuilder (generate → PUT with status=sent).
+                      let convId = bridgeConversationId;
+                      let contrId = bridgeContractorId;
+
+                      // Ensure bridge is resolved
+                      if (!convId && selectedThread) {
+                        try {
+                          const res = await fetch(`/api/conversations/for-thread?threadId=${encodeURIComponent(selectedThread.id)}`);
+                          if (!res.ok) return false;
+                          const data = await res.json();
+                          convId = data.conversationId;
+                          contrId = data.contractorId;
+                          setBridgeConversationId(data.conversationId);
+                          setBridgeHomeownerId(data.homeownerId);
+                          setBridgeContractorId(data.contractorId);
+                          setBridgeJobId(data.jobId);
+                        } catch { return false; }
+                      }
+                      if (!convId || !contrId) return false;
+
+                      try {
+                        // Step 1: Generate draft via existing API (reads real thread, applies validation)
+                        const genRes = await fetch('/api/quotes/generate', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ conversationId: convId, contractorId: contrId }),
+                        });
+                        const genData = await genRes.json();
+                        if (!genRes.ok || !genData.quote?.id) return false;
+
+                        // Step 2: Send it immediately via existing PUT (same as LiveQuoteBuilder saveQuote('sent'))
+                        const sendRes = await fetch(`/api/quotes/${genData.quote.id}`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            title: genData.quote.title,
+                            description: genData.quote.description,
+                            scope: genData.quote.scope,
+                            laborCost: genData.quote.laborCost,
+                            materialCost: genData.quote.materialCost,
+                            totalCost: genData.quote.totalCost,
+                            items: genData.quote.items,
+                            status: 'sent',
+                          }),
+                        });
+                        const sendData = await sendRes.json();
+                        if (!sendRes.ok) return false;
+
+                        // Success — update quote panel
+                        setAutoDraftPrefill(null);
+                        setLatestQuotes(prev => [sendData.quote as QuoteResult, ...prev.filter(q => q.id !== sendData.quote.id)]);
+                        if (convId) fetchLatestQuotes(convId);
+                        return true;
+                      } catch {
+                        return false;
+                      }
+                    }}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full p-4">
@@ -857,15 +987,18 @@ export default function MessagesPage() {
           homeownerId={bridgeHomeownerId}
           {...(reviseQuoteId !== undefined ? { reviseQuoteId } : {})}
           {...(editDraftQuoteId !== undefined ? { editDraftQuoteId } : {})}
+          autoDraftPrefill={autoDraftPrefill}
           onClose={() => {
             setShowQuoteBuilder(false);
             setReviseQuoteId(undefined);
             setEditDraftQuoteId(undefined);
+            setAutoDraftPrefill(null);
           }}
           onQuoteSent={(quote) => {
             setShowQuoteBuilder(false);
             setReviseQuoteId(undefined);
             setEditDraftQuoteId(undefined);
+            setAutoDraftPrefill(null);
             // Append/replace latest quote in the panel immediately, then re-fetch for accuracy
             setLatestQuotes(prev => [quote as QuoteResult, ...prev.filter(q => q.id !== quote.id)]);
             if (bridgeConversationId) fetchLatestQuotes(bridgeConversationId);

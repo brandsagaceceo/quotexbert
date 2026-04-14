@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         estimatesGenerated,
       },
       referrals,
-      shareLink: `${process.env.NEXT_PUBLIC_URL || 'https://quotexbert.com'}/?ref=${userId}`,
+      shareLink: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'}/?ref=${userId}`,
     });
   } catch (error) {
     console.error("[HOMEOWNER_REFERRAL_GET]", error);

@@ -24,6 +24,17 @@ export async function GET(request: NextRequest) {
     // The primary DB id is used for conversation partner comparison on the client
     const selfUserId = matchingUsers[0]?.id || userId;
 
+    // ── TEMP DEBUG: server-side identity trace ──
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/threads][GET]', {
+        inputUserId: userId,
+        matchCount: matchingUsers.length,
+        dbUserIds,
+        selfUserId,
+        idMatch: userId === selfUserId,
+      });
+    }
+
     // Get all threads where the user is involved (either as homeowner, contractor, or message participant)
     const threads = await prisma.thread.findMany({
       where: {

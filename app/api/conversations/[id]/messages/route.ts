@@ -166,7 +166,7 @@ export async function POST(
     // Send email notification to receiver (skipped if opted out)
     if (receiverPrefs?.notifyMessageEmail !== false) {
       try {
-        const conversationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://quotexbert.com'}/messages/${conversationId}`;
+        const conversationUrl = `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/messages/${conversationId}`;
         
         await sendEmailNotification({
           type: 'message_received',

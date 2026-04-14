@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser, useClerk } from '@clerk/nextjs';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface User {
   id: string;
@@ -17,9 +17,18 @@ export function useAuth() {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [roleLoading, setRoleLoading] = useState(true); // Start as true
 
+  // Track the Clerk user ID so we can detect account switches
+  const prevClerkIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     const fetchUserRole = async () => {
       if (isLoaded && clerkUser) {
+        // Detect account switch — clear stale authUser immediately
+        if (prevClerkIdRef.current && prevClerkIdRef.current !== clerkUser.id) {
+          setAuthUser(null);
+        }
+        prevClerkIdRef.current = clerkUser.id;
+
         // Start with whatever Clerk session has
         let role = clerkUser.publicMetadata?.role as 'homeowner' | 'contractor' | 'admin' | undefined;
         let dbProfilePhoto: string | null = null;
@@ -80,6 +89,7 @@ export function useAuth() {
         }
       } else if (isLoaded) {
         setAuthUser(null);
+        prevClerkIdRef.current = null;
       }
     };
     

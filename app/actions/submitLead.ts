@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { sendLeadEmail } from "@/lib/email";
+import { sendLeadEmail, sendJobPostedEmail } from "@/lib/email";
 import { NotificationService } from "@/lib/notifications";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
@@ -495,6 +495,19 @@ export async function submitLead(formData: FormData) {
     } catch (notificationError) {
       console.error(`[submitLead:${requestId}] Contractor notification error:`, notificationError);
       // Don't fail lead creation if notifications fail
+    }
+
+    // Send homeowner job-posted confirmation email
+    if (user.email) {
+      try {
+        await sendJobPostedEmail({
+          homeowner: { id: user.id, email: user.email, name: user.name },
+          job: { id: lead.id, title: data.title, category: data.projectType },
+        });
+        console.log(`[submitLead:${requestId}] Job-posted confirmation email sent to ${user.email}`);
+      } catch (jobEmailError) {
+        console.error(`[submitLead:${requestId}] Job-posted email error (non-fatal):`, jobEmailError);
+      }
     }
 
     return {

@@ -102,12 +102,14 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
       });
 
       if (response.ok) {
+        const data = await response.json();
         // Refresh the job data
         await fetchJob();
         
         if (action === 'accept') {
-          // Redirect to chat with the selected contractor
-          router.push(`/homeowner/jobs/${job.id}/chat`);
+          // Redirect to the messaging thread (API creates one on accept)
+          const redirectUrl = data.redirectUrl || `/messages?threadId=${data.threadId}`;
+          router.push(redirectUrl);
         }
       } else {
         console.error(`Failed to ${action} application`);
@@ -193,7 +195,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
                 <p className="text-sm text-green-600">{accepted.contractor.contractorProfile?.companyName || accepted.contractor.name}</p>
               </div>
               <div className="ml-auto flex gap-2">
-                <Link href={`/homeowner/jobs/${job.id}/chat`}>
+                <Link href={`/messages?leadId=${job.id}`}>
                   <Button size="sm">
                     <MessageCircle className="w-4 h-4 mr-1.5" />
                     Chat

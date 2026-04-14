@@ -29,6 +29,8 @@ interface EmailTemplate {
 }
 
 // (Dead code below — real email delivery is handled by sendNotificationEmail() via lib/email.ts + Resend)
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com';
+
 const _unusedMockTransporter = () => {
   return {
     sendMail: async (options: any) => {
@@ -74,7 +76,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
                   <li>Pay securely through our platform</li>
                 </ul>
               </div>
-              <a href="${process.env.NEXT_PUBLIC_URL}/create-lead" class="button">Post Your First Project</a>
+              <a href="${BASE_URL}/create-lead" class="button">Post Your First Project</a>
             ` : `
               <div class="highlight">
                 <h3>🔨 As a Contractor, you can:</h3>
@@ -85,7 +87,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
                   <li>Get paid through our secure system</li>
                 </ul>
               </div>
-              <a href="${process.env.NEXT_PUBLIC_URL}/contractor/jobs" class="button">Browse Available Jobs</a>
+              <a href="${BASE_URL}/contractor/jobs" class="button">Browse Available Jobs</a>
             `}
             
             <p>If you have any questions, feel free to reach out to our support team.</p>
@@ -96,10 +98,10 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
             <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
             <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-            <p style="margin: 6px 0 0 0;"><a href="${process.env.NEXT_PUBLIC_URL}" style="color: #9f1239;">Visit QuoteXbert</a></p>
+            <p style="margin: 6px 0 0 0;"><a href="${BASE_URL}" style="color: #9f1239;">Visit QuoteXbert</a></p>
           </div>
         `,
-        text: `Welcome to QuoteXbert! Thank you for joining our platform. Visit ${process.env.NEXT_PUBLIC_URL} to get started.`
+        text: `Welcome to QuoteXbert! Thank you for joining our platform. Visit ${BASE_URL} to get started.`
       };
 
     case 'job_posted':
@@ -123,7 +125,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             
             <p>This job matches your profile and service area. Submit a quote to get started!</p>
             
-            <a href="${process.env.NEXT_PUBLIC_URL}/contractor/jobs/${data.jobId}" class="button">View Job & Submit Quote</a>
+            <a href="${BASE_URL}/contractor/jobs/${data.jobId}" class="button">View Job &amp; Submit Quote</a>
             
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
@@ -134,7 +136,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
-        text: `New job available: ${data.jobTitle} in ${data.location}. Budget: $${data.budget}. Visit ${process.env.NEXT_PUBLIC_URL}/contractor/jobs/${data.jobId} to view and quote.`
+        text: `New job available: ${data.jobTitle} in ${data.location}. Budget: $${data.budget}. Visit ${BASE_URL}/contractor/jobs/${data.jobId} to view and quote.`
       };
 
     case 'quote_received':
@@ -158,7 +160,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             
             <p>Review the quote and contractor profile to make your decision.</p>
             
-            <a href="${process.env.NEXT_PUBLIC_URL}/homeowner/quotes/${data.quoteId}" class="button">Review Quote</a>
+            <a href="${BASE_URL}/homeowner/quotes/${data.quoteId}" class="button">Review Quote</a>
             
             <p>Best regards,<br>The QuoteXbert Team</p>
           </div>
@@ -169,7 +171,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
             <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
           </div>
         `,
-        text: `New quote received for ${data.jobTitle} from ${data.contractorName}. Amount: $${data.quoteAmount}. View at ${process.env.NEXT_PUBLIC_URL}/homeowner/quotes/${data.quoteId}`
+        text: `New quote received for ${data.jobTitle} from ${data.contractorName}. Amount: $${data.quoteAmount}. View at ${BASE_URL}/homeowner/quotes/${data.quoteId}`
       };
 
     case 'quote_accepted':

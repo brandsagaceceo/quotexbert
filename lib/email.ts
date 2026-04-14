@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+﻿import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 
 const resend = process.env.RESEND_API_KEY
@@ -6,7 +6,10 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const fromEmail = process.env.MAIL_FROM || "Quotexbert <no-reply@quotexbert.com>";
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://quotexbert.com";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "https://www.quotexbert.com";
+/** @deprecated use BASE_URL */
+const baseUrl = BASE_URL;
+const REPLY_TO = 'quotexbert@gmail.com';
 
 // Email event logging (NO SECRETS)
 async function logEmailEvent(
@@ -98,9 +101,9 @@ async function getUserEmail(userId: string): Promise<string | null> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Shared email layout builder
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface EmailBlock {
   type: 'heading' | 'text' | 'card' | 'cta' | 'tag';
@@ -173,7 +176,7 @@ function buildEmail(subject: string, blocks: EmailBlock[]): string {
           <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
           or call <a href="tel:9052429460" style="color:#9f1239;text-decoration:none;font-weight:600;">905-242-9460</a>
         </p>
-        <p style="margin:0;font-size:11px;color:#94a3b8;">© ${new Date().getFullYear()} QuoteXbert · All rights reserved</p>
+        <p style="margin:0;font-size:11px;color:#94a3b8;">Â© ${new Date().getFullYear()} QuoteXbert Â· All rights reserved</p>
       </td></tr>
 
     </table>
@@ -186,7 +189,7 @@ function buildEmail(subject: string, blocks: EmailBlock[]): string {
 // Email templates
 function createMessageReceivedTemplate(preview: string, threadId: string): string {
   const safePreview = escHtml(preview);
-  return buildEmail('New Message — QuoteXbert', [
+  return buildEmail('New Message â€” QuoteXbert', [
     { type: 'tag', content: 'New Message' },
     { type: 'heading', content: 'You have a new message' },
     { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Preview', rawHtml: true },
@@ -196,7 +199,7 @@ function createMessageReceivedTemplate(preview: string, threadId: string): strin
 }
 
 function createContractSentTemplate(contractId: string): string {
-  return buildEmail('Contract Ready for Review — QuoteXbert', [
+  return buildEmail('Contract Ready for Review â€” QuoteXbert', [
     { type: 'tag', content: 'Contract' },
     { type: 'heading', content: 'A contract is ready for your review' },
     { type: 'text', content: 'A contract has been sent to you. Please review it and sign to move forward.' },
@@ -208,13 +211,13 @@ function createContractAcceptedTemplate(contractId: string, pdfUrl?: string): st
   const blocks: EmailBlock[] = [
     { type: 'tag', content: 'Contract Signed' },
     { type: 'heading', content: 'Your contract is now active' },
-    { type: 'text', content: 'Both parties have signed. The contract is now in effect — you can view the full details below.' },
+    { type: 'text', content: 'Both parties have signed. The contract is now in effect â€” you can view the full details below.' },
     { type: 'cta', content: 'View Contract', href: `${baseUrl}/contracts/${contractId}` },
   ];
   if (pdfUrl) {
     blocks.push({ type: 'text', content: `<a href="${pdfUrl}" style="color:#9f1239;font-weight:600;text-decoration:none;">Download PDF copy</a>` });
   }
-  return buildEmail('Contract Accepted — QuoteXbert', blocks);
+  return buildEmail('Contract Accepted â€” QuoteXbert', blocks);
 }
 
 interface LeadEmailPayload {
@@ -227,22 +230,30 @@ interface LeadEmailPayload {
 }
 
 // Welcome Email
-export async function sendWelcomeEmail(user: { id: string; email: string; name?: string | null }) {
+export async function sendWelcomeEmail(user: { id: string; email: string; name?: string | null; role?: string | null }) {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping welcome email');
     return { success: false, error: 'Email service not configured' };
   }
 
   try {
+    const isContractor = user.role === 'contractor';
+    const isHomeowner = user.role === 'homeowner';
+    const ctaHref = isContractor ? `${baseUrl}/contractor/jobs` : `${baseUrl}/create-lead`;
+    const ctaLabel = isContractor ? 'Browse Available Jobs' : 'Post Your First Project';
+    const cardContent = isContractor
+      ? '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Browse projects in your area</li><li style="margin-bottom:6px;">Submit quotes directly to homeowners</li><li style="margin-bottom:6px;">Message clients and track your jobs</li><li>Build your reputation with reviews</li></ul>'
+      : '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Post your home improvement project</li><li style="margin-bottom:6px;">Get quotes from verified contractors</li><li style="margin-bottom:6px;">Message contractors directly</li><li>Save money \u2014 no bidding wars</li></ul>';
     await resend.emails.send({
       from: fromEmail,
+      replyTo: REPLY_TO,
       to: user.email,
-      subject: 'Welcome to QuoteXbert! 🎉',
+      subject: isContractor ? 'Your QuoteXbert contractor account is ready' : isHomeowner ? 'Your QuoteXbert account is ready' : 'Welcome to QuoteXbert! \uD83C\uDF89',
       html: buildEmail('Welcome to QuoteXbert!', [
         { type: 'heading', content: `Welcome, ${user.name || 'there'}!` },
-        { type: 'text', content: "Thanks for joining QuoteXbert — your AI-powered home renovation platform." },
-        { type: 'card', label: 'What you can do now', content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Get instant AI estimates by uploading photos</li><li style="margin-bottom:6px;">Connect with verified local contractors</li><li style="margin-bottom:6px;">Compare quotes and save money</li><li>Generate professional contracts</li></ul>' },
-        { type: 'cta', content: 'Get Started', href: baseUrl },
+        { type: 'text', content: "Thanks for joining QuoteXbert \u2014 your AI-powered home renovation platform." },
+        { type: 'card', label: 'What you can do now', content: cardContent, rawHtml: true },
+        { type: 'cta', content: ctaLabel, href: ctaHref },
       ])
     });
 
@@ -279,13 +290,12 @@ export async function sendNewJobEmail(
     }
 
     await resend.emails.send({
-      from: fromEmail,
-      to: contractor.email,
-      subject: `New ${escHtml(job.category)} Job Available! 🔔`,
-      html: buildEmail(`New ${escHtml(job.category)} Job Match — QuoteXbert`, [
+      from: fromEmail,      replyTo: REPLY_TO,      to: contractor.email,
+      subject: `New ${escHtml(job.category)} Job Available! ðŸ””`,
+      html: buildEmail(`New ${escHtml(job.category)} Job Match â€” QuoteXbert`, [
         { type: 'tag', content: job.category },
         { type: 'heading', content: job.title },
-        { type: 'text', content: job.description.substring(0, 160) + (job.description.length > 160 ? '…' : '') },
+        { type: 'text', content: job.description.substring(0, 160) + (job.description.length > 160 ? 'â€¦' : '') },
         { type: 'card', rawHtml: true, content: `<strong>Category:</strong> ${escHtml(job.category)}${job.budget ? `<br><strong>Budget:</strong> ${escHtml(job.budget)}` : ''}`, label: 'Job Details' },
         { type: 'cta', content: 'View Job', href: `${baseUrl}/contractor/jobs` },
         { type: 'text', content: `<span style="font-size:12px;color:#94a3b8;">You're receiving this because you're subscribed to ${escHtml(job.category)} jobs.</span>`, rawHtml: true },
@@ -317,9 +327,8 @@ export async function sendNewMessageEmail(
 
   try {
     await resend.emails.send({
-      from: fromEmail,
-      to: recipient.email,
-      subject: `New message from ${sender.name || 'a user'} 💬`,
+      from: fromEmail,      replyTo: REPLY_TO,      to: recipient.email,
+      subject: `New message from ${sender.name || 'a user'} ðŸ’¬`,
       html: createMessageReceivedTemplate(messagePreview, threadId)
     });
 
@@ -410,7 +419,7 @@ export async function sendMessageReceivedEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "New Message — QuoteXbert",
+      subject: "New Message â€” QuoteXbert",
       html: createMessageReceivedTemplate(preview, threadId),
     };
 
@@ -443,7 +452,7 @@ export async function sendContractSentEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "Contract Ready for Review — QuoteXbert",
+      subject: "Contract Ready for Review â€” QuoteXbert",
       html: createContractSentTemplate(contractId),
     };
 
@@ -477,7 +486,7 @@ export async function sendContractAcceptedEmail(params: {
     const emailContent = {
       from: fromEmail,
       to: userEmail,
-      subject: "Contract Accepted — QuoteXbert",
+      subject: "Contract Accepted â€” QuoteXbert",
       html: createContractAcceptedTemplate(contractId, pdfUrl),
     };
 
@@ -509,8 +518,8 @@ export async function sendJobAcceptedEmail(
     await resend.emails.send({
       from: fromEmail,
       to: homeowner.email,
-      subject: `${escHtml(contractor.companyName)} Accepted Your Job! ✅`,
-      html: buildEmail(`${escHtml(contractor.companyName)} Accepted Your Job — QuoteXbert`, [
+      subject: `${escHtml(contractor.companyName)} Accepted Your Job! âœ…`,
+      html: buildEmail(`${escHtml(contractor.companyName)} Accepted Your Job â€” QuoteXbert`, [
         { type: 'tag', content: 'Job Accepted' },
         { type: 'heading', content: `${escHtml(contractor.companyName)} is on your job!` },
         { type: 'text', content: `<strong>${escHtml(contractor.companyName)}</strong> has accepted your job request for <strong>${escHtml(job.title)}</strong>.`, rawHtml: true },
@@ -554,10 +563,10 @@ export async function sendNewRenovationLeadEmail(
       from: fromEmail,
       to: contractor.email,
       subject: `New ${escHtml(job.category)} Lead on QuoteXbert`,
-      html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
+      html: buildEmail(`New ${escHtml(job.category)} Lead â€” QuoteXbert`, [
         { type: 'tag', content: job.category },
         { type: 'heading', content: job.title || job.category },
-        { type: 'card', label: 'Lead Details', rawHtml: true, content: `${job.city ? `<strong>Location:</strong> ${escHtml(job.city)}<br>` : ''}${job.estimatedPrice ? `<strong>Est. Value:</strong> ${escHtml(job.estimatedPrice)}<br>` : ''}${job.description ? `<span style="color:#64748b;">${escHtml(job.description.substring(0, 200))}${job.description.length > 200 ? '…' : ''}</span>` : ''}` },
+        { type: 'card', label: 'Lead Details', rawHtml: true, content: `${job.city ? `<strong>Location:</strong> ${escHtml(job.city)}<br>` : ''}${job.estimatedPrice ? `<strong>Est. Value:</strong> ${escHtml(job.estimatedPrice)}<br>` : ''}${job.description ? `<span style="color:#64748b;">${escHtml(job.description.substring(0, 200))}${job.description.length > 200 ? 'â€¦' : ''}</span>` : ''}` },
         { type: 'cta', content: 'View Lead', href: `${baseUrl}/contractor/jobs` },
         { type: 'text', content: '<span style="font-size:12px;color:#94a3b8;">You\'re receiving this because this project matches your selected service categories.</span>', rawHtml: true },
       ])
@@ -584,14 +593,14 @@ export async function sendReviewReceivedEmail(
     return { success: false, error: 'Email service not configured' };
   }
 
-  const stars = '⭐'.repeat(review.rating);
+  const stars = 'â­'.repeat(review.rating);
 
   try {
     await resend.emails.send({
       from: fromEmail,
       to: contractor.email,
-      subject: `New ${review.rating}-Star Review Received! ⭐`,
-      html: buildEmail(`New ${review.rating}-Star Review — QuoteXbert`, [
+      subject: `New ${review.rating}-Star Review Received! â­`,
+      html: buildEmail(`New ${review.rating}-Star Review â€” QuoteXbert`, [
         { type: 'tag', content: `${review.rating} / 5 stars` },
         { type: 'heading', content: 'You have a new review!' },
         { type: 'card', label: `From ${escHtml(review.reviewerName || 'a client')}`, rawHtml: true, content: `<div style="font-size:22px;letter-spacing:2px;margin-bottom:8px;">${stars}</div>${review.comment ? `<p style="margin:0;font-size:14px;color:#475569;font-style:italic;">&ldquo;${escHtml(review.comment)}&rdquo;</p>` : ''}` },
@@ -609,3 +618,78 @@ export async function sendReviewReceivedEmail(
     return { success: false, error };
   }
 }
+
+// â”€â”€â”€ Job Posted Confirmation (homeowner) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export async function sendJobPostedEmail(params: {
+  homeowner: { id: string; email: string; name?: string | null };
+  job: { id: string; title: string; category: string };
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping job-posted email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { homeowner, job } = params;
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: homeowner.email,
+      subject: 'Your project is now live on QuoteXbert',
+      html: buildEmail('Your Project is Live â€” QuoteXbert', [
+        { type: 'tag', content: job.category },
+        { type: 'heading', content: `"${escHtml(job.title)}" is now live!`, rawHtml: true },
+        { type: 'text', content: 'Your project has been posted and matching contractors have been notified.' },
+        { type: 'card', label: 'What happens next', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Contractors will review your project</li><li style="margin-bottom:6px;">You\'ll receive quotes directly in your messages</li><li>Accept the quote that best fits your budget and schedule</li></ul>' },
+        { type: 'cta', content: 'View My Messages', href: `${baseUrl}/messages` },
+      ]),
+    });
+    await logEmailEvent('job_posted', homeowner.email, homeowner.id, job.id, undefined, 'sent');
+    console.log(`[EMAIL] Job-posted confirmation sent to ${homeowner.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('job_posted', homeowner.email, homeowner.id, job.id, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send job-posted email:', error);
+    return { success: false, error };
+  }
+}
+
+// â”€â”€â”€ Quote Received Notification (homeowner) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export async function sendQuoteReceivedEmail(params: {
+  homeowner: { id: string; email: string; name?: string | null };
+  contractorName: string;
+  jobTitle: string;
+  totalCost: number;
+  leadId: string;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping quote-received email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { homeowner, contractorName, jobTitle, totalCost, leadId } = params;
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: homeowner.email,
+      subject: `You received a quote for your project on QuoteXbert`,
+      html: buildEmail('New Quote Received â€” QuoteXbert', [
+        { type: 'tag', content: 'New Quote' },
+        { type: 'heading', content: 'You received a quote!' },
+        { type: 'text', content: `${escHtml(contractorName)} has sent you a quote.` },
+        { type: 'card', label: 'Quote Details', rawHtml: true, content: `<strong>Project:</strong> ${escHtml(jobTitle)}<br><strong>Quote Total:</strong> $${escHtml(totalCost.toLocaleString())}` },
+        { type: 'cta', content: 'View Quote & Reply', href: `${baseUrl}/messages?leadId=${encodeURIComponent(leadId)}` },
+        { type: 'text', content: '<span style="font-size:12px;color:#94a3b8;">Reply to this email if you need help from our support team.</span>', rawHtml: true },
+      ]),
+    });
+    await logEmailEvent('quote_received', homeowner.email, homeowner.id, leadId, undefined, 'sent');
+    console.log(`[EMAIL] Quote-received email sent to ${homeowner.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('quote_received', homeowner.email, homeowner.id, leadId, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send quote-received email:', error);
+    return { success: false, error };
+  }
+}
+

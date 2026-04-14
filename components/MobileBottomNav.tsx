@@ -18,6 +18,7 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isSignedIn, authUser } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
     if (!isSignedIn || !authUser?.id) return;
@@ -45,6 +46,25 @@ export default function MobileBottomNav() {
     };
   }, [isSignedIn, authUser?.id]);
 
+  useEffect(() => {
+    if (!isSignedIn || !authUser?.id) return;
+    const fetchMessageUnread = () => {
+      fetch(`/api/threads?userId=${authUser.id}`)
+        .then((r) => r.json())
+        .then((data) => {
+          const total: number = (data.threads ?? []).reduce(
+            (sum: number, t: { unreadCount?: number }) => sum + (t.unreadCount ?? 0),
+            0
+          );
+          setUnreadMessageCount(total);
+        })
+        .catch(() => {});
+    };
+    fetchMessageUnread();
+    const interval = setInterval(fetchMessageUnread, 30000);
+    return () => clearInterval(interval);
+  }, [isSignedIn, authUser?.id]);
+
   if (!isSignedIn || !authUser) {
     return null;
   }
@@ -54,7 +74,7 @@ export default function MobileBottomNav() {
       { href: "/", label: "Home", icon: Home, active: pathname === "/" },
       { href: "/contractor/jobs", label: "Jobs", icon: Briefcase, active: pathname.startsWith("/contractor/jobs") },
       { href: "/notifications", label: "Alerts", icon: Bell, active: pathname === "/notifications", badge: unreadCount },
-      { href: "/messages", label: "Messages", icon: MessageCircle, active: pathname === "/messages" },
+      { href: "/messages", label: "Messages", icon: MessageCircle, active: pathname === "/messages", badge: unreadMessageCount },
       { href: "/profile", label: "Profile", icon: User, active: pathname === "/profile" },
     ];
     return (
@@ -96,7 +116,7 @@ export default function MobileBottomNav() {
     { href: "/notifications", label: "Alerts", icon: Bell, active: pathname === "/notifications", badge: unreadCount },
   ];
   const rightItems = [
-    { href: "/messages", label: "Messages", icon: MessageCircle, active: pathname === "/messages" },
+    { href: "/messages", label: "Messages", icon: MessageCircle, active: pathname === "/messages", badge: unreadMessageCount },
     { href: "/profile", label: "Profile", icon: User, active: pathname === "/profile" },
   ];
 
@@ -148,11 +168,18 @@ export default function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center h-full transition-colors ${
+              className={`relative flex flex-col items-center justify-center h-full transition-colors ${
                 item.active ? "text-[#800020]" : "text-gray-500 hover:text-[#800020]"
               }`}
             >
-              <Icon className="h-5 w-5 shrink-0" />
+              <span className="relative">
+                <Icon className="h-5 w-5 shrink-0" />
+                {"badge" in item && item.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-600 text-white text-[10px] font-bold rounded-full leading-none">
+                    {item.badge > 99 ? "99+" : item.badge}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] mt-0.5 font-medium leading-tight">{item.label}</span>
             </Link>
           );

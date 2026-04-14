@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { emitQuoteSignal } from "@/lib/quote-signals";
+import { sendQuoteReceivedEmail } from "@/lib/email";
 
 export async function GET(
   request: NextRequest,
@@ -146,6 +147,28 @@ export async function PUT(
           payload: { leadId: updatedQuote.conversation.job.id },
         }
       });
+
+      // Email homeowner — non-fatal if Resend is not configured
+      try {
+        const contractorName =
+          updatedQuote.conversation.contractor?.name ??
+          updatedQuote.conversation.contractor?.email ??
+          'Your contractor';
+        await sendQuoteReceivedEmail({
+          homeowner: {
+            id: updatedQuote.conversation.homeowner.id,
+            email: updatedQuote.conversation.homeowner.email,
+            name: updatedQuote.conversation.homeowner.name,
+          },
+          contractorName,
+          jobTitle: updatedQuote.conversation.job.title,
+          totalCost: parseFloat(totalCost || 0),
+          leadId: updatedQuote.conversation.job.id,
+        });
+        console.log(`[QUOTE] Quote-received email sent to ${updatedQuote.conversation.homeowner.email}`);
+      } catch (emailErr) {
+        console.error('[QUOTE] Failed to send quote-received email (non-fatal):', emailErr);
+      }
     }
     // Phase 6: learning signal for sent/rejected transitions
     if (status === 'sent' || status === 'rejected') {

@@ -34,6 +34,9 @@ interface ContractorProfile {
   reviewCount: number;
   profilePhoto?: string;
   completedJobs: number;
+  jobsAccepted?: number;
+  jobsCompleted?: number;
+  conversionRate?: number;
   categories?: string[];
   serviceAreas?: string[];
   portfolio?: any[];
@@ -264,6 +267,30 @@ export default function ContractorProfilePage() {
                       </span>
                     </div>
                   )}
+                </div>
+
+                {/* Contractor Metrics — Jobs Accepted / Completed / Conversion Rate */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="bg-blue-50 rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-bold text-blue-700">
+                      {contractor.jobsAccepted ?? contractor.completedJobs ?? 0}
+                    </p>
+                    <p className="text-xs text-blue-500 font-medium mt-0.5">Jobs Accepted</p>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-bold text-green-700">
+                      {contractor.jobsCompleted ?? 0}
+                    </p>
+                    <p className="text-xs text-green-500 font-medium mt-0.5">Jobs Completed</p>
+                  </div>
+                  <div className="bg-orange-50 rounded-xl p-3 sm:p-4 text-center">
+                    <p className="text-xl sm:text-2xl font-bold text-orange-700">
+                      {contractor.conversionRate != null
+                        ? `${Math.round(contractor.conversionRate * 100)}%`
+                        : '—'}
+                    </p>
+                    <p className="text-xs text-orange-500 font-medium mt-0.5">Conversion Rate</p>
+                  </div>
                 </div>
 
                 {/* Rating Display */}

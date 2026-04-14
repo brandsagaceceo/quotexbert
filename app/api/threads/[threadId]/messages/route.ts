@@ -93,7 +93,23 @@ export async function POST(
 
     // Security: verify the authenticated caller IS the sender
     if (dbFromUserId !== callerDbId) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[API/messages][POST] 403 FORBIDDEN', { callerDbId, dbFromUserId, clientFromUserId: fromUserId });
+      }
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // ── TEMP DEBUG: server-side send trace ──
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/messages][POST]', {
+        threadId,
+        callerDbId,
+        clientFromUserId: fromUserId,
+        resolvedFromUserId: dbFromUserId,
+        clientToUserId: toUserId,
+        resolvedToUserId: dbToUserId,
+        callerMatchesSender: dbFromUserId === callerDbId,
+      });
     }
 
     // Prevent self-messaging
@@ -231,13 +247,16 @@ export async function PATCH(
 
     // Security: the authenticated session must match the viewer being marked as read
     if (dbViewerId !== callerDbId) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[API/messages][PATCH] 403 FORBIDDEN mark-read', { callerDbId, dbViewerId, clientViewerUserId: viewerUserId });
+      }
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const now = new Date();
 
     // Mark all messages sent TO this viewer in this thread as read
-    await prisma.message.updateMany({
+    const markResult = await prisma.message.updateMany({
       where: {
         threadId,
         toUserId: dbViewerId,
@@ -245,6 +264,16 @@ export async function PATCH(
       },
       data: { readAt: now },
     });
+
+    // ── TEMP DEBUG: server-side mark-read trace ──
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/messages][PATCH] mark-read', {
+        threadId,
+        callerDbId,
+        dbViewerId,
+        messagesMarked: markResult.count,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

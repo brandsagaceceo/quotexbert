@@ -66,7 +66,7 @@ export async function GET() {
     return NextResponse.json({
       recentEvents,
       lastWebhookTime,
-      webhookEndpoint: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://quotexbert.com'}/api/webhooks/stripe`
+      webhookEndpoint: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/api/webhooks/stripe`
     });
   } catch (error) {
     console.error('Webhook health check error:', error);

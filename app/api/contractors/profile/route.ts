@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { contractorProfileSchema } from "@/lib/validation/schemas";
 import { auth } from "@clerk/nextjs/server";
+import { getContractorMetrics } from "@/lib/contractor-metrics";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +50,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ profile });
+    // Compute metrics from the shared utility (single source of truth)
+    const metrics = await getContractorMetrics(userId);
+
+    return NextResponse.json({
+      profile: {
+        ...profile,
+        jobsAccepted: metrics.jobsAccepted,
+        jobsCompleted: metrics.jobsCompleted,
+        conversionRate: metrics.conversionRate,
+      },
+    });
   } catch (error) {
     console.error("Error fetching contractor profile:", error);
     return NextResponse.json(

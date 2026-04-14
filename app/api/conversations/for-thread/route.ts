@@ -59,8 +59,6 @@ export async function GET(request: NextRequest) {
 
   const { lead } = thread;
 
-  console.log('[DEBUG for-thread] Lead data:', { leadId: lead.id, homeownerId: lead.homeownerId, contractorId: lead.contractorId, callerDbUserId: dbUserId });
-
   if (!lead.contractorId) {
     return NextResponse.json(
       { error: "No contractor assigned to this lead yet" },

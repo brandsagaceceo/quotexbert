@@ -284,7 +284,7 @@ export default function HomeownerJobDetailPage() {
             Edit Job
           </Link>
           <Link
-            href={`/homeowner/jobs/${job.id}/chat`}
+            href={`/messages?leadId=${job.id}`}
             className="flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-slate-700 px-5 py-3.5 rounded-2xl font-semibold hover:border-rose-400 hover:text-rose-700 transition-all"
           >
             <MessageCircle className="w-5 h-5" />
