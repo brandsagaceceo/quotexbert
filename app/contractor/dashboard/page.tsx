@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LoadingState from "@/components/ui/LoadingState";
 import { ContractorMetricsCard } from "@/components/ContractorMetricsCard";
+import { ContractorOnboardingChecklist } from "@/components/ContractorOnboardingChecklist";
+import { formatDistanceToNow } from "date-fns";
+import { calculateUrgency } from "@/lib/urgency";
 import { 
   Bell, 
   Briefcase, 
@@ -21,6 +24,12 @@ import {
   CheckCircle
 } from "lucide-react";
 
+const TRUST_MESSAGES = [
+  "✨ New jobs posted daily in your area",
+  "⚡ Be first to respond — fast replies win more jobs",
+  "🎯 No bidding wars — direct access to homeowners",
+];
+
 export default function ContractorDashboard() {
   const { authUser, isSignedIn } = useAuth();
   const router = useRouter();
@@ -29,6 +38,7 @@ export default function ContractorDashboard() {
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingQuotes, setPendingQuotes] = useState(0);
+  const [bannerIndex, setBannerIndex] = useState(0);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -43,6 +53,14 @@ export default function ContractorDashboard() {
 
     fetchDashboardData();
   }, [authUser, isSignedIn]);
+
+  // Rotate trust banner every 4 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBannerIndex((i) => (i + 1) % TRUST_MESSAGES.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -70,6 +88,19 @@ export default function ContractorDashboard() {
       ).length;
       setUnreadMessages(unreadMsgCount);
       setPendingQuotes(0);
+
+      // Auto-mark onboarding checklist items from fetched data
+      if (typeof window !== 'undefined') {
+        if (unreadMsgCount > 0) {
+          localStorage.setItem('checklist_sent_message', '1');
+        }
+        const hasAccepted = (jobsData.jobs || []).some(
+          (j: any) => j.status === 'claimed' || j.status === 'completed'
+        );
+        if (hasAccepted) {
+          localStorage.setItem('checklist_accepted_job', '1');
+        }
+      }
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -139,12 +170,19 @@ export default function ContractorDashboard() {
     <div className="min-h-screen bg-gray-50 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
             Welcome back, {contractorProfile?.companyName || authUser?.name || "Contractor"}! 👋
           </h1>
           <p className="mt-2 text-gray-600">
             Here's your performance overview and quick actions
+          </p>
+        </div>
+
+        {/* Trust / Motivation Banner */}
+        <div className="mb-6 bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100 rounded-xl px-4 py-3 text-center select-none">
+          <p className="text-sm font-medium text-rose-800">
+            {TRUST_MESSAGES[bannerIndex]}
           </p>
         </div>
 
@@ -168,6 +206,9 @@ export default function ContractorDashboard() {
             </div>
           </div>
         )}
+
+        {/* Onboarding Checklist */}
+        <ContractorOnboardingChecklist />
 
         {/* Performance Metrics */}
         {authUser?.id && (
@@ -222,23 +263,31 @@ export default function ContractorDashboard() {
               {recentJobs.map((job) => (
                 <Link
                   key={job.id}
-                  href={`/contractor/jobs`}
-                  className="block p-4 border border-gray-200 rounded-lg hover:border-rose-500 hover:bg-gray-50 transition-colors"
+                  href={`/contractor/jobs?highlight=${job.id}`}
+                  className="block p-4 border border-gray-200 rounded-lg hover:border-rose-400 hover:bg-rose-50 transition-colors"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-1">
-                        {job.description}
-                      </p>
-                      <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
-                        <span>📍 {job.city || "Location not specified"}</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        {calculateUrgency(job.createdAt) === "hot" && (
+                          <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                            NEW
+                          </span>
+                        )}
+                        <h3 className="font-semibold text-gray-900 truncate">{job.title}</h3>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 flex-wrap">
+                        <span>📍 {job.city || job.location || "Location not specified"}</span>
                         {job.budget && <span>💰 {job.budget}</span>}
+                        {job.category && <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-xs">{job.category}</span>}
                       </div>
                     </div>
-                    <span className="text-xs text-gray-400 ml-4">
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </span>
+                    <div className="text-right flex-shrink-0">
+                      <span className="text-xs text-gray-400 block">
+                        {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                      </span>
+                      <span className="text-xs text-rose-600 font-medium mt-1 block">View Job →</span>
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -248,18 +297,21 @@ export default function ContractorDashboard() {
 
         {/* Empty State */}
         {recentJobs.length === 0 && (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs yet</h3>
-            <p className="text-gray-600 mb-6">
-              Start browsing available jobs to grow your business
+          <div className="bg-white rounded-lg shadow-md p-10 text-center">
+            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="h-8 w-8 text-rose-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No jobs yet in your area</h3>
+            <p className="text-gray-500 mb-2">
+              We&apos;ll notify you as soon as new jobs are posted nearby.
             </p>
+            <p className="text-sm text-gray-400 mb-6">New homeowner projects are added daily.</p>
             <Link
               href="/contractor/jobs"
-              className="inline-flex items-center px-6 py-3 bg-rose-700 text-white rounded-lg hover:bg-rose-800 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-rose-700 text-white rounded-lg hover:bg-rose-800 transition-colors font-semibold"
             >
               <Briefcase className="mr-2 h-5 w-5" />
-              Browse Jobs
+              Browse All Jobs
             </Link>
           </div>
         )}

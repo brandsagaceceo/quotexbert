@@ -43,6 +43,14 @@ export default function Home() {
     setHasUsedFree(localStorage.getItem('estimateUsed') === '1');
   }, []);
 
+  // When user signs in, clear the guest gate so returning users aren't blocked
+  useEffect(() => {
+    if (isSignedIn) {
+      localStorage.removeItem('estimateUsed');
+      setHasUsedFree(false);
+    }
+  }, [isSignedIn]);
+
   // Block the estimator for unauthenticated visitors who have already used their 1 free estimate
   const isEstimatorBlocked = !isSignedIn && hasUsedFree;
 

@@ -269,41 +269,87 @@ export async function sendWelcomeEmail(user: { id: string; email: string; name?:
 }
 
 // New Job Email (for matching contractors)
+/** Format urgency label + emoji for email based on job creation time */
+function getJobUrgencyForEmail(createdAt?: string): { emoji: string; label: string } {
+  if (!createdAt) return { emoji: '📋', label: 'Just posted' };
+  const minutesAgo = (Date.now() - new Date(createdAt).getTime()) / 60000;
+  if (minutesAgo < 30) {
+    const m = Math.max(1, Math.round(minutesAgo));
+    return { emoji: '🔥', label: `Posted ${m} minute${m !== 1 ? 's' : ''} ago — ACT FAST` };
+  }
+  if (minutesAgo < 360) {
+    const h = Math.round(minutesAgo / 60);
+    return { emoji: '🟡', label: `Posted ${h} hour${h !== 1 ? 's' : ''} ago` };
+  }
+  const h = Math.round(minutesAgo / 60);
+  return { emoji: '⚪', label: `Posted ${h} hours ago` };
+}
+
 export async function sendNewJobEmail(
   contractor: { id: string; email: string; name?: string | null },
-  job: { id: string; title: string; category: string; description: string; budget?: string | null }
+  job: {
+    id: string;
+    title: string;
+    category: string;
+    description: string;
+    budget?: string | null;
+    city?: string | null;
+    location?: string | null;
+    createdAt?: string | null;
+  }
 ) {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping job notification');
     return { success: false, error: 'Email service not configured' };
   }
 
-  // Check if user has notifications enabled
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: contractor.id },
-      select: { email: true } // Add notificationsEnabled field to schema if needed
-    });
+  // Rate limit: max 5 new_job emails per contractor per hour
+  const canSend = await checkEmailRateLimit(contractor.id, 'new_job');
+  if (!canSend) {
+    await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'failed', 'Rate limit exceeded (max 5/hr)');
+    console.warn(`[EMAIL] Rate limit hit for contractor ${contractor.id} — skipping job notification`);
+    return { success: false, error: 'Rate limit exceeded' };
+  }
 
-    if (!user) {
-      return { success: false, error: 'User not found' };
-    }
+  const urgency = getJobUrgencyForEmail(job.createdAt ?? undefined);
+  const displayLocation = job.city || job.location || null;
+  // Deep link highlights the specific job card when the contractor opens the page
+  const jobDeepLink = `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(job.id)}`;
+
+  try {
+    const cardRows: string[] = [
+      `<strong>Category:</strong> ${escHtml(job.category)}`,
+      displayLocation ? `<strong>Location:</strong> ${escHtml(displayLocation)}` : '',
+      job.budget ? `<strong>Budget:</strong> ${escHtml(job.budget)}` : '',
+      `<strong>Urgency:</strong> ${urgency.emoji} ${escHtml(urgency.label)}`,
+    ].filter(Boolean);
 
     await resend.emails.send({
-      from: fromEmail,      replyTo: REPLY_TO,      to: contractor.email,
-      subject: `New ${escHtml(job.category)} Job Available! ðŸ””`,
-      html: buildEmail(`New ${escHtml(job.category)} Job Match â€” QuoteXbert`, [
-        { type: 'tag', content: job.category },
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`,
+      html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
+        { type: 'tag', content: `${urgency.emoji} ${urgency.label}` },
         { type: 'heading', content: job.title },
-        { type: 'text', content: job.description.substring(0, 160) + (job.description.length > 160 ? 'â€¦' : '') },
-        { type: 'card', rawHtml: true, content: `<strong>Category:</strong> ${escHtml(job.category)}${job.budget ? `<br><strong>Budget:</strong> ${escHtml(job.budget)}` : ''}`, label: 'Job Details' },
-        { type: 'cta', content: 'View Job', href: `${baseUrl}/contractor/jobs` },
-        { type: 'text', content: `<span style="font-size:12px;color:#94a3b8;">You're receiving this because you're subscribed to ${escHtml(job.category)} jobs.</span>`, rawHtml: true },
-      ])
+        { type: 'text', content: job.description.substring(0, 180) + (job.description.length > 180 ? '...' : '') },
+        {
+          type: 'card',
+          rawHtml: true,
+          content: cardRows.join('<br>'),
+          label: 'Job Details',
+        },
+        { type: 'cta', content: '👉 View Job Now', href: jobDeepLink },
+        {
+          type: 'text',
+          content: `<span style="font-size:12px;color:#94a3b8;">You're receiving this because you're subscribed to ${escHtml(job.category)} jobs on QuoteXbert. <a href="${BASE_URL}/contractor/settings" style="color:#9f1239;">Manage alerts</a></span>`,
+          rawHtml: true,
+        },
+      ]),
     });
 
     await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'sent');
-    console.log(`[EMAIL] Job notification sent to ${contractor.email}`);
+    console.log(`[EMAIL] Job notification sent to ${contractor.email} for lead ${job.id}`);
     return { success: true };
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
@@ -312,7 +358,6 @@ export async function sendNewJobEmail(
     return { success: false, error };
   }
 }
-
 // New Message Email
 export async function sendNewMessageEmail(
   recipient: { id: string; email: string; name?: string | null },

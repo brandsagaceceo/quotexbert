@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { GTA_CITIES, RENOVATION_TYPES } from '@/lib/seo/gta-cities'
 import { TORONTO_NEIGHBOURHOODS, TORONTO_SERVICES } from '@/lib/seo/toronto-pinpoint'
+import { ALL_CONTRACTOR_CITY_SLUGS } from '@/lib/seo/contractor-city-data'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
@@ -322,5 +323,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
                 : 0.75,
       }))
     ),
+    // ─── Contractor city + trade + intent pages (15 new pages) ──────────────────
+    // City contractor lead pages (Mississauga, Brampton, Vaughan, Markham)
+    // City+trade combos (plumber/electrician/roofing/handyman/GC × city)
+    // "How to get jobs" intent pages for contractor acquisition SEO
+    ...ALL_CONTRACTOR_CITY_SLUGS.map(slug => ({
+      url: `${baseUrl}/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: slug.startsWith('how-to') ? 0.82 : 0.80,
+    })),
   ]
 }

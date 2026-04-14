@@ -22,6 +22,7 @@ export default function AIAssistantPopup() {
   const [showTerms, setShowTerms] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showHelperBubble, setShowHelperBubble] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
@@ -159,6 +160,14 @@ export default function AIAssistantPopup() {
     };
   }, [shouldHideForPath, isOpen]);
 
+  // Show a one-time helper bubble for contractors to aid discoverability
+  useEffect(() => {
+    if (userType !== 'contractor') return;
+    if (typeof window !== 'undefined' && localStorage.getItem('aiHelperBubbleDismissed')) return;
+    const timer = setTimeout(() => setShowHelperBubble(true), 3000);
+    return () => clearTimeout(timer);
+  }, [userType]);
+
   const initializeChat = () => {
     const welcomeMessage: Message = {
       role: 'assistant',
@@ -285,6 +294,38 @@ export default function AIAssistantPopup() {
 
   return (
     <>
+      {/* Small dismissible helper bubble for discoverability */}
+      {showHelperBubble && !isHidden && !isOpen && !mobileMenuOpen && (
+        <div
+          className="fixed z-40 flex items-center gap-2 bg-white border border-rose-200 shadow-lg rounded-xl px-3 py-2"
+          style={{
+            bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 4rem)',
+            right: '1rem',
+            maxWidth: '190px',
+          }}
+        >
+          <span className="text-xs text-gray-700 leading-snug">✨ AI can help draft replies
+          </span>
+          <button
+            onClick={() => {
+              setShowHelperBubble(false);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('aiHelperBubbleDismissed', '1');
+              }
+            }}
+            className="text-gray-300 hover:text-gray-500 flex-shrink-0"
+            aria-label="Dismiss helper bubble"
+          >
+            <X className="w-3 h-3" />
+          </button>
+          {/* Arrow pointing down toward the button */}
+          <span
+            className="absolute -bottom-1.5 right-5 w-3 h-3 bg-white border-r border-b border-rose-200 rotate-45"
+            aria-hidden="true"
+          />
+        </div>
+      )}
+
       {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
       {!isOpen && !mobileMenuOpen && (
         <button

@@ -34,6 +34,16 @@ export async function POST(req: NextRequest) {
     postalCode = body.postalCode;
     userId = body.userId;
 
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[ESTIMATE][request]', {
+        userId: userId || 'anonymous',
+        projectType,
+        photoCount: photos?.length ?? 0,
+        hasDescription: !!description?.trim(),
+        postalCode: postalCode || 'not_provided',
+      });
+    }
+
     // Validation
     if (!projectType) {
       return NextResponse.json(
@@ -101,13 +111,28 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("Error generating estimate:", error);
     
-    // Check for rate limit / quota errors
+    // Dev logging for diagnosing estimate failures
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[ESTIMATE][error]', {
+        userId,
+        projectType,
+        photoCount: photos?.length ?? 0,
+        error: error?.message,
+        code: error?.code,
+        status: error?.status,
+      });
+    }
+
+    // Check for rate limit / quota errors (OpenAI returns these in several different shapes)
     const errorMessage = error?.message || error?.toString() || '';
-    const isQuotaError = 
-      errorMessage.includes('quota') || 
+    const isQuotaError =
+      errorMessage.includes('quota') ||
       errorMessage.includes('rate limit') ||
+      errorMessage.includes('exceeded') ||
+      errorMessage.includes('billing') ||
       errorMessage.includes('429') ||
-      error?.status === 429;
+      error?.status === 429 ||
+      error?.code === 'insufficient_quota';
     
     if (isQuotaError) {
       return NextResponse.json(
@@ -177,6 +202,13 @@ async function generateAIEstimateMultimodal(params: {
   // Build the prompt for detailed contractor-style estimate
   const systemPrompt = `You are an expert contractor and cost estimator specializing in the Greater Toronto Area (GTA) and Southern Ontario. You provide detailed, contractor-style estimates with line items, accurate CAD pricing based on current 2026 Toronto/GTA market rates, and realistic timelines.
 
+ACCURACY RULES — FOLLOW STRICTLY:
+- Read EVERY photo carefully. Identify materials, finishes, dimensions, condition, and scope from what is visible.
+- Do NOT invent scope items that are not evident from the photos or description.
+- If the description contradicts the photos, trust the photos for physical/size details.
+- Your line_item quantities must be derived from what is actually visible or described (e.g. count tiles, measure visible wall areas, note existing fixtures).
+- If information is insufficient to price accurately, set confidence below 0.6 and ask specific questions.
+
 IMPORTANT PRICING CONTEXT:
 - All prices must be in CAD (Canadian Dollars)
 - Use current 2026 GTA/Toronto labor rates: $65-95/hour for skilled trades
@@ -234,15 +266,18 @@ ESTIMATION GUIDELINES:
   const contentParts: Array<{ type: string; text?: string; image_url?: { url: string } }> = [];
 
   // Add description if provided
+  const photoNote = photos.length > 0
+    ? `\n${photos.length} photo${photos.length !== 1 ? 's' : ''} provided — analyze each carefully for materials, condition, scope, and dimensions.`
+    : '';
   if (description && description.trim()) {
     contentParts.push({
       type: "text",
-      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Project Description: ${description}`,
+      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Project Description: ${description}${photoNote}`,
     });
   } else {
     contentParts.push({
       type: "text",
-      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Please analyze the provided photos and provide a detailed estimate.`,
+      text: `Project Type: ${projectType}\n${postalCode ? `Location: ${postalCode} (GTA/Ontario)\n` : ''}Please analyze the provided photos and provide a detailed estimate.${photoNote}`,
     });
   }
 
@@ -279,7 +314,7 @@ ESTIMATION GUIDELINES:
             content: contentParts as any,
           },
         ],
-        temperature: 0.7,
+        temperature: 0.4, // lower temperature → more consistent, realistic estimates
         max_tokens: 2500,
         response_format: { type: "json_object" },
       });

@@ -67,6 +67,11 @@ function ContractorJobsContent() {
     fetchJobs();
     fetchSubscriptions();
     fetchEmailNudge();
+
+    // Mark onboarding checklist: contractor has viewed the jobs page
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('checklist_viewed_jobs', '1');
+    }
     
     // Check if this is a new contractor (show popup once)
     const hasSeenOnboarding = localStorage.getItem('contractor_seen_onboarding');
@@ -326,6 +331,11 @@ function ContractorJobsContent() {
           title: '✅ Job Accepted Successfully!',
           duration: 4000
         });
+
+        // Mark onboarding checklist: accepted first job
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('checklist_accepted_job', '1');
+        }
         
         // Redirect to messages page with specific thread
         const redirectUrl = result.redirectUrl || '/messages';
@@ -857,14 +867,14 @@ function ContractorJobsContent() {
 
                 <div className="flex justify-between items-center mt-3 flex-wrap gap-2">
                   <span className="text-xs text-gray-500">
-                    Posted {new Date(job.createdAt).toLocaleDateString()}
+                    Posted {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
                   </span>
                   <div className="flex gap-2 flex-wrap">
                     <button 
                       onClick={() => toggleJobDetails(job.id)}
                       className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                     >
-                      {expandedJob === job.id ? 'Hide Details' : 'View Details'}
+                      {expandedJob === job.id ? 'Hide Details' : 'View Job'}
                     </button>
                     {job.status === 'open' && (() => {
                       // Access already computed per card above as _hasAccess
@@ -893,6 +903,15 @@ function ContractorJobsContent() {
                         </div>
                       );
                     })()}
+                    {/* Message Homeowner CTA for claimed jobs */}
+                    {job.status === 'claimed' && job.claimedBy === user?.id && (
+                      <Link
+                        href="/messages"
+                        className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                      >
+                        Message Homeowner
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -905,7 +924,7 @@ function ContractorJobsContent() {
       {/* Acceptance Modal */}
       {acceptanceModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center p-4 py-8">
+          <div className="min-h-full flex items-center justify-center p-4 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
             <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
               Accept Job: {acceptanceModal.title}

@@ -364,7 +364,6 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sendPayload),
       });
-      isSendingRef.current = false;
       if (response.ok) {
         const sendResult = await response.json();
         if (process.env.NODE_ENV === 'development') {
@@ -374,9 +373,13 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
             storedTo: sendResult.message?.toUser?.id,
           });
         }
-        // Replace optimistic with confirmed server data
+        // Replace optimistic with confirmed server data.
+        // Keep isSendingRef = true until fetchMessages completes to prevent
+        // the polling interval from racing and causing a duplicate flash.
         await fetchMessages();
+        isSendingRef.current = false;
       } else {
+        isSendingRef.current = false;
         const errData = await response.json().catch(() => ({}));
         if (process.env.NODE_ENV === 'development') {
           console.debug('[Chat][send-fail]', { status: response.status, error: errData });

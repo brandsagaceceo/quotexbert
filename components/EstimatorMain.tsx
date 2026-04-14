@@ -207,12 +207,16 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       return;
     }
 
+    // Determine real (non-example) photos for count display
+    const realPhotosForCount = photos.filter(p => !p.isExample);
     setIsLoading(true);
-    setLoadingStage("Analyzing photos...");
+    setLoadingStage(realPhotosForCount.length > 0
+      ? `Analyzing your ${realPhotosForCount.length} photo${realPhotosForCount.length !== 1 ? 's' : ''}...`
+      : "Analyzing project details...");
 
     try {
       // Filter out example photos and convert real photos to base64
-      const realPhotos = photos.filter(p => !p.isExample);
+      const realPhotos = realPhotosForCount;
       const photoPromises = realPhotos.map(photo => {
         return new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
@@ -266,7 +270,13 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
         });
       }, 300);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate estimate");
+      const rawMsg = err instanceof Error ? err.message : String(err);
+      // Map quota/rate-limit/API errors to a user-friendly message
+      const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
+      setError(isQuotaOrBillingErr
+        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
+        : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
+      );
     } finally {
       setIsLoading(false);
       setLoadingStage("");

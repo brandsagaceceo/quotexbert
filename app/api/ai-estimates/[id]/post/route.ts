@@ -157,6 +157,7 @@ export async function POST(
         budget: lead.budget,
         // Only include city when we have a concrete string value
         ...(city ? { city } : {}),
+        createdAt: lead.createdAt.toISOString(),
       });
     } catch (notificationError) {
       console.error('Failed to notify contractors, but job was posted:', notificationError);

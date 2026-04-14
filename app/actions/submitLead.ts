@@ -490,6 +490,7 @@ export async function submitLead(formData: FormData) {
         budget: finalBudget,
         city: data.postalCode,
         category: data.projectType,
+        createdAt: lead.createdAt.toISOString(),
       });
       console.log(`[submitLead:${requestId}] Contractor notifications sent`);
     } catch (notificationError) {

@@ -161,7 +161,7 @@ export default function NotificationBell() {
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: string, payload?: any) => {
     switch (type) {
       case "JOB_CLAIMED":
         return "🎉";
@@ -171,8 +171,16 @@ export default function NotificationBell() {
         return "💰";
       case "PAYMENT_FAILED":
         return "❌";
-      case "LEAD_MATCHED":
+      case "LEAD_MATCHED": {
+        // Show urgency emoji based on when the job was created
+        const createdAt = payload?.createdAt;
+        if (createdAt) {
+          const minsAgo = (Date.now() - new Date(createdAt).getTime()) / 60000;
+          if (minsAgo < 30) return "🔥"; // hot
+          if (minsAgo < 360) return "🟡"; // active
+        }
         return "🔧";
+      }
       case "WELCOME":
         return "👋";
       default:
@@ -211,8 +219,16 @@ export default function NotificationBell() {
         return "Your payment has been processed successfully.";
       case "PAYMENT_FAILED":
         return "There was an issue processing your payment.";
-      case "LEAD_MATCHED":
-        return `New lead in ${payload?.location || "your area"}.`;
+      case "LEAD_MATCHED": {
+        const parts: string[] = [];
+        if (payload?.city && payload.city !== 'Not specified') parts.push(payload.city);
+        if (payload?.budget) parts.push(payload.budget);
+        if (payload?.createdAt) {
+          const minsAgo = Math.round((Date.now() - new Date(payload.createdAt).getTime()) / 60000);
+          if (minsAgo < 60) parts.push(`${minsAgo}m ago`);
+        }
+        return parts.length > 0 ? parts.join(' · ') : `New lead in ${payload?.city || 'your area'}.`;
+      }
       case "WELCOME":
         return "Thanks for joining! Complete your profile to get started.";
       default:
@@ -223,13 +239,20 @@ export default function NotificationBell() {
   const getNotificationActionUrl = (notification: Notification) => {
     const payload = notification.payload || {};
 
+    // LEAD_MATCHED always routes to the job board with a highlight, regardless of other payload keys
+    if (notification.type === 'LEAD_MATCHED') {
+      const highlightId = payload.leadId || payload.jobId;
+      return highlightId
+        ? `/contractor/jobs?highlight=${highlightId}`
+        : '/contractor/jobs';
+    }
+
     if (payload.threadId) return `/messages?threadId=${payload.threadId}`;
     if (payload.conversationId) return `/messages?conversationId=${payload.conversationId}`;
     if (payload.leadId) return `/messages?leadId=${payload.leadId}`;
 
     if (payload.jobId) {
-      const isLead = notification.type === 'LEAD_MATCHED';
-      return isLead ? `/contractor/jobs?highlight=${payload.jobId}` : `/messages`;
+      return `/messages`;
     }
 
     if (notification.relatedType === "conversation" && notification.relatedId) {
@@ -420,7 +443,7 @@ export default function NotificationBell() {
                         onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="flex items-start space-x-3">
-                          <div className="text-2xl flex-shrink-0">{getNotificationIcon(notification.type)}</div>
+                          <div className="text-2xl flex-shrink-0">{getNotificationIcon(notification.type, notification.payload)}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
                               <p className={`text-sm font-medium ${!notification.read ? "text-gray-900" : "text-gray-600"}`}>

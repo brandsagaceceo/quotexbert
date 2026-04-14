@@ -143,6 +143,8 @@ export class NotificationService {
     budget: string;
     city?: string;
     category?: string;
+    /** ISO timestamp — used for urgency labelling in email */
+    createdAt?: string;
   }): Promise<void> {
     try {
       // Fetch all active contractors with their subscriptions for category filtering
@@ -152,7 +154,7 @@ export class NotificationService {
       });
 
       // Filter to only contractors who match the job's category (or god users who bypass)
-      const matchingContractors = jobDetails.category
+      const categoryMatched = jobDetails.category
         ? allContractors.filter((contractor) => {
             if (isGodUser(contractor.email)) return true;
             return contractor.subscriptions.some(
@@ -160,6 +162,16 @@ export class NotificationService {
             );
           })
         : allContractors; // No category → notify all (legacy fallback)
+
+      // Soft location filter: if a contractor has a city set, only notify them when the
+      // job city overlaps (case-insensitive). Contractors without a city set always qualify.
+      const jobCity = (jobDetails.city || '').toLowerCase().trim();
+      const matchingContractors = categoryMatched.filter((contractor) => {
+        const contractorCity = (contractor.contractorProfile?.city || '').toLowerCase().trim();
+        if (!contractorCity || !jobCity) return true; // no city data — notify
+        // Partial match in either direction covers "Toronto" vs "North York, Toronto"
+        return contractorCity.includes(jobCity) || jobCity.includes(contractorCity);
+      });
 
       console.log(
         `[LEADS] New lead "${jobDetails.title}" (category=${jobDetails.category || 'unknown'}): ` +
@@ -185,6 +197,7 @@ export class NotificationService {
             budget: jobDetails.budget,
             city: jobDetails.city || 'Not specified',
             category: jobDetails.category || 'Home Improvement',
+            createdAt: jobDetails.createdAt || new Date().toISOString(),
           },
           sendEmail: true,
           sendSms: false,
@@ -256,6 +269,8 @@ export class NotificationService {
             category: payload.category || 'Home Improvement',
             description: typeof payload.description === 'string' ? payload.description : 'A new job matching your services is available.',
             budget: typeof payload.budget === 'string' ? payload.budget : null,
+            city: typeof payload.city === 'string' && payload.city !== 'Not specified' ? payload.city : null,
+            createdAt: typeof payload.createdAt === 'string' ? payload.createdAt : null,
           }
         );
         console.log(`EMAIL SENT TO: ${user.email} | type=LEAD_MATCHED | lead=${payload.leadId}`);

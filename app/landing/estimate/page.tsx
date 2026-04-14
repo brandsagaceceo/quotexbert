@@ -83,6 +83,14 @@ export default function LandingEstimatePage() {
     setHasUsedFree(localStorage.getItem("estimateUsed") === "1");
   }, []);
 
+  // When user signs in, clear the guest gate so returning users aren't blocked
+  useEffect(() => {
+    if (isSignedIn) {
+      localStorage.removeItem('estimateUsed');
+      setHasUsedFree(false);
+    }
+  }, [isSignedIn]);
+
   const isBlocked = !isSignedIn && hasUsedFree;
 
   const handleEstimateComplete = (result: any) => {
