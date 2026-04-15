@@ -114,40 +114,43 @@ export default function QuoteBottomSheet({
         .qxb-sheet-enter { will-change: transform; }
       `}</style>
 
-      {/* Backdrop */}
+      {/* Backdrop — above bottom nav (z-50) */}
       <div
-        className="qxb-backdrop-enter fixed inset-0 z-40 bg-black/40"
+        className="qxb-backdrop-enter fixed inset-0 z-[60] bg-black/40"
         style={{ backdropFilter: 'blur(2px)' }}
         aria-hidden="true"
         onClick={onClose}
       />
 
-      {/* Sheet */}
+      {/* Sheet — above backdrop */}
       <div
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-label="Quote details"
-        className="qxb-sheet-enter fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-2xl flex flex-col"
+        className="qxb-sheet-enter fixed inset-x-0 bottom-0 z-[70] bg-white rounded-t-3xl shadow-2xl flex flex-col"
         style={{
-          maxHeight: '88vh',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          touchAction: 'none',
+          maxHeight: '85dvh',
           transition: 'transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1)',
         }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
-        {/* Drag handle — tappable hit area */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="flex-shrink-0 flex justify-center pt-3 pb-2 w-full"
+        {/* Drag handle — touch-action: none only here so content can scroll */}
+        <div
+          className="flex-shrink-0"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{ touchAction: 'none' }}
         >
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
-        </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex justify-center pt-3 pb-2 w-full"
+          >
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </button>
+        </div>
 
         {/* Sheet header */}
         <div className="flex-shrink-0 flex items-center justify-between px-5 py-2.5 border-b border-gray-100">
@@ -166,12 +169,13 @@ export default function QuoteBottomSheet({
           </button>
         </div>
 
-        {/* Scrollable content — internal scroll, never pushes layout */}
+        {/* Scrollable content — primary scroll area, safe-area padding inside */}
         <div
-          className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
-          style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-4"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+          } as React.CSSProperties}
         >
           <QuoteMessageCard
             payload={payload}
@@ -186,8 +190,6 @@ export default function QuoteBottomSheet({
               onRevise?.(quoteId);
             }}
           />
-          {/* Bottom breathing room */}
-          <div className="h-6" />
         </div>
       </div>
     </>

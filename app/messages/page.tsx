@@ -502,9 +502,9 @@ export default function MessagesPage() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden min-h-0">
-        {/* Modern Header */}
-        <div className="mb-3 sm:mb-6 flex-shrink-0">
+      <div className="max-w-7xl mx-auto p-2 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden min-h-0">
+        {/* Modern Header — hidden on mobile when viewing a thread */}
+        <div className={`mb-2 sm:mb-6 flex-shrink-0 ${selectedThread ? 'hidden lg:block' : ''}`}>
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent">
@@ -519,7 +519,7 @@ export default function MessagesPage() {
           </div>
         </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1 min-h-0 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
           <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
             <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
@@ -739,19 +739,10 @@ export default function MessagesPage() {
           <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 overflow-hidden ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
               <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full min-h-0">
-                <div className="lg:hidden px-4 py-3">
-                  <button
-                    onClick={() => setSelectedThread(null)}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700"
-                  >
-                    <ArrowLeftIcon className="h-4 w-4" />
-                    Back to conversations
-                  </button>
-                </div>
 
                 {/* Phase 2: Generate Quote — contractor only, requires contractor assigned to lead */}
                 {user?.role === 'contractor' && selectedThread?.lead?.contractor?.id && (
-                  <div className="flex-shrink-0 px-4 py-2 border-b border-gray-100 bg-slate-50 flex items-center justify-between gap-3">
+                  <div className="flex-shrink-0 px-3 py-1.5 border-b border-gray-100 bg-slate-50 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <DocumentTextIcon className="w-4 h-4 text-slate-400" />
                       <span className="text-xs text-slate-500 font-medium">Quotes</span>
@@ -781,7 +772,7 @@ export default function MessagesPage() {
 
                 {/* Phase A: Empty quote state — bridge resolved, no quotes yet */}
                 {bridgeConversationId && !bridgeLoading && !isFetchingQuotes && latestQuotes.length === 0 && selectedThread?.lead?.contractor?.id && (
-                  <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-4 py-2">
+                  <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50 px-3 py-1.5">
                     <p className="text-xs text-slate-400 text-center">
                       {user?.role === 'contractor'
                         ? 'No quotes yet. Generate one to get started.'
@@ -807,7 +798,7 @@ export default function MessagesPage() {
                       onClick={() => setShowQuoteSheet(true)}
                       className="flex-shrink-0 w-full border-b border-rose-100 bg-gradient-to-r from-rose-50/70 to-orange-50/40 hover:from-rose-100/80 hover:to-orange-100/60 active:scale-[0.99] transition-all duration-150 text-left"
                     >
-                      <div className="flex items-center gap-3 px-4 py-2.5">
+                      <div className="flex items-center gap-3 px-3 py-2">
                         {/* Icon pill */}
                         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-sm">
                           <DocumentTextIcon className="w-4 h-4 text-white" />
@@ -833,6 +824,7 @@ export default function MessagesPage() {
                   <Chat
                     thread={selectedThread}
                     currentUserId={selfUserId}
+                    onBack={() => setSelectedThread(null)}
                     onDeleteThread={(threadId) => {
                       setThreads(prev => prev.filter(t => t.id !== threadId));
                       setSelectedThread(null);

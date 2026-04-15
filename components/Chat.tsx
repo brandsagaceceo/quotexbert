@@ -37,6 +37,8 @@ interface ChatProps {
   thread: Thread;
   currentUserId?: string;
   onDeleteThread?: (threadId: string) => void;
+  /** Called when mobile back arrow is tapped */
+  onBack?: () => void;
   // Phase 1 port: AI Reply Assistant
   userRole?: string;
   jobTitle?: string;
@@ -84,7 +86,7 @@ function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; s
   );
 }
 
-export default function Chat({ thread, currentUserId, onDeleteThread, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly }: ChatProps) {
+export default function Chat({ thread, currentUserId, onDeleteThread, onBack, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -502,9 +504,20 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
 
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden">
-      {/* Header */}
-      <div className="flex-shrink-0 px-5 py-3.5 border-b border-gray-100 bg-white flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* Header — compact on mobile */}
+      <div className="flex-shrink-0 px-3 sm:px-5 py-2 sm:py-3.5 border-b border-gray-100 bg-white flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition-colors flex-shrink-0"
+              aria-label="Back to conversations"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
           {isHomeowner && otherUser?.contractorProfile ? (
             <Link href={`/contractors/profile/${otherUser.id}`} className="flex items-center gap-3 min-w-0 group">
               <Avatar user={otherUser} size="md" />
@@ -657,8 +670,8 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
 
       {/* Input */}
       <div
-        className="flex-shrink-0 px-3 py-2.5 border-t border-gray-100 bg-white"
-        style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))' }}
+        className="flex-shrink-0 px-2 sm:px-3 py-1.5 sm:py-2.5 border-t border-gray-100 bg-white"
+        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom, 6px))' }}
       >
         {/* Auto-draft CTA — contractor only, shown when price detected in conversation */}
         {autoDraftState?.shouldSuggestDraft && !autoDraftDismissed && !instantSendSuccess && (onAutoDraftReview || onSendInstantly) && (
