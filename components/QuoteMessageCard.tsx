@@ -81,12 +81,28 @@ export default function QuoteMessageCard({
     setAnalysisError(null);
     try {
       const res = await fetch(`/api/quotes/${payload.quoteId}/analyze`, { method: 'POST' });
-      if (!res.ok) throw new Error('Analysis failed');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[QuoteMessageCard] AI analysis HTTP error:', res.status, errData);
+        }
+        if (res.status === 401) {
+          setAnalysisError('Please sign in to analyze this quote.');
+        } else if (res.status === 403) {
+          setAnalysisError('Quote analysis is only available to the homeowner.');
+        } else {
+          setAnalysisError('We couldn\'t analyze this quote right now. Please try again.');
+        }
+        return;
+      }
       const data: QuoteAnalysisResult = await res.json();
       setAnalysis(data);
       setShowAnalysis(true);
-    } catch {
-      setAnalysisError('Unable to analyze this quote right now. Try again later.');
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[QuoteMessageCard] AI analysis network error:', err);
+      }
+      setAnalysisError('Something went wrong. Please check your connection and try again.');
     } finally {
       setAnalyzing(false);
     }
@@ -294,92 +310,107 @@ export default function QuoteMessageCard({
         {/* AI Analysis — homeowner only, non-superseded */}
         {viewerRole === 'homeowner' && !isSuperseded && (
           <div className="pt-1">
-            {!showAnalysis ? (
-              <>
-                <button
-                  onClick={handleAskAI}
-                  disabled={analyzing}
-                  className="w-full flex items-center justify-center gap-1.5 border border-violet-300 text-violet-700 bg-violet-50 px-3 py-2 rounded-xl text-sm font-semibold hover:bg-violet-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {analyzing ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-violet-600" />
-                  ) : (
-                    <SparklesIcon className="w-4 h-4" />
-                  )}
-                  {analyzing ? 'Analyzing…' : 'Ask AI About This Quote'}
-                </button>
-                {analysisError && (
-                  <p className="text-xs text-red-500 text-center mt-1">{analysisError}</p>
-                )}
-              </>
-            ) : analysis ? (
-              <div
-                className={`rounded-xl border p-3 space-y-2 ${
-                  analysis.verdict === 'fair'
-                    ? 'border-green-200 bg-green-50'
-                    : analysis.verdict === 'high'
-                    ? 'border-red-200 bg-red-50'
-                    : analysis.verdict === 'low'
-                    ? 'border-amber-200 bg-amber-50'
-                    : 'border-gray-200 bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <SparklesIcon className="w-4 h-4 text-violet-500" />
-                    <span className="text-xs font-semibold text-gray-700">AI Analysis</span>
-                  </div>
-                  <span
-                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                      analysis.verdict === 'fair'
-                        ? 'bg-green-200 text-green-800'
-                        : analysis.verdict === 'high'
-                        ? 'bg-red-200 text-red-800'
-                        : analysis.verdict === 'low'
-                        ? 'bg-amber-200 text-amber-800'
-                        : 'bg-gray-200 text-gray-700'
-                    }`}
-                  >
-                    {analysis.verdict === 'fair'
-                      ? 'Fair Price'
-                      : analysis.verdict === 'high'
-                      ? 'Priced High'
-                      : analysis.verdict === 'low'
-                      ? 'Priced Low'
-                      : 'Unknown'}
-                  </span>
+            {/* Loading state */}
+            {analyzing && (
+              <div className="flex items-center gap-2.5 rounded-xl bg-violet-50 border border-violet-200 px-3 py-2.5">
+                <div className="flex gap-0.5 flex-shrink-0">
+                  {[0, 120, 240].map((d) => (
+                    <div
+                      key={d}
+                      className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"
+                      style={{ animationDelay: `${d}ms` }}
+                    />
+                  ))}
                 </div>
-
-                {(analysis.fairRangeLow > 0 || analysis.fairRangeHigh > 0) && (
-                  <p className="text-xs text-gray-600">
-                    Fair range:{' '}
-                    <span className="font-semibold">
-                      ${analysis.fairRangeLow.toLocaleString()} – ${analysis.fairRangeHigh.toLocaleString()}
-                    </span>
-                  </p>
-                )}
-
-                <p className="text-xs text-gray-700 leading-relaxed">{analysis.explanation}</p>
-
-                {analysis.suggestions.length > 0 && (
-                  <ul className="space-y-1">
-                    {analysis.suggestions.map((s, i) => (
-                      <li key={i} className="text-xs text-gray-600 flex gap-1.5">
-                        <span className="text-violet-400 flex-shrink-0">•</span>
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                <button
-                  onClick={() => setShowAnalysis(false)}
-                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  Hide analysis
-                </button>
+                <span className="text-xs font-semibold text-violet-700">Analyzing quote…</span>
               </div>
-            ) : null}
+            )}
+
+            {/* Error state */}
+            {!analyzing && analysisError && (
+              <div className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 px-3 py-2.5">
+                <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-9v4h2V9H9zm0-4v2h2V5H9z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-red-700 font-medium leading-snug">{analysisError}</p>
+                  <button
+                    onClick={() => { setAnalysisError(null); setShowAnalysis(false); }}
+                    className="text-[10px] text-red-500 hover:text-red-700 font-semibold mt-0.5 transition-colors"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Trigger button — hidden while loading/showing result */}
+            {!analyzing && !showAnalysis && !analysisError && (
+              <button
+                onClick={handleAskAI}
+                className="w-full flex items-center justify-center gap-1.5 border border-violet-200 text-violet-700 bg-violet-50 active:bg-violet-100 hover:bg-violet-100 active:scale-[0.98] px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150"
+              >
+                <SparklesIcon className="w-4 h-4" />
+                Ask AI About This Quote
+              </button>
+            )}
+
+            {/* Result card */}
+            {!analyzing && showAnalysis && analysis && (() => {
+              const verdictConfig = {
+                fair: { border: 'border-green-200', bg: 'bg-green-50', chip: 'bg-green-200 text-green-800', icon: '✓', label: 'Fair Price' },
+                high: { border: 'border-red-200',   bg: 'bg-red-50',   chip: 'bg-red-200 text-red-800',   icon: '↑', label: 'Priced High' },
+                low:  { border: 'border-amber-200', bg: 'bg-amber-50', chip: 'bg-amber-200 text-amber-800', icon: '↓', label: 'Priced Low' },
+                unknown: { border: 'border-gray-200', bg: 'bg-gray-50', chip: 'bg-gray-200 text-gray-700', icon: '?', label: 'Unknown' },
+              } as const;
+              const cfg = verdictConfig[analysis.verdict] ?? verdictConfig.unknown;
+              return (
+                <div className={`rounded-xl border ${cfg.border} ${cfg.bg} p-3 space-y-2`}>
+                  {/* Header row */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <SparklesIcon className="w-3.5 h-3.5 text-violet-500" />
+                      <span className="text-xs font-bold text-gray-800">AI Price Analysis</span>
+                    </div>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${cfg.chip}`}>
+                      {cfg.icon} {cfg.label}
+                    </span>
+                  </div>
+
+                  {/* Fair range — prominent */}
+                  {(analysis.fairRangeLow > 0 || analysis.fairRangeHigh > 0) && (
+                    <div className="flex items-center justify-between bg-white/70 rounded-lg px-2.5 py-1.5">
+                      <span className="text-[11px] text-gray-500 font-medium">Fair market range</span>
+                      <span className="text-xs font-bold text-gray-900">
+                        ${analysis.fairRangeLow.toLocaleString()} – ${analysis.fairRangeHigh.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Short explanation — clamp to 3 lines to stay skimmable */}
+                  <p className="text-xs text-gray-700 leading-relaxed line-clamp-3">{analysis.explanation}</p>
+
+                  {/* Tips */}
+                  {analysis.suggestions.length > 0 && (
+                    <ul className="space-y-1">
+                      {analysis.suggestions.map((s, i) => (
+                        <li key={i} className="text-xs text-gray-600 flex gap-1.5 leading-snug">
+                          <span className="text-violet-400 flex-shrink-0 mt-0.5">•</span>
+                          <span>{s}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <button
+                    onClick={() => { setShowAnalysis(false); setAnalysis(null); }}
+                    className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>

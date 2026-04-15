@@ -10,6 +10,7 @@ import { ToastProvider } from "@/components/ToastProvider";
 import dynamicImport from "next/dynamic";
 import "./globals.css";
 import "../styles/mobile.css";
+import ReferralTracker from "@/components/ReferralTracker";
 
 export const dynamic = 'force-dynamic';
 
@@ -264,6 +265,7 @@ export default function RootLayout({
           <SiteFooter />
           <MobileBottomNav />
           <AIAssistantPopup />
+          <ReferralTracker />
           {process.env.NODE_ENV === 'development' && (
             <>
               <DevStatus />

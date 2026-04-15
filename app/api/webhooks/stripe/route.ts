@@ -415,15 +415,52 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
           data: { leadsThisMonth: 0 }
         });
 
-        // AFFILIATE COMMISSION: 20% recurring lifetime
-        // Note: Affiliate commission tracking temporarily disabled
-        // The User model needs a referredByAffiliateId field added to schema.prisma
-        // Once added, this code can be re-enabled to track 20% recurring affiliate commissions
+        // AFFILIATE COMMISSION: 20% recurring
+        // Find the contractor user via Stripe subscription ID and check for affiliate attribution
         try {
-          console.log('[Affiliate] Commission tracking temporarily disabled - referredByAffiliateId field not yet added to User model');
+          const contractorUser = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { stripeCustomerId: invoice.customer as string },
+                { stripeSubscriptionId: invoice.subscription as string },
+              ],
+            },
+            select: { id: true, referredByAffiliateId: true },
+          });
+
+          if (contractorUser?.referredByAffiliateId) {
+            const affiliate = await prisma.affiliate.findUnique({
+              where: { id: contractorUser.referredByAffiliateId },
+            });
+
+            if (affiliate) {
+              const rate = affiliate.payoutPercent / 100; // e.g. 20 → 0.20
+              const commissionAmount =
+                Math.round((invoice.amount_paid / 100) * rate * 100) / 100; // CAD, 2dp
+
+              await prisma.affiliateCommission.upsert({
+                where: { stripeInvoiceId: invoice.id as string },
+                create: {
+                  affiliateId: affiliate.id,
+                  userId: contractorUser.id,
+                  subscriptionId: subscription?.id ?? null,
+                  stripeInvoiceId: invoice.id as string,
+                  amount: commissionAmount,
+                  rate,
+                  period: new Date((invoice.period_start as number) * 1000),
+                  status: "pending",
+                },
+                update: {},  // Already recorded — no-op on retry
+              });
+
+              console.log(
+                `[Affiliate] Commission $${commissionAmount} CAD queued → ${affiliate.referralCode} (invoice ${invoice.id})`
+              );
+            }
+          }
         } catch (affiliateError) {
-          console.error('[Affiliate] Error creating commission:', affiliateError);
-          // Don't fail the main webhook if affiliate tracking fails
+          console.error('[Affiliate] Error creating commission record:', affiliateError);
+          // Never fail the webhook over affiliate tracking
         }
       }
     }

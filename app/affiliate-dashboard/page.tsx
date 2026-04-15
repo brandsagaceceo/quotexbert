@@ -39,31 +39,44 @@ export default function AffiliateDashboard() {
 
   const loadAffiliateData = async () => {
     try {
-      // In a real implementation, this would fetch from your API
-      // For now, generate a unique code based on user email
-      const referralCode = user?.emailAddresses[0]?.emailAddress
-        ?.split('@')[0]
-        ?.toUpperCase()
-        ?.replace(/[^A-Z0-9]/g, '') || 'HOMEOWNER';
+      const res = await fetch("/api/affiliates/my-dashboard");
+      const json = await res.json();
 
-      setStats({
-        referralCode,
-        totalEarnings: 0,
-        pendingEarnings: 0,
-        referrals: 0,
-        clicks: 0,
-        conversionRate: 0
-      });
-      setLoading(false);
+      if (json.notAffiliate) {
+        // Not an affiliate yet — show zero-state with signup prompt
+        setStats({
+          referralCode: "",
+          totalEarnings: 0,
+          pendingEarnings: 0,
+          referrals: 0,
+          clicks: 0,
+          conversionRate: 0,
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (json.success) {
+        setStats({
+          referralCode: json.stats.referralCode,
+          totalEarnings: json.stats.totalEarned,
+          pendingEarnings: json.stats.pendingCommissions,
+          referrals: json.stats.totalReferrals,
+          clicks: 0, // click tracking not yet implemented
+          conversionRate: 0,
+        });
+      }
     } catch (error) {
       console.error("Error loading affiliate data:", error);
+    } finally {
       setLoading(false);
     }
   };
 
   const getReferralUrl = () => {
     if (!stats) return "";
-    return `https://quotexbert.com/?ref=${stats.referralCode}`;
+    const base = process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com";
+    return `${base}/?ref=${stats.referralCode}`;
   };
 
   const copyToClipboard = async (text: string) => {

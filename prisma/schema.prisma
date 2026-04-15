@@ -49,6 +49,9 @@ model User {
   notifyMessageInApp   Boolean @default(true)
   notifyMarketingEmail Boolean @default(false)
 
+  // Affiliate tracking — set when contractor subscribes via referral link
+  referredByAffiliateId String?
+
   // Relations
   contractorProfile    ContractorProfile?
   homeownerProfile     HomeownerProfile?
@@ -320,8 +323,9 @@ model Affiliate {
   name          String?
   email         String?  @unique
   referralCode  String   @unique
-  payoutPercent Int      @default(50)
+  payoutPercent Int      @default(20)
   notes         String?
+  commissions   AffiliateCommission[]
   
   @@map("affiliates")
 }
@@ -335,6 +339,26 @@ model Referral {
   userAgent    String?
   
   @@map("referrals")
+}
+
+// Tracks per-invoice commissions owed to affiliates
+model AffiliateCommission {
+  id              String    @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id])
+  userId          String    // contractor who triggered the payment
+  subscriptionId  String?   // ContractorSubscription.id
+  stripeInvoiceId String?   @unique  // prevents double-counting per invoice
+  amount          Float     // commission amount in CAD
+  rate            Float     @default(0.20)
+  period          DateTime  // billing period start from invoice
+  status          String    @default("pending") // "pending" | "paid"
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([affiliateId, status])
+  @@index([userId])
+  @@map("affiliate_commissions")
 }
 
 model ProMembership {

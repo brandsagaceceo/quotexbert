@@ -32,6 +32,11 @@ export async function POST(req: Request) {
     const { contractorId, tier, email, selectedCategories } = await req.json();
     console.log('[API] Request data:', { contractorId, tier, email, contractorIdType: typeof contractorId, contractorIdLength: contractorId?.length });
 
+    // Read affiliate referral code from cookie (set by ReferralTracker)
+    const cookieHeader = req.headers.get('cookie') || '';
+    const refMatch = cookieHeader.match(/qxb_ref=([^;]+)/);
+    const referralCodeFromCookie = refMatch?.[1] ? decodeURIComponent(refMatch[1]) : null;
+
     if (!contractorId || !tier || !email) {
       console.error('[API] Missing required fields');
       return NextResponse.json(
@@ -103,6 +108,27 @@ export async function POST(req: Request) {
 
     // Use the DB primary key for all operations
     const dbUserId = contractor.id;
+
+    // ── AFFILIATE ATTRIBUTION ─────────────────────────────────────────────────
+    // If a referral code cookie is present and the user hasn't been attributed yet,
+    // attach the affiliate before checkout so the webhook can create commissions.
+    if (referralCodeFromCookie && !contractor.referredByAffiliateId) {
+      try {
+        const affiliate = await prisma.affiliate.findUnique({
+          where: { referralCode: referralCodeFromCookie },
+        });
+        if (affiliate) {
+          await prisma.user.update({
+            where: { id: dbUserId },
+            data: { referredByAffiliateId: affiliate.id },
+          });
+          console.log(`[API] Affiliate ${affiliate.referralCode} attributed to contractor ${dbUserId}`);
+        }
+      } catch (affiliateErr) {
+        console.error('[API] Affiliate attribution error (non-blocking):', affiliateErr);
+      }
+    }
+    // ── END AFFILIATE ATTRIBUTION ─────────────────────────────────────────────
 
     // ── GOD USER BYPASS ────────────────────────────────────────────────────────
     // Admin/testing accounts skip Stripe entirely — activate subscription directly

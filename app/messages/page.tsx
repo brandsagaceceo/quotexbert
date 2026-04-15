@@ -10,8 +10,8 @@ import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import Chat from "@/components/Chat";
 import LiveQuoteBuilder from "@/components/LiveQuoteBuilder";
-import QuoteMessageCard from "@/components/QuoteMessageCard";
 import type { QuoteCardPayload } from "@/components/QuoteMessageCard";
+import QuoteBottomSheet from "@/components/QuoteBottomSheet";
 import LoadingState from "@/components/ui/LoadingState";
 import { ChatBubbleLeftRightIcon, ArrowLeftIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
@@ -110,7 +110,8 @@ export default function MessagesPage() {
   const [reviseQuoteId, setReviseQuoteId] = useState<string | undefined>(undefined);
   // editDraftQuoteId: when set, LiveQuoteBuilder loads this existing draft instead of generating new
   const [editDraftQuoteId, setEditDraftQuoteId] = useState<string | undefined>(undefined);
-  const [quoteCardCollapsed, setQuoteCardCollapsed] = useState(true);
+  // showQuoteSheet: controls the bottom sheet for viewing quote details
+  const [showQuoteSheet, setShowQuoteSheet] = useState(false);
   // Auto-draft prefill data from CTA in Chat
   const [autoDraftPrefill, setAutoDraftPrefill] = useState<{
     suggestedTitle: string;
@@ -222,7 +223,7 @@ export default function MessagesPage() {
       setBridgeJobId(null);
       setBridgeError(null);
       setLatestQuotes([]);
-      setQuoteCardCollapsed(true);
+      setShowQuoteSheet(false);
       setEditDraftQuoteId(undefined);
       setAutoDraftPrefill(null);
       return;
@@ -233,7 +234,7 @@ export default function MessagesPage() {
       currentBridgeThreadIdRef.current = null;
       setBridgeConversationId(null);
       setLatestQuotes([]);
-      setQuoteCardCollapsed(true);
+      setShowQuoteSheet(false);
       setEditDraftQuoteId(undefined);
       setAutoDraftPrefill(null);
       return;
@@ -241,6 +242,8 @@ export default function MessagesPage() {
 
     // Stamp which thread this fetch belongs to BEFORE the async call fires
     currentBridgeThreadIdRef.current = selectedThread.id;
+    // Clear stale quotes from previous thread immediately so no old data shows
+    setLatestQuotes([]);
     callBridge(selectedThread.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedThread?.id]);
@@ -647,11 +650,11 @@ export default function MessagesPage() {
                         <div
                           key={thread.id}
                           onClick={() => selectThread(thread)}
-                          className={`group relative p-3 cursor-pointer rounded-xl transition-all duration-200 ${
+                          className={`group relative p-3 cursor-pointer rounded-xl transition-all duration-150 active:scale-[0.99] ${
                             isSelected
                               ? 'bg-rose-100 border-l-4 border-rose-600 shadow-md'
                               : (thread.unreadCount ?? 0) > 0
-                                ? 'bg-gradient-to-r from-rose-50 to-transparent border-l-4 border-rose-500 shadow-sm'
+                                ? 'bg-gradient-to-r from-rose-50/90 to-slate-50 border-l-4 border-rose-500 shadow-sm ring-1 ring-rose-100'
                                 : 'hover:bg-slate-50 border-l-4 border-transparent'
                           }`}
                         >
@@ -674,39 +677,52 @@ export default function MessagesPage() {
                             <div className="relative flex-shrink-0">
                               <ConvAvatar user={otherUser} />
                               {(thread.unreadCount ?? 0) > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1.5 bg-rose-600 rounded-full flex items-center justify-center">
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1.5 bg-rose-600 rounded-full flex items-center justify-center shadow-sm">
                                   <span className="text-[10px] font-bold text-white leading-none">
                                     {(thread.unreadCount ?? 0) > 9 ? '9+' : thread.unreadCount}
                                   </span>
                                 </span>
+                              )}
+                              {(thread.unreadCount ?? 0) > 0 && !isSelected && (
+                                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
                               )}
                             </div>
                             
                             {/* Content */}
                             <div className="flex-1 min-w-0 pr-8">
                               <div className="flex items-center justify-between gap-1">
-                                <p className={`text-sm truncate ${(thread.unreadCount ?? 0) > 0 ? 'font-bold text-slate-900' : 'font-medium text-slate-600'}`}>
+                                <p className={`text-sm truncate leading-tight ${
+                                  (thread.unreadCount ?? 0) > 0
+                                    ? 'font-extrabold text-slate-900'
+                                    : 'font-medium text-slate-600'
+                                }`}>
                                   {getDisplayName(otherUser)}
                                 </p>
                                 {lastMessage && (
-                                  <span className="text-xs text-slate-400 flex-shrink-0">
+                                  <span className={`text-xs flex-shrink-0 ${
+                                    (thread.unreadCount ?? 0) > 0 ? 'text-rose-500 font-semibold' : 'text-slate-400'
+                                  }`}>
                                     {formatTime(lastMessage.createdAt)}
                                   </span>
                                 )}
                               </div>
-                              
-                              <p className="text-xs text-slate-400 truncate">
+
+                              <p className={`text-xs truncate ${
+                                (thread.unreadCount ?? 0) > 0 ? 'text-slate-600 font-medium' : 'text-slate-400'
+                              }`}>
                                 {thread.lead.title}
                               </p>
-                              
+
                               {lastMessage ? (
-                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${(thread.unreadCount ?? 0) > 0 ? 'text-slate-800 font-semibold' : 'text-slate-400'}`}>
+                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${
+                                  (thread.unreadCount ?? 0) > 0
+                                    ? 'text-slate-800 font-semibold'
+                                    : 'text-slate-400'
+                                }`}>
                                   {lastMessage.body}
                                 </p>
                               ) : (
-                                <p className="text-xs text-slate-400 mt-1 italic">
-                                  No messages yet
-                                </p>
+                                <p className="text-xs text-slate-400 mt-1 italic">No messages yet</p>
                               )}
                             </div>
                           </div>
@@ -774,59 +790,42 @@ export default function MessagesPage() {
                   </div>
                 )}
 
-                {/* Phase 2: Quote Panel — shown for both roles when a non-superseded quote exists */}
+                {/* Quote attachment bar — whole bar is tappable, opens bottom sheet without shifting chat */}
                 {latestQuotes.length > 0 && user && (() => {
-                  // Build payload from the first (latest) active quote
                   const q = latestQuotes[0];
                   if (!q) return null;
-                  const payload: QuoteCardPayload = {
-                    quoteId: q.id,
-                    title: q.title,
-                    totalCost: q.totalCost,
-                    laborCost: q.laborCost,
-                    materialCost: q.materialCost,
-                    scope: q.scope,
-                    itemCount: q.items.length,
-                    version: q.version ?? 1,
+                  const statusMeta: Record<string, { bg: string; text: string; label: string }> = {
+                    accepted: { bg: 'bg-green-100', text: 'text-green-700', label: 'Accepted' },
+                    sent:     { bg: 'bg-blue-100',  text: 'text-blue-700',  label: 'Sent' },
+                    draft:    { bg: 'bg-gray-100',  text: 'text-gray-600',  label: 'Draft' },
+                    revision_requested: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Changes Requested' },
                   };
-                  const statusColors: Record<string, string> = {
-                    accepted: 'bg-green-100 text-green-700',
-                    sent: 'bg-blue-100 text-blue-700',
-                    draft: 'bg-gray-100 text-gray-600',
-                    revision_requested: 'bg-amber-100 text-amber-700',
-                  };
+                  const sm = statusMeta[q.status] ?? { bg: 'bg-gray-100', text: 'text-gray-600', label: q.status };
                   return (
-                    <div className="flex-shrink-0 border-b border-gray-100 bg-slate-50">
-                      {/* Compact header — always visible */}
-                      <div className="flex items-center justify-between px-4 py-2 gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide flex-shrink-0">Quote</p>
-                          <span className="text-xs font-semibold text-slate-700 truncate">{q.title}</span>
-                          <span className="text-xs text-slate-500 flex-shrink-0">${q.totalCost?.toLocaleString()}</span>
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${statusColors[q.status] ?? 'bg-gray-100 text-gray-600'}`}>{q.status}</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowQuoteSheet(true)}
+                      className="flex-shrink-0 w-full border-b border-rose-100 bg-gradient-to-r from-rose-50/70 to-orange-50/40 hover:from-rose-100/80 hover:to-orange-100/60 active:scale-[0.99] transition-all duration-150 text-left"
+                    >
+                      <div className="flex items-center gap-3 px-4 py-2.5">
+                        {/* Icon pill */}
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-sm">
+                          <DocumentTextIcon className="w-4 h-4 text-white" />
                         </div>
-                        <button
-                          onClick={() => setQuoteCardCollapsed(c => !c)}
-                          className="flex-shrink-0 text-[11px] font-semibold text-rose-600 hover:text-rose-700"
-                        >
-                          {quoteCardCollapsed ? 'Show ▾' : 'Hide ▴'}
-                        </button>
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-800 truncate leading-tight">{q.title}</span>
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${sm.bg} ${sm.text}`}>{sm.label}</span>
+                          </div>
+                          <span className="text-[11px] text-slate-500 font-medium">${q.totalCost?.toLocaleString()} total</span>
+                        </div>
+                        {/* Chevron */}
+                        <svg className="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
                       </div>
-                      {/* Expanded card */}
-                      {!quoteCardCollapsed && (
-                        <div className="px-4 pb-3 overflow-y-auto" style={{ maxHeight: '300px' }}>
-                          <QuoteMessageCard
-                            payload={payload}
-                            isOwn={user.role === 'contractor'}
-                            viewerRole={user.role || 'homeowner'}
-                            quoteStatus={q.status}
-                            onAccept={handleQuoteAccept}
-                            onRequestChanges={handleQuoteRequestChanges}
-                            onRevise={handleQuoteRevise}
-                          />
-                        </div>
-                      )}
-                    </div>
+                    </button>
                   );
                 })()}
 
@@ -1005,6 +1004,33 @@ export default function MessagesPage() {
           }}
         />
       )}
+
+      {/* Quote bottom sheet — rendered at root so it overlays full viewport without shifting chat */}
+      {showQuoteSheet && latestQuotes.length > 0 && user && (() => {
+        const q = latestQuotes[0];
+        if (!q) return null;
+        const sheetPayload: QuoteCardPayload = {
+          quoteId: q.id,
+          title: q.title,
+          totalCost: q.totalCost,
+          laborCost: q.laborCost,
+          materialCost: q.materialCost,
+          scope: q.scope,
+          itemCount: q.items.length,
+          version: q.version ?? 1,
+        };
+        return (
+          <QuoteBottomSheet
+            payload={sheetPayload}
+            quoteStatus={q.status}
+            viewerRole={user.role || 'homeowner'}
+            onClose={() => setShowQuoteSheet(false)}
+            onAccept={handleQuoteAccept}
+            onRequestChanges={handleQuoteRequestChanges}
+            onRevise={handleQuoteRevise}
+          />
+        );
+      })()}
     </div>
   );
 }

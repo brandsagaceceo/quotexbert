@@ -869,7 +869,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
                 onClick={handleAiEnhance}
                 disabled={aiEnhancing || !newMessage.trim()}
                 title={newMessage.trim() ? 'Improve with AI' : 'Type a message to use AI assist'}
-                className="w-10 h-10 bg-violet-100 hover:bg-violet-200 disabled:opacity-40 disabled:cursor-not-allowed text-violet-600 rounded-full flex items-center justify-center transition-colors"
+                className="w-10 h-10 bg-violet-100 hover:bg-violet-200 active:bg-violet-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-violet-600 rounded-full flex items-center justify-center transition-all duration-150"
               >
                 {aiEnhancing ? (
                   <div className="w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
@@ -884,7 +884,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, userRole, 
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+            className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 active:from-rose-700 active:to-orange-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all duration-150 shadow-md hover:shadow-lg"
           >
             {sending ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

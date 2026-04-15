@@ -146,8 +146,8 @@ export async function POST(req: NextRequest) {
             };
           }),
       mode: "subscription",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/contractor/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/contractor/subscription`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://www.quotexbert.com"}/contractor/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://www.quotexbert.com"}/contractor/subscription`,
       metadata: {
         userId,
         categories: JSON.stringify(categories),

@@ -90,6 +90,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
+  // Affiliate SEO landing pages
+  const affiliateSeoPages: MetadataRoute.Sitemap = [
+    'make-money-online-toronto',
+    'side-hustles-toronto',
+    'passive-income-canada',
+    'affiliate-marketing-toronto',
+    'affiliate-programs-canada',
+    'best-affiliate-programs-canada',
+    'how-to-make-money-referring-contractors',
+    'contractor-referral-program-canada',
+    'earn-money-from-contractor-leads',
+  ].map(slug => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.75,
+  }))
+
   // Contractor pages
   const contractorPages: MetadataRoute.Sitemap = [
     {
@@ -267,6 +285,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...torontoPages,
     ...staticPages,
     ...contractorPages,
+    ...affiliateSeoPages,
     ...legalPages,
     ...renovationCostPages,
     ...neighbourhoodPages,

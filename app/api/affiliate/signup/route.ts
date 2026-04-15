@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 
+/** Generate a short referral code like "alice7X2QP" */
+function generateReferralCode(email: string): string {
+  const raw = email.split("@")[0] ?? "";
+  const prefix = raw.replace(/[^a-zA-Z0-9]/g, "").toLowerCase().slice(0, 6);
+  const suffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+  return `${prefix}${suffix}`;
+}
+
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
@@ -63,7 +71,31 @@ export async function POST(request: NextRequest) {
       console.error('[AFFILIATE LEAD] Database error:', dbError);
       // Continue to send email even if DB fails
     }
-    
+
+    // Create or retrieve real Affiliate record so they have a referral link immediately
+    let referralCode: string | null = null;
+    const baseUrl = process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com";
+
+    try {
+      referralCode = generateReferralCode(email);
+      const affiliate = await prisma.affiliate.upsert({
+        where: { email },
+        create: {
+          email,
+          referralCode,
+          name: email.split("@")[0],
+          payoutPercent: 20,
+          notes: `Auto-created from affiliate signup form on ${new Date().toISOString()}`,
+        },
+        update: {},  // Already exists — keep existing record
+      });
+      referralCode = affiliate.referralCode;
+      console.log(`[AFFILIATE] Affiliate record ready: ${referralCode}`);
+    } catch (affiliateError) {
+      console.error("[AFFILIATE] Failed to create affiliate record:", affiliateError);
+      // Non-blocking; we still respond success
+    }
+
     // Send email notification to quotexbert@gmail.com
     if (resend) {
       try {
@@ -123,7 +155,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Thank you for your interest! We'll be in touch soon."
+      message: "Thank you for your interest! We'll be in touch soon.",
+      referralCode,
+      referralUrl: referralCode ? `${baseUrl}/?ref=${referralCode}` : null,
     });
 
   } catch (error) {

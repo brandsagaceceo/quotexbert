@@ -123,7 +123,7 @@ Respond in JSON format:
 
     try {
       // Call AI service (using the same endpoint as other AI features)
-      const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/ai-estimate`, {
+      const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.quotexbert.com'}/api/ai-estimate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
