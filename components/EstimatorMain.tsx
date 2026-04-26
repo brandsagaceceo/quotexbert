@@ -212,7 +212,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       // Note: photos are intentionally excluded — base64 blobs can exceed
       // sessionStorage quota limits. Users will need to re-upload after sign-in.
       try {
-        sessionStorage.setItem('estimate_form_data', JSON.stringify({
+        sessionStorage.setItem(ESTIMATE_FORM_STORAGE_KEY, JSON.stringify({
           description,
           projectType,
           postalCode,
