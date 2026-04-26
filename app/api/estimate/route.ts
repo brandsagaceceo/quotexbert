@@ -12,7 +12,7 @@ const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.include
 interface EstimateRequest {
   description?: string;
   photos?: string[]; // base64 encoded images
-  projectType: string;
+  projectType?: string;
   postalCode?: string;
   userId?: string;
 }
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   // Hoist parsed body so catch block can reference it without re-consuming the stream
   let description: string | undefined;
   let photos: string[] | undefined;
-  let projectType: string = '';
+  let projectType: string = 'General';
   let postalCode: string | undefined;
   let userId: string | undefined;
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const body: EstimateRequest = await req.json();
     description = body.description;
     photos = body.photos;
-    projectType = body.projectType;
+    projectType = body.projectType || 'General';
     postalCode = body.postalCode;
     userId = body.userId;
 
@@ -44,34 +44,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validation
-    if (!projectType) {
-      return NextResponse.json(
-        { error: "Project type is required" },
-        { status: 400 },
-      );
-    }
-
-    if ((!description || description.trim().length < 3) && (!photos || photos.length === 0)) {
-      return NextResponse.json(
-        { error: "Please provide either a description or upload photos" },
-        { status: 400 },
-      );
-    }
-
-    // Validate photo count and size
+    // Validate photo count (hard limit — ignore silently if exceeded)
     if (photos && photos.length > 5) {
+      photos = photos.slice(0, 5);
+    }
+
+    // If neither description nor photos — generate a generic fallback immediately
+    if ((!description || description.trim().length < 3) && (!photos || photos.length === 0)) {
+      console.warn('[ESTIMATE] No description or photos provided — returning generic fallback');
       return NextResponse.json(
-        { error: "Maximum 5 photos allowed" },
-        { status: 400 },
+        buildFallbackEstimate(projectType, 'general', 'No description or photos were provided. This is a rough ballpark estimate.')
       );
     }
 
     // Check if OpenAI API key is configured
     if (!openai) {
-      console.warn("OpenAI API key not configured, using fallback");
-      const estimate = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
-      return NextResponse.json(estimate);
+      console.warn('[ESTIMATE] OpenAI API key not configured, using fallback');
+      return NextResponse.json(
+        buildFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase(), projectType)
+      );
     }
 
     // Generate AI-powered estimate using OpenAI (multimodal)
@@ -109,56 +100,24 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(estimate);
   } catch (error: any) {
-    console.error("Error generating estimate:", error);
-    
-    // Dev logging for diagnosing estimate failures
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('[ESTIMATE][error]', {
-        userId,
-        projectType,
-        photoCount: photos?.length ?? 0,
-        error: error?.message,
-        code: error?.code,
-        status: error?.status,
-      });
-    }
+    // Log the real underlying error for debugging — never expose to end users
+    console.error('[ESTIMATE] Error generating estimate:', {
+      message: error?.message,
+      code: error?.code,
+      status: error?.status,
+      type: error?.type,
+      userId,
+      projectType,
+      photoCount: photos?.length ?? 0,
+    });
 
-    // Check for rate limit / quota errors (OpenAI returns these in several different shapes)
-    const errorMessage = error?.message || error?.toString() || '';
-    const isQuotaError =
-      errorMessage.includes('quota') ||
-      errorMessage.includes('rate limit') ||
-      errorMessage.includes('exceeded') ||
-      errorMessage.includes('billing') ||
-      errorMessage.includes('429') ||
-      error?.status === 429 ||
-      error?.code === 'insufficient_quota';
-    
-    if (isQuotaError) {
-      return NextResponse.json(
-        { 
-          error: "High demand right now. Please try again in a moment.",
-          type: "rate_limit"
-        },
-        { status: 429 }
-      );
-    }
-    
-    // Fallback to basic estimate if OpenAI fails
-    try {
-      const fallbackEstimate = generateFallbackEstimate(
-        description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
-      );
-      return NextResponse.json({
-        ...fallbackEstimate,
-        warning: "AI service temporarily unavailable, using basic estimate"
-      });
-    } catch {
-      return NextResponse.json(
-        { error: "Failed to generate estimate" },
-        { status: 500 },
-      );
-    }
+    // Always return a usable fallback — never a hard failure
+    return NextResponse.json(
+      buildFallbackEstimate(
+        description?.toLowerCase() || projectType?.toLowerCase() || 'general',
+        projectType || 'General'
+      )
+    );
   }
 }
 
@@ -440,146 +399,153 @@ Be realistic and conservative. Return ONLY the JSON, no other text.`;
   };
 }
 
-// Fallback keyword-based estimate for when OpenAI is unavailable
-function generateFallbackEstimate(description: string): {
-  min: number;
-  max: number;
-  description: string;
-}
-
-function generateFallbackEstimate(description: string): {
-  min: number;
-  max: number;
-  description: string;
+// Structured fallback estimate that matches the full EstimateResultData shape.
+// Used whenever OpenAI is unavailable, fails, or quota is exceeded.
+function buildFallbackEstimate(
+  description: string,
+  projectType: string,
+  customNote?: string,
+): {
+  summary: string;
+  scope: string[];
+  assumptions: string[];
+  line_items: Array<{ name: string; qty: number; unit: string; material_cost: number; labor_cost: number; notes?: string }>;
+  totals: { materials: number; labor: number; permit_or_fees: number; overhead_profit: number; subtotal: number; tax_estimate: number; total_low: number; total_high: number };
+  timeline: { duration_days_low: number; duration_days_high: number };
+  confidence: number;
+  questions_to_confirm: string[];
+  next_steps: string[];
+  note: string;
 } {
-  // Kitchen projects
-  if (description.includes("kitchen")) {
-    if (description.includes("renovation") || description.includes("remodel")) {
-      return {
-        min: 15000,
-        max: 45000,
-        description:
-          "Kitchen renovation costs vary widely based on size, materials, and appliances. This estimate includes basic to mid-range finishes.",
-      };
+  const lower = description.toLowerCase();
+
+  let summary = `${projectType} project estimate.`;
+  let materials = 500;
+  let labor = 800;
+  let permitFees = 0;
+  let durationLow = 1;
+  let durationHigh = 5;
+  let scopeItems: string[] = [
+    'Initial assessment and site preparation',
+    'Supply and install materials',
+    'Final cleanup and inspection',
+  ];
+
+  if (lower.includes('kitchen')) {
+    if (lower.includes('renovation') || lower.includes('remodel')) {
+      summary = 'Full kitchen renovation including cabinetry, countertops, and appliances.';
+      materials = 10000; labor = 8000; permitFees = 800; durationLow = 7; durationHigh = 21;
+      scopeItems = ['Demolition of existing kitchen', 'Install new cabinetry', 'Countertop installation', 'Appliance hookups', 'Plumbing and electrical rough-in'];
+    } else if (lower.includes('cabinet')) {
+      summary = 'Kitchen cabinet replacement or refacing.';
+      materials = 4000; labor = 3000; durationLow = 3; durationHigh = 7;
+    } else if (lower.includes('faucet') || lower.includes('sink')) {
+      summary = 'Kitchen faucet or sink replacement.';
+      materials = 300; labor = 200; durationLow = 1; durationHigh = 1;
+    } else {
+      summary = 'Kitchen improvement project.';
+      materials = 2000; labor = 1500; durationLow = 2; durationHigh = 5;
     }
-    if (description.includes("cabinet")) {
-      return {
-        min: 3000,
-        max: 12000,
-        description:
-          "Cabinet replacement or refacing costs depend on size, material, and hardware choices.",
-      };
+  } else if (lower.includes('bathroom')) {
+    if (lower.includes('renovation') || lower.includes('remodel')) {
+      summary = 'Full bathroom renovation including fixtures, tiling, and plumbing.';
+      materials = 5000; labor = 5000; permitFees = 500; durationLow = 5; durationHigh = 14;
+      scopeItems = ['Demolition of existing bathroom', 'Tile installation (floor and walls)', 'Fixture replacements', 'Plumbing updates', 'Paint and finishing'];
+    } else {
+      summary = 'Bathroom improvement project.';
+      materials = 1500; labor = 1500; durationLow = 2; durationHigh = 5;
     }
-    if (description.includes("faucet")) {
-      return {
-        min: 150,
-        max: 500,
-        description:
-          "Faucet replacement including basic installation. Higher-end faucets may cost more.",
-      };
-    }
+  } else if (lower.includes('paint') || projectType.toLowerCase().includes('painting')) {
+    const roomCount = extractRoomCount(lower);
+    summary = `Interior painting for ${roomCount} room${roomCount > 1 ? 's' : ''}.`;
+    materials = 400 * roomCount; labor = 600 * roomCount; durationLow = 1; durationHigh = 3;
+    scopeItems = ['Surface preparation and priming', 'Apply 2 coats of paint', 'Touch-ups and final inspection'];
+  } else if (lower.includes('floor') || lower.includes('laminate') || lower.includes('hardwood') || lower.includes('tile') || projectType.toLowerCase().includes('flooring')) {
+    const sqft = extractSquareFootage(lower) || 400;
+    const isHardwood = lower.includes('hardwood');
+    summary = `${isHardwood ? 'Hardwood' : 'Flooring'} installation for approximately ${sqft} sq ft.`;
+    materials = sqft * (isHardwood ? 10 : 5); labor = sqft * 4; durationLow = 2; durationHigh = 5;
+    scopeItems = ['Remove existing flooring', 'Subfloor preparation', `Install new ${isHardwood ? 'hardwood' : 'flooring'}`, 'Trim and finishing'];
+  } else if (lower.includes('roof') || projectType.toLowerCase().includes('roofing')) {
+    summary = 'Roof replacement or major repair.';
+    materials = 7000; labor = 5000; permitFees = 500; durationLow = 3; durationHigh = 7;
+    scopeItems = ['Remove existing shingles', 'Inspect and repair sheathing', 'Install new roofing material', 'Flashing and sealing'];
+  } else if (lower.includes('electrical') || lower.includes('wiring') || lower.includes('outlet') || projectType.toLowerCase().includes('electrical')) {
+    summary = 'Electrical work including wiring or fixture installation.';
+    materials = 300; labor = 600; durationLow = 1; durationHigh = 3;
+    scopeItems = ['Electrical assessment', 'Install/replace wiring or outlets', 'Final testing and inspection'];
+  } else if (lower.includes('plumbing') || lower.includes('pipe') || lower.includes('drain') || projectType.toLowerCase().includes('plumbing')) {
+    summary = 'Plumbing repair or installation.';
+    materials = 400; labor = 700; durationLow = 1; durationHigh = 3;
+    scopeItems = ['Shut off water supply', 'Replace or repair pipes/fixtures', 'Test for leaks and restore water'];
+  } else if (lower.includes('hvac') || lower.includes('furnace') || lower.includes('air condition')) {
+    summary = 'HVAC system installation or repair.';
+    materials = 3000; labor = 2000; permitFees = 300; durationLow = 2; durationHigh = 5;
+    scopeItems = ['System assessment', 'Install or replace HVAC unit', 'Ductwork and connections', 'Commissioning and testing'];
+  } else if (lower.includes('deck') || lower.includes('fence') || projectType.toLowerCase().includes('deck')) {
+    summary = 'Deck or fence construction.';
+    materials = 4000; labor = 3000; permitFees = 400; durationLow = 3; durationHigh = 10;
+    scopeItems = ['Site preparation', 'Foundation/post installation', 'Frame and decking installation', 'Finish and sealant'];
+  } else if (lower.includes('basement') || projectType.toLowerCase().includes('basement')) {
+    summary = 'Basement renovation or finishing.';
+    materials = 8000; labor = 7000; permitFees = 700; durationLow = 10; durationHigh = 30;
+    scopeItems = ['Framing and insulation', 'Drywall installation', 'Flooring', 'Electrical and lighting', 'Finishing touches'];
+  } else if (lower.includes('drywall') || projectType.toLowerCase().includes('drywall')) {
+    summary = 'Drywall installation or repair.';
+    materials = 800; labor = 1200; durationLow = 2; durationHigh = 5;
+    scopeItems = ['Surface preparation', 'Install/patch drywall', 'Tape, mud, and sand', 'Prime and paint-ready finish'];
+  } else if (lower.includes('landscaping') || projectType.toLowerCase().includes('landscaping')) {
+    summary = 'Landscaping project.';
+    materials = 1500; labor = 2000; durationLow = 2; durationHigh = 7;
+    scopeItems = ['Site assessment and design', 'Grading and soil preparation', 'Planting and hardscaping', 'Cleanup and final inspection'];
   }
 
-  // Bathroom projects
-  if (description.includes("bathroom")) {
-    if (description.includes("renovation") || description.includes("remodel")) {
-      return {
-        min: 8000,
-        max: 25000,
-        description:
-          "Bathroom renovation including fixtures, tiling, and basic electrical/plumbing work.",
-      };
-    }
-  }
+  const subtotal = materials + labor;
+  const overheadProfit = Math.round(subtotal * 0.175);
+  const beforeTax = subtotal + overheadProfit + permitFees;
+  const taxEstimate = Math.round(beforeTax * 0.13); // Ontario HST
+  const totalLow = beforeTax + taxEstimate;
+  const totalHigh = Math.round(totalLow * 1.25);
 
-  // Painting
-  if (description.includes("paint")) {
-    const roomCount = extractRoomCount(description);
-    const baseMin = 300;
-    const baseMax = 800;
-    return {
-      min: baseMin * roomCount,
-      max: baseMax * roomCount,
-      description: `Interior painting for ${roomCount} room${roomCount > 1 ? "s" : ""} including primer, paint, and basic prep work.`,
-    };
-  }
-
-  // Flooring
-  if (
-    description.includes("floor") ||
-    description.includes("laminate") ||
-    description.includes("hardwood") ||
-    description.includes("tile")
-  ) {
-    const sqft = extractSquareFootage(description) || 500;
-    const pricePerSqft = description.includes("hardwood")
-      ? { min: 8, max: 15 }
-      : { min: 3, max: 8 };
-    return {
-      min: Math.round(sqft * pricePerSqft.min),
-      max: Math.round(sqft * pricePerSqft.max),
-      description: `Flooring installation for approximately ${sqft} sq ft including materials and labor.`,
-    };
-  }
-
-  // Roofing
-  if (description.includes("roof")) {
-    return {
-      min: 8000,
-      max: 20000,
-      description:
-        "Roof replacement or major repair for typical residential home. Price varies with materials and size.",
-    };
-  }
-
-  // Electrical
-  if (
-    description.includes("electrical") ||
-    description.includes("wiring") ||
-    description.includes("outlet")
-  ) {
-    return {
-      min: 200,
-      max: 800,
-      description:
-        "Basic electrical work including outlet installation or minor wiring. Complex projects may cost more.",
-    };
-  }
-
-  // Plumbing
-  if (
-    description.includes("plumbing") ||
-    description.includes("pipe") ||
-    description.includes("drain")
-  ) {
-    return {
-      min: 250,
-      max: 1200,
-      description:
-        "Plumbing repair or installation including basic fixtures and labor.",
-    };
-  }
-
-  // HVAC
-  if (
-    description.includes("hvac") ||
-    description.includes("furnace") ||
-    description.includes("air condition")
-  ) {
-    return {
-      min: 3000,
-      max: 8000,
-      description:
-        "HVAC system installation or major repair including unit and basic installation.",
-    };
-  }
-
-  // Default estimate for unrecognized projects
   return {
-    min: 500,
-    max: 2000,
-    description:
-      "General home repair estimate. Final cost will depend on specific project requirements and materials.",
+    summary,
+    scope: scopeItems,
+    assumptions: [
+      'Prices are in CAD based on GTA/Ontario market rates',
+      'Estimate based on typical project scope — actual costs may vary',
+      'Permits may be required depending on municipality',
+    ],
+    line_items: [
+      { name: 'Materials', qty: 1, unit: 'lot', material_cost: materials, labor_cost: 0, notes: 'Mid-range quality materials' },
+      { name: 'Labour', qty: 1, unit: 'lot', material_cost: 0, labor_cost: labor, notes: 'Skilled trades at GTA market rates' },
+      ...(permitFees > 0 ? [{ name: 'Permits & Fees', qty: 1, unit: 'lot', material_cost: permitFees, labor_cost: 0, notes: 'Estimated municipal permit fees' }] : []),
+    ],
+    totals: {
+      materials,
+      labor,
+      permit_or_fees: permitFees,
+      overhead_profit: overheadProfit,
+      subtotal,
+      tax_estimate: taxEstimate,
+      total_low: totalLow,
+      total_high: totalHigh,
+    },
+    timeline: {
+      duration_days_low: durationLow,
+      duration_days_high: durationHigh,
+    },
+    confidence: 0.3,
+    questions_to_confirm: [
+      'What is the exact size or square footage of the area?',
+      'Are there any existing issues (water damage, mold, structural)?',
+      'What level of finish or material quality are you looking for?',
+    ],
+    next_steps: [
+      'Get 3 quotes from licensed local contractors',
+      'Share photos for a more accurate estimate',
+      'Create a free account to save this estimate',
+    ],
+    note: customNote || 'This is a rough estimate generated without AI. For a more accurate quote, please create an account or provide more details.',
   };
 }
 
