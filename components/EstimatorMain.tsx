@@ -12,6 +12,7 @@ interface EstimatorMainProps {
   userId?: string | undefined;
   isBlocked?: boolean;
   onBlocked?: () => void;
+  isSignedIn?: boolean;
 }
 
 const PROJECT_TYPES = [
@@ -36,7 +37,7 @@ interface UploadedPhoto {
   isExample?: boolean;
 }
 
-export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked }: EstimatorMainProps) {
+export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked, isSignedIn }: EstimatorMainProps) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("");
@@ -44,6 +45,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -184,6 +186,26 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setAuthRequired(false);
+
+    // Auth gate: guests must sign in before generating an estimate
+    if (!isSignedIn) {
+      // Preserve form data so it can be restored after sign-in.
+      // Note: photos are intentionally excluded — base64 blobs can exceed
+      // sessionStorage quota limits. Users will need to re-upload after sign-in.
+      try {
+        sessionStorage.setItem('estimate_form_data', JSON.stringify({
+          description,
+          projectType,
+          postalCode,
+        }));
+      } catch {
+        // sessionStorage unavailable — ignore
+      }
+      setError("");
+      setAuthRequired(true);
+      return;
+    }
 
     // Free-use gate: block if caller says so
     if (isBlocked) {
@@ -271,12 +293,17 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       }, 300);
     } catch (err) {
       const rawMsg = err instanceof Error ? err.message : String(err);
-      // Map quota/rate-limit/API errors to a user-friendly message
-      const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
-      setError(isQuotaOrBillingErr
-        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
-        : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
-      );
+      // If the user somehow isn't signed in at this point, show the auth prompt
+      if (!isSignedIn) {
+        setAuthRequired(true);
+      } else {
+        // Map quota/rate-limit/API errors to a user-friendly message
+        const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
+        setError(isQuotaOrBillingErr
+          ? "We\u2019re sorry, we couldn\u2019t generate your estimate right now. Please try again in a moment."
+          : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
+        );
+      }
     } finally {
       setIsLoading(false);
       setLoadingStage("");
@@ -469,8 +496,23 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
             />
           </div>
 
+          {/* Auth-required message — shown to guests who click "Get Estimate" */}
+          {authRequired && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center">
+              <p className="text-sm font-semibold text-blue-900 mb-3">
+                Create a free account to get your AI estimate. It only takes a minute — no credit card needed.
+              </p>
+              <a
+                href="/sign-in"
+                className="block w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-2.5 rounded-lg text-sm transition-all"
+              >
+                Sign In / Create Free Account
+              </a>
+            </div>
+          )}
+
           {/* Error Message */}
-          {error && (
+          {error && !authRequired && (
             <div className="bg-red-50 border-2 border-red-200 rounded-lg p-2.5">
               <p className="text-xs text-red-700 font-semibold">{error}</p>
             </div>
