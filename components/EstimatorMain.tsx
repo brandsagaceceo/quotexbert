@@ -1,11 +1,13 @@
 // LIVE PRODUCTION COMPONENT — renamed for clarity (was IPhoneEstimatorMockup.tsx)
 "use client";
 
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface EstimatorMainProps {
   onEstimateComplete: (result: any) => void;
@@ -36,7 +38,11 @@ interface UploadedPhoto {
   isExample?: boolean;
 }
 
+const ESTIMATE_FORM_STORAGE_KEY = "qxb_estimate_form";
+
 export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked }: EstimatorMainProps) {
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("");
@@ -44,10 +50,29 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  // Restore saved form data from sessionStorage after returning from sign-in
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem(ESTIMATE_FORM_STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.description) setDescription(parsed.description);
+          if (parsed.projectType) setProjectType(parsed.projectType);
+          if (parsed.postalCode) setPostalCode(parsed.postalCode);
+          sessionStorage.removeItem(ESTIMATE_FORM_STORAGE_KEY);
+        } catch {
+          // ignore malformed data
+        }
+      }
+    }
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -184,6 +209,18 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setAuthMessage("");
+
+    // Hard gate: guests must sign in before generating an estimate
+    if (!isSignedIn) {
+      sessionStorage.setItem(ESTIMATE_FORM_STORAGE_KEY, JSON.stringify({
+        description,
+        projectType,
+        postalCode,
+      }));
+      setAuthMessage("Create a free account to get your AI estimate. No credit card needed.");
+      return;
+    }
 
     // Free-use gate: block if caller says so
     if (isBlocked) {
@@ -274,7 +311,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       // Map quota/rate-limit/API errors to a user-friendly message
       const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
       setError(isQuotaOrBillingErr
-        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
+        ? "Service is temporarily busy. Please try again in a moment."
         : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
       );
     } finally {
@@ -473,6 +510,20 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           {error && (
             <div className="bg-red-50 border-2 border-red-200 rounded-lg p-2.5">
               <p className="text-xs text-red-700 font-semibold">{error}</p>
+            </div>
+          )}
+
+          {/* Auth Gate Message — shown when a guest tries to submit */}
+          {authMessage && (
+            <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 text-center space-y-3">
+              <p className="text-sm text-amber-900 font-semibold">{authMessage}</p>
+              <button
+                type="button"
+                onClick={() => router.push(`/sign-in?redirect_url=${encodeURIComponent("/")}`)}
+                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-md"
+              >
+                Sign In / Create Free Account
+              </button>
             </div>
           )}
 
