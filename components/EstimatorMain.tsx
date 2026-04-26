@@ -1,11 +1,13 @@
 // LIVE PRODUCTION COMPONENT — renamed for clarity (was IPhoneEstimatorMockup.tsx)
 "use client";
 
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import Image from "next/image";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
+
+const ESTIMATE_FORM_STORAGE_KEY = 'qxb_estimate_form';
 
 interface EstimatorMainProps {
   onEstimateComplete: (result: any) => void;
@@ -50,6 +52,22 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  // Restore form data saved before sign-in redirect
+  useEffect(() => {
+    const saved = sessionStorage.getItem(ESTIMATE_FORM_STORAGE_KEY);
+    if (saved) {
+      try {
+        const { description: d, projectType: pt, postalCode: pc } = JSON.parse(saved);
+        if (d) setDescription(d);
+        if (pt) setProjectType(pt);
+        if (pc) setPostalCode(pc);
+        sessionStorage.removeItem(ESTIMATE_FORM_STORAGE_KEY);
+      } catch {
+        // ignore malformed data
+      }
+    }
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -208,6 +226,12 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 
     // Free-use gate: block if caller says so
     if (isBlocked) {
+      // Save form data so it can be restored after sign-in redirect
+      sessionStorage.setItem(ESTIMATE_FORM_STORAGE_KEY, JSON.stringify({
+        description,
+        projectType,
+        postalCode,
+      }));
       onBlocked?.();
       return;
     }
