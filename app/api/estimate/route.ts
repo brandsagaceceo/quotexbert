@@ -4,6 +4,16 @@ import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
 
+/** Pricing constants shared by AI and fallback estimate calculations */
+const ONTARIO_HST_RATE = 0.13;
+const OVERHEAD_PROFIT_MARGIN = 0.175;
+/** Upper bound multiplier for the high-end estimate range (25% variance) */
+const HIGH_ESTIMATE_MULTIPLIER = 1.25;
+/** AI-estimate high range multiplier (15% variance — narrower than fallback) */
+const AI_HIGH_ESTIMATE_MULTIPLIER = 1.15;
+/** Confidence score assigned to all keyword-based fallback estimates */
+const FALLBACK_CONFIDENCE = 0.3;
+
 // Initialize OpenAI client
 const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('demo') ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -296,11 +306,11 @@ ESTIMATION GUIDELINES:
       const materialsTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.material_cost || 0), 0);
       const laborTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.labor_cost || 0), 0);
       const subtotal = materialsTotal + laborTotal;
-      const overheadProfit = Math.round(subtotal * 0.175); // 17.5% average
+      const overheadProfit = Math.round(subtotal * OVERHEAD_PROFIT_MARGIN);
       const beforeTax = subtotal + overheadProfit + (estimate.totals.permit_or_fees || 0);
-      const taxEstimate = Math.round(beforeTax * 0.13); // Ontario HST
+      const taxEstimate = Math.round(beforeTax * ONTARIO_HST_RATE);
       const totalLow = beforeTax + taxEstimate;
-      const totalHigh = Math.round(totalLow * 1.15); // 15% range for uncertainty
+      const totalHigh = Math.round(totalLow * AI_HIGH_ESTIMATE_MULTIPLIER);
 
       // Ensure totals are calculated correctly
       estimate.totals = {
@@ -399,8 +409,15 @@ Be realistic and conservative. Return ONLY the JSON, no other text.`;
   };
 }
 
-// Structured fallback estimate that matches the full EstimateResultData shape.
-// Used whenever OpenAI is unavailable, fails, or quota is exceeded.
+/**
+ * Builds a structured fallback estimate that matches the full EstimateResultData shape.
+ * Used whenever OpenAI is unavailable, returns an error, or exceeds quota.
+ * Always returns HTTP 200 so the frontend can render a result.
+ *
+ * @param description - Lowercased project description (used for keyword matching)
+ * @param projectType - Human-readable project type (e.g. "Kitchen", "Roofing")
+ * @param customNote  - Optional override for the fallback notice shown to the user
+ */
 function buildFallbackEstimate(
   description: string,
   projectType: string,
@@ -418,6 +435,7 @@ function buildFallbackEstimate(
   note: string;
 } {
   const lower = description.toLowerCase();
+  const lowerType = projectType.toLowerCase();
 
   let summary = `${projectType} project estimate.`;
   let materials = 500;
@@ -455,26 +473,26 @@ function buildFallbackEstimate(
       summary = 'Bathroom improvement project.';
       materials = 1500; labor = 1500; durationLow = 2; durationHigh = 5;
     }
-  } else if (lower.includes('paint') || projectType.toLowerCase().includes('painting')) {
+  } else if (lower.includes('paint') || lowerType.includes('painting')) {
     const roomCount = extractRoomCount(lower);
     summary = `Interior painting for ${roomCount} room${roomCount > 1 ? 's' : ''}.`;
     materials = 400 * roomCount; labor = 600 * roomCount; durationLow = 1; durationHigh = 3;
     scopeItems = ['Surface preparation and priming', 'Apply 2 coats of paint', 'Touch-ups and final inspection'];
-  } else if (lower.includes('floor') || lower.includes('laminate') || lower.includes('hardwood') || lower.includes('tile') || projectType.toLowerCase().includes('flooring')) {
+  } else if (lower.includes('floor') || lower.includes('laminate') || lower.includes('hardwood') || lower.includes('tile') || lowerType.includes('flooring')) {
     const sqft = extractSquareFootage(lower) || 400;
     const isHardwood = lower.includes('hardwood');
     summary = `${isHardwood ? 'Hardwood' : 'Flooring'} installation for approximately ${sqft} sq ft.`;
     materials = sqft * (isHardwood ? 10 : 5); labor = sqft * 4; durationLow = 2; durationHigh = 5;
     scopeItems = ['Remove existing flooring', 'Subfloor preparation', `Install new ${isHardwood ? 'hardwood' : 'flooring'}`, 'Trim and finishing'];
-  } else if (lower.includes('roof') || projectType.toLowerCase().includes('roofing')) {
+  } else if (lower.includes('roof') || lowerType.includes('roofing')) {
     summary = 'Roof replacement or major repair.';
     materials = 7000; labor = 5000; permitFees = 500; durationLow = 3; durationHigh = 7;
     scopeItems = ['Remove existing shingles', 'Inspect and repair sheathing', 'Install new roofing material', 'Flashing and sealing'];
-  } else if (lower.includes('electrical') || lower.includes('wiring') || lower.includes('outlet') || projectType.toLowerCase().includes('electrical')) {
+  } else if (lower.includes('electrical') || lower.includes('wiring') || lower.includes('outlet') || lowerType.includes('electrical')) {
     summary = 'Electrical work including wiring or fixture installation.';
     materials = 300; labor = 600; durationLow = 1; durationHigh = 3;
     scopeItems = ['Electrical assessment', 'Install/replace wiring or outlets', 'Final testing and inspection'];
-  } else if (lower.includes('plumbing') || lower.includes('pipe') || lower.includes('drain') || projectType.toLowerCase().includes('plumbing')) {
+  } else if (lower.includes('plumbing') || lower.includes('pipe') || lower.includes('drain') || lowerType.includes('plumbing')) {
     summary = 'Plumbing repair or installation.';
     materials = 400; labor = 700; durationLow = 1; durationHigh = 3;
     scopeItems = ['Shut off water supply', 'Replace or repair pipes/fixtures', 'Test for leaks and restore water'];
@@ -482,30 +500,30 @@ function buildFallbackEstimate(
     summary = 'HVAC system installation or repair.';
     materials = 3000; labor = 2000; permitFees = 300; durationLow = 2; durationHigh = 5;
     scopeItems = ['System assessment', 'Install or replace HVAC unit', 'Ductwork and connections', 'Commissioning and testing'];
-  } else if (lower.includes('deck') || lower.includes('fence') || projectType.toLowerCase().includes('deck')) {
+  } else if (lower.includes('deck') || lower.includes('fence') || lowerType.includes('deck')) {
     summary = 'Deck or fence construction.';
     materials = 4000; labor = 3000; permitFees = 400; durationLow = 3; durationHigh = 10;
     scopeItems = ['Site preparation', 'Foundation/post installation', 'Frame and decking installation', 'Finish and sealant'];
-  } else if (lower.includes('basement') || projectType.toLowerCase().includes('basement')) {
+  } else if (lower.includes('basement') || lowerType.includes('basement')) {
     summary = 'Basement renovation or finishing.';
     materials = 8000; labor = 7000; permitFees = 700; durationLow = 10; durationHigh = 30;
     scopeItems = ['Framing and insulation', 'Drywall installation', 'Flooring', 'Electrical and lighting', 'Finishing touches'];
-  } else if (lower.includes('drywall') || projectType.toLowerCase().includes('drywall')) {
+  } else if (lower.includes('drywall') || lowerType.includes('drywall')) {
     summary = 'Drywall installation or repair.';
     materials = 800; labor = 1200; durationLow = 2; durationHigh = 5;
     scopeItems = ['Surface preparation', 'Install/patch drywall', 'Tape, mud, and sand', 'Prime and paint-ready finish'];
-  } else if (lower.includes('landscaping') || projectType.toLowerCase().includes('landscaping')) {
+  } else if (lower.includes('landscaping') || lowerType.includes('landscaping')) {
     summary = 'Landscaping project.';
     materials = 1500; labor = 2000; durationLow = 2; durationHigh = 7;
     scopeItems = ['Site assessment and design', 'Grading and soil preparation', 'Planting and hardscaping', 'Cleanup and final inspection'];
   }
 
   const subtotal = materials + labor;
-  const overheadProfit = Math.round(subtotal * 0.175);
+  const overheadProfit = Math.round(subtotal * OVERHEAD_PROFIT_MARGIN);
   const beforeTax = subtotal + overheadProfit + permitFees;
-  const taxEstimate = Math.round(beforeTax * 0.13); // Ontario HST
+  const taxEstimate = Math.round(beforeTax * ONTARIO_HST_RATE);
   const totalLow = beforeTax + taxEstimate;
-  const totalHigh = Math.round(totalLow * 1.25);
+  const totalHigh = Math.round(totalLow * HIGH_ESTIMATE_MULTIPLIER);
 
   return {
     summary,
@@ -534,7 +552,7 @@ function buildFallbackEstimate(
       duration_days_low: durationLow,
       duration_days_high: durationHigh,
     },
-    confidence: 0.3,
+    confidence: FALLBACK_CONFIDENCE,
     questions_to_confirm: [
       'What is the exact size or square footage of the area?',
       'Are there any existing issues (water damage, mold, structural)?',
