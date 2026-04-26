@@ -202,7 +202,6 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       } catch {
         // sessionStorage unavailable — ignore
       }
-      setError("");
       setAuthRequired(true);
       return;
     }
