@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, lazy, Suspense, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
@@ -37,6 +38,7 @@ export default function Home() {
   const [showSignUpGate, setShowSignUpGate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const toast = useToast();
+  const router = useRouter();
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
@@ -57,6 +59,17 @@ export default function Home() {
   const handleShowSignUpGate = () => {
     setShowSignUpGate(true);
     trackSignUpModalShown('estimator_gate');
+  };
+
+  const handleSignInRedirect = () => {
+    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    router.push(`/sign-in?redirect_url=${redirectUrl}`);
+  };
+
+  const handleSignUpRedirect = (trackSource?: string) => {
+    if (trackSource) trackCreateAccountClicked(trackSource);
+    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    router.push(`/sign-up?redirect_url=${redirectUrl}`);
   };
 
   // In production, fetch real reviews from API
@@ -82,7 +95,7 @@ export default function Home() {
     if (isSignedIn) {
       window.location.href = '/create-lead';
     } else {
-      window.location.href = '/sign-up';
+      handleSignUpRedirect();
     }
   };
 
@@ -91,7 +104,10 @@ export default function Home() {
       toast.success('Coming soon — save & email estimates!');
     } else {
       toast.error('Please sign in to save your estimate');
-      setTimeout(() => { window.location.href = '/sign-in'; }, 1200);
+      setTimeout(() => {
+        const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/sign-in?redirect_url=${redirectUrl}`;
+      }, 1200);
     }
   };
 
@@ -172,20 +188,21 @@ export default function Home() {
             </ul>
 
             {/* CTAs */}
-            <a
-              href="/sign-up"
-              onClick={() => trackCreateAccountClicked('signup_gate_modal')}
+            <button
+              type="button"
+              onClick={() => handleSignUpRedirect('signup_gate_modal')}
               data-track="create_account_clicked"
               className="block w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 sm:py-3.5 rounded-lg sm:rounded-xl text-sm sm:text-base transition mb-2 sm:mb-3"
             >
               Create Free Account →
-            </a>
-            <a
-              href="/sign-in"
+            </button>
+            <button
+              type="button"
+              onClick={handleSignInRedirect}
               className="block w-full text-slate-600 hover:text-rose-600 text-xs sm:text-sm font-medium transition"
             >
               Already have an account? Sign in
-            </a>
+            </button>
           </div>
         </div>
       )}
