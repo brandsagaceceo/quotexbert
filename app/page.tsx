@@ -181,7 +181,7 @@ export default function Home() {
               Create Free Account →
             </a>
             <a
-              href="/sign-in"
+              href={`/sign-in?redirect_url=${encodeURIComponent('/')}`}
               className="block w-full text-slate-600 hover:text-rose-600 text-xs sm:text-sm font-medium transition"
             >
               Already have an account? Sign in
