@@ -26,15 +26,16 @@ interface EstimateGateProps {
 function EstimateGate({ onClose }: EstimateGateProps) {
   const router = useRouter();
 
+  const getRedirectUrl = () =>
+    encodeURIComponent(window.location.pathname + window.location.search);
+
   const handleSignUp = () => {
     trackCreateAccountClicked("landing_gate");
-    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
-    router.push(`/sign-up?redirect_url=${redirectUrl}`);
+    router.push(`/sign-up?redirect_url=${getRedirectUrl()}`);
   };
 
   const handleSignIn = () => {
-    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
-    router.push(`/sign-in?redirect_url=${redirectUrl}`);
+    router.push(`/sign-in?redirect_url=${getRedirectUrl()}`);
   };
 
   return (

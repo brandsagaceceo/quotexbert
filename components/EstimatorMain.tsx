@@ -7,6 +7,8 @@ import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, Sparkles
 import { IPhoneFrame } from "./IPhoneFrame";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
+const ESTIMATE_FORM_STORAGE_KEY = 'qxb_estimate_form';
+
 interface EstimatorMainProps {
   onEstimateComplete: (result: any) => void;
   userId?: string | undefined;
@@ -51,14 +53,14 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 
   // Restore form data saved before sign-in redirect
   useEffect(() => {
-    const saved = sessionStorage.getItem('qxb_estimate_form');
+    const saved = sessionStorage.getItem(ESTIMATE_FORM_STORAGE_KEY);
     if (saved) {
       try {
         const { description: d, projectType: pt, postalCode: pc } = JSON.parse(saved);
         if (d) setDescription(d);
         if (pt) setProjectType(pt);
         if (pc) setPostalCode(pc);
-        sessionStorage.removeItem('qxb_estimate_form');
+        sessionStorage.removeItem(ESTIMATE_FORM_STORAGE_KEY);
       } catch {
         // ignore malformed data
       }
@@ -204,7 +206,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
     // Free-use gate: block if caller says so
     if (isBlocked) {
       // Save form data so it can be restored after sign-in redirect
-      sessionStorage.setItem('qxb_estimate_form', JSON.stringify({
+      sessionStorage.setItem(ESTIMATE_FORM_STORAGE_KEY, JSON.stringify({
         description,
         projectType,
         postalCode,

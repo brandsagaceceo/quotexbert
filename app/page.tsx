@@ -61,15 +61,16 @@ export default function Home() {
     trackSignUpModalShown('estimator_gate');
   };
 
+  const getRedirectUrl = () =>
+    encodeURIComponent(window.location.pathname + window.location.search);
+
   const handleSignInRedirect = () => {
-    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
-    router.push(`/sign-in?redirect_url=${redirectUrl}`);
+    router.push(`/sign-in?redirect_url=${getRedirectUrl()}`);
   };
 
   const handleSignUpRedirect = (trackSource?: string) => {
     if (trackSource) trackCreateAccountClicked(trackSource);
-    const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
-    router.push(`/sign-up?redirect_url=${redirectUrl}`);
+    router.push(`/sign-up?redirect_url=${getRedirectUrl()}`);
   };
 
   // In production, fetch real reviews from API
@@ -105,8 +106,7 @@ export default function Home() {
     } else {
       toast.error('Please sign in to save your estimate');
       setTimeout(() => {
-        const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.href = `/sign-in?redirect_url=${redirectUrl}`;
+        window.location.href = `/sign-in?redirect_url=${getRedirectUrl()}`;
       }, 1200);
     }
   };
