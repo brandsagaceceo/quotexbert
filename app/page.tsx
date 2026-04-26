@@ -51,8 +51,8 @@ export default function Home() {
     }
   }, [isSignedIn]);
 
-  // Block the estimator for unauthenticated visitors who have already used their 1 free estimate
-  const isEstimatorBlocked = !isSignedIn && hasUsedFree;
+  // Block the estimator for all unauthenticated visitors
+  const isEstimatorBlocked = !isSignedIn;
 
   const handleShowSignUpGate = () => {
     setShowSignUpGate(true);
@@ -317,6 +317,7 @@ export default function Home() {
                   userId={user?.id || undefined}
                   isBlocked={isEstimatorBlocked}
                   onBlocked={handleShowSignUpGate}
+                  isSignedIn={isSignedIn}
                 />
               </div>
             </div>
