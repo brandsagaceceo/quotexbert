@@ -45,6 +45,7 @@ interface EstimateResultData {
   confidence: number;
   questions_to_confirm: string[];
   next_steps: string[];
+  note?: string;
 }
 
 interface EstimateResultsProps {
@@ -240,6 +241,16 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
       </div>
 
       <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+        {/* Low-confidence / fallback notice */}
+        {(data.note || data.confidence < 0.5) && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <ExclamationTriangleIcon className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800">
+              {data.note || 'Estimate may be less accurate — provide more details or photos for a better quote.'}
+            </p>
+          </div>
+        )}
+
         {/* Summary */}
         <div>
           <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3">Project Summary</h3>

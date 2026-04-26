@@ -251,8 +251,10 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to generate estimate");
+      // The API always returns 200 with either a real estimate or a structured fallback.
+      // Only treat a non-OK response as an error if there is no usable estimate data.
+      if (!response.ok && !data?.totals) {
+        throw new Error(data?.error || "Failed to generate estimate");
       }
 
       setLoadingStage("Matching contractors...");
@@ -270,13 +272,8 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
         });
       }, 300);
     } catch (err) {
-      const rawMsg = err instanceof Error ? err.message : String(err);
-      // Map quota/rate-limit/API errors to a user-friendly message
-      const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
-      setError(isQuotaOrBillingErr
-        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
-        : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
-      );
+      console.error('[EstimatorMain] Estimate request failed:', err);
+      setError("We couldn\u2019t generate your estimate right now. Please try again.");
     } finally {
       setIsLoading(false);
       setLoadingStage("");
