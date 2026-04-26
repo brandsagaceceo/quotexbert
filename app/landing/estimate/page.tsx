@@ -91,7 +91,7 @@ export default function LandingEstimatePage() {
     }
   }, [isSignedIn]);
 
-  const isBlocked = !isSignedIn && hasUsedFree;
+  const isBlocked = !isSignedIn;
 
   const handleEstimateComplete = (result: any) => {
     setEstimateResult(result);
@@ -210,6 +210,7 @@ export default function LandingEstimatePage() {
                     userId={authUser?.id}
                     isBlocked={isBlocked}
                     onBlocked={() => setShowGate(true)}
+                    isSignedIn={isSignedIn}
                   />
                 </div>
               </div>
