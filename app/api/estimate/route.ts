@@ -123,28 +123,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Check for rate limit / quota errors (OpenAI returns these in several different shapes)
-    const errorMessage = error?.message || error?.toString() || '';
-    const isQuotaError =
-      errorMessage.includes('quota') ||
-      errorMessage.includes('rate limit') ||
-      errorMessage.includes('exceeded') ||
-      errorMessage.includes('billing') ||
-      errorMessage.includes('429') ||
-      error?.status === 429 ||
-      error?.code === 'insufficient_quota';
-    
-    if (isQuotaError) {
-      return NextResponse.json(
-        { 
-          error: "High demand right now. Please try again in a moment.",
-          type: "rate_limit"
-        },
-        { status: 429 }
-      );
-    }
-    
-    // Fallback to basic estimate if OpenAI fails
+    // Fallback to basic estimate if OpenAI fails (quota/rate-limit or any other error)
     try {
       const fallbackEstimate = generateFallbackEstimate(
         description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
