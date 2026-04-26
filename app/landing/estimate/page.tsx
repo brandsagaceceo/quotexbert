@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
@@ -23,6 +24,20 @@ interface EstimateGateProps {
 // ─── Sign-up Gate (lighter version for landing page) ─────────────────────────
 
 function EstimateGate({ onClose }: EstimateGateProps) {
+  const router = useRouter();
+
+  const getRedirectUrl = () =>
+    encodeURIComponent(window.location.pathname + window.location.search);
+
+  const handleSignUp = () => {
+    trackCreateAccountClicked("landing_gate");
+    router.push(`/sign-up?redirect_url=${getRedirectUrl()}`);
+  };
+
+  const handleSignIn = () => {
+    router.push(`/sign-in?redirect_url=${getRedirectUrl()}`);
+  };
+
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
@@ -50,20 +65,21 @@ function EstimateGate({ onClose }: EstimateGateProps) {
           ].map((b) => <li key={b}>{b}</li>)}
         </ul>
 
-        <a
-          href="/sign-up"
-          onClick={() => trackCreateAccountClicked("landing_gate")}
+        <button
+          type="button"
+          onClick={handleSignUp}
           data-track="create_account_clicked"
           className="block w-full bg-brand text-white font-bold py-3.5 rounded-xl text-base transition hover:bg-brand-dark mb-3"
         >
           Create Free Account →
-        </a>
-        <a
-          href="/sign-in"
+        </button>
+        <button
+          type="button"
+          onClick={handleSignIn}
           className="block w-full text-gray-500 hover:text-brand text-sm font-medium transition"
         >
           Already have an account? Sign in
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -91,7 +107,7 @@ export default function LandingEstimatePage() {
     }
   }, [isSignedIn]);
 
-  const isBlocked = !isSignedIn && hasUsedFree;
+  const isBlocked = !isSignedIn;
 
   const handleEstimateComplete = (result: any) => {
     setEstimateResult(result);
@@ -210,6 +226,7 @@ export default function LandingEstimatePage() {
                     userId={authUser?.id}
                     isBlocked={isBlocked}
                     onBlocked={() => setShowGate(true)}
+                    isSignedIn={isSignedIn}
                   />
                 </div>
               </div>
