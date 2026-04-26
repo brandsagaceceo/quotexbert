@@ -270,13 +270,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
         });
       }, 300);
     } catch (err) {
-      const rawMsg = err instanceof Error ? err.message : String(err);
-      // Map quota/rate-limit/API errors to a user-friendly message
-      const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
-      setError(isQuotaOrBillingErr
-        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
-        : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
-      );
+      setError("We couldn't generate your estimate right now. Please try again.");
     } finally {
       setIsLoading(false);
       setLoadingStage("");

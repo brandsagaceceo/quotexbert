@@ -40,13 +40,13 @@ export default function Home() {
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
-    setHasUsedFree(localStorage.getItem('estimateUsed') === '1');
+    setHasUsedFree(localStorage.getItem('qxb_guest_estimate_used') === 'true');
   }, []);
 
   // When user signs in, clear the guest gate so returning users aren't blocked
   useEffect(() => {
     if (isSignedIn) {
-      localStorage.removeItem('estimateUsed');
+      localStorage.removeItem('qxb_guest_estimate_used');
       setHasUsedFree(false);
     }
   }, [isSignedIn]);
@@ -101,7 +101,7 @@ export default function Home() {
 
     // Mark free estimate as used for unauthenticated visitors
     if (!isSignedIn) {
-      localStorage.setItem('estimateUsed', '1');
+      localStorage.setItem('qxb_guest_estimate_used', 'true');
       setHasUsedFree(true);
     }
     
