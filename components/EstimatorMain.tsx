@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { CloudArrowUpIcon, XMarkIcon, PhotoIcon, DevicePhoneMobileIcon, SparklesIcon, MicrophoneIcon } from "@heroicons/react/24/outline";
 import { IPhoneFrame } from "./IPhoneFrame";
@@ -37,6 +39,8 @@ interface UploadedPhoto {
 }
 
 export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked }: EstimatorMainProps) {
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [description, setDescription] = useState("");
   const [projectType, setProjectType] = useState("");
@@ -44,6 +48,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState("");
   const [error, setError] = useState("");
+  const [guestMessage, setGuestMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -184,6 +189,19 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setGuestMessage("");
+
+    // GUEST GATE — must be first check: do not call estimate API for unauthenticated users
+    if (!isSignedIn) {
+      // Save form data to sessionStorage so it can be restored after sign-in
+      try {
+        sessionStorage.setItem('estimate_form', JSON.stringify({ description, projectType, postalCode }));
+      } catch {
+        // sessionStorage not available — ignore
+      }
+      setGuestMessage("Create a free account to get your AI estimate. No credit card needed.");
+      return;
+    }
 
     // Free-use gate: block if caller says so
     if (isBlocked) {
@@ -274,7 +292,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       // Map quota/rate-limit/API errors to a user-friendly message
       const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
       setError(isQuotaOrBillingErr
-        ? "\u23F3 We\u2019re experiencing high demand. Please try again in a moment."
+        ? "Our AI estimator is temporarily busy. Please try again in a moment."
         : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
       );
     } finally {
@@ -468,6 +486,27 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
                        placeholder:text-slate-400"
             />
           </div>
+
+          {/* Guest Sign-In Prompt */}
+          {guestMessage && (
+            <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-3">
+              <p className="text-sm text-slate-800 font-semibold mb-2">{guestMessage}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  const redirectPath = typeof window !== 'undefined'
+                    ? window.location.pathname + window.location.search
+                    : '/';
+                  router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectPath)}`);
+                }}
+                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700
+                         hover:to-orange-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm
+                         transition-all shadow-md"
+              >
+                Sign In / Create Free Account
+              </button>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
