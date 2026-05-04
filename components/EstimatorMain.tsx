@@ -271,8 +271,13 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 
       if (!response.ok) {
         console.error("Estimate failed:", data);
-        setError("Something went wrong. Please try again.");
-        return;
+        // If the API still sent a usable estimate shape despite non-ok, use it
+        if (data?.totals || data?.estimate) {
+          onEstimateComplete(data);
+        } else {
+          setError(data?.error || "Something went wrong. Please try again.");
+          return;
+        }
       }
 
       setLoadingStage("Matching contractors...");

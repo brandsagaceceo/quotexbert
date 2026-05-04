@@ -154,8 +154,13 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
 
       if (!response.ok) {
         console.error("Estimate failed:", data);
-        setError("Something went wrong. Please try again.");
-        return;
+        // If the API still sent a usable estimate shape despite non-ok, use it
+        if (data?.totals || data?.estimate) {
+          onEstimateComplete(data);
+        } else {
+          setError(data?.error || "Something went wrong. Please try again.");
+          return;
+        }
       }
 
       onEstimateComplete(data);

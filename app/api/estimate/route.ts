@@ -30,8 +30,13 @@ export async function POST(req: NextRequest) {
   try {
     const body: EstimateRequest = await req.json();
     requestBody = body;
-    console.log("=== ESTIMATE REQUEST ===");
-    console.log("Body:", body);
+    console.log("📩 ESTIMATE REQUEST", {
+      userId: body.userId || "anonymous",
+      projectType: body.projectType,
+      photoCount: body.photos?.length ?? 0,
+      hasDescription: !!(body.description?.trim()),
+      postalCode: body.postalCode || "not_provided",
+    });
 
     description = body.description;
     photos = body.photos;
@@ -49,10 +54,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Validation
-    if (!description?.trim() || !projectType?.trim()) {
+    // Validation — require projectType; require at least description OR photos
+    if (!projectType?.trim()) {
       return NextResponse.json(
         { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    if ((!description || description.trim().length < 1) && (!photos || photos.length === 0)) {
+      return NextResponse.json(
+        { error: "Please provide either a description or upload photos" },
         { status: 400 },
       );
     }
@@ -68,12 +80,13 @@ export async function POST(req: NextRequest) {
     // Check if OpenAI API key is configured
     if (!openai) {
       console.warn("OpenAI API key not configured, using fallback");
-      return NextResponse.json(
-        buildFallbackEstimateResponse(
+      return NextResponse.json({
+        success: true,
+        ...buildFallbackEstimateResponse(
           description?.toLowerCase() || projectType.toLowerCase(),
           "OpenAI API key is not configured",
         ),
-      );
+      });
     }
 
     // Generate AI-powered estimate using OpenAI (multimodal)
@@ -101,8 +114,7 @@ export async function POST(req: NextRequest) {
         aiPowered: true,
       }
     ).catch((err) => {
-      console.error("Service failed: analytics logging", err);
-      throw err;
+      console.error("Service failed: analytics logging (non-fatal)", err);
     });
 
     // Phase 6: structured learning signal
@@ -117,7 +129,7 @@ export async function POST(req: NextRequest) {
       console.error("Service failed: quote signal emission", err);
     });
 
-    return NextResponse.json(estimate);
+    return NextResponse.json({ success: true, ...estimate });
   } catch (error: any) {
     console.error("❌ ESTIMATE ERROR:", error);
     console.error("[ESTIMATE][request-body]", requestBody);
@@ -136,16 +148,12 @@ export async function POST(req: NextRequest) {
 
     // Fallback to basic estimate if any service fails. Keep 200 so user never hits a dead-end.
     try {
-      const fallbackEstimate = generateFallbackEstimate(
-        description?.toLowerCase() ||
-        projectType?.toLowerCase() ||
-        requestBody?.description?.toLowerCase() ||
-        requestBody?.projectType?.toLowerCase() ||
-        "home repair"
-      );
       return NextResponse.json({
+        success: true,
         ...buildFallbackEstimateResponse(
-          description?.toLowerCase() || projectType?.toLowerCase() || "home repair",
+          description?.toLowerCase() || projectType?.toLowerCase() ||
+          requestBody?.description?.toLowerCase() || requestBody?.projectType?.toLowerCase() ||
+          "home repair",
           error?.message || "Unknown error",
         ),
         warning: "Estimate generation failed. Returned fallback estimate.",
@@ -154,6 +162,7 @@ export async function POST(req: NextRequest) {
       console.error("Service failed: fallback estimate generation", fallbackError);
       return NextResponse.json(
         {
+          success: true,
           ...buildStaticFallbackEstimateResponse(error?.message || "Unknown error"),
           warning: "Estimate generation failed. Returned static fallback estimate.",
         },
