@@ -267,10 +267,12 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate estimate");
+        console.error("Estimate failed:", data);
+        setError("Something went wrong. Please try again.");
+        return;
       }
 
       setLoadingStage("Matching contractors...");
@@ -288,13 +290,8 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
         });
       }, 300);
     } catch (err) {
-      const rawMsg = err instanceof Error ? err.message : String(err);
-      // Map quota/rate-limit/API errors to a user-friendly message
-      const isQuotaOrBillingErr = /quota|rate.?limit|429|billing|exceeded|high demand/i.test(rawMsg);
-      setError(isQuotaOrBillingErr
-        ? "Our AI estimator is temporarily busy. Please try again in a moment."
-        : "We couldn\u2019t generate your estimate. Please check your inputs and try again."
-      );
+      console.error("Frontend error:", err);
+      setError("Network error. Try again.");
     } finally {
       setIsLoading(false);
       setLoadingStage("");

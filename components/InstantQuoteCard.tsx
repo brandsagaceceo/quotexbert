@@ -150,15 +150,18 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate estimate");
+        console.error("Estimate failed:", data);
+        setError("Something went wrong. Please try again.");
+        return;
       }
 
       onEstimateComplete(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate estimate");
+      console.error("Frontend error:", err);
+      setError("Network error. Try again.");
     } finally {
       setIsLoading(false);
     }

@@ -20,6 +20,7 @@ interface EstimateRequest {
 // AI estimate using real OpenAI API with multimodal support
 export async function POST(req: NextRequest) {
   // Hoist parsed body so catch block can reference it without re-consuming the stream
+  let requestBody: EstimateRequest | null = null;
   let description: string | undefined;
   let photos: string[] | undefined;
   let projectType: string = '';
@@ -28,6 +29,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const body: EstimateRequest = await req.json();
+    requestBody = body;
+    console.log("=== ESTIMATE REQUEST ===");
+    console.log("Body:", body);
+
     description = body.description;
     photos = body.photos;
     projectType = body.projectType;
@@ -45,16 +50,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Validation
-    if (!projectType) {
+    if (!description?.trim() || !projectType?.trim()) {
       return NextResponse.json(
-        { error: "Project type is required" },
-        { status: 400 },
-      );
-    }
-
-    if ((!description || description.trim().length < 3) && (!photos || photos.length === 0)) {
-      return NextResponse.json(
-        { error: "Please provide either a description or upload photos" },
+        { error: "Missing required fields" },
         { status: 400 },
       );
     }
@@ -70,8 +68,12 @@ export async function POST(req: NextRequest) {
     // Check if OpenAI API key is configured
     if (!openai) {
       console.warn("OpenAI API key not configured, using fallback");
-      const estimate = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
-      return NextResponse.json(estimate);
+      return NextResponse.json(
+        buildFallbackEstimateResponse(
+          description?.toLowerCase() || projectType.toLowerCase(),
+          "OpenAI API key is not configured",
+        ),
+      );
     }
 
     // Generate AI-powered estimate using OpenAI (multimodal)
@@ -80,6 +82,9 @@ export async function POST(req: NextRequest) {
       photos: photos || [],
       projectType,
       postalCode: postalCode || "",
+    }).catch((err) => {
+      console.error("Service failed: OpenAI estimate generation", err);
+      throw err;
     });
 
     // Log analytics event
@@ -95,7 +100,10 @@ export async function POST(req: NextRequest) {
         confidence: estimate.confidence,
         aiPowered: true,
       }
-    );
+    ).catch((err) => {
+      console.error("Service failed: analytics logging", err);
+      throw err;
+    });
 
     // Phase 6: structured learning signal
     void emitQuoteSignal({
@@ -105,11 +113,14 @@ export async function POST(req: NextRequest) {
       aiEstimateLow: estimate.totals?.total_low,
       aiEstimateHigh: estimate.totals?.total_high,
       createdByRole: 'system',
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Service failed: quote signal emission", err);
+    });
 
     return NextResponse.json(estimate);
   } catch (error: any) {
-    console.error("Error generating estimate:", error);
+    console.error("❌ ESTIMATE ERROR:", error);
+    console.error("[ESTIMATE][request-body]", requestBody);
     
     // Dev logging for diagnosing estimate failures
     if (process.env.NODE_ENV === 'development') {
@@ -123,40 +134,30 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Check for rate limit / quota errors (OpenAI returns these in several different shapes)
-    const errorMessage = error?.message || error?.toString() || '';
-    const isQuotaError =
-      errorMessage.includes('quota') ||
-      errorMessage.includes('rate limit') ||
-      errorMessage.includes('exceeded') ||
-      errorMessage.includes('billing') ||
-      errorMessage.includes('429') ||
-      error?.status === 429 ||
-      error?.code === 'insufficient_quota';
-    
-    if (isQuotaError) {
-      return NextResponse.json(
-        { 
-          error: "High demand right now. Please try again in a moment.",
-          type: "rate_limit"
-        },
-        { status: 429 }
-      );
-    }
-    
-    // Fallback to basic estimate if OpenAI fails
+    // Fallback to basic estimate if any service fails. Keep 200 so user never hits a dead-end.
     try {
       const fallbackEstimate = generateFallbackEstimate(
-        description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
+        description?.toLowerCase() ||
+        projectType?.toLowerCase() ||
+        requestBody?.description?.toLowerCase() ||
+        requestBody?.projectType?.toLowerCase() ||
+        "home repair"
       );
       return NextResponse.json({
-        ...fallbackEstimate,
-        warning: "AI service temporarily unavailable, using basic estimate"
+        ...buildFallbackEstimateResponse(
+          description?.toLowerCase() || projectType?.toLowerCase() || "home repair",
+          error?.message || "Unknown error",
+        ),
+        warning: "Estimate generation failed. Returned fallback estimate.",
       });
-    } catch {
+    } catch (fallbackError: any) {
+      console.error("Service failed: fallback estimate generation", fallbackError);
       return NextResponse.json(
-        { error: "Failed to generate estimate" },
-        { status: 500 },
+        {
+          ...buildStaticFallbackEstimateResponse(error?.message || "Unknown error"),
+          warning: "Estimate generation failed. Returned static fallback estimate.",
+        },
+        { status: 200 },
       );
     }
   }
@@ -317,6 +318,9 @@ ESTIMATION GUIDELINES:
         temperature: 0.4, // lower temperature → more consistent, realistic estimates
         max_tokens: 2500,
         response_format: { type: "json_object" },
+      }).catch((err) => {
+        console.error("Service failed: OpenAI chat completion", err);
+        throw err;
       });
 
       const response = completion.choices[0]?.message?.content?.trim();
@@ -437,6 +441,96 @@ Be realistic and conservative. Return ONLY the JSON, no other text.`;
     min: Math.round(estimate.min),
     max: Math.round(estimate.max),
     description: estimate.description
+  };
+}
+
+function buildFallbackEstimateResponse(input: string, details: string) {
+  const fallbackEstimate = generateFallbackEstimate(input || "home repair");
+  const low = Math.round(fallbackEstimate.min);
+  const high = Math.round(fallbackEstimate.max);
+
+  return {
+    summary: fallbackEstimate.description,
+    scope: ["General scope based on provided project details"],
+    assumptions: ["Final pricing depends on site visit and contractor quote"],
+    line_items: [
+      {
+        name: "General project allowance",
+        qty: 1,
+        unit: "each",
+        material_cost: Math.round(low * 0.45),
+        labor_cost: Math.round(low * 0.55),
+        notes: "Fallback estimate due to temporary service issue",
+      },
+    ],
+    totals: {
+      materials: Math.round(low * 0.45),
+      labor: Math.round(low * 0.55),
+      permit_or_fees: 0,
+      overhead_profit: Math.round(low * 0.15),
+      subtotal: low,
+      tax_estimate: 0,
+      total_low: low,
+      total_high: high,
+    },
+    timeline: {
+      duration_days_low: 2,
+      duration_days_high: 7,
+    },
+    confidence: 0.35,
+    questions_to_confirm: [
+      "Can you share measurements and preferred materials for a refined quote?",
+    ],
+    next_steps: [
+      "Upload clear photos and project dimensions for a more accurate estimate",
+    ],
+    estimate: {
+      low,
+      high,
+      note: "Rough estimate (fallback)",
+    },
+    details,
+  };
+}
+
+function buildStaticFallbackEstimateResponse(details: string) {
+  return {
+    summary: "Rough estimate based on standard home repair pricing.",
+    scope: ["General home repair"],
+    assumptions: ["This is a backup estimate with limited project detail"],
+    line_items: [
+      {
+        name: "General project allowance",
+        qty: 1,
+        unit: "each",
+        material_cost: 225,
+        labor_cost: 275,
+        notes: "Static fallback estimate",
+      },
+    ],
+    totals: {
+      materials: 225,
+      labor: 275,
+      permit_or_fees: 0,
+      overhead_profit: 75,
+      subtotal: 500,
+      tax_estimate: 0,
+      total_low: 500,
+      total_high: 1500,
+    },
+    timeline: {
+      duration_days_low: 2,
+      duration_days_high: 7,
+    },
+    confidence: 0.25,
+    questions_to_confirm: ["Please provide project details for a refined quote"],
+    next_steps: ["Retry estimate generation or request contractor follow-up"],
+    estimate: {
+      low: 500,
+      high: 1500,
+      note: "Rough estimate (fallback)",
+    },
+    details,
   };
 }
 
