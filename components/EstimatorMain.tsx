@@ -51,7 +51,7 @@ function buildClientFallback(projectType: string) {
       materials: 500,
       labor: 750,
       permit_or_fees: 0,
-      overhead_profit: 218,
+    overhead_profit: 218, // ~17.5% of subtotal (1250 * 0.175 ≈ 218)
       subtotal: 1250,
       tax_estimate: 163,
       total_low: 500,
