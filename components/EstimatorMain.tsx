@@ -18,22 +18,28 @@ interface EstimatorMainProps {
 
 // Compress a File to a JPEG base64 string ≤ ~200 KB
 async function compressImage(file: File): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
+    reader.onerror = () => reject(new Error('FileReader failed'));
     reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
+      const img = new window.Image();
+      img.onerror = () => reject(new Error('Image failed to load'));
       img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const MAX_WIDTH = 800;
-        const scale = Math.min(1, MAX_WIDTH / img.width);
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const compressed = canvas.toDataURL("image/jpeg", 0.6);
-        resolve(compressed);
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const MAX_WIDTH = 1024;
+          const scale = Math.min(1, MAX_WIDTH / img.width);
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.75);
+          resolve(compressed);
+        } catch (err) {
+          reject(err);
+        }
       };
+      img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
   });
@@ -266,11 +272,18 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       const realPhotos = realPhotosForCount;
       console.log("Uploading photos:", realPhotos.length);
 
-      const photoBase64 = await Promise.all(
-        realPhotos.map(photo => compressImage(photo.file))
-      );
-
-      console.log("Compressed size check done — photo count:", photoBase64.length);
+      // Compress photos — fall back to sending description-only if compression fails
+      let photoBase64: string[] = [];
+      if (realPhotos.length > 0) {
+        try {
+          photoBase64 = await Promise.all(
+            realPhotos.map(photo => compressImage(photo.file))
+          );
+        } catch (compressErr) {
+          console.warn("Photo compression failed, continuing without photos:", compressErr);
+          setLoadingStage("Analyzing project details...");
+        }
+      }
 
       // Save compressed photos to localStorage for later use
       if (photoBase64.length > 0) {
@@ -283,19 +296,29 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 
       setLoadingStage("Checking local pricing...");
 
-      const response = await fetch("/api/estimate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          description: description.trim(),
-          photos: photoBase64,
-          projectType,
-          postalCode: postalCode.trim().toUpperCase(),
-          userId,
-        }),
-      });
+      // Abort after 90s so the UI never hangs forever
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 90_000);
+
+      let response: Response;
+      try {
+        response = await fetch("/api/estimate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            description: description.trim(),
+            photos: photoBase64,
+            projectType,
+            postalCode: postalCode.trim().toUpperCase(),
+            userId,
+          }),
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const data = await response.json().catch(() => null);
 
@@ -324,25 +347,29 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           block: 'start'
         });
       }, 300);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Upload/estimate failed:", err);
-      // Never show a dead-end — fall back to a rough estimate
-      onEstimateComplete({
-        success: true,
-        summary: "Rough estimate based on typical project pricing.",
-        totals: {
-          materials: 500,
-          labor: 700,
-          permit_or_fees: 0,
-          overhead_profit: 150,
-          subtotal: 1350,
-          tax_estimate: 175,
-          total_low: 500,
-          total_high: 1500,
-        },
-        confidence: 0.3,
-        warning: "Rough estimate (upload issue fallback)",
-      });
+      if (err?.name === 'AbortError') {
+        setError("Analysis timed out. Try adding a description instead of (or alongside) a photo, then try again.");
+      } else {
+        // Never show a dead-end — fall back to a rough estimate
+        onEstimateComplete({
+          success: true,
+          summary: "Rough estimate based on typical project pricing.",
+          totals: {
+            materials: 500,
+            labor: 700,
+            permit_or_fees: 0,
+            overhead_profit: 150,
+            subtotal: 1350,
+            tax_estimate: 175,
+            total_low: 500,
+            total_high: 1500,
+          },
+          confidence: 0.3,
+          warning: "Rough estimate (upload issue fallback)",
+        });
+      }
     } finally {
       setIsLoading(false);
       setLoadingStage("");
