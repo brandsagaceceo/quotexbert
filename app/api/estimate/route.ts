@@ -34,15 +34,13 @@ export async function POST(req: NextRequest) {
     postalCode = body.postalCode;
     userId = body.userId;
 
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('[ESTIMATE][request]', {
-        userId: userId || 'anonymous',
-        projectType,
-        photoCount: photos?.length ?? 0,
-        hasDescription: !!description?.trim(),
-        postalCode: postalCode || 'not_provided',
-      });
-    }
+    console.log("📩 Incoming estimate request:", {
+      userId: userId || 'anonymous',
+      projectType,
+      photoCount: photos?.length ?? 0,
+      hasDescription: !!description?.trim(),
+      postalCode: postalCode || 'not_provided',
+    });
 
     // Validation
     if (!projectType) {
@@ -70,8 +68,11 @@ export async function POST(req: NextRequest) {
     // Check if OpenAI API key is configured
     if (!openai) {
       console.warn("OpenAI API key not configured, using fallback");
-      const estimate = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
-      return NextResponse.json(estimate);
+      const simple = generateFallbackEstimate(description?.toLowerCase() || projectType.toLowerCase());
+      return NextResponse.json({
+        ...buildStructuredFallback(simple, projectType),
+        warning: "AI service not configured, using basic estimate",
+      });
     }
 
     // Generate AI-powered estimate using OpenAI (multimodal)
@@ -135,13 +136,13 @@ export async function POST(req: NextRequest) {
       error?.code === 'insufficient_quota';
     
     if (isQuotaError) {
-      return NextResponse.json(
-        { 
-          error: "High demand right now. Please try again in a moment.",
-          type: "rate_limit"
-        },
-        { status: 429 }
+      const simpleEstimate = generateFallbackEstimate(
+        description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
       );
+      return NextResponse.json({
+        ...buildStructuredFallback(simpleEstimate, projectType || "home repair"),
+        warning: "High demand right now. Using basic estimate.",
+      });
     }
     
     // Fallback to basic estimate if OpenAI fails
@@ -150,14 +151,15 @@ export async function POST(req: NextRequest) {
         description?.toLowerCase() || projectType?.toLowerCase() || "home repair"
       );
       return NextResponse.json({
-        ...fallbackEstimate,
-        warning: "AI service temporarily unavailable, using basic estimate"
+        ...buildStructuredFallback(fallbackEstimate, projectType || "home repair"),
+        warning: "AI service temporarily unavailable, using basic estimate",
       });
     } catch {
-      return NextResponse.json(
-        { error: "Failed to generate estimate" },
-        { status: 500 },
+      const emergency = buildStructuredFallback(
+        { min: 500, max: 2000, description: "General home repair estimate." },
+        projectType || "home repair"
       );
+      return NextResponse.json({ ...emergency, warning: "AI service temporarily unavailable, using basic estimate" });
     }
   }
 }
@@ -437,6 +439,54 @@ Be realistic and conservative. Return ONLY the JSON, no other text.`;
     min: Math.round(estimate.min),
     max: Math.round(estimate.max),
     description: estimate.description
+  };
+}
+
+// Convert simple { min, max, description } fallback into the full EstimateResultData shape
+function buildStructuredFallback(
+  simple: { min: number; max: number; description: string },
+  projectType: string
+) {
+  const laborCost = Math.round(simple.min * 0.5);
+  const materialCost = simple.min - laborCost;
+  const overhead = Math.round(simple.min * 0.175);
+  const subtotal = simple.min;
+  const tax = Math.round((subtotal + overhead) * 0.13);
+  return {
+    summary: `${projectType} project estimate. ${simple.description}`,
+    scope: [
+      "Evaluation of project scope and site conditions",
+      "Labor and materials for project completion",
+    ],
+    assumptions: [
+      "Standard materials and mid-range finishes",
+      "Normal site and access conditions",
+      "No hidden structural or code issues",
+    ],
+    line_items: [
+      { name: "Labor", qty: 1, unit: "job", material_cost: 0, labor_cost: laborCost, notes: "Skilled trade labor (GTA rates)" },
+      { name: "Materials", qty: 1, unit: "job", material_cost: materialCost, labor_cost: 0, notes: "Standard materials and supplies" },
+    ],
+    totals: {
+      materials: materialCost,
+      labor: laborCost,
+      permit_or_fees: 0,
+      overhead_profit: overhead,
+      subtotal,
+      tax_estimate: tax,
+      total_low: simple.min,
+      total_high: simple.max,
+    },
+    timeline: { duration_days_low: 1, duration_days_high: 7 },
+    confidence: 0.3,
+    questions_to_confirm: [
+      "What is the approximate size of the project area?",
+      "Are there any existing issues or special requirements?",
+    ],
+    next_steps: [
+      "Get 3 detailed quotes from licensed GTA contractors",
+      "Ask contractors about warranties and project timelines",
+    ],
   };
 }
 
