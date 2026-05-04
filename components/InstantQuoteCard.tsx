@@ -75,6 +75,36 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
     }
   };
 
+  // Compress image to max 1024px and 80% JPEG quality before sending to API
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = document.createElement('img');
+        img.onload = () => {
+          const MAX_SIZE = 1024;
+          let { width, height } = img;
+          if (width > height) {
+            if (width > MAX_SIZE) { height = Math.round(height * MAX_SIZE / width); width = MAX_SIZE; }
+          } else {
+            if (height > MAX_SIZE) { width = Math.round(width * MAX_SIZE / height); height = MAX_SIZE; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { reject(new Error('Canvas not supported')); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.onerror = reject;
+        img.src = reader.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const addPhotos = (files: File[]) => {
     if (photos.length + files.length > 5) {
       setError("Maximum 5 photos allowed");
@@ -123,18 +153,13 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
 
     setIsLoading(true);
 
-    try {
-      // Convert photos to base64
-      const photoPromises = photos.map(photo => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(photo.file);
-        });
-      });
+    // Abort the fetch after 90 seconds so the UI never hangs forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
-      const photoBase64 = await Promise.all(photoPromises);
+    try {
+      // Compress photos before sending (phone photos can be 5MB+ raw)
+      const photoBase64 = await Promise.all(photos.map(p => compressImage(p.file)));
 
       const response = await fetch("/api/estimate", {
         method: "POST",
@@ -148,6 +173,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           postalCode: postalCode.trim().toUpperCase(),
           userId,
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json().catch(() => null);
@@ -164,10 +190,15 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
       }
 
       onEstimateComplete(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Frontend error:", err);
-      setError("Network error. Try again.");
+      if (err?.name === 'AbortError') {
+        setError("Analysis timed out. Try with fewer or smaller photos, or add a description instead.");
+      } else {
+        setError("Network error. Please check your connection and try again.");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };

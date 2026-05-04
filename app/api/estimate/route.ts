@@ -4,9 +4,13 @@ import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
+// Tell Vercel this function can run for up to 60 seconds (GPT-4o + vision is slow)
+export const maxDuration = 60;
+
+// Initialize OpenAI client with a 25-second timeout so hung requests don't block forever
 const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('demo') ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  timeout: 25_000,
 }) : null;
 
 interface EstimateRequest {
