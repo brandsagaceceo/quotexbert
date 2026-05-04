@@ -28,7 +28,17 @@ export async function POST(req: NextRequest) {
   let userId: string | undefined;
 
   try {
-    const body: EstimateRequest = await req.json();
+    let body: EstimateRequest;
+    try {
+      body = await req.json();
+    } catch (parseErr) {
+      console.error("❌ JSON parse failed (likely payload too large)", parseErr);
+      return NextResponse.json({
+        success: true,
+        ...buildStaticFallbackEstimateResponse("Payload too large or malformed"),
+        warning: "Estimate based on typical pricing (photo upload too large — please use smaller images)",
+      });
+    }
     requestBody = body;
     console.log("📩 ESTIMATE REQUEST", {
       userId: body.userId || "anonymous",
