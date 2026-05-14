@@ -139,7 +139,7 @@ export default function QuoteMessageCard({
   // Superseded quote — show compact greyed-out card
   if (isSuperseded) {
     return (
-      <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-gray-50 overflow-hidden shadow-sm opacity-60">
+      <div className="w-full rounded-2xl border border-gray-200 bg-gray-50 overflow-hidden shadow-sm opacity-60">
         <div className="flex items-center gap-2 px-4 py-3 bg-gray-400">
           <DocumentTextIcon className="w-5 h-5 text-white flex-shrink-0" />
           <span className="text-sm font-semibold text-white truncate">{payload.title}</span>
@@ -156,7 +156,7 @@ export default function QuoteMessageCard({
 
   return (
     <div
-      className={`w-full max-w-sm rounded-2xl border overflow-hidden shadow-sm ${
+      className={`w-full rounded-2xl border overflow-hidden shadow-sm ${
         isOwn
           ? 'border-rose-200 bg-gradient-to-br from-rose-50 to-orange-50'
           : 'border-gray-200 bg-white'

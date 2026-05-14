@@ -625,8 +625,8 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
                 <div className={`w-8 flex-shrink-0 ${showAvatar ? "" : "invisible"}`}>
                   <Avatar user={msg.fromUser} size="sm" />
                 </div>
-                  <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[72%]`}>
-                  <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words whitespace-pre-wrap shadow-sm ${
+                  <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[80%] sm:max-w-[72%]`}>
+                  <div className={`px-3 sm:px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words whitespace-pre-wrap shadow-sm min-w-0 w-full ${
                     isMine
                       ? "bg-gradient-to-br from-rose-500 to-orange-500 text-white rounded-br-sm"
                       : "bg-gray-100 text-gray-900 rounded-bl-sm"

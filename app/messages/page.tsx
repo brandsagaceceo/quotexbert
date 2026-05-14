@@ -342,56 +342,6 @@ export default function MessagesPage() {
     setShowQuoteBuilder(true);
   };
 
-  // Post a detailed quote as a chat message in the thread so the other party sees it inline.
-  // Works for both contractor→homeowner and homeowner→contractor directions.
-  const postQuoteMessageToThread = async (
-    quote: {
-      title?: string;
-      scope?: string;
-      laborCost?: number;
-      materialCost?: number;
-      totalCost?: number;
-      items?: Array<{ category: string; description: string; quantity: number; unitPrice: number; totalPrice: number }>;
-    },
-    threadId: string,
-    fromUserId: string,
-    toUserId: string,
-  ) => {
-    const fmt = (n: number) => `$${(n ?? 0).toLocaleString('en-CA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-    const lines: string[] = [];
-    lines.push(`📋 QUOTE: ${quote.title ?? 'Project Quote'}`);
-    lines.push('─────────────────────────────');
-    if (quote.scope) {
-      lines.push(`Scope of Work:\n${quote.scope}`);
-      lines.push('');
-    }
-    const items = quote.items ?? [];
-    if (items.length > 0) {
-      lines.push('Line Items:');
-      for (const item of items) {
-        const label = item.category === 'labor' ? '🔨 Labor' : item.category === 'materials' ? '🪵 Materials' : item.category === 'permits' ? '📄 Permits' : '• Other';
-        lines.push(`  ${label} — ${item.description}: ${item.quantity} × ${fmt(item.unitPrice)} = ${fmt(item.totalPrice)}`);
-      }
-      lines.push('');
-    }
-    if ((quote.laborCost ?? 0) > 0) lines.push(`Labour:    ${fmt(quote.laborCost ?? 0)}`);
-    if ((quote.materialCost ?? 0) > 0) lines.push(`Materials: ${fmt(quote.materialCost ?? 0)}`);
-    lines.push('─────────────────────────────');
-    lines.push(`TOTAL: ${fmt(quote.totalCost ?? 0)}`);
-    lines.push('');
-    lines.push('Reply to accept or request changes.');
-
-    try {
-      await fetch(`/api/threads/${encodeURIComponent(threadId)}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fromUserId, toUserId, message: lines.join('\n') }),
-      });
-    } catch {
-      // Best-effort — the quote panel still shows it even if the chat message fails
-    }
-  };
-
   // Phase 2: Homeowner accepts a quote
   const handleQuoteAccept = async (quoteId: string) => {
     if (!selfUserId) return;
@@ -842,27 +792,42 @@ export default function MessagesPage() {
                     revision_requested: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Changes Requested' },
                   };
                   const sm = statusMeta[q.status] ?? { bg: 'bg-gray-100', text: 'text-gray-600', label: q.status };
+                  const isNewForHomeowner = user?.role === 'homeowner' && q.status === 'sent';
                   return (
                     <button
                       type="button"
                       onClick={() => setShowQuoteSheet(true)}
-                      className="flex-shrink-0 w-full border-b border-rose-100 bg-gradient-to-r from-rose-50/70 to-orange-50/40 hover:from-rose-100/80 hover:to-orange-100/60 active:scale-[0.99] transition-all duration-150 text-left"
+                      className={`flex-shrink-0 w-full border-b transition-all duration-150 text-left active:scale-[0.99] ${
+                        isNewForHomeowner
+                          ? 'border-rose-300 bg-gradient-to-r from-rose-100 to-orange-50 hover:from-rose-200 hover:to-orange-100 shadow-sm'
+                          : 'border-rose-100 bg-gradient-to-r from-rose-50/70 to-orange-50/40 hover:from-rose-100/80 hover:to-orange-100/60'
+                      }`}
                     >
-                      <div className="flex items-center gap-3 px-3 py-2">
+                      <div className="flex items-center gap-3 px-3 py-2.5">
                         {/* Icon pill */}
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center shadow-sm">
-                          <DocumentTextIcon className="w-4 h-4 text-white" />
+                        <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${
+                          isNewForHomeowner ? 'bg-gradient-to-br from-rose-600 to-orange-500' : 'bg-gradient-to-br from-rose-500 to-orange-500'
+                        }`}>
+                          <DocumentTextIcon className="w-5 h-5 text-white" />
                         </div>
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs font-bold text-slate-800 truncate leading-tight">{q.title}</span>
                             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${sm.bg} ${sm.text}`}>{sm.label}</span>
                           </div>
-                          <span className="text-[11px] text-slate-500 font-medium">${q.totalCost?.toLocaleString()} total</span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-sm font-bold text-slate-900">${q.totalCost?.toLocaleString()}</span>
+                            {isNewForHomeowner && (
+                              <span className="text-[10px] text-rose-600 font-semibold">Tap to view &amp; accept →</span>
+                            )}
+                            {!isNewForHomeowner && (
+                              <span className="text-[10px] text-slate-400">Tap to view details</span>
+                            )}
+                          </div>
                         </div>
                         {/* Chevron */}
-                        <svg className="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-5 h-5 flex-shrink-0 ${isNewForHomeowner ? 'text-rose-500' : 'text-rose-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </div>
@@ -956,10 +921,6 @@ export default function MessagesPage() {
                         setAutoDraftPrefill(null);
                         setLatestQuotes(prev => [sendData.quote as QuoteResult, ...prev.filter(q => q.id !== sendData.quote.id)]);
                         if (convId) fetchLatestQuotes(convId);
-                        // Send the detailed quote as a chat message so the homeowner sees it inline
-                        if (selectedThread && selfUserId && bridgeHomeownerId) {
-                          await postQuoteMessageToThread(genData.quote, selectedThread.id, selfUserId, bridgeHomeownerId);
-                        }
                         return true;
                       } catch {
                         return false;
@@ -1047,10 +1008,6 @@ export default function MessagesPage() {
             // Append/replace latest quote in the panel immediately, then re-fetch for accuracy
             setLatestQuotes(prev => [quote as QuoteResult, ...prev.filter(q => q.id !== quote.id)]);
             if (bridgeConversationId) fetchLatestQuotes(bridgeConversationId);
-            // Send the detailed quote as a chat message so the homeowner sees it inline
-            if (selectedThread && selfUserId && bridgeHomeownerId) {
-              postQuoteMessageToThread(quote, selectedThread.id, selfUserId, bridgeHomeownerId);
-            }
           }}
         />
       )}
