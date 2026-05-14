@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PhotoUploadFixed from "@/components/PhotoUploadFixed";
 import { submitLead } from "@/app/actions/submitLead";
-import { CATEGORY_GROUPS } from "@/lib/categories";
+import { SIMPLE_CATEGORIES } from "@/lib/categories";
 import { Sparkles, CheckCircle, AlertCircle } from "lucide-react";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 
@@ -32,45 +32,17 @@ export default function CreateLeadPage() {
   // Function to determine category from description
   const detectCategoryFromDescription = (description: string): string => {
     const desc = description.toLowerCase();
-    
-    // Kitchen categories
-    if (desc.includes('kitchen')) return 'kitchen-renovation';
-    if (desc.includes('cabinets') || desc.includes('millwork')) return 'cabinets-millwork';
-    if (desc.includes('countertop')) return 'countertops-installation';
-    
-    // Bathroom categories
-    if (desc.includes('bathroom') || desc.includes('shower') || desc.includes('toilet')) return 'bathroom-renovation';
-    
-    // Plumbing and water
-    if (desc.includes('plumb') || desc.includes('pipe') || desc.includes('water') || desc.includes('drain')) return 'electrical-general';
-    
-    // Electrical
-    if (desc.includes('electric') || desc.includes('wiring') || desc.includes('outlet') || desc.includes('lighting')) return 'electrical-general';
-    if (desc.includes('smart home') || desc.includes('security')) return 'smart-home-installation';
-    
-    // Flooring
-    if (desc.includes('floor') || desc.includes('carpet') || desc.includes('tile') || desc.includes('hardwood')) return 'flooring-installation-repair';
-    
-    // Painting
-    if (desc.includes('paint') || desc.includes('wall') || desc.includes('interior') || desc.includes('exterior')) return 'painting-interior-exterior';
-    
-    // Roofing
-    if (desc.includes('roof') || desc.includes('gutter') || desc.includes('siding')) return 'roofing';
-    
-    // HVAC
-    if (desc.includes('hvac') || desc.includes('heating') || desc.includes('cooling') || desc.includes('air') || desc.includes('furnace')) return 'heating-cooling-hvac';
-    
-    // Landscaping
-    if (desc.includes('landscape') || desc.includes('garden') || desc.includes('yard') || desc.includes('lawn')) return 'landscaping-garden-design';
-    
-    // Handyman
-    if (desc.includes('handyman') || desc.includes('repair') || desc.includes('fix') || desc.includes('mount')) return 'handyman-services';
-    
-    // Cleaning
-    if (desc.includes('clean') || desc.includes('wash') || desc.includes('maintenance')) return 'deep-cleaning';
-    
-    // Default to handyman for general work
-    return 'handyman-services';
+    if (desc.includes('kitchen') || desc.includes('cabinets') || desc.includes('countertop') || desc.includes('basement') || desc.includes('bathroom') || desc.includes('shower') || desc.includes('roof') || desc.includes('siding')) return 'Renovation';
+    if (desc.includes('plumb') || desc.includes('pipe') || desc.includes('drain') || desc.includes('toilet') || desc.includes('faucet') || desc.includes('water heater')) return 'Plumbing';
+    if (desc.includes('electric') || desc.includes('wiring') || desc.includes('outlet') || desc.includes('lighting') || desc.includes('smart home') || desc.includes('security')) return 'Electrical';
+    if (desc.includes('floor') || desc.includes('carpet') || desc.includes('tile') || desc.includes('hardwood')) return 'Flooring';
+    if (desc.includes('paint')) return 'Painting';
+    if (desc.includes('hvac') || desc.includes('heating') || desc.includes('cooling') || desc.includes('air condition') || desc.includes('furnace')) return 'HVAC';
+    if (desc.includes('landscape') || desc.includes('garden') || desc.includes('yard') || desc.includes('lawn') || desc.includes('snow')) return 'Landscaping';
+    if (desc.includes('clean') || desc.includes('wash') || desc.includes('duct')) return 'Cleaning';
+    if (desc.includes('mov') || desc.includes('haul') || desc.includes('junk') || desc.includes('demol')) return 'Moving';
+    if (desc.includes('handyman') || desc.includes('repair') || desc.includes('fix') || desc.includes('mount') || desc.includes('assembly')) return 'Handyman';
+    return 'Other';
   };
 
   // Load estimate data on component mount
@@ -533,14 +505,10 @@ export default function CreateLeadPage() {
                 disabled={isSubmitting}
               >
                 <option value="">Select a category</option>
-                {CATEGORY_GROUPS.map((group) => (
-                  <optgroup key={group.id} label={group.name}>
-                    {group.categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </optgroup>
+                {SIMPLE_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
               </select>
               {fieldErrors.category && (

@@ -205,3 +205,155 @@ export const getPriceTierName = (price: number): string => {
     default: return "Custom";
   }
 };
+
+// ─── Simplified category system ────────────────────────────────────────────
+// Single source of truth for UI dropdowns, job posting, and job board filters.
+export const SIMPLE_CATEGORIES = [
+  "Handyman",
+  "Plumbing",
+  "Electrical",
+  "Painting",
+  "Flooring",
+  "Landscaping",
+  "Cleaning",
+  "Renovation",
+  "HVAC",
+  "Moving",
+  "Other",
+] as const;
+
+export type SimpleCategory = (typeof SIMPLE_CATEGORIES)[number];
+
+// Maps detailed category IDs (from CATEGORY_GROUPS) → simple category name.
+// Used to normalize old DB values and match jobs ↔ subscriptions.
+export const CATEGORY_TO_SIMPLE: Record<string, SimpleCategory> = {
+  // Handyman
+  "handyman-services": "Handyman",
+  "furniture-assembly": "Handyman",
+  "mounting-artwork-tvs-furniture": "Handyman",
+  "small-repairs-odd-jobs": "Handyman",
+  "organizing-decluttering-packing": "Handyman",
+  "drywall-plastering": "Handyman",
+  "tv-mounting": "Handyman",
+  // Plumbing
+  "general-plumbing": "Plumbing",
+  "toilet-repair-installation": "Plumbing",
+  "faucet-fixture-repair": "Plumbing",
+  "drain-cleaning": "Plumbing",
+  "pipe-repair-replacement": "Plumbing",
+  "water-heater-services": "Plumbing",
+  "sump-pump-services": "Plumbing",
+  "backflow-prevention": "Plumbing",
+  "leak-detection-repair": "Plumbing",
+  // Electrical
+  "electrical-general": "Electrical",
+  "lighting-installations": "Electrical",
+  "smart-home-installation": "Electrical",
+  "security-systems": "Electrical",
+  "home-electronics-setup": "Electrical",
+  "window-tinting": "Electrical",
+  // Painting
+  "painting-interior-exterior": "Painting",
+  // Flooring
+  "flooring-installation-repair": "Flooring",
+  "tile-grout-cleaning": "Flooring",
+  "countertops-installation": "Flooring",
+  // Landscaping
+  "landscaping-garden-design": "Landscaping",
+  "lawn-maintenance": "Landscaping",
+  "tree-services": "Landscaping",
+  "artificial-turf": "Landscaping",
+  "seasonal-lawn-maintenance": "Landscaping",
+  "yard-cleanup": "Landscaping",
+  "snow-removal-cleaning": "Landscaping",
+  "sprinkler-installation-winterization": "Landscaping",
+  "paving-driveways": "Landscaping",
+  "exterior-caulking": "Landscaping",
+  // Cleaning
+  "deep-cleaning": "Cleaning",
+  "duct-cleaning": "Cleaning",
+  "dryer-vent-cleaning": "Cleaning",
+  "window-eaves-gutter-cleaning": "Cleaning",
+  "power-washing-stain-seal": "Cleaning",
+  "carpet-upholstery-cleaning": "Cleaning",
+  // Renovation
+  "bathroom-renovation": "Renovation",
+  "kitchen-renovation": "Renovation",
+  "basement-renovation": "Renovation",
+  "cabinets-millwork": "Renovation",
+  "roofing": "Renovation",
+  "siding-repair-installation": "Renovation",
+  "masonry-stone-interlock-concrete": "Renovation",
+  "decks-fences": "Renovation",
+  "garage-builds-repairs": "Renovation",
+  "stair-builder-railings": "Renovation",
+  // HVAC
+  "heating-cooling-hvac": "HVAC",
+  "air-cleaners-humidifiers": "HVAC",
+  "ventilation-exhaust-fans": "HVAC",
+  "insulation": "HVAC",
+  "furnace-tuneup": "HVAC",
+  "ac-tuneup": "HVAC",
+  "gas-services": "HVAC",
+  "gas-fireplace-tuneup": "HVAC",
+  // Moving
+  "moving-storage": "Moving",
+  "junk-removal": "Moving",
+  "demolition-excavation": "Moving",
+  "business-services-commercial": "Moving",
+  // Other
+  "appliance-installation": "Other",
+  "appliance-repair": "Other",
+  "dishwasher-installation": "Other",
+  "bbq-cleaning-repair": "Other",
+  "refrigeration-specialist": "Other",
+  "home-inspector": "Other",
+  "accessibility-modifications": "Other",
+  "mould-remediation": "Other",
+  "water-sewage-damage-repair": "Other",
+  "pest-control-wasp-treatment": "Other",
+  "locksmith-services": "Other",
+  "architect-interior-designer": "Other",
+  "acoustic-insulation": "Other",
+  "mirrors-glass": "Other",
+  "upholstery-furniture-repair": "Other",
+  "pool-spa-hot-tub-services": "Other",
+};
+
+/**
+ * Normalizes any category value (detailed ID, simple name, or freeform text)
+ * to a SimpleCategory. Safe for old DB IDs, new simple names, and raw user input.
+ * Falls back to "Handyman" when no match is found.
+ */
+export function normalizeCategory(category: string): string {
+  if (!category) return "Handyman";
+
+  const cleaned = category.trim();
+  const lower = cleaned.toLowerCase();
+
+  // Exact match against simple category names (case-insensitive)
+  const directMatch = SIMPLE_CATEGORIES.find(s => s.toLowerCase() === lower);
+  if (directMatch) return directMatch;
+
+  // Exact match against detailed ID map
+  if (CATEGORY_TO_SIMPLE[cleaned]) return CATEGORY_TO_SIMPLE[cleaned];
+
+  // Lowercase-normalized ID map lookup (handles mixed-case IDs)
+  const lowerKey = Object.keys(CATEGORY_TO_SIMPLE).find(k => k.toLowerCase() === lower);
+  if (lowerKey) return CATEGORY_TO_SIMPLE[lowerKey];
+
+  // Keyword detection for partial / freeform text
+  if (lower.includes("paint")) return "Painting";
+  if (lower.includes("stairs") || lower.includes("hardwood") || lower.includes("tile") || lower.includes("floor")) return "Flooring";
+  if (lower.includes("sink") || lower.includes("toilet") || lower.includes("plumb") || lower.includes("drain")) return "Plumbing";
+  if (lower.includes("yard") || lower.includes("grass") || lower.includes("lawn") || lower.includes("landscape") || lower.includes("garden")) return "Landscaping";
+  if (lower.includes("electric") || lower.includes("wiring") || lower.includes("outlet") || lower.includes("circuit")) return "Electrical";
+  if (lower.includes("clean")) return "Cleaning";
+  if (lower.includes("hvac") || lower.includes("furnace") || lower.includes("heating") || lower.includes("cooling") || lower.includes("insul")) return "HVAC";
+  if (lower.includes("moving") || lower.includes("junk") || lower.includes("haul")) return "Moving";
+  if (lower.includes("renovat") || lower.includes("kitchen") || lower.includes("bathroom") || lower.includes("basement") || lower.includes("roof")) return "Renovation";
+  if (lower.includes("handyman") || lower.includes("repair") || lower.includes("fix") || lower.includes("odd job")) return "Handyman";
+
+  // Fallback — safe default so no job is ever unreachable
+  return "Handyman";
+}

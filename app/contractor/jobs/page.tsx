@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ALL_CATEGORIES } from "@/lib/categories";
+import { ALL_CATEGORIES, SIMPLE_CATEGORIES, normalizeCategory } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
 import { canAcceptJob, isUnlimitedTestContractor } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
@@ -127,7 +127,8 @@ function ContractorJobsContent() {
 
   useEffect(() => {
     applyFilters();
-  }, [jobs, filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobs, filters, subscriptions]);
 
   const applyFilters = () => {
     let filtered = [...jobs];
@@ -143,7 +144,7 @@ function ContractorJobsContent() {
     }
 
     if (filters.category) {
-      filtered = filtered.filter(job => job.category === filters.category);
+      filtered = filtered.filter(job => normalizeCategory(job.category) === filters.category);
     }
 
     if (filters.minBudget) {
@@ -180,6 +181,35 @@ function ContractorJobsContent() {
       });
     }
 
+    // ── Priority matching: annotate each job with _matchType ──────────────────
+    // Only applies when no explicit category filter is set (user hasn't narrowed manually)
+    const normalizedContractorCats = subscriptions
+      .filter(sub => sub.status === 'active')
+      .map(sub => normalizeCategory(sub.category));
+
+    const isHandymanContractor = normalizedContractorCats.includes('Handyman');
+
+    filtered = filtered.map(job => {
+      const jobCat = normalizeCategory(job.category);
+      let _matchType: 'exact' | 'partial' | 'fallback';
+
+      if (normalizedContractorCats.includes(jobCat)) {
+        _matchType = 'exact';
+      } else if (jobCat === 'Handyman' || isHandymanContractor) {
+        _matchType = 'partial';
+      } else {
+        _matchType = 'fallback';
+      }
+
+      console.log("MATCH SYSTEM:", {
+        job: job.category,
+        contractor: normalizedContractorCats,
+        matchType: _matchType,
+      });
+
+      return { ...job, _matchType };
+    });
+
     // Apply sorting
     if (filters.sortBy === 'newest') {
       filtered = filtered.sort((a, b) => 
@@ -197,7 +227,14 @@ function ContractorJobsContent() {
         const budgetB = parseInt(b.budget?.replace(/[^0-9]/g, '') || '0');
         return budgetA - budgetB;
       });
+    } else if (!filters.category) {
+      // No manual sort or category filter — apply priority ordering
+      const order = { exact: 0, partial: 1, fallback: 2 } as const;
+      filtered = filtered.sort((a, b) => order[a._matchType as keyof typeof order] - order[b._matchType as keyof typeof order]);
     }
+
+    // Cap at 50 to keep the board readable
+    filtered = filtered.slice(0, 50);
 
     setFilteredJobs(filtered);
   };
@@ -246,7 +283,7 @@ function ContractorJobsContent() {
       fetchJobs();
       
       // Show alert banner for matching jobs
-      if (subscriptions.some(sub => sub.category === job.category && sub.status === 'active')) {
+      if (subscriptions.some(sub => normalizeCategory(sub.category) === normalizeCategory(job.category) && sub.status === 'active')) {
         setNewJobAlert(job);
         setTimeout(() => setNewJobAlert(null), 60000); // Hide after 1 minute
       }
@@ -281,12 +318,21 @@ function ContractorJobsContent() {
       return;
     }
 
-    // Check if contractor is subscribed to this job's category
-    const isSubscribed = subscriptions.some(sub => 
-      sub.category === job.category && 
-      sub.status === 'active' && 
-      sub.canClaimLeads
-    );
+    // Check if contractor is subscribed to this job's category (normalize for simple vs. detailed IDs)
+    const isSubscribed = subscriptions.some(sub => {
+      const normalizedJob = normalizeCategory(job.category);
+      const normalizedContractor = normalizeCategory(sub.category);
+      console.log("MATCH CHECK:", {
+        job: job.category,
+        contractor: sub.category,
+        normalizedJob,
+        normalizedContractor,
+        match: normalizedJob === normalizedContractor,
+        subStatus: sub.status,
+        subCanClaim: sub.canClaimLeads,
+      });
+      return normalizedJob === normalizedContractor && sub.status === 'active' && sub.canClaimLeads;
+    });
 
     // God users can accept ANY job without subscription
     const hasAccess = canAcceptJob(user?.email, isSubscribed);
@@ -601,9 +647,9 @@ function ContractorJobsContent() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     <option value="">All categories</option>
-                    {ALL_CATEGORIES.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
+                    {SIMPLE_CATEGORIES.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
                       </option>
                     ))}
                   </select>
@@ -710,11 +756,13 @@ function ContractorJobsContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">No jobs available right now</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">New jobs are coming in — check back soon</h3>
                 <p className="text-gray-500 text-sm max-w-xs mx-auto mb-5 leading-relaxed">
-                  New homeowner projects are added daily. Check back soon or set up alerts to be first to know.
+                  Homeowner projects are posted daily. You&apos;ll be notified instantly when a matching job appears, or try expanding your subscribed categories to see more.
                 </p>
-                <p className="text-xs text-gray-400">New leads are posted every day — you&apos;ll be notified instantly.</p>
+                <Link href="/contractor/subscriptions" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow hover:shadow-md transition-all">
+                  Expand My Categories
+                </Link>
               </>
             ) : (
               <>
@@ -738,7 +786,7 @@ function ContractorJobsContent() {
           <div className="grid gap-6">
             {filteredJobs.map((job) => {
               const _isSubscribed = subscriptions.some(sub =>
-                sub.category === job.category &&
+                normalizeCategory(sub.category) === normalizeCategory(job.category) &&
                 sub.status === 'active' &&
                 sub.canClaimLeads
               );
@@ -760,6 +808,16 @@ function ContractorJobsContent() {
                       <span className="whitespace-nowrap">📍 {_displayLocation}{!_hasAccess && ' (area only)'}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
                       <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
+                      {/* Match type badge */}
+                      {job._matchType === 'exact' && (
+                        <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">⭐ Best Match</span>
+                      )}
+                      {job._matchType === 'partial' && (
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">🔗 Related Job</span>
+                      )}
+                      {job._matchType === 'fallback' && (
+                        <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">✨ New Opportunity</span>
+                      )}
                       {/* Contractor Interest Counter */}
                       {job._count?.applications > 0 && (
                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded whitespace-nowrap font-semibold flex items-center gap-1">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TrendingUp, Star, Clock, CheckCircle, Briefcase, Target, DollarSign, Calendar } from "lucide-react";
+import { TrendingUp, Star, Clock, CheckCircle, Briefcase, Target, DollarSign, Calendar, ChevronDown } from "lucide-react";
 
 interface ContractorMetrics {
   leadsReceived: number;
@@ -30,6 +30,7 @@ export function ContractorMetricsCard({ contractorId }: ContractorMetricsCardPro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [noProfile, setNoProfile] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     fetchMetrics();
@@ -174,68 +175,62 @@ export function ContractorMetricsCard({ contractorId }: ContractorMetricsCardPro
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Performance Metrics</h2>
-        {metrics.recentActivity.acceptancesLast30Days > 0 && (
-          <span className="text-sm text-green-600 font-medium">
-            {metrics.recentActivity.acceptancesLast30Days} new job{metrics.recentActivity.acceptancesLast30Days !== 1 ? 's' : ''} this month
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Compact header row — always visible */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+      >
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+            <TrendingUp className="h-4 w-4 text-rose-500" />
+            My Stats
           </span>
-        )}
-      </div>
+          <span className="text-xs text-gray-500 flex items-center gap-1">
+            <Briefcase className="h-3 w-3" />
+            {metrics.leadsReceived} leads
+          </span>
+          <span className="text-xs text-gray-500 flex items-center gap-1">
+            <CheckCircle className="h-3 w-3 text-green-500" />
+            {metrics.jobsAccepted} accepted
+          </span>
+          {metrics.avgRating > 0 && (
+            <span className="text-xs text-gray-500">
+              ⭐ {metrics.avgRating.toFixed(1)}
+            </span>
+          )}
+          {metrics.recentActivity.acceptancesLast30Days > 0 && (
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+              {metrics.recentActivity.acceptancesLast30Days} new this month
+            </span>
+          )}
+        </div>
+        <ChevronDown className={`h-4 w-4 text-gray-400 flex-shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {metricItems.map((item, index) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={index}
-              className={`${item.bgColor} rounded-lg p-4 border border-gray-200 hover:shadow-lg transition-shadow duration-200`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600 mb-1">
-                    {item.label}
-                  </p>
-                  <p className={`text-2xl font-bold ${item.color}`}>
-                    {item.value}
-                  </p>
+      {/* Expanded detail grid */}
+      {expanded && (
+        <div className="border-t border-gray-100 px-4 pb-4 pt-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {metricItems.slice(0, 5).map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={index}
+                  className={`${item.bgColor} rounded-lg p-3 border border-gray-100`}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Icon className={`h-3.5 w-3.5 ${item.color}`} />
+                    <p className="text-xs font-medium text-gray-500">{item.label}</p>
+                  </div>
+                  <p className={`text-lg font-bold ${item.color}`}>{item.value}</p>
                   {item.subtitle && (
-                    <p className="text-xs text-gray-500 mt-1">{item.subtitle}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{item.subtitle}</p>
                   )}
                 </div>
-                <div className={`${item.bgColor} p-2 rounded-lg`}>
-                  <Icon className={`h-6 w-6 ${item.color}`} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Additional insights */}
-      {metrics.recentActivity.reviewsLast30Days > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-800">
-            🎉 You received {metrics.recentActivity.reviewsLast30Days} new review{metrics.recentActivity.reviewsLast30Days !== 1 ? 's' : ''} this month!
-          </p>
-        </div>
-      )}
-
-      {/* Tips for improvement */}
-      {metrics.avgRating === 0 && metrics.jobsCompleted > 0 && (
-        <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-          <p className="text-sm text-yellow-800">
-            💡 Ask your clients to leave reviews to build trust and improve your ranking!
-          </p>
-        </div>
-      )}
-
-      {metrics.leadsReceived > 0 && metrics.jobsAccepted === 0 && (
-        <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-          <p className="text-sm text-orange-800">
-            💡 Start accepting jobs to grow your business and build your reputation!
-          </p>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

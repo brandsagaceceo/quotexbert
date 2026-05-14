@@ -100,7 +100,30 @@ export default function AdminVerificationPage() {
     }
   };
 
-  const filteredContractors = contractors.filter(contractor => {
+  const [broadcastLoading, setBroadcastLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<{sent:number;failed:number;skipped:number;message:string} | null>(null);
+  const [broadcastUnsubOnly, setBroadcastUnsubOnly] = useState(true);
+
+  const sendBroadcast = async () => {
+    if (!confirm(`Send subscription signup email to all contractors${broadcastUnsubOnly ? ' without an active plan' : ''}? This cannot be undone.`)) return;
+    setBroadcastLoading(true);
+    setBroadcastResult(null);
+    try {
+      const res = await fetch('/api/admin/broadcast-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unsubscribedOnly: broadcastUnsubOnly }),
+      });
+      const data = await res.json();
+      setBroadcastResult(data);
+    } catch {
+      setBroadcastResult({ sent: 0, failed: 0, skipped: 0, message: 'Network error — check console' });
+    } finally {
+      setBroadcastLoading(false);
+    }
+  };
+
+
     if (filter === "verified") return contractor.verified;
     if (filter === "unverified") return !contractor.verified;
     return true;
@@ -174,6 +197,37 @@ export default function AdminVerificationPage() {
               <p className="text-red-400">{error}</p>
             </div>
           )}
+
+          {/* Broadcast Email Panel */}
+          <div className="bg-gray-700 border border-orange-500/40 rounded-xl p-6 mb-8">
+            <h2 className="text-lg font-bold text-white mb-1">📧 Send Subscription Signup Email</h2>
+            <p className="text-gray-400 text-sm mb-4">
+              Sends an email to contractors with a direct link to the subscription plans page.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={broadcastUnsubOnly}
+                  onChange={e => setBroadcastUnsubOnly(e.target.checked)}
+                  className="accent-orange-500"
+                />
+                Only send to contractors <strong>without</strong> an active subscription
+              </label>
+            </div>
+            <button
+              onClick={sendBroadcast}
+              disabled={broadcastLoading}
+              className="bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow"
+            >
+              {broadcastLoading ? '⏳ Sending...' : '🚀 Send Signup Email to Contractors'}
+            </button>
+            {broadcastResult && (
+              <div className={`mt-4 rounded-lg px-4 py-3 text-sm font-medium ${broadcastResult.failed === 0 ? 'bg-green-900/30 text-green-300 border border-green-600/40' : 'bg-yellow-900/30 text-yellow-300 border border-yellow-600/40'}`}>
+                {broadcastResult.message}
+              </div>
+            )}
+          </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

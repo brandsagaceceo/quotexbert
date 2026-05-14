@@ -9,7 +9,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { CATEGORY_GROUPS, getCategoryById } from "@/lib/categories";
+import { CATEGORY_GROUPS, getCategoryById, normalizeCategory } from "@/lib/categories";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -56,6 +56,9 @@ export default function SubscriptionsPage() {
   const [priceFilter, setPriceFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');  
   const [categoryGroupFilter, setCategoryGroupFilter] = useState<string>('all');
+
+  // Selected plan for visual highlight before checkout
+  const [selectedPlan, setSelectedPlan] = useState<'handyman' | 'renovation' | 'general' | null>(null);
 
   // Category picker modal state
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -174,6 +177,7 @@ export default function SubscriptionsPage() {
       toastError('Please sign in to subscribe to a plan');
       return;
     }
+    setSelectedPlan(tier);
     if (tier === 'general') {
       // All categories auto-selected — go directly to checkout
       const allCategories = CATEGORY_GROUPS.flatMap((g) => g.categories.map((c) => c.id));
@@ -190,6 +194,11 @@ export default function SubscriptionsPage() {
   const handleProceedToCheckout = async (tier: 'handyman' | 'renovation' | 'general', categories: string[]) => {
     if (!authUser) return;
 
+    if (!selectedPlan) {
+      alert("Please select a plan before proceeding to payment.");
+      return;
+    }
+
     setShowCategoryModal(false);
 
     try {
@@ -197,7 +206,11 @@ export default function SubscriptionsPage() {
       setError(null);
 
       // Save selected categories to localStorage before Stripe redirect
+      // Store both raw IDs and normalized equivalents for failsafe matching
       localStorage.setItem(`pending_categories_${tier}`, JSON.stringify(categories));
+      localStorage.setItem(`pending_categories_normalized_${tier}`, JSON.stringify(
+        categories.map(c => normalizeCategory(c))
+      ));
 
       const response = await fetch('/api/subscriptions/create-checkout', {
         method: 'POST',
@@ -440,309 +453,112 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
-          {/* Introduction Section */}
-          <div className="bg-white rounded-3xl shadow-xl p-4 md:p-10 mb-6 border-2 border-rose-100">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold text-lg mb-6 shadow-lg">
-                  <span className="text-2xl">👷</span>
-                  <span>Welcome, Contractor!</span>
-                </div>
-                <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-3">
-                  Get More Jobs, Keep 100% of Your Profits
-                </h2>
-                <p className="text-base md:text-xl text-gray-600 leading-relaxed">
-                  Unlike other platforms, we <span className="font-bold text-rose-600">never take a percentage of your job earnings</span>. 
-                  Pay a simple monthly subscription per category and keep every dollar you earn.
-                </p>
+          {/* Compact intro banner */}
+          <div className="bg-white rounded-2xl shadow-sm border border-rose-100 px-4 py-5 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-gray-900">Get More Jobs — Keep 100% of Your Earnings</h2>
+                <p className="text-sm text-gray-600 mt-1">No commission. Flat monthly fee. Unlimited job applications in your categories.</p>
               </div>
-
-              {/* Key Benefits Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-8">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 md:p-6 border-2 border-green-200">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-green-500 rounded-full p-2 md:p-3 flex-shrink-0">
-                      <span className="text-2xl md:text-3xl">💰</span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Zero Commission</h3>
-                      <p className="text-gray-700">
-                        Keep 100% of your earnings. We only charge for category access, never per job or commission.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-4 md:p-6 border-2 border-rose-200">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-rose-700 rounded-full p-2 md:p-3 flex-shrink-0">
-                      <span className="text-2xl md:text-3xl">🎯</span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Choose Your Categories</h3>
-                      <p className="text-gray-700">
-                        Select 3, 6, or 10 job categories based on your expertise. From roofing to electrical, plumbing to landscaping.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-4 md:p-6 border-2 border-rose-200">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-rose-500 rounded-full p-2 md:p-3 flex-shrink-0">
-                      <span className="text-2xl md:text-3xl">📬</span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Unlimited Applications</h3>
-                      <p className="text-gray-700">
-                        Apply to as many jobs as you want in your selected categories. No per-lead fees, ever.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-2xl p-4 md:p-6 border-2 border-orange-200">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-orange-500 rounded-full p-2 md:p-3 flex-shrink-0">
-                      <span className="text-2xl md:text-3xl">💬</span>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900 mb-2">Direct Messaging</h3>
-                      <p className="text-gray-700">
-                        Chat directly with homeowners, negotiate terms, and close deals—all through our platform.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* How It Works */}
-              <div className="bg-gradient-to-r from-rose-500 to-orange-500 rounded-2xl p-5 md:p-8 text-white">
-                <h3 className="text-xl font-black mb-4 text-center">How It Works</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                  <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-3xl">📋</span>
-                    </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
-                      <span className="text-sm font-black">STEP 1</span>
-                    </div>
-                    <h4 className="font-bold text-lg mb-2">Choose Your Plan</h4>
-                    <p className="text-white text-opacity-90">Select how many categories you want access to (3, 6, or 10)</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-3xl">🎯</span>
-                    </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
-                      <span className="text-sm font-black">STEP 2</span>
-                    </div>
-                    <h4 className="font-bold text-lg mb-2">Pick Categories</h4>
-                    <p className="text-white text-opacity-90">After subscribing, select your job categories from 30+ options</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-white bg-opacity-20 backdrop-blur rounded-full w-14 h-14 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-3 shadow-xl border-2 border-white border-opacity-30">
-                      <span className="text-3xl">🚀</span>
-                    </div>
-                    <div className="bg-white bg-opacity-10 rounded-full px-4 py-1 mx-auto w-fit mb-2">
-                      <span className="text-sm font-black">STEP 3</span>
-                    </div>
-                    <h4 className="font-bold text-lg mb-2">Start Bidding</h4>
-                    <p className="text-white text-opacity-90">Apply to unlimited jobs and keep 100% of what you earn</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category Examples */}
-              <div className="mt-4 text-center">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Available Categories Include:</h3>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {[
-                    '🏠 Roofing', '⚡ Electrical', '🚰 Plumbing', '🎨 Painting', 
-                    '🌳 Landscaping', '❄️ HVAC', '🪟 Windows & Doors', '🧱 Masonry',
-                    '🛠️ General Repairs', '🏗️ Renovations', '🔧 Carpentry', '☃️ Snow Removal'
-                  ].map((cat) => (
-                    <span key={cat} className="bg-gray-100 hover:bg-rose-100 border border-gray-300 hover:border-rose-300 px-4 py-2 rounded-full text-sm font-semibold text-gray-700 transition-colors">
-                      {cat}
-                    </span>
-                  ))}
-                  <span className="bg-gradient-to-r from-rose-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                    + 18 More!
-                  </span>
-                </div>
+              <div className="flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
+                <span className="flex items-center gap-1">✓ <span className="font-medium">No hidden fees</span></span>
+                <span className="flex items-center gap-1">✓ <span className="font-medium">Cancel anytime</span></span>
               </div>
             </div>
           </div>
 
-          {/* Pricing Tiers - CATEGORY BUNDLE DESIGN */}
-          <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-2xl p-8 mb-8 relative overflow-hidden">
-            {/* Background Decorative Bubbles */}
-            <div className="absolute top-0 left-0 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-            
-            <div className="relative z-10">
-              <div className="text-center mb-10">
-                <div className="inline-block mb-4">
-                  <span className="px-6 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-bold shadow-lg">
-                    💎 One Price, Multiple Categories
-                  </span>
+          {/* ── Pricing Tiers ── */}
+          <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-xl p-4 md:p-8 mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-2">
+                Choose Your Plan
+              </h2>
+              <p className="text-gray-600 text-sm md:text-base">One monthly fee · Pick your categories · Keep every dollar you earn</p>
+              {selectedPlan && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
+                  ✓ {selectedPlan === 'handyman' ? 'Handyman ($49/mo)' : selectedPlan === 'renovation' ? 'Renovation Xbert ($99/mo)' : 'General Contractor ($149/mo)'} selected — complete payment below
                 </div>
-                <h2 className="text-5xl font-black bg-gradient-to-r from-rose-600 via-orange-600 to-amber-600 bg-clip-text text-transparent mb-4">
-                  Choose Your Plan
-                </h2>
-                <p className="text-xl text-gray-700 font-semibold max-w-2xl mx-auto">
-                  Pay one monthly fee to access multiple job categories. No per-lead charges!
-                </p>
-              </div>
-              
-              <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-6 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-8 md:max-w-6xl md:mx-auto md:pt-6 md:overflow-x-visible md:pb-0" style={{WebkitOverflowScrolling:'touch'}}>
+              )}
+            </div>
+            
+            {/* Mobile-only swipe hint */}
+            <p className="md:hidden text-center text-xs text-gray-400 italic mb-2">← Swipe to view plans →</p>
+
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-6 md:max-w-5xl md:mx-auto md:overflow-x-visible md:pb-0" style={{WebkitOverflowScrolling:'touch'}}>
                 {/* Handyman Tier */}
                 <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
-                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-green-400">
+                  <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'handyman' ? 'bg-green-400 opacity-80' : 'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 opacity-50 group-hover:opacity-80'}`}></div>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'handyman' ? 'border-4 border-green-500 ring-4 ring-green-200' : 'border-4 border-green-400 hover:scale-105 hover:shadow-3xl'}`}>
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                       <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         STARTER
                       </span>
                     </div>
                     
-                    <div className="text-center mt-4">
-                      <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-4xl">🔧</span>
-                      </div>
-                      
-                      <h3 className="text-3xl font-black text-gray-900 mb-3">Handyman</h3>
-                      
-                      <div className="mb-4">
-                        <span className="text-6xl font-black bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">$49</span>
-                        <span className="text-gray-600 font-bold text-xl">/month</span>
-                      </div>
-                      
-                      <div className="bg-green-50 rounded-2xl p-4 mb-6 border-2 border-green-200">
-                        <p className="text-sm font-black text-green-800 mb-2">Access to 3 Categories</p>
-                        <p className="text-xs text-green-700">Perfect for solo contractors</p>
-                      </div>
-                      
-                      <ul className="text-left space-y-3 mb-8">
-                        <li className="flex items-start gap-2">
-                          <span className="text-green-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Choose any 3 job categories</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-green-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-green-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Direct homeowner messaging</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-green-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Profile on contractor directory</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-green-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Cancel anytime</span>
-                        </li>
-                      </ul>
-                      
-                      <button 
-                        onClick={() => handleTierSubscription('handyman')}
-                        disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 bg-[length:200%_100%]"></div>
-                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          {checkoutLoading === 'handyman' ? (
-                            <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Processing...</span>
-                            </>
-                          ) : (
-                            <>
-                              <span>Get Started</span>
-                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
-                            </>
-                          )}
+                      <div className="text-center mt-4">
+                        <div className="text-5xl mb-4">🔧</div>
+                        <h3 className="text-2xl font-black text-gray-900 mb-2">Handyman</h3>
+                        <div className="mb-3">
+                          <span className="text-5xl font-black bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">$49</span>
+                          <span className="text-gray-600 font-bold text-lg">/month</span>
                         </div>
-                      </button>
+                        <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-200">
+                          <p className="text-sm font-black text-green-800">3 Categories — Perfect for solo contractors</p>
+                        </div>
+                      
+                        <ul className="text-left space-y-2 mb-6">
+                          <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Choose any 3 job categories</li>
+                          <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Unlimited job applications</li>
+                          <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Direct homeowner messaging</li>
+                          <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Contractor directory listing</li>
+                          <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Cancel anytime</li>
+                        </ul>
+                        
+                        <button 
+                          onClick={() => handleTierSubscription('handyman')}
+                          disabled={checkoutLoading !== null}
+                          className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'handyman' ? 'bg-green-600 text-white ring-2 ring-green-300' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700'}`}>
+                          {checkoutLoading === 'handyman' ? (
+                            <span className="flex items-center justify-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>Processing...</span>
+                          ) : selectedPlan === 'handyman' ? '✓ Selected — Proceed to Payment' : 'Get Access →'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
                 {/* Renovation Xbert Tier */}
                 <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none md:scale-105 z-20">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-90 transition duration-500"></div>
-                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-orange-400">
+                  <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'renovation' ? 'bg-orange-400 opacity-90' : 'bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 opacity-60 group-hover:opacity-90'}`}></div>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'renovation' ? 'border-4 border-orange-500 ring-4 ring-orange-200' : 'border-4 border-orange-400 hover:scale-105 hover:shadow-3xl'}`}>
                     <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-30">
                       <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white whitespace-nowrap">
                         ⭐ MOST POPULAR
                       </span>
                     </div>
-                    
                     <div className="text-center mt-4">
-                      <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-4xl">🏗️</span>
+                      <div className="text-5xl mb-4">🏗️</div>
+                      <h3 className="text-2xl font-black text-gray-900 mb-2">Renovation Xbert</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-orange-500 to-rose-700 bg-clip-text text-transparent">$99</span>
+                        <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
-                      
-                      <h3 className="text-3xl font-black text-gray-900 mb-3">Renovation Xbert</h3>
-                      
-                      <div className="mb-4">
-                        <span className="text-6xl font-black bg-gradient-to-r from-orange-500 to-rose-700 bg-clip-text text-transparent">$99</span>
-                        <span className="text-gray-600 font-bold text-xl">/month</span>
+                      <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
+                        <p className="text-sm font-black text-orange-800">6 Categories — Best value for growing businesses</p>
                       </div>
-                      
-                      <div className="bg-orange-50 rounded-2xl p-4 mb-6 border-2 border-orange-200">
-                        <p className="text-sm font-black text-orange-800 mb-2">Access to 6 Categories</p>
-                        <p className="text-xs text-orange-700">Best value for growing businesses</p>
-                      </div>
-                      
-                      <ul className="text-left space-y-3 mb-8">
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Choose any 6 job categories</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Priority in search results</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Featured contractor badge</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Portfolio showcase</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-orange-600 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Everything in Handyman</span>
-                        </li>
+                      <ul className="text-left space-y-2 mb-6">
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Choose any 6 job categories</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Unlimited job applications</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Priority in search results</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Featured contractor badge</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Portfolio showcase</li>
                       </ul>
-                      
                       <button 
                         onClick={() => handleTierSubscription('renovation')}
                         disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%]"></div>
-                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          {checkoutLoading === 'renovation' ? (
-                            <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Processing...</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-xl">🚀</span>
-                              <span>Get Started</span>
-                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
-                            </>
-                          )}
-                        </div>
+                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'renovation' ? 'bg-orange-600 text-white ring-2 ring-orange-300' : 'bg-gradient-to-r from-orange-500 to-rose-600 text-white hover:from-orange-600 hover:to-rose-700'}`}>
+                        {checkoutLoading === 'renovation' ? (
+                          <span className="flex items-center justify-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>Processing...</span>
+                        ) : selectedPlan === 'renovation' ? '✓ Selected — Proceed to Payment' : '🚀 Get Access →'}
                       </button>
                     </div>
                   </div>
@@ -750,88 +566,44 @@ export default function SubscriptionsPage() {
 
                 {/* General Contractor Tier */}
                 <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-rose-400 via-orange-600 to-rose-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-80 transition duration-500 animate-pulse"></div>
-                  <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-3xl border-4 border-rose-400">
+                  <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'general' ? 'bg-rose-400 opacity-80' : 'bg-gradient-to-br from-rose-400 via-orange-600 to-rose-600 opacity-50 group-hover:opacity-80'}`}></div>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'general' ? 'border-4 border-rose-600 ring-4 ring-rose-200' : 'border-4 border-rose-400 hover:scale-105 hover:shadow-3xl'}`}>
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <span className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         PRO
                       </span>
                     </div>
-                    
                     <div className="text-center mt-4">
-                      <div className="w-24 h-24 bg-gradient-to-br from-rose-600 to-orange-600 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl transform group-hover:rotate-12 transition-transform duration-300">
-                        <span className="text-white text-4xl">👷</span>
+                      <div className="text-5xl mb-4">👷</div>
+                      <h3 className="text-2xl font-black text-gray-900 mb-2">General Contractor</h3>
+                      <div className="mb-3">
+                        <span className="text-5xl font-black bg-gradient-to-r from-rose-500 to-orange-700 bg-clip-text text-transparent">$149</span>
+                        <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
-                      
-                      <h3 className="text-3xl font-black text-gray-900 mb-3">General Contractor</h3>
-                      
-                      <div className="mb-4">
-                        <span className="text-6xl font-black bg-gradient-to-r from-rose-500 to-orange-700 bg-clip-text text-transparent">$149</span>
-                        <span className="text-gray-600 font-bold text-xl">/month</span>
+                      <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
+                        <p className="text-sm font-black text-rose-900">ALL 10+ Categories — Full-service contractors</p>
                       </div>
-                      
-                      <div className="bg-rose-50 rounded-2xl p-4 mb-6 border-2 border-rose-200">
-                        <p className="text-sm font-black text-rose-900 mb-2">Access to ALL 10+ Categories</p>
-                        <p className="text-xs text-rose-800">Complete access for full-service contractors</p>
-                      </div>
-                      
-                      <ul className="text-left space-y-3 mb-8">
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">ALL job categories included</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Unlimited job applications</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Top priority in search results</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Premium contractor badge</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Featured homepage placement</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Dedicated account manager</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-rose-700 text-xl">✓</span>
-                          <span className="text-sm font-semibold text-gray-700">Everything in Renovation Xbert</span>
-                        </li>
+                      <ul className="text-left space-y-2 mb-6">
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> ALL job categories included</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Unlimited job applications</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Top priority in search results</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Premium contractor badge</li>
+                        <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Featured homepage placement</li>
                       </ul>
-                      
                       <button 
                         onClick={() => handleTierSubscription('general')}
                         disabled={checkoutLoading !== null}
-                        className="group/btn relative w-full overflow-hidden rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-orange-600 to-rose-500 bg-[length:200%_100%]"></div>
-                        <div className="relative px-6 py-4 text-white flex items-center justify-center gap-2">
-                          {checkoutLoading === 'general' ? (
-                            <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Processing...</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-xl">👑</span>
-                              <span>Get Started</span>
-                              <span className="text-2xl group-hover/btn:translate-x-1 transition-transform">→</span>
-                            </>
-                          )}
-                        </div>
+                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'general' ? 'bg-rose-700 text-white ring-2 ring-rose-300' : 'bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700'}`}>
+                        {checkoutLoading === 'general' ? (
+                          <span className="flex items-center justify-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>Processing...</span>
+                        ) : selectedPlan === 'general' ? '✓ Selected — Proceed to Payment' : '👑 Get Access →'}
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Mobile swipe dots indicator */}
+              {/* Mobile swipe dots */}
               <div className="flex md:hidden justify-center gap-2 mt-3 mb-2">
                 <div className="w-4 h-2 rounded-full bg-green-500"></div>
                 <div className="w-6 h-2 rounded-full bg-orange-500"></div>
@@ -839,27 +611,14 @@ export default function SubscriptionsPage() {
               </div>
 
               {/* Trust Badges */}
-              <div className="mt-12 pt-8 border-t border-gray-300">
-                <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">✓</span>
-                    <span className="font-semibold">No Hidden Fees</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">✓</span>
-                    <span className="font-semibold">Cancel Anytime</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">✓</span>
-                    <span className="font-semibold">Switch Categories Monthly</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">✓</span>
-                    <span className="font-semibold">No Per-Lead Charges</span>
-                  </div>
+              <div className="mt-6 pt-5 border-t border-gray-200">
+                <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-gray-500">
+                  <span>✓ <span className="font-semibold">No Hidden Fees</span></span>
+                  <span>✓ <span className="font-semibold">Cancel Anytime</span></span>
+                  <span>✓ <span className="font-semibold">Switch Categories Monthly</span></span>
+                  <span>✓ <span className="font-semibold">No Per-Lead Charges</span></span>
                 </div>
               </div>
-            </div>
           </div>
 
           {/* Summary Cards - Compact */}
