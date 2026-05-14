@@ -9,7 +9,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import { CATEGORY_GROUPS, getCategoryById, normalizeCategory } from "@/lib/categories";
+import { CATEGORY_GROUPS, getCategoryById, normalizeCategory, SIMPLE_CATEGORIES } from "@/lib/categories";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -179,9 +179,8 @@ export default function SubscriptionsPage() {
     }
     setSelectedPlan(tier);
     if (tier === 'general') {
-      // All categories auto-selected — go directly to checkout
-      const allCategories = CATEGORY_GROUPS.flatMap((g) => g.categories.map((c) => c.id));
-      handleProceedToCheckout(tier, allCategories);
+      // All categories auto-selected — go directly to checkout using simple names
+      handleProceedToCheckout(tier, [...SIMPLE_CATEGORIES]);
       return;
     }
     setPendingTier(tier);
@@ -384,14 +383,7 @@ export default function SubscriptionsPage() {
   return (
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Subscription Management</h1>
-            <p className="mt-2 text-gray-600">
-              Manage your category subscriptions to access leads and grow your business.
-            </p>
-          </div>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12">
 
           {/* Success Message */}
           {showSuccessMessage && (
@@ -934,16 +926,15 @@ export default function SubscriptionsPage() {
         const maxAllowed = pendingTier === 'handyman' ? 3 : 6;
         const tierLabel = pendingTier === 'handyman' ? 'Handyman' : 'Renovation Xbert';
         const tierColor = pendingTier === 'handyman' ? 'green' : 'orange';
-        const filteredGroups = CATEGORY_GROUPS.map((g) => ({
-          ...g,
-          categories: g.categories.filter((c) =>
-            !modalSearch || c.name.toLowerCase().includes(modalSearch.toLowerCase())
-          ),
-        })).filter((g) => g.categories.length > 0);
+
+        // Use the 11 simple categories, filtered by search
+        const filteredCategories = SIMPLE_CATEGORIES.filter((cat) =>
+          !modalSearch || cat.toLowerCase().includes(modalSearch.toLowerCase())
+        );
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
               {/* Modal Header */}
               <div className={`px-6 py-5 border-b border-gray-200 bg-gradient-to-r ${
                 tierColor === 'green' ? 'from-green-500 to-emerald-600' : 'from-orange-500 to-rose-600'
@@ -952,7 +943,7 @@ export default function SubscriptionsPage() {
                   <div>
                     <h2 className="text-xl font-black">Pick Your {maxAllowed} Categories</h2>
                     <p className="text-sm text-white/80 mt-0.5">
-                      {tierLabel} Plan — Choose exactly {maxAllowed} categories you want to receive jobs from
+                      {tierLabel} Plan — Choose exactly {maxAllowed} job types
                     </p>
                   </div>
                   <button
@@ -963,9 +954,9 @@ export default function SubscriptionsPage() {
                   </button>
                 </div>
 
-                {/* Progress counter */}
+                {/* Progress bar */}
                 <div className="mt-4 flex items-center gap-3">
-                  <div className="flex-1 bg-white/20 rounded-full h-3 overflow-hidden">
+                  <div className="flex-1 bg-white/20 rounded-full h-2.5 overflow-hidden">
                     <div
                       className="h-full bg-white rounded-full transition-all duration-300"
                       style={{ width: `${(pickedCategories.length / maxAllowed) * 100}%` }}
@@ -984,54 +975,52 @@ export default function SubscriptionsPage() {
                   placeholder="Search categories..."
                   value={modalSearch}
                   onChange={(e) => setModalSearch(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400"
                 />
               </div>
 
-              {/* Category list */}
-              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
-                {filteredGroups.map((group) => (
-                  <div key={group.id}>
-                    <p className="text-xs font-black text-gray-500 uppercase tracking-wide mb-2">{group.name}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {group.categories.map((cat) => {
-                        const isSelected = pickedCategories.includes(cat.id);
-                        const isDisabled = !isSelected && pickedCategories.length >= maxAllowed;
-                        return (
-                          <button
-                            key={cat.id}
-                            onClick={() => togglePickedCategory(cat.id, maxAllowed)}
-                            disabled={isDisabled}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all text-sm font-semibold ${
-                              isSelected
-                                ? tierColor === 'green'
-                                  ? 'bg-green-50 border-green-500 text-green-800'
-                                  : 'bg-orange-50 border-orange-500 text-orange-800'
-                                : isDisabled
-                                ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                              isSelected
-                                ? tierColor === 'green'
-                                  ? 'bg-green-500 border-green-500'
-                                  : 'bg-orange-500 border-orange-500'
-                                : 'border-gray-300'
-                            }`}>
-                              {isSelected && (
-                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </div>
-                            <span className="flex-1">{cat.name}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+              {/* Category grid — 11 simple categories */}
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredCategories.map((cat) => {
+                    const isSelected = pickedCategories.includes(cat);
+                    const isDisabled = !isSelected && pickedCategories.length >= maxAllowed;
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => togglePickedCategory(cat, maxAllowed)}
+                        disabled={isDisabled}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all text-sm font-semibold ${
+                          isSelected
+                            ? tierColor === 'green'
+                              ? 'bg-green-50 border-green-500 text-green-800'
+                              : 'bg-orange-50 border-orange-500 text-orange-800'
+                            : isDisabled
+                            ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
+                          isSelected
+                            ? tierColor === 'green'
+                              ? 'bg-green-500 border-green-500'
+                              : 'bg-orange-500 border-orange-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="flex-1">{cat}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {filteredCategories.length === 0 && (
+                  <p className="text-center text-sm text-gray-400 py-6">No categories match your search</p>
+                )}
               </div>
 
               {/* Modal Footer */}
