@@ -183,6 +183,12 @@ export default function NotificationBell() {
       }
       case "WELCOME":
         return "👋";
+      case "quote_revision_requested":
+        return "🔄";
+      case "quote_received":
+        return "📋";
+      case "quote_accepted":
+        return "✅";
       default:
         return "📢";
     }
@@ -203,6 +209,12 @@ export default function NotificationBell() {
         return `New Lead: ${payload?.title || "Home Project"}`;
       case "WELCOME":
         return "Welcome to QuoteXbert!";
+      case "quote_revision_requested":
+        return `Changes Requested: ${payload?.quoteTitle || "Your Quote"}`;
+      case "quote_received":
+        return `New Quote: ${payload?.quoteTitle || "Review Your Quote"}`;
+      case "quote_accepted":
+        return `Quote Accepted: ${payload?.quoteTitle || "Your Quote"}`;
       default:
         return "Notification";
     }
@@ -231,6 +243,14 @@ export default function NotificationBell() {
       }
       case "WELCOME":
         return "Thanks for joining! Complete your profile to get started.";
+      case "quote_revision_requested":
+        return payload?.note
+          ? `"${String(payload.note).substring(0, 100)}"`
+          : "The homeowner requested changes on your quote.";
+      case "quote_received":
+        return "A new quote has been sent to you — tap to review and accept.";
+      case "quote_accepted":
+        return "Your quote was accepted by the homeowner.";
       default:
         return "You have a new notification.";
     }

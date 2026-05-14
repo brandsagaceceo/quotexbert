@@ -118,7 +118,6 @@ export async function POST(
     // action === 'request_changes'
     // Store the homeowner's note on the quote (revisionNote) so the contractor
     // can read it when the LiveQuoteBuilder opens in revision mode.
-    // Also post a system message so both parties see it inline in chat.
     const updated = await prisma.quote.update({
       where: { id: quoteId },
       data: {
@@ -127,37 +126,65 @@ export async function POST(
       },
     });
 
-    // Post a system message summarising the change request
-    await prisma.conversationMessage.create({
-      data: {
-        conversationId: quote.conversation.id,
-        senderId: homeowner.id,
-        senderRole: 'homeowner',
-        receiverId: quote.conversation.contractorId,
-        receiverRole: 'contractor',
-        content: `📝 Change request for quote "${quote.title}": ${note.trim()}`,
-        type: 'notification',
+    // Look up homeowner details for the thread message body
+    const homeownerUser = await prisma.user.findUnique({
+      where: { id: homeowner.id },
+      select: {
+        name: true,
+        homeownerProfile: { select: { name: true } },
       },
-    }).catch((e: unknown) => console.error('[quote action] system message failed', e));
+    }).catch(() => null);
+    const homeownerName = homeownerUser?.homeownerProfile?.name || homeownerUser?.name || 'Homeowner';
 
-    // Update conversation lastMessageAt
-    await prisma.conversation.update({
-      where: { id: quote.conversation.id },
-      data: { lastMessageAt: new Date() },
-    }).catch((e: unknown) => console.error('[quote action] conversation update failed', e));
+    // Post a visible message in the Thread so the contractor sees it in the messaging tab
+    const thread = await prisma.thread.findUnique({
+      where: { leadId: quote.conversation.job.id },
+      select: { id: true },
+    }).catch(() => null);
 
-    // Notify contractor
+    if (thread) {
+      await prisma.message.create({
+        data: {
+          threadId: thread.id,
+          fromUserId: homeowner.id,
+          toUserId: quote.conversation.contractorId,
+          body: `📝 Quote change request for "${quote.title}":\n\n"${note.trim()}"\n\nPlease revise the quote and resubmit.`,
+        },
+      }).catch((e: unknown) => console.error('[quote action] thread message failed', e));
+    }
+
+    // In-app notification for contractor
     await prisma.notification.create({
       data: {
         userId: quote.conversation.contractorId,
         type: 'quote_revision_requested',
-        title: 'Changes Requested on Quote',
-        message: `The homeowner requested changes on your quote for "${quote.conversation.job.title}": ${note.trim().substring(0, 120)}`,
+        title: 'Quote Changes Requested',
+        message: `${homeownerName} requested changes on your quote for "${quote.conversation.job.title}": ${note.trim().substring(0, 120)}`,
         relatedId: quoteId,
         relatedType: 'quote',
-        payload: { leadId: quote.conversation.job.id },
+        payload: { leadId: quote.conversation.job.id, quoteTitle: quote.title, note: note.trim().substring(0, 200) },
       },
     }).catch((e: unknown) => console.error('[quote action] notification failed', e));
+
+    // Email notification to contractor
+    const contractorUser = await prisma.user.findUnique({
+      where: { id: quote.conversation.contractorId },
+      select: { email: true, name: true, contractorProfile: { select: { companyName: true } } },
+    }).catch(() => null);
+    if (contractorUser?.email) {
+      try {
+        const { sendQuoteChangeRequestEmail } = await import('@/lib/email');
+        await sendQuoteChangeRequestEmail(
+          { email: contractorUser.email, name: contractorUser.contractorProfile?.companyName || contractorUser.name || 'Contractor' },
+          homeownerName,
+          quote.conversation.job.title,
+          note.trim(),
+          quote.conversation.job.id,
+        );
+      } catch (e) {
+        console.error('[quote action] email failed', e);
+      }
+    }
 
     // Phase 6: learning signal
     void emitQuoteSignal({

@@ -358,7 +358,7 @@ export default function LiveQuoteBuilder({
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-[60] flex justify-end">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
@@ -697,7 +697,7 @@ export default function LiveQuoteBuilder({
 
         {/* Footer Actions */}
         {quote && !['sent', 'accepted', 'superseded'].includes(quote.status) && (
-          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 bg-white space-y-3">
+          <div className="flex-shrink-0 px-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-4 border-t border-gray-200 bg-white space-y-3">
             <div className="flex items-center gap-3">
               <button
                 type="button"

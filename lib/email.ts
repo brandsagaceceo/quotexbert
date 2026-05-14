@@ -187,14 +187,17 @@ function buildEmail(subject: string, blocks: EmailBlock[]): string {
 }
 
 // Email templates
-function createMessageReceivedTemplate(preview: string, threadId: string): string {
+function createMessageReceivedTemplate(preview: string, threadId: string, senderName?: string, jobTitle?: string): string {
   const safePreview = escHtml(preview);
-  return buildEmail('New Message â€” QuoteXbert', [
+  const safeSender = senderName ? escHtml(senderName) : null;
+  const safeJob = jobTitle ? escHtml(jobTitle) : null;
+  return buildEmail(`New Message${safeSender ? ` from ${safeSender}` : ''} — QuoteXbert`, [
     { type: 'tag', content: 'New Message' },
-    { type: 'heading', content: 'You have a new message' },
-    { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Preview', rawHtml: true },
-    { type: 'cta', content: 'Reply Now', href: `${baseUrl}/messages?threadId=${threadId}` },
-    { type: 'text', content: `Manage all your messages at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>.`, rawHtml: true },
+    { type: 'heading', content: safeSender ? `Message from ${safeSender}` : 'You have a new message', rawHtml: true },
+    ...(safeJob ? [{ type: 'text' as const, content: `Re: <strong>${safeJob}</strong>`, rawHtml: true }] : []),
+    { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Message Preview', rawHtml: true },
+    { type: 'cta', content: 'Reply Now →', href: `${baseUrl}/messages?threadId=${threadId}` },
+    { type: 'text', content: `View all your conversations at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>.`, rawHtml: true },
   ]);
 }
 
@@ -363,7 +366,8 @@ export async function sendNewMessageEmail(
   recipient: { id: string; email: string; name?: string | null },
   sender: { name?: string | null },
   messagePreview: string,
-  threadId: string
+  threadId: string,
+  jobTitle?: string,
 ) {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping message notification');
@@ -372,9 +376,11 @@ export async function sendNewMessageEmail(
 
   try {
     await resend.emails.send({
-      from: fromEmail,      replyTo: REPLY_TO,      to: recipient.email,
-      subject: `New message from ${sender.name || 'a user'} ðŸ’¬`,
-      html: createMessageReceivedTemplate(messagePreview, threadId)
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: recipient.email,
+      subject: `New message from ${sender.name || 'a user'} on QuoteXbert`,
+      html: createMessageReceivedTemplate(messagePreview, threadId, sender.name ?? undefined, jobTitle),
     });
 
     await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'sent');
@@ -384,6 +390,37 @@ export async function sendNewMessageEmail(
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'failed', errorMsg);
     console.error('[EMAIL] Failed to send message notification:', error);
+    return { success: false, error };
+  }
+}
+
+// Quote Change Request Email (contractor receives when homeowner requests changes)
+export async function sendQuoteChangeRequestEmail(
+  contractor: { email: string; name?: string | null },
+  homeownerName: string,
+  jobTitle: string,
+  changeNote: string,
+  leadId: string,
+) {
+  if (!resend) return { success: false, error: 'Email service not configured' };
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `Quote changes requested — ${jobTitle}`,
+      html: buildEmail('Quote Changes Requested — QuoteXbert', [
+        { type: 'tag', content: 'Quote Update' },
+        { type: 'heading', content: `${escHtml(homeownerName)} requested changes to your quote`, rawHtml: true },
+        { type: 'text', content: `Re: <strong>${escHtml(jobTitle)}</strong>`, rawHtml: true },
+        { type: 'card', content: `<em style="color:#92400e;">"${escHtml(changeNote)}"</em>`, label: "Homeowner's Request", rawHtml: true },
+        { type: 'text', content: 'Open the Quote Builder in your messaging thread to revise and resubmit the quote.' },
+        { type: 'cta', content: 'Revise Quote →', href: `${baseUrl}/messages?leadId=${leadId}` },
+      ]),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('[EMAIL] Failed to send quote change request email:', error);
     return { success: false, error };
   }
 }
@@ -737,4 +774,6 @@ export async function sendQuoteReceivedEmail(params: {
     return { success: false, error };
   }
 }
+
+
 
