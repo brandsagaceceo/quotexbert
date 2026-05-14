@@ -342,6 +342,56 @@ export default function MessagesPage() {
     setShowQuoteBuilder(true);
   };
 
+  // Post a detailed quote as a chat message in the thread so the other party sees it inline.
+  // Works for both contractor→homeowner and homeowner→contractor directions.
+  const postQuoteMessageToThread = async (
+    quote: {
+      title?: string;
+      scope?: string;
+      laborCost?: number;
+      materialCost?: number;
+      totalCost?: number;
+      items?: Array<{ category: string; description: string; quantity: number; unitPrice: number; totalPrice: number }>;
+    },
+    threadId: string,
+    fromUserId: string,
+    toUserId: string,
+  ) => {
+    const fmt = (n: number) => `$${(n ?? 0).toLocaleString('en-CA', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    const lines: string[] = [];
+    lines.push(`📋 QUOTE: ${quote.title ?? 'Project Quote'}`);
+    lines.push('─────────────────────────────');
+    if (quote.scope) {
+      lines.push(`Scope of Work:\n${quote.scope}`);
+      lines.push('');
+    }
+    const items = quote.items ?? [];
+    if (items.length > 0) {
+      lines.push('Line Items:');
+      for (const item of items) {
+        const label = item.category === 'labor' ? '🔨 Labor' : item.category === 'materials' ? '🪵 Materials' : item.category === 'permits' ? '📄 Permits' : '• Other';
+        lines.push(`  ${label} — ${item.description}: ${item.quantity} × ${fmt(item.unitPrice)} = ${fmt(item.totalPrice)}`);
+      }
+      lines.push('');
+    }
+    if ((quote.laborCost ?? 0) > 0) lines.push(`Labour:    ${fmt(quote.laborCost ?? 0)}`);
+    if ((quote.materialCost ?? 0) > 0) lines.push(`Materials: ${fmt(quote.materialCost ?? 0)}`);
+    lines.push('─────────────────────────────');
+    lines.push(`TOTAL: ${fmt(quote.totalCost ?? 0)}`);
+    lines.push('');
+    lines.push('Reply to accept or request changes.');
+
+    try {
+      await fetch(`/api/threads/${encodeURIComponent(threadId)}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromUserId, toUserId, message: lines.join('\n') }),
+      });
+    } catch {
+      // Best-effort — the quote panel still shows it even if the chat message fails
+    }
+  };
+
   // Phase 2: Homeowner accepts a quote
   const handleQuoteAccept = async (quoteId: string) => {
     if (!selfUserId) return;
@@ -906,6 +956,10 @@ export default function MessagesPage() {
                         setAutoDraftPrefill(null);
                         setLatestQuotes(prev => [sendData.quote as QuoteResult, ...prev.filter(q => q.id !== sendData.quote.id)]);
                         if (convId) fetchLatestQuotes(convId);
+                        // Send the detailed quote as a chat message so the homeowner sees it inline
+                        if (selectedThread && selfUserId && bridgeHomeownerId) {
+                          await postQuoteMessageToThread(genData.quote, selectedThread.id, selfUserId, bridgeHomeownerId);
+                        }
                         return true;
                       } catch {
                         return false;
@@ -993,6 +1047,10 @@ export default function MessagesPage() {
             // Append/replace latest quote in the panel immediately, then re-fetch for accuracy
             setLatestQuotes(prev => [quote as QuoteResult, ...prev.filter(q => q.id !== quote.id)]);
             if (bridgeConversationId) fetchLatestQuotes(bridgeConversationId);
+            // Send the detailed quote as a chat message so the homeowner sees it inline
+            if (selectedThread && selfUserId && bridgeHomeownerId) {
+              postQuoteMessageToThread(quote, selectedThread.id, selfUserId, bridgeHomeownerId);
+            }
           }}
         />
       )}
