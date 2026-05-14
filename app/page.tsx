@@ -162,7 +162,7 @@ export default function Home() {
               {[
                 "♾️  Unlimited AI renovation estimates",
                 "💾  Save & revisit past estimates",
-                "📬  Post jobs to 500+ verified contractors",
+                "📬  Post jobs to GTA-area verified contractors",
                 "💬  Direct messaging with contractors",
               ].map((b) => (
                 <li key={b} className="flex items-start gap-2">
@@ -215,7 +215,7 @@ export default function Home() {
               {/* Left Column - Headline & Benefits - Mobile-Optimized */}
               <div className="text-center lg:text-left space-y-3 md:space-y-6">
                 <div className="inline-block mb-3 md:mb-6 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white rounded-full shadow-lg md:shadow-2xl animate-pulse-glow">
-                  <span className="text-xs md:text-sm lg:text-base font-bold">🤖 AI-POWERED ESTIMATES • 100% FREE</span>
+                  <span className="text-xs md:text-sm lg:text-base font-bold">🤖 AI-POWERED ESTIMATES • FREE TO START</span>
                 </div>
                 
                 <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 md:mb-8 leading-tight animate-fade-in-up">
@@ -231,7 +231,7 @@ export default function Home() {
                 <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-4 md:mb-10 leading-relaxed font-medium">
                   <span className="text-rose-700 font-bold">Upload photos</span> of your project —
                   get a real, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
-                  Free for homeowners. No signup needed.
+                  Free for homeowners — quick free account required.
                 </p>
 
                 {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
@@ -302,7 +302,7 @@ export default function Home() {
                     <span className="text-xs md:text-sm font-bold text-slate-700">500+ homeowners</span>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm px-3 md:px-5 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-amber-200">
-                    <span className="text-xs md:text-sm font-bold text-slate-700">⭐ 5.0/5 Rating</span>
+                    <span className="text-xs md:text-sm font-bold text-slate-700">⭐ Top Rated GTA</span>
                   </div>
                   <div className="bg-white/90 backdrop-blur-sm px-3 md:px-5 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-green-200">
                     <span className="text-xs md:text-sm font-bold text-slate-700">✓ GTA Verified</span>
@@ -324,40 +324,34 @@ export default function Home() {
         </section>
 
         {/* Real Homes Photo Strip */}
-        <section className="relative overflow-hidden">
-          {/* Mobile: taller grid so faces aren't cropped; Desktop: 4-col strip */}
+        <section className="overflow-hidden">
+          {/* 4-col photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 h-72 md:h-80">
             <div className="relative overflow-hidden group">
-              {/* Kitchen — no person, center crop is fine */}
               <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=1000&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Kitchen · $28k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              {/* Bathroom — no person, center is fine */}
               <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=1000&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Bathroom · $9k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              {/* Basement — no person, center is fine */}
               <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=1000&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Basement · $15k saved</span>
             </div>
             <div className="relative overflow-hidden group">
-              {/* Exterior — person visible; object-top keeps the face in frame */}
               <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=top&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Exterior · $22k saved</span>
             </div>
           </div>
-          {/* Overlay callout — compact on mobile so it doesn't cover images */}
-          <div className="absolute inset-0 flex items-end md:items-center justify-center pointer-events-none pb-3 md:pb-0">
-            <div className="bg-white/90 backdrop-blur-md px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border border-rose-100 text-center">
-              <p className="text-rose-700 font-black text-sm md:text-xl">Real Toronto Homes. Real Savings.</p>
-              <p className="text-slate-600 text-xs mt-0.5 hidden md:block">Homeowners saved an average of <strong>$16,400</strong> by comparing quotes first</p>
-            </div>
+          {/* Callout bar — sits below the photos, never overlaps */}
+          <div className="bg-rose-700 px-4 py-3 md:py-4 text-center">
+            <p className="text-white font-black text-sm md:text-lg">Real Toronto Homes. Real Savings.</p>
+            <p className="text-rose-200 text-xs md:text-sm mt-0.5">Homeowners avoid overpaying by knowing real prices <strong className="text-white">before</strong> calling a contractor</p>
           </div>
         </section>
 
@@ -452,7 +446,7 @@ export default function Home() {
                   What would you like to do?
                 </h2>
                 <p className="text-base text-slate-600">
-                  Pick a tool to get started — everything is free for homeowners
+                  Pick a tool to get started — homeowner tools are free (account required)
                 </p>
               </div>
 
@@ -573,7 +567,7 @@ export default function Home() {
                   <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">Know before you sign.</span>
                 </h2>
                 <p className="text-slate-300 text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
-                  First-time homeowners in the GTA saved an average of <strong className="text-white">$16,400</strong> by getting an AI estimate before hiring a contractor.
+                  First-time homeowners in the GTA avoid costly surprises by getting an AI estimate <strong className="text-white">before</strong> hiring a contractor.
                 </p>
                 {/* Stat cards — compact on mobile */}
                 <div className="flex flex-wrap gap-2 md:gap-4">
@@ -684,8 +678,8 @@ export default function Home() {
                   Get Quality Leads.<br />Grow Your Business.
                 </h2>
                 <p className="text-base md:text-lg text-slate-300 mb-4 md:mb-6">
-                  Stop chasing leads. Access pre-qualified projects in Toronto &amp; GTA.
-                  All homeowners are verified and ready to hire.
+                  Stop chasing leads. Access real projects from GTA homeowners.
+                  Every job is posted with project details and a budget.
                 </p>
                 
                 {/* Quick Stats */}
@@ -695,7 +689,7 @@ export default function Home() {
                     <div className="text-slate-400 text-xs">Coverage</div>
                   </div>
                   <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-orange-500">12</div>
+                    <div className="text-2xl font-black text-orange-500">11</div>
                     <div className="text-slate-400 text-xs">Categories</div>
                   </div>
                   <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
@@ -722,8 +716,8 @@ export default function Home() {
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-white mb-0.5">Pre-Qualified Homeowners</h3>
-                      <p className="text-slate-300 text-sm">All leads have budgets and are ready to hire</p>
+                      <h3 className="text-base font-bold text-white mb-0.5">Real Project Leads</h3>
+                      <p className="text-slate-300 text-sm">Homeowners post jobs with project details and budgets</p>
                     </div>
                   </div>
                 </div>
@@ -763,7 +757,7 @@ export default function Home() {
               Take a photo. Get your price.
             </h2>
             <p className="text-lg mb-6 text-rose-100">
-              Free AI estimate in 30 seconds. No signup required.
+              Free AI estimate in 30 seconds. Free account required.
             </p>
             <button
               onClick={() => {

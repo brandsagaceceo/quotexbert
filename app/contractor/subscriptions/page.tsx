@@ -474,9 +474,9 @@ export default function SubscriptionsPage() {
             </div>
             
             {/* Mobile-only swipe hint */}
-            <p className="md:hidden text-center text-xs text-gray-400 italic mb-2">← Swipe to view plans →</p>
+            <p className="md:hidden text-center text-xs text-gray-400 italic mb-6">← Swipe to view plans →</p>
 
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-6 md:max-w-5xl md:mx-auto md:overflow-x-visible md:pb-0" style={{WebkitOverflowScrolling:'touch'}}>
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pt-6 pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-6 md:max-w-5xl md:mx-auto md:overflow-x-visible md:pb-0 md:pt-8" style={{WebkitOverflowScrolling:'touch'}}>
                 {/* Handyman Tier */}
                 <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
                   <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'handyman' ? 'bg-green-400 opacity-80' : 'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 opacity-50 group-hover:opacity-80'}`}></div>
@@ -933,8 +933,8 @@ export default function SubscriptionsPage() {
         );
 
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden">
               {/* Modal Header */}
               <div className={`px-6 py-5 border-b border-gray-200 bg-gradient-to-r ${
                 tierColor === 'green' ? 'from-green-500 to-emerald-600' : 'from-orange-500 to-rose-600'
@@ -1024,27 +1024,26 @@ export default function SubscriptionsPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between gap-4">
-                <button
-                  onClick={() => setShowCategoryModal(false)}
-                  className="px-5 py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition"
-                >
-                  Cancel
-                </button>
-
+              <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
+                {pickedCategories.length < maxAllowed && (
+                  <p className="text-center text-sm text-gray-500 mb-3">
+                    Select {maxAllowed - pickedCategories.length} more to continue
+                  </p>
+                )}
                 <div className="flex items-center gap-3">
-                  {pickedCategories.length < maxAllowed && (
-                    <p className="text-sm text-gray-500">
-                      Select {maxAllowed - pickedCategories.length} more
-                    </p>
-                  )}
+                  <button
+                    onClick={() => setShowCategoryModal(false)}
+                    className="flex-shrink-0 px-5 py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition text-sm"
+                  >
+                    Cancel
+                  </button>
                   <button
                     onClick={() => handleProceedToCheckout(pendingTier, pickedCategories)}
                     disabled={pickedCategories.length !== maxAllowed}
-                    className={`px-6 py-3 rounded-xl font-black text-white shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                    className={`flex-1 py-3 rounded-xl font-black text-white shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm ${
                       tierColor === 'green'
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-green-200 hover:shadow-xl'
-                        : 'bg-gradient-to-r from-orange-500 to-rose-600 hover:shadow-orange-200 hover:shadow-xl'
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600'
+                        : 'bg-gradient-to-r from-orange-500 to-rose-600'
                     }`}
                   >
                     Continue to Payment →
