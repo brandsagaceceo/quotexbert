@@ -24,6 +24,7 @@ export default function AIAssistantPopup() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showHelperBubble, setShowHelperBubble] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
   const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate', '/profile', '/contractor/subscriptions', '/contractor/jobs', '/ai-quote', '/ai-renovation-check', '/billing'];
@@ -130,11 +131,15 @@ export default function AIAssistantPopup() {
     return () => observer.disconnect();
   }, [shouldHideForPath, pathname, isOpen]);
 
-  // On mobile: hide widget when any input/textarea/select is focused (user is interacting with a form)
+  // On mobile: hide widget when any input/textarea/select is focused (user is interacting with a form).
+  // IMPORTANT: exclude focus events that happen inside the chat window itself — otherwise the
+  // widget's own input field closes the popup every time the user tries to type.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleFocusIn = (e: FocusEvent) => {
       if (window.innerWidth >= 768) return;
+      // If the focused element is inside our chat window, do NOT hide
+      if (chatWindowRef.current && chatWindowRef.current.contains(e.target as Node)) return;
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
         setIsHidden(true);
@@ -146,6 +151,8 @@ export default function AIAssistantPopup() {
       // Small delay to allow new focus to settle — if another field is focused, handleFocusIn will re-hide
       setTimeout(() => {
         const active = document.activeElement;
+        // If focus moved into the chat window, keep it visible
+        if (chatWindowRef.current && chatWindowRef.current.contains(active as Node)) return;
         const tag = active?.tagName;
         if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT' && !shouldHideForPath) {
           setIsHidden(false);
@@ -221,6 +228,10 @@ export default function AIAssistantPopup() {
     } else if (href === '#') {
       // Show terms for signed-in contractors
       setShowTerms(true);
+    } else if (href === '#refresh') {
+      window.location.reload();
+    } else if (href.startsWith('mailto:')) {
+      window.location.href = href;
     } else if (href.startsWith('/#')) {
       setIsOpen(false);
       setTimeout(() => {
@@ -277,13 +288,42 @@ export default function AIAssistantPopup() {
             ]
           : [{ label: '📸 Get Quote First', href: '/#instant-quote', variant: 'primary' }]
       };
+    } else if (lowerInput.includes('subscription') || lowerInput.includes('plan') || lowerInput.includes('upgrade') || lowerInput.includes('payment') || lowerInput.includes('billing')) {
+      response = {
+        role: 'assistant',
+        content: userType === 'contractor'
+          ? "QuoteXbert offers contractor subscription plans with access to unlimited leads, priority listing, and AI tools. Head to your subscription page to compare plans."
+          : "QuoteXbert is completely free for homeowners — no subscription needed. Contractors pay to access leads.",
+        actions: userType === 'contractor'
+          ? [{ label: '💳 View Plans', href: '/contractor/subscriptions', variant: 'primary' }]
+          : [{ label: '📸 Get Free Quote', href: '/#instant-quote', variant: 'primary' }]
+      };
+    } else if (lowerInput.includes('sign up') || lowerInput.includes('register') || lowerInput.includes('account') || lowerInput.includes('login') || lowerInput.includes('sign in')) {
+      response = {
+        role: 'assistant',
+        content: "Creating an account is free and takes under a minute. Sign up as a homeowner to post projects, or as a contractor to start winning jobs.",
+        actions: [
+          { label: '🏠 Sign Up as Homeowner', href: '/sign-up', variant: 'primary' },
+          { label: '👷 Sign Up as Contractor', href: '/sign-up', variant: 'secondary' },
+        ]
+      };
+    } else if (lowerInput.includes('problem') || lowerInput.includes('issue') || lowerInput.includes('bug') || lowerInput.includes('error') || lowerInput.includes('help') || lowerInput.includes('support') || lowerInput.includes('not working')) {
+      response = {
+        role: 'assistant',
+        content: "Sorry to hear you're having trouble! Here are the most common fixes:\n\n• **Refresh the page** — clears most temporary issues\n• **Check your internet connection**\n• **Try a different browser** if the issue persists\n\nFor account or billing problems, reach out to our support team.",
+        actions: [
+          { label: '📧 Contact Support', href: 'mailto:support@quotexbert.com', variant: 'primary' },
+          { label: '🔄 Refresh Page', href: '#refresh', variant: 'secondary' },
+        ]
+      };
     } else {
       response = {
         role: 'assistant',
-        content: "I can help you with:\n\n• Getting instant AI quotes\n• Generating professional contracts\n• Finding contractors\n• Understanding costs\n• Posting jobs\n\nWhat would you like to do?",
+        content: "I'm your QuoteXbert assistant — I specialise in home renovation quotes, contractor connections, and project pricing in the GTA.\n\nHere's what I can help with:",
         actions: [
-          { label: '📸 Get Instant Quote', href: '/#instant-quote', variant: 'primary' },
-          { label: '📄 Generate Contract', href: '/ai-quote', variant: 'secondary' },
+          { label: '📸 Get an Instant Quote', href: '/#instant-quote', variant: 'primary' },
+          { label: '👷 Find a Contractor', href: '/contractors', variant: 'secondary' },
+          { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'secondary' },
         ]
       };
     }
@@ -350,6 +390,7 @@ export default function AIAssistantPopup() {
       {/* Chat Window */}
       {isOpen && (
         <div
+          ref={chatWindowRef}
           className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 sm:left-auto sm:right-4 mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
             maxHeight: '80vh',
@@ -380,7 +421,7 @@ export default function AIAssistantPopup() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-96 bg-gradient-to-b from-gray-50 to-white">
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" style={{ minHeight: '120px', maxHeight: 'calc(80vh - 160px)' }}>
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85vw] sm:max-w-[85%] ${msg.role === 'user' ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
@@ -414,8 +455,9 @@ export default function AIAssistantPopup() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Ask me anything..."
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                placeholder="Ask me anything about QuoteXbert..."
+                autoComplete="off"
                 className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all text-sm"
               />
               <button
