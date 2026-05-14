@@ -192,11 +192,7 @@ export default function SubscriptionsPage() {
   // Called from modal "Continue to Payment" button
   const handleProceedToCheckout = async (tier: 'handyman' | 'renovation' | 'general', categories: string[]) => {
     if (!authUser) return;
-
-    if (!selectedPlan) {
-      alert("Please select a plan before proceeding to payment.");
-      return;
-    }
+    if (!tier) return;
 
     setShowCategoryModal(false);
 
@@ -933,7 +929,7 @@ export default function SubscriptionsPage() {
         );
 
         return (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden">
               {/* Modal Header */}
               <div className={`px-6 py-5 border-b border-gray-200 bg-gradient-to-r ${
