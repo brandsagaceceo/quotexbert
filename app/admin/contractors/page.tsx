@@ -123,7 +123,7 @@ export default function AdminVerificationPage() {
     }
   };
 
-
+  const filteredContractors = contractors.filter(contractor => {
     if (filter === "verified") return contractor.verified;
     if (filter === "unverified") return !contractor.verified;
     return true;
