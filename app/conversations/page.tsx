@@ -89,7 +89,7 @@ export default function ConversationsPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previousMessageCount, setPreviousMessageCount] = useState(0);
   const [aiEnhancing, setAiEnhancing] = useState(false);
-  const [enhancedMessage, setEnhancedMessage] = useState<string | null>(null);
+  const [aiEnhanced, setAiEnhanced] = useState(false);
   const [aiEnhanceError, setAiEnhanceError] = useState<string | null>(null);
   const [showQuickReplies, setShowQuickReplies] = useState(true);
   const [showQuoteBuilder, setShowQuoteBuilder] = useState(false);
@@ -335,7 +335,8 @@ export default function ConversationsPage() {
 
       const data = await response.json();
       if (response.ok && data.improvedMessage) {
-        setEnhancedMessage(data.improvedMessage);
+        setNewMessage(data.improvedMessage);
+        setAiEnhanced(true);
       } else {
         setAiEnhanceError(data.error || 'Could not improve your message. Please try again.');
       }
@@ -347,12 +348,7 @@ export default function ConversationsPage() {
     }
   };
 
-  const useEnhancedMessage = () => {
-    if (enhancedMessage) {
-      setNewMessage(enhancedMessage);
-      setEnhancedMessage(null);
-    }
-  };
+
 
   // Called by LiveQuoteBuilder after a quote is sent
   const handleQuoteSent = (_quote: QuoteData) => {
@@ -574,7 +570,7 @@ export default function ConversationsPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="lg:col-span-2 flex flex-col">
+            <div className="lg:col-span-2 flex flex-col min-h-0">
               {selectedConversation ? (
                 <>
                   {/* Chat Header */}
@@ -782,7 +778,7 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                   </div>
 
                   {/* Input Area */}
-                  <form onSubmit={sendMessage} className="p-4 bg-white">
+                  <form onSubmit={sendMessage} className="p-4 bg-white flex-shrink-0 overflow-y-auto" style={{maxHeight: '55vh'}}>
                     {/* Error Message */}
                     {sendError && (
                       <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
@@ -812,37 +808,14 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                       </div>
                     )}
 
-                    {/* AI Enhanced Message Preview */}
-                    {enhancedMessage && (
-                      <div className="mb-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
-                        <div className="flex items-start gap-3">
-                          <SparklesIcon className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-semibold text-purple-900">✨ AI Enhanced Version — edit before using</span>
-                              <button
-                                type="button"
-                                onClick={() => setEnhancedMessage(null)}
-                                className="text-purple-600 hover:text-purple-900 transition-colors"
-                              >
-                                <XMarkIcon className="w-4 h-4" />
-                              </button>
-                            </div>
-                            <textarea
-                              value={enhancedMessage}
-                              onChange={(e) => setEnhancedMessage(e.target.value)}
-                              rows={4}
-                              className="w-full text-sm text-gray-800 bg-white/70 border border-purple-200 rounded-lg px-3 py-2 mb-3 leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                            />
-                            <button
-                              type="button"
-                              onClick={useEnhancedMessage}
-                              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-purple-700 hover:to-blue-700 transition-all shadow-sm hover:shadow-md"
-                            >
-                              Use This Version
-                            </button>
-                          </div>
-                        </div>
+                    {/* AI Enhanced — inline badge */}
+                    {aiEnhanced && (
+                      <div className="mb-2 flex items-center gap-2 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5">
+                        <SparklesIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="flex-1">✨ AI enhanced — edit the message below as needed, then send</span>
+                        <button type="button" onClick={() => setAiEnhanced(false)} className="text-purple-400 hover:text-purple-700">
+                          <XMarkIcon className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     )}
 
@@ -881,22 +854,28 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                         <PhotoIcon className="w-5 h-5 text-gray-600" />
                       </button>
                       <div className="flex-1 bg-gray-50 rounded-[22px] px-5 py-3 focus-within:bg-white focus-within:ring-2 focus-within:ring-rose-500/20 focus-within:border-rose-500/30 border border-gray-200 transition-all">
-                        <input
-                          type="text"
+                        <textarea
                           value={newMessage}
+                          rows={aiEnhanced ? 4 : 1}
                           onChange={(e) => {
                             setNewMessage(e.target.value);
-                            setEnhancedMessage(null);
+                            if (aiEnhanced) setAiEnhanced(false);
                             setAiEnhanceError(null);
                           }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              sendMessage(e as unknown as React.FormEvent);
+                            }
+                          }}
                           placeholder="Type your message..."
-                          className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-400 text-[15px]"
+                          className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-400 text-[15px] resize-none"
                           disabled={sending}
                         />
                       </div>
                       {/* AI Enhance Button — available for both contractor and homeowner */}
                       {/* Prompt adapts per role: contractors get win-the-job tone; homeowners get clarity tone */}
-                      {newMessage.trim() && !enhancedMessage && (
+                      {newMessage.trim() && !aiEnhancing && (
                         <button
                           type="button"
                           onClick={enhanceMessageWithAI}
