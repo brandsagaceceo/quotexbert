@@ -345,6 +345,34 @@ export default function LiveQuoteBuilder({
     }
   };
 
+  // Create a revision of the current sent quote (used from the sent-footer)
+  const startRevisionFromSent = async () => {
+    if (!quote) return;
+    setGenerating(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/quotes/${quote.id}/revise`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractorId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create revision');
+      if (data.revisionNote) setRevisionContext(data.revisionNote);
+      setQuote(data.quote as QuoteData);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Generate a brand-new quote (resets current state)
+  const startNewQuote = () => {
+    setQuote(null);
+    generateQuote();
+  };
+
   // Discard a draft quote — deletes from DB and closes the builder
   const discardQuote = async () => {
     if (!quote || !window.confirm('Discard this draft quote? This cannot be undone.')) return;
@@ -738,13 +766,37 @@ export default function LiveQuoteBuilder({
           </div>
         )}
 
-        {/* Re-generate option after sent */}
+        {/* Actions after quote is sent */}
         {quote && quote.status === 'sent' && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-white">
+          <div className="flex-shrink-0 px-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] md:pb-4 border-t border-gray-200 bg-white space-y-3">
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-xs text-green-800 font-medium">✓ Quote sent — homeowner has been notified</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={startRevisionFromSent}
+                disabled={generating}
+                className="flex-1 flex items-center justify-center gap-1.5 border border-rose-300 text-rose-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-rose-50 disabled:opacity-50 transition-colors"
+              >
+                <ArrowPathIcon className="w-4 h-4" />
+                Revise Quote
+              </button>
+              <button
+                type="button"
+                onClick={startNewQuote}
+                disabled={generating}
+                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 transition-all shadow-md"
+              >
+                <SparklesIcon className="w-4 h-4" />
+                New Quote
+              </button>
+            </div>
             <button
               type="button"
               onClick={onClose}
-              className="w-full bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
+              className="w-full text-xs text-gray-500 hover:text-gray-700 font-medium py-1 transition-colors"
             >
               Close
             </button>

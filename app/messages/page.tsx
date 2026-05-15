@@ -847,6 +847,7 @@ export default function MessagesPage() {
                     userRole={user?.role}
                     jobTitle={selectedThread?.lead?.title || ""}
                     aiEnhanceEnabled={true}
+                    quoteSent={latestQuotes.some(q => ['sent', 'accepted'].includes(q.status))}
                     onAutoDraftReview={(draft, displayPrice, sourceSnippets) => {
                       if (!draft) return;
                       // If a draft quote already exists, open it for editing instead

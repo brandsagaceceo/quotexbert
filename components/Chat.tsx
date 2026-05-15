@@ -48,6 +48,8 @@ interface ChatProps {
   /** Callback when the auto-draft CTA "Send Instantly" button is clicked.
    *  Returns a promise that resolves true on success, false on failure. */
   onSendInstantly?: (draft: NonNullable<AutoDraftState['draft']>, displayPrice: string) => Promise<boolean>;
+  /** When true, hides the "Draft quote ready" CTA because a quote is already sent/active */
+  quoteSent?: boolean;
 }
 
 function getDisplayName(user: UserProfile | null | undefined): string {
@@ -86,7 +88,7 @@ function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; s
   );
 }
 
-export default function Chat({ thread, currentUserId, onDeleteThread, onBack, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly }: ChatProps) {
+export default function Chat({ thread, currentUserId, onDeleteThread, onBack, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly, quoteSent }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const [deleteError, setDeleteError] = useState<string | null>(null);
   // Phase 1: AI Reply Assistant
   const [aiEnhancing, setAiEnhancing] = useState(false);
-  const [enhancedMessage, setEnhancedMessage] = useState<string | null>(null);
+  const [aiEnhanced, setAiEnhanced] = useState(false);
   const [aiEnhanceError, setAiEnhanceError] = useState<string | null>(null);
   // AI hint chip — shown once per session until dismissed
   const [aiHintDismissed, setAiHintDismissed] = useState(false);
@@ -421,7 +423,6 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
     if (!newMessage.trim() || aiEnhancing || !userRole) return;
     setAiEnhancing(true);
     setAiEnhanceError(null);
-    setEnhancedMessage(null);
     try {
       const res = await fetch("/api/ai/enhance-message", {
         method: "POST",
@@ -435,7 +436,8 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
       if (res.ok) {
         const data = await res.json();
         if (data.improvedMessage) {
-          setEnhancedMessage(data.improvedMessage);
+          setNewMessage(data.improvedMessage);
+          setAiEnhanced(true);
         } else {
           setAiEnhanceError("AI returned an empty response. Try again.");
         }
@@ -674,7 +676,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
         style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom, 6px))' }}
       >
         {/* Auto-draft CTA — contractor only, shown when price detected in conversation */}
-        {autoDraftState?.shouldSuggestDraft && !autoDraftDismissed && !instantSendSuccess && (onAutoDraftReview || onSendInstantly) && (
+        {autoDraftState?.shouldSuggestDraft && !autoDraftDismissed && !instantSendSuccess && !quoteSent && (onAutoDraftReview || onSendInstantly) && (
           <div className="mb-2 rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 to-orange-50 px-3 py-2.5">
             <div className="flex items-center gap-2 mb-1">
               <svg className="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -804,48 +806,33 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
           </div>
         )}
 
-        {/* AI Reply Assistant — preview banner (scrollable on mobile) */}
-        {enhancedMessage && (
-          <div className="mb-2 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2.5" style={{ maxHeight: '50dvh' }}>
-            <div className="flex items-center gap-1.5 mb-1.5 flex-shrink-0">
-              <svg className="w-3.5 h-3.5 text-violet-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" />
-              </svg>
-              <span className="text-[11px] font-semibold text-violet-700 uppercase tracking-wide">AI Suggestion</span>
-            </div>
-            <div className="overflow-y-auto overscroll-contain" style={{ maxHeight: 'calc(50dvh - 80px)' }}>
-              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap break-words">{enhancedMessage}</p>
-            </div>
-            <div className="flex items-center gap-2 mt-2.5 flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setNewMessage(enhancedMessage);
-                  setEnhancedMessage(null);
-                }}
-                className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-lg transition-colors"
-              >
-                Insert into Message
-              </button>
-              <button
-                type="button"
-                onClick={() => setEnhancedMessage(null)}
-                className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg border border-slate-200 transition-colors"
-              >
-                Dismiss
-              </button>
-            </div>
+        {/* AI enhanced — inline badge */}
+        {aiEnhanced && (
+          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-violet-50 border border-violet-200 rounded-lg text-xs text-violet-700">
+            <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" />
+            </svg>
+            <span className="flex-1">✨ AI enhanced — edit the message below then send</span>
+            <button type="button" onClick={() => setAiEnhanced(false)} className="text-violet-400 hover:text-violet-700">✕</button>
           </div>
         )}
 
-        <form onSubmit={sendMessage} className="flex items-center gap-2">
-          <input
-            type="text"
+        <form onSubmit={sendMessage} className="flex items-end gap-2">
+          <textarea
             value={newMessage}
+            rows={aiEnhanced ? 4 : 1}
             onChange={(e) => {
-              handleInputChange(e);
-              // Clear any stale AI preview when the user edits the message
-              if (enhancedMessage) setEnhancedMessage(null);
+              setNewMessage(e.target.value);
+              sendTyping("start");
+              if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              typingTimeoutRef.current = setTimeout(() => sendTyping("stop"), 2000);
+              if (aiEnhanced) setAiEnhanced(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(e as unknown as React.FormEvent);
+              }
             }}
             onFocus={() => {
               setShouldScrollToBottom(true);
@@ -853,7 +840,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
               setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'instant', block: 'end' }), 320);
             }}
             placeholder={`Message ${getDisplayName(otherUser)}...`}
-            className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400"
+            className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400 resize-none"
             style={{ fontSize: '16px' }}
           />
           {/* AI sparkle button — always visible when AI is enabled.
