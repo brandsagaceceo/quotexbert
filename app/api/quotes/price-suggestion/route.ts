@@ -17,6 +17,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 const MIN_SIGNALS = 3;
 const LOOKBACK_DAYS = 90;
 

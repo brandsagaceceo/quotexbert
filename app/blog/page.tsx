@@ -576,7 +576,7 @@ export default function BlogPage() {
             '@type': 'Blog',
             name: 'QuoteXbert Home Renovation Blog — Toronto, Durham Region & the GTA',
             description:
-              'Practical renovation, repair, and DIY advice for Toronto, Durham Region, Clarington, and GTA homeowners, reviewed by local contractors.',,
+              'Practical renovation, repair, and DIY advice for Toronto, Durham Region, Clarington, and GTA homeowners, reviewed by local contractors.',
             url: 'https://www.quotexbert.com/blog',
             inLanguage: 'en-CA',
             author: {
