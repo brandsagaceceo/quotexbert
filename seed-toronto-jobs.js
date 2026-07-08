@@ -504,6 +504,7 @@ async function seedTorontoJobs() {
             zipCode: location.zipCode,
             status: "open",
             published: true,
+            isSeeded: true,
             homeownerId: homeowner.id,
             maxContractors: 5,
             acceptedContractors: "[]",

@@ -210,16 +210,12 @@ description: "Complete front yard update, 1,800 sq ft. Remove overgrown shrubs, 
 ];
 
 export async function GET(request: Request) {
-  // Safety: only allow in non-production OR when explicitly forced
-  const url = new URL(request.url);
-  const force = url.searchParams.get('force') === 'true';
+  // Hard block in production — no override flag can bypass this
   const isProduction = process.env.NODE_ENV === 'production';
-
-  // In production, require explicit force flag to prevent accidental re-seeding
-  if (isProduction && !force) {
+  if (isProduction) {
     return NextResponse.json({
       success: false,
-      message: 'Seed endpoint disabled in production. Pass ?force=true to override only if intentional.',
+      message: 'Seed endpoint is disabled in production.',
     }, { status: 403 });
   }
 
@@ -312,6 +308,7 @@ export async function GET(request: Request) {
             zipCode: location.zipCode,
             status: "open",
             published: true,
+            isSeeded: true,
             homeownerId: homeowner.id,
             maxContractors: 5,
             acceptedContractors: "[]",

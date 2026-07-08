@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  // Block entirely in production — debug info must not be publicly accessible
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
+  }
+
   try {
     const { userId, sessionClaims } = await auth();
     

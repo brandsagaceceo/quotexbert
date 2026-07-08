@@ -1,26 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 
 export const dynamic = "force-dynamic";
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase());
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    // TEMPORARY: For testing purposes, allow access
-    // In production, you would uncomment the security check below:
-    
-    /*
-    const user = await currentUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    
-    const userRole = user.publicMetadata.role || 'user';
-    if (userRole !== 'admin') {
+    const user = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { email: true },
+    });
+    if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
-    */
 
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '7d';
@@ -67,9 +69,9 @@ export async function GET(request: NextRequest) {
         prisma.user.count({ where: { role: 'homeowner' } }),
         prisma.user.count({ where: { role: 'contractor' } }),
         prisma.user.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.lead.count(),
-        prisma.lead.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.lead.count({ where: { status: 'completed' } }),
+        prisma.lead.count({ where: { isSeeded: false } }),
+        prisma.lead.count({ where: { isSeeded: false, createdAt: { gte: startDate } } }),
+        prisma.lead.count({ where: { isSeeded: false, status: 'completed' } }),
         prisma.jobApplication.count(),
         prisma.jobApplication.count({ where: { createdAt: { gte: startDate } } }),
         prisma.jobApplication.count({ where: { status: 'accepted' } }),

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const [totalJobs, totalContractors, reviews] = await Promise.all([
-      prisma.lead.count({ where: { status: { in: ['OPEN', 'PENDING', 'ACCEPTED'] } } }),
+      prisma.lead.count({ where: { isSeeded: false, status: { in: ['open', 'claimed', 'accepted'] } } }),
       prisma.user.count({ where: { role: 'contractor' } }),
       prisma.review.aggregate({
         where: { status: 'published' },

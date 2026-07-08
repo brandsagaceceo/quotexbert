@@ -1,24 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 // Admin emails allowed to grant comp subscriptions
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").filter(Boolean);
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "brandsagaceo@gmail.com,quotexbert@gmail.com")
+  .split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
-function isAuthorized(request: NextRequest): boolean {
-  // Check admin token header
+async function isAuthorized(request: NextRequest): Promise<boolean> {
+  // 1. Allow requests with the admin token header (for CLI/automation use)
   const token = request.headers.get("x-admin-token");
-  if (token && token === ADMIN_TOKEN) {
+  if (token && ADMIN_TOKEN && token === ADMIN_TOKEN) {
     return true;
   }
 
-  // Could add additional auth checks here (e.g., session-based)
+  // 2. Allow authenticated admin email users
+  try {
+    const { userId } = await auth();
+    if (userId) {
+      const caller = await prisma.user.findFirst({
+        where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+        select: { email: true },
+      });
+      if (caller && ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
+        return true;
+      }
+    }
+  } catch {
+    // auth() may throw outside a request context — fall through
+  }
+
   return false;
 }
 
 // POST - Grant comp subscription
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  if (!await isAuthorized(request)) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
@@ -81,7 +98,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE - Remove comp subscription
 export async function DELETE(request: NextRequest) {
-  if (!isAuthorized(request)) {
+  if (!await isAuthorized(request)) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }

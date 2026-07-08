@@ -31,15 +31,6 @@ interface EmailTemplate {
 // (Dead code below — real email delivery is handled by sendNotificationEmail() via lib/email.ts + Resend)
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com';
 
-const _unusedMockTransporter = () => {
-  return {
-    sendMail: async (options: any) => {
-      console.log('📧 [DEMO] Email would be sent:', options);
-      return Promise.resolve({ messageId: 'demo-' + Date.now() });
-    }
-  };
-};
-
 // Email templates
 export const getEmailTemplate = (type: NotificationType, data: Record<string, any>): EmailTemplate => {
   const baseStyle = `

@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase());
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authorization header or implement your own auth check
-    // For now, we'll just return the data (should add proper auth)
-    
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const adminUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { email: true },
+    });
+    if (!adminUser || !ADMIN_EMAILS.includes(adminUser.email.toLowerCase())) {
+      return NextResponse.json({ error: 'Forbidden — admin only' }, { status: 403 });
+    }
+
     const logs = await prisma.$queryRaw`
       SELECT id, type, "eventId", processed, error, "createdAt"
       FROM stripe_webhook_logs

@@ -1268,6 +1268,7 @@ async function seedLeads() {
           zipCode: leadTemplate.zipCode,
           status: "open",
           published: true, // All leads are published for contractors to browse
+          isSeeded: true,
           homeownerId: homeowner.id,
           photos: "[]",
           createdAt: new Date(Date.now() - Math.floor(Math.random() * 15 * 24 * 60 * 60 * 1000)), // Random date within last 15 days

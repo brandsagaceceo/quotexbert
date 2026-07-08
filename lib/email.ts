@@ -775,5 +775,154 @@ export async function sendQuoteReceivedEmail(params: {
   }
 }
 
+// ─── Subscription Created / Payment Success (contractor) ──────────────────────
+export async function sendSubscriptionCreatedEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  tier: string;
+  categories: string[];
+  nextBillingDate?: Date | null;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping subscription-created email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, tier, categories, nextBillingDate } = params;
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+  const catList = categories.slice(0, 8).map(c => `<li style="margin-bottom:4px;">${escHtml(c)}</li>`).join('');
+  const moreCount = categories.length > 8 ? ` + ${categories.length - 8} more` : '';
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `✅ Your ${tierLabel} Plan is now active — QuoteXbert`,
+      html: buildEmail(`${tierLabel} Plan Activated — QuoteXbert`, [
+        { type: 'tag', content: `${tierLabel} Plan` },
+        { type: 'heading', content: 'Welcome to QuoteXbert Pro!' },
+        { type: 'text', content: `Your subscription is active. You can now access leads in your selected categories.` },
+        { type: 'card', label: 'Your Categories', rawHtml: true, content: `<ul style="margin:0;padding-left:18px;">${catList}</ul>${moreCount ? `<p style="margin:8px 0 0;font-size:12px;color:#64748b;">${escHtml(moreCount)}</p>` : ''}` },
+        ...(nextBillingDate ? [{ type: 'text' as const, content: `Next billing date: <strong>${new Date(nextBillingDate).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>`, rawHtml: true }] : []),
+        { type: 'cta', content: 'Browse Jobs Now', href: `${BASE_URL}/contractor/jobs` },
+      ]),
+    });
+    await logEmailEvent('subscription_created', contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Subscription-created email sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('subscription_created', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send subscription-created email:', error);
+    return { success: false, error };
+  }
+}
 
+// ─── Payment Failed (contractor) ─────────────────────────────────────────────
+export async function sendPaymentFailedEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  category?: string;
+  amountDue?: number;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping payment-failed email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, category, amountDue } = params;
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: '⚠️ Payment failed — action required on QuoteXbert',
+      html: buildEmail('Payment Failed — QuoteXbert', [
+        { type: 'tag', content: 'Action Required' },
+        { type: 'heading', content: 'We could not process your payment' },
+        { type: 'text', content: `Your subscription payment${category ? ` for <strong>${escHtml(category)}</strong>` : ''} was unsuccessful.${amountDue ? ` Amount due: <strong>$${amountDue.toFixed(2)}</strong>.` : ''}`, rawHtml: true },
+        { type: 'card', label: 'What this means', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:4px;">Your job access has been paused</li><li style="margin-bottom:4px;">Update your payment method to restore access</li><li>No leads will be missed — your profile stays visible</li></ul>' },
+        { type: 'cta', content: 'Update Payment Method', href: `${BASE_URL}/contractor/subscriptions` },
+        { type: 'text', content: 'Need help? Call us at <a href="tel:9052429460" style="color:#9f1239;">905-242-9460</a> or email <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;">quotexbert@gmail.com</a>', rawHtml: true },
+      ]),
+    });
+    await logEmailEvent('payment_failed', contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Payment-failed email sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('payment_failed', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send payment-failed email:', error);
+    return { success: false, error };
+  }
+}
 
+// ─── Subscription Cancelled (contractor) ──────────────────────────────────────
+export async function sendSubscriptionCancelledEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  category?: string;
+  accessUntil?: Date | null;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping subscription-cancelled email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, category, accessUntil } = params;
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: 'Your QuoteXbert subscription has been cancelled',
+      html: buildEmail('Subscription Cancelled — QuoteXbert', [
+        { type: 'heading', content: 'Subscription Cancelled' },
+        { type: 'text', content: `Your subscription${category ? ` for <strong>${escHtml(category)}</strong>` : ''} has been cancelled.`, rawHtml: true },
+        ...(accessUntil ? [{ type: 'card' as const, label: 'Access Until', content: new Date(accessUntil).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' }) }] : []),
+        { type: 'text', content: 'You can resubscribe at any time to regain access to leads.' },
+        { type: 'cta', content: 'View Plans', href: `${BASE_URL}/contractor/subscriptions` },
+      ]),
+    });
+    await logEmailEvent('subscription_cancelled', contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Subscription-cancelled email sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('subscription_cancelled', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send subscription-cancelled email:', error);
+    return { success: false, error };
+  }
+}
+
+// ─── Subscription Renewal Receipt (contractor) ────────────────────────────────
+export async function sendSubscriptionRenewalEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  tier: string;
+  amountPaid: number;
+  nextBillingDate?: Date | null;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping renewal email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, tier, amountPaid, nextBillingDate } = params;
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `✅ Payment received — QuoteXbert ${tierLabel} Plan renewed`,
+      html: buildEmail(`${tierLabel} Plan Renewed — QuoteXbert`, [
+        { type: 'tag', content: 'Payment Received' },
+        { type: 'heading', content: 'Your subscription has been renewed' },
+        { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${escHtml(tierLabel)}<br><strong>Amount Paid:</strong> $${amountPaid.toFixed(2)} CAD${nextBillingDate ? `<br><strong>Next Billing Date:</strong> ${new Date(nextBillingDate).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}` : ''}` },
+        { type: 'cta', content: 'View Jobs', href: `${BASE_URL}/contractor/jobs` },
+        { type: 'text', content: 'Questions? Call <a href="tel:9052429460" style="color:#9f1239;">905-242-9460</a>', rawHtml: true },
+      ]),
+    });
+    await logEmailEvent('subscription_renewed', contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Renewal receipt sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('subscription_renewed', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send renewal email:', error);
+    return { success: false, error };
+  }
+}

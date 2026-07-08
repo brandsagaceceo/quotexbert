@@ -231,6 +231,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'renovation-estimates-oshawa',
     'renovation-estimates-burlington',
     'renovation-estimates-oakville',
+    'renovation-estimates-milton',
+    'renovation-estimates-newmarket',
+    'renovation-estimates-aurora',
+    'renovation-estimates-thornhill',
+    'renovation-estimates-stouffville',
+    'renovation-estimates-caledon',
+    // Expanded Ontario cities
+    'renovation-estimates-hamilton',
+    'renovation-estimates-barrie',
+    'renovation-estimates-guelph',
+    'renovation-estimates-kitchener',
+    'renovation-estimates-waterloo',
+    'renovation-estimates-cambridge',
+    // Premium Toronto neighbourhoods
+    'renovation-estimates-forest-hill',
+    'renovation-estimates-rosedale',
+    'renovation-estimates-leaside',
+    'renovation-estimates-the-annex',
+    'renovation-estimates-trinity-bellwoods',
   ]
 
   const neighbourhoodPages: MetadataRoute.Sitemap = neighbourhoodSlugs.map(slug => ({

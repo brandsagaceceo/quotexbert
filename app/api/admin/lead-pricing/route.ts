@@ -1,12 +1,27 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase());
+
+async function requireAdmin() {
+  const { userId } = await auth();
+  if (!userId) return null;
+  const user = await prisma.user.findUnique({ where: { clerkUserId: userId }, select: { email: true } });
+  if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) return null;
+  return user;
+}
+
 // Get all lead pricing
 export async function GET() {
+  const admin = await requireAdmin();
+  if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   try {
     // Use raw SQL to fetch lead pricing
     const pricingData = await prisma.$queryRaw`
@@ -25,6 +40,8 @@ export async function GET() {
 
 // Create or update lead pricing
 export async function POST(request: NextRequest) {
+  const admin = await requireAdmin();
+  if (!admin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   try {
     const body = await request.json();
     const { trade, city = "default", priceCents } = body;

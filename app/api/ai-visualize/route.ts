@@ -31,9 +31,6 @@ Style: High-quality, realistic, professional architectural photography. Modern, 
 
 Important: Create a photorealistic image that looks like a professionally photographed completed renovation, not a rendering or illustration.`;
 
-    console.log('🎨 Generating AI visualization with DALL-E 3...');
-    console.log('Prompt:', prompt.substring(0, 200) + '...');
-
     // Generate image with DALL-E 3
     const response = await openai.images.generate({
       model: 'dall-e-3',

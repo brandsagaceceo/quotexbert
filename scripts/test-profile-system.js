@@ -120,7 +120,8 @@ async function testProfileSystem() {
         zipCode: '12345',
         category: 'general',
         homeownerId: testHomeowner.id,
-        status: 'closed'
+        status: 'closed',
+        isSeeded: true,
       }
     });
 

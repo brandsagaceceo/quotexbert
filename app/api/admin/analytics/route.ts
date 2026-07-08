@@ -1,8 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 import { PostHog } from "posthog-node";
 
 export const dynamic = "force-dynamic";
+
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase());
 
 // Initialize PostHog server client conditionally
 let postHogClient: PostHog | null = null;
@@ -28,6 +34,18 @@ interface PostHogEvent {
 
 export async function GET(request: NextRequest) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const caller = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { email: true },
+    });
+    if (!caller || !ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const range = searchParams.get("range") || "7d";
 

@@ -88,7 +88,9 @@ export async function getAccessibleLeads(contractorId: string) {
         category: {
           in: activeCategories
         },
-        status: 'open' // Only show open leads
+        status: 'open',     // Only show open leads
+        published: true,    // Only show published leads
+        isSeeded: false,    // Never show demo/seed data
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -116,8 +118,9 @@ export async function getAllOpenLeads() {
   try {
     const leads = await prisma.lead.findMany({
       where: {
-        status: 'open', // Only show open leads
-        published: true // Only show published leads
+        status: 'open',    // Only show open leads
+        published: true,   // Only show published leads
+        isSeeded: false,   // Never show demo/seed data in production
       },
       orderBy: { createdAt: 'desc' },
       include: {

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import {
+  sendSubscriptionCreatedEmail,
+  sendSubscriptionCancelledEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionRenewalEmail,
+} from "@/lib/email";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -232,6 +238,22 @@ async function handleCheckoutSessionCompleted(session: any) {
 
     console.log(`[STRIPE WEBHOOK] Successfully activated ${tierInfo.normalizedTier} subscription for contractor ${contractorId}`);
 
+    // Send subscription confirmation email
+    const contractorEmailUser = await prisma.user.findUnique({
+      where: { id: contractorId },
+      select: { id: true, email: true, name: true, displayName: true, selectedCategories: true, subscriptionCurrentPeriodEnd: true }
+    });
+    if (contractorEmailUser?.email) {
+      let activatedCategories: string[] = [];
+      try { activatedCategories = JSON.parse(contractorEmailUser.selectedCategories || '[]'); } catch {}
+      await sendSubscriptionCreatedEmail({
+        contractor: { id: contractorEmailUser.id, email: contractorEmailUser.email, name: contractorEmailUser.displayName ?? contractorEmailUser.name },
+        tier: tierInfo.normalizedTier,
+        categories: activatedCategories,
+        nextBillingDate: contractorEmailUser.subscriptionCurrentPeriodEnd,
+      }).catch(err => console.error('[EMAIL] sendSubscriptionCreatedEmail error:', err));
+    }
+
   } catch (error) {
     console.error("[STRIPE WEBHOOK] Error handling checkout session completed:", error);
   }
@@ -366,6 +388,11 @@ async function handleSubscriptionDeleted(subscription: any) {
     console.log("Subscription deleted:", subscription.id);
     
     // Update the subscription record in our database
+    const cancelledSub = await prisma.contractorSubscription.findFirst({
+      where: { stripeSubscriptionId: subscription.id },
+      include: { contractor: { select: { id: true, email: true, name: true, displayName: true } } }
+    });
+
     await prisma.contractorSubscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
@@ -375,6 +402,14 @@ async function handleSubscriptionDeleted(subscription: any) {
         canViewLeads: false
       }
     });
+
+    if (cancelledSub?.contractor?.email) {
+      await sendSubscriptionCancelledEmail({
+        contractor: { id: cancelledSub.contractor.id, email: cancelledSub.contractor.email, name: cancelledSub.contractor.displayName ?? cancelledSub.contractor.name },
+        category: cancelledSub.category ?? undefined,
+        accessUntil: cancelledSub.currentPeriodEnd ?? null,
+      }).catch(err => console.error('[EMAIL] sendSubscriptionCancelledEmail error:', err));
+    }
 
   } catch (error) {
     console.error("Error handling subscription deleted:", error);
@@ -463,6 +498,22 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
           // Never fail the webhook over affiliate tracking
         }
       }
+
+      // Send renewal receipt email
+      if (subscription) {
+        const contractorUser = await prisma.user.findUnique({
+          where: { id: subscription.contractorId },
+          select: { id: true, email: true, name: true, displayName: true, subscriptionPlan: true }
+        });
+        if (contractorUser?.email) {
+          await sendSubscriptionRenewalEmail({
+            contractor: { id: contractorUser.id, email: contractorUser.email, name: contractorUser.displayName ?? contractorUser.name },
+            tier: contractorUser.subscriptionPlan ?? 'HANDYMAN',
+            amountPaid: (invoice.amount_paid as number) / 100,
+            nextBillingDate: invoice.period_end ? new Date((invoice.period_end as number) * 1000) : null,
+          }).catch(err => console.error('[EMAIL] sendSubscriptionRenewalEmail error:', err));
+        }
+      }
     }
 
   } catch (error) {
@@ -502,6 +553,19 @@ async function handleInvoicePaymentFailed(invoice: any) {
             canClaimLeads: false // Restrict access until payment is resolved
           }
         });
+
+        // Send payment-failed email to contractor
+        const contractorUser = await prisma.user.findUnique({
+          where: { id: subscription.contractorId },
+          select: { id: true, email: true, name: true, displayName: true }
+        });
+        if (contractorUser?.email) {
+          await sendPaymentFailedEmail({
+            contractor: { id: contractorUser.id, email: contractorUser.email, name: contractorUser.displayName ?? contractorUser.name },
+            category: subscription.category ?? undefined,
+            amountDue: (invoice.amount_due as number) / 100,
+          }).catch(err => console.error('[EMAIL] sendPaymentFailedEmail error:', err));
+        }
       }
     }
 

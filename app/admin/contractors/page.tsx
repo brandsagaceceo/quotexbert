@@ -35,10 +35,10 @@ export default function AdminVerificationPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      // Check if user is a contractor (or admin role in future)
-      const role = user.role;
-      if (role !== "contractor") {
-        router.push("/");
+      // Admin-only page: check email against allowed admins
+      const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
+      if (!ADMIN_EMAILS.includes(user.email || '')) {
+        router.push('/');
         return;
       }
 

@@ -25,9 +25,9 @@ export default function SiteFooter() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/#get-estimate" className="text-ink-600 hover:text-brand transition-colors">Get AI Estimate</Link></li>
               <li><Link href="/renovation-costs" className="text-ink-600 hover:text-brand transition-colors">Renovation Cost Guides</Link></li>
-              <li><Link href="/renovation-cost/toronto/kitchen-renovation" className="text-ink-600 hover:text-brand transition-colors">Kitchen Costs — Toronto</Link></li>
-              <li><Link href="/renovation-cost/toronto/bathroom-renovation" className="text-ink-600 hover:text-brand transition-colors">Bathroom Costs — Toronto</Link></li>
-              <li><Link href="/renovation-cost/toronto/basement-finishing" className="text-ink-600 hover:text-brand transition-colors">Basement Costs — Toronto</Link></li>
+              <li><Link href="/renovation-cost/toronto/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchen Costs — Toronto</Link></li>
+              <li><Link href="/renovation-cost/toronto/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathroom Costs — Toronto</Link></li>
+              <li><Link href="/renovation-cost/toronto/basement" className="text-ink-600 hover:text-brand transition-colors">Basement Costs — Toronto</Link></li>
               <li><Link href="/ai-renovation-check" className="text-ink-600 hover:text-brand transition-colors">AI Renovation Inspector</Link></li>
             </ul>
           </div>
@@ -72,9 +72,9 @@ export default function SiteFooter() {
             {/* Popular cities teaser */}
             <h3 className="text-sm font-bold text-ink-900 mt-6 mb-3 uppercase tracking-wide">Popular Guides</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/renovation-cost/mississauga/kitchen-renovation" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Mississauga</Link></li>
-              <li><Link href="/renovation-cost/brampton/bathroom-renovation" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Brampton</Link></li>
-              <li><Link href="/renovation-cost/scarborough/basement-finishing" className="text-ink-600 hover:text-brand transition-colors">Basements — Scarborough</Link></li>
+              <li><Link href="/renovation-cost/mississauga/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Mississauga</Link></li>
+              <li><Link href="/renovation-cost/brampton/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Brampton</Link></li>
+              <li><Link href="/renovation-cost/scarborough/basement" className="text-ink-600 hover:text-brand transition-colors">Basements — Scarborough</Link></li>
             </ul>
           </div>
         </div>

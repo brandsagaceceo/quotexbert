@@ -16,7 +16,8 @@ async function createTestJob() {
         homeownerId: "demo-homeowner",
         status: "open",
         claimed: false,
-        published: true
+        published: true,
+        isSeeded: true,
       }
     });
     

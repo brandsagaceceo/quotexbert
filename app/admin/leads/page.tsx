@@ -1,9 +1,22 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminLeadsTable from "./AdminLeadsTable";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',').map(e => e.trim().toLowerCase());
+
 export default async function AdminLeadsPage() {
-  // For now, we'll skip role checking and implement a simple admin page
-  // In production, you'd add requireRole("admin") here
+  const { userId } = await auth();
+  if (!userId) redirect('/sign-in');
+
+  const caller = await prisma.user.findFirst({
+    where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+    select: { email: true },
+  });
+  if (!caller || !ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
+    redirect('/');
+  }
 
   const leads = await prisma.lead.findMany({
     orderBy: { createdAt: "desc" },

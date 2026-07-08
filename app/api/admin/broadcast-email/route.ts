@@ -5,6 +5,9 @@ import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',').map(e => e.trim().toLowerCase());
+
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
@@ -116,12 +119,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Admin check
-    const adminUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
+    const adminUser = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { email: true },
     });
 
-    if (!adminUser || adminUser.role !== "admin") {
+    if (!adminUser || !ADMIN_EMAILS.includes(adminUser.email.toLowerCase())) {
       return NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
 

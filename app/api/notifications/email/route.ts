@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/prisma';
 import { sendNotificationEmail, sendBulkNotifications, NotificationType } from '@/lib/email-notifications';
 
 export const dynamic = "force-dynamic";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',')
+  .map((e) => e.trim().toLowerCase());
+
 export async function POST(request: NextRequest) {
   try {
+    // Require admin authentication for email sending API
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const caller = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+      select: { email: true },
+    });
+    if (!caller || !ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { type, recipients, data } = body;
 
@@ -62,8 +81,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to test email templates
+// GET endpoint to test email templates — dev/admin only
 export async function GET(request: NextRequest) {
+  // Block in production
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
+  }
+
   const url = new URL(request.url);
   const type = url.searchParams.get('type') as NotificationType;
   const preview = url.searchParams.get('preview') === 'true';

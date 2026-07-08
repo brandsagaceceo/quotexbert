@@ -27,13 +27,14 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // HTML pages: always revalidate, never serve stale
+        // Security headers on all routes
         source: '/:path*',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, must-revalidate',
-          },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Cache-Control', value: 'no-cache, must-revalidate' },
         ],
       },
       {

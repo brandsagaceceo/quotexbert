@@ -58,6 +58,7 @@ async function main() {
         zipCode: "90210",
         category: "plumbing",
         homeownerId: homeowner.id,
+        isSeeded: true,
       },
     });
 
@@ -69,6 +70,7 @@ async function main() {
         zipCode: "90211",
         category: "electrical",
         homeownerId: homeowner.id,
+        isSeeded: true,
       },
     });
 
@@ -80,6 +82,7 @@ async function main() {
         zipCode: "90212",
         category: "remodeling",
         homeownerId: homeowner.id,
+        isSeeded: true,
       },
     });
 
@@ -91,6 +94,7 @@ async function main() {
         zipCode: "90213",
         category: "roofing",
         homeownerId: homeowner.id,
+        isSeeded: true,
       },
     });
 
@@ -102,6 +106,7 @@ async function main() {
         zipCode: "90210",
         category: "hvac",
         homeownerId: homeowner.id,
+        isSeeded: true,
       },
     });
 

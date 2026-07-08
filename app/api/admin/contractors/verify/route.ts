@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
+  .split(',').map(e => e.trim().toLowerCase());
+
 export async function PUT(request: NextRequest) {
   try {
     const authResult = await auth();
@@ -15,12 +18,12 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
+    const caller = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { email: true },
     });
 
-    if (!user || user.role !== "admin") {
+    if (!caller || !ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
       return NextResponse.json(
         { error: "Admin access required" },
         { status: 403 }

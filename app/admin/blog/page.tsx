@@ -1,6 +1,8 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   PlusIcon, 
@@ -24,10 +26,21 @@ interface BlogPost {
   views: number;
 }
 
+const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
+
 export default function AdminBlogPage() {
+  const { authUser, authLoading } = useAuth();
+  const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
+
+  // Guard: redirect non-admins
+  useEffect(() => {
+    if (!authLoading && (!authUser || !ADMIN_EMAILS.includes(authUser.email || ''))) {
+      router.push('/');
+    }
+  }, [authUser, authLoading, router]);
 
   // Sample blog posts for admin - Toronto focused
   const samplePosts: BlogPost[] = [

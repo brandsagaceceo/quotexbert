@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
     const jobs = await prisma.lead.findMany({
       where: {
         homeownerId: { in: homeownerDbIds },
+        isSeeded: false, // Real homeowners only see their own real jobs
       },
       include: {
         applications: {

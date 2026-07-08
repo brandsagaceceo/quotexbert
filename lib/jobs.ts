@@ -24,7 +24,9 @@ export async function listPublishedLeads(params: ListPublishedLeadsParams) {
   } = params;
 
   const where: any = {
-    status: "PUBLISHED",
+    status: "open",      // Matches schema status field
+    published: true,     // Matches schema published field
+    isSeeded: false, // Never serve demo/seed data
   };
 
   // Search query

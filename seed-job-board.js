@@ -435,6 +435,7 @@ async function seedJobBoard() {
             homeownerId: demoHomeowner.id,
             status: 'open',
             published: true,
+            isSeeded: true,
             maxContractors: 3,
             photos: '[]' // No photos for seed data
           }

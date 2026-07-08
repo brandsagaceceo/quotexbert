@@ -22,7 +22,7 @@ export async function POST(
 
     // Get the lead and check if it exists and is open for applications
     const lead = await prisma.lead.findUnique({
-      where: { id: leadId },
+      where: { id: leadId, isSeeded: false },
       include: {
         applications: true,
         homeowner: {
@@ -170,7 +170,7 @@ export async function GET(
 
     // Get the lead to verify ownership or access
     const lead = await prisma.lead.findUnique({
-      where: { id: leadId },
+      where: { id: leadId, isSeeded: false },
       include: {
         applications: {
           include: {

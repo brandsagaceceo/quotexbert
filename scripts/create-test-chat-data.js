@@ -39,7 +39,8 @@ async function createCompleteTestData() {
         category: "Kitchen",
         homeownerId: homeowner.id,
         contractorId: contractor.id,
-        status: "claimed"
+        status: "claimed",
+        isSeeded: true,
       }
     });
 

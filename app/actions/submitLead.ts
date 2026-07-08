@@ -102,12 +102,6 @@ export async function submitLead(formData: FormData) {
       affiliateCode: (formData.get("affiliateCode") as string) || undefined, // Affiliate tracking
     };
 
-    console.log(`[submitLead:${requestId}] Raw data:`, {
-      title: rawData.title,
-      category: rawData.projectType,
-      photosCount: rawData.photos.length
-    });
-
     // Check honeypot
     if (rawData.website && rawData.website.trim() !== "") {
       console.warn(`[submitLead:${requestId}] Honeypot triggered`);

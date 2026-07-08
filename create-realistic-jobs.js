@@ -200,7 +200,8 @@ async function createRealisticJobs() {
                 status: 'open',
                 maxContractors: 3,
                 homeownerId: 'demo-homeowner',
-                published: true
+                published: true,
+                isSeeded: true
               }
             });
 

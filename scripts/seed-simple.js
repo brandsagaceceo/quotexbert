@@ -47,6 +47,7 @@ async function main() {
       zipCode: "90210",
       category: "plumbing",
       homeownerId: homeowner.id,
+      isSeeded: true,
     },
   });
 
@@ -58,6 +59,7 @@ async function main() {
       zipCode: "90211",
       category: "general",
       homeownerId: homeowner.id,
+      isSeeded: true,
     },
   });
 

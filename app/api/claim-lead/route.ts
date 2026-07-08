@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Get the lead
     const lead = await prisma.lead.findUnique({
-      where: { id: leadId },
+      where: { id: leadId, isSeeded: false },
       include: { homeowner: true },
     });
 

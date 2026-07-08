@@ -148,6 +148,7 @@ model Lead {
   claimedBy        String?          // Contractor ID who claimed first
   claimedAt        DateTime?        // When lead was first claimed
   published        Boolean          @default(false) // Changed default to false - homeowner controls when to publish
+  isSeeded         Boolean          @default(false) // true = demo/seed data, excluded from production job board
   photos           String           @default("[]") @db.Text // JSON array of photo URLs
   userId           String?          // Added userId field for homeowner
   maxContractors   Int              @default(3) // Maximum contractors that can apply

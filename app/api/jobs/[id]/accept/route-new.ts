@@ -19,7 +19,7 @@ export async function POST(
 
     // Get the lead and check if it exists
     const currentLead = await prisma.lead.findUnique({
-      where: { id: jobId },
+      where: { id: jobId, isSeeded: false },
       include: {
         homeowner: {
           select: { name: true, email: true }

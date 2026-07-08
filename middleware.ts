@@ -1,6 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
+  // Admin area — must be first so /admin is never publicly accessible
+  "/admin(.*)",
+
   // Profile & user API (original)
   "/profile(.*)",
   "/api/user(.*)",

@@ -102,6 +102,7 @@ export async function GET(request: Request) {
     const leadsWhereContractorMatches = await prisma.lead.findMany({
       where: {
         status: { in: ["open", "claimed", "accepted", "in_progress", "completed"] },
+        isSeeded: false, // Exclude demo/seed data from contractor metrics
       },
       select: {
         id: true,
@@ -163,6 +164,7 @@ export async function GET(request: Request) {
     const acceptedLeads = await prisma.lead.findMany({
       where: {
         acceptedById: resolvedContractorId,
+        isSeeded: false,
         NOT: { budget: "" },
       },
       select: { budget: true },
@@ -191,6 +193,7 @@ export async function GET(request: Request) {
           { acceptedById: resolvedContractorId },
           { acceptedContractors: { contains: resolvedContractorId } },
         ],
+        isSeeded: false,
         createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },
     });
@@ -198,6 +201,7 @@ export async function GET(request: Request) {
     const jobsCompletedLast30Days = await prisma.lead.count({
       where: {
         acceptedById: resolvedContractorId,
+        isSeeded: false,
         status: "completed",
         updatedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       },

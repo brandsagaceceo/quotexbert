@@ -85,7 +85,7 @@ async function createTestJobs() {
 
     for (const job of testJobs) {
       const created = await prisma.lead.create({
-        data: job
+        data: { ...job, isSeeded: true }
       });
       console.log(`Created job: ${created.title} (${created.id})`);
     }

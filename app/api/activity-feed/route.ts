@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -55,6 +56,12 @@ export async function GET(request: Request) {
  * Create a new activity event
  */
 export async function POST(request: Request) {
+  // Require authentication to prevent anonymous event spam
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { type, category, city, estimate, contractorName, rating } = body;

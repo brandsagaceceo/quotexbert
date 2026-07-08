@@ -6,8 +6,13 @@ const prisma = new PrismaClient();
 // This API endpoint should be called by a cron job every 6 hours
 export async function POST(request: NextRequest) {
   try {
-    console.log('[AutoFollow-Up] Starting contractor follow-up check...');
-    
+    // Verify cron secret to prevent unauthorized invocations
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Find jobs posted more than 48 hours ago with no applications
     const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
     
@@ -18,6 +23,7 @@ export async function POST(request: NextRequest) {
         },
         status: 'open',
         published: true,
+        isSeeded: false, // Never follow up on demo/seed data
         applications: {
           none: {}
         },
@@ -77,6 +83,7 @@ export async function POST(request: NextRequest) {
         },
         status: 'open',
         published: true,
+        isSeeded: false, // Never follow up on demo/seed data
         viewCount: {
           gt: 0
         },

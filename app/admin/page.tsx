@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
 import LoadingState from "@/components/ui/LoadingState";
 import { 
   ChartBarIcon, 
@@ -27,13 +30,21 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  const { authUser: user } = useAuth();
+  const { authUser: user, authLoading } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Guard: only admin emails may access this page
   useEffect(() => {
-    // For demo purposes, we'll show mock data
-    // In production, you'd fetch real stats from your API
+    if (!authLoading && (!user || !ADMIN_EMAILS.includes(user.email || ''))) {
+      router.push('/');
+    }
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (!user || !ADMIN_EMAILS.includes(user.email || '')) return;
+    // Load mock stats for the admin overview
     setTimeout(() => {
       setStats({
         totalLeads: 156,

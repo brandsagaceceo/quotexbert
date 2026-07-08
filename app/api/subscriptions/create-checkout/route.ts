@@ -28,9 +28,7 @@ const TIER_PRICING = {
 
 export async function POST(req: Request) {
   try {
-    console.log('[API] Create checkout request received');
     const { contractorId, tier, email, selectedCategories } = await req.json();
-    console.log('[API] Request data:', { contractorId, tier, email, contractorIdType: typeof contractorId, contractorIdLength: contractorId?.length });
 
     // Read affiliate referral code from cookie (set by ReferralTracker)
     const cookieHeader = req.headers.get('cookie') || '';
@@ -213,6 +211,13 @@ export async function POST(req: Request) {
     }
 
     // Create Stripe Checkout session
+    // selectedCategories is embedded in metadata so the webhook can activate
+    // categories even if the client-side localStorage flow fails (tab closed, etc.).
+    // Stripe metadata values are capped at 500 chars; JSON of ≤10 short IDs is well within that.
+    const selectedCategoriesJson = selectedCategories && selectedCategories.length > 0
+      ? JSON.stringify(selectedCategories)
+      : '';
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -242,13 +247,11 @@ export async function POST(req: Request) {
       metadata: {
         contractorId: dbUserId,
         tier: tier,
-        categories: tierConfig.categories.toString()
+        categories: tierConfig.categories.toString(),
+        selectedCategories: selectedCategoriesJson,
       }
     });
 
-    console.log('[API] Checkout session created successfully:', session.id);
-    console.log('[API] Checkout URL:', session.url);
-    
     return NextResponse.json({
       success: true,
       checkoutUrl: session.url,
@@ -256,8 +259,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error("[API] Error creating checkout session:", error);
-    console.error("[API] Error details:", error instanceof Error ? error.stack : error);
+    console.error("[API] Error creating checkout session:", error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
       { 
         success: false, 

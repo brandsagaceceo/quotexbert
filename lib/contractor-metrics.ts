@@ -28,6 +28,7 @@ export async function getContractorMetrics(contractorDbId: string): Promise<Cont
           { acceptedById: contractorDbId },
           { contractorId: contractorDbId, status: { not: 'open' } },
         ],
+        isSeeded: false, // Exclude demo/seed data from metrics
       },
     }),
     prisma.lead.count({
@@ -36,6 +37,7 @@ export async function getContractorMetrics(contractorDbId: string): Promise<Cont
           { acceptedById: contractorDbId, status: 'completed' },
           { contractorId: contractorDbId, status: 'completed' },
         ],
+        isSeeded: false, // Exclude demo/seed data from metrics
       },
     }),
   ]);
