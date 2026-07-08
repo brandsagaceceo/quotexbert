@@ -23,6 +23,7 @@ export default function AIAssistantPopup() {
   const [isHidden, setIsHidden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showHelperBubble, setShowHelperBubble] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
@@ -175,6 +176,22 @@ export default function AIAssistantPopup() {
     return () => clearTimeout(timer);
   }, [userType]);
 
+  // Track virtual keyboard height on mobile so the chat window stays above it
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const handleViewportChange = () => {
+      const kbHeight = window.innerHeight - vv.height - vv.offsetTop;
+      setKeyboardOffset(Math.max(0, kbHeight));
+    };
+    vv.addEventListener('resize', handleViewportChange);
+    vv.addEventListener('scroll', handleViewportChange);
+    return () => {
+      vv.removeEventListener('resize', handleViewportChange);
+      vv.removeEventListener('scroll', handleViewportChange);
+    };
+  }, []);
+
   const initializeChat = () => {
     const welcomeMessage: Message = {
       role: 'assistant',
@@ -249,87 +266,226 @@ export default function AIAssistantPopup() {
 
     const userMsg: Message = { role: 'user', content: inputValue };
     setMessages(prev => [...prev, userMsg]);
-
-    // Simple AI response logic
     const lowerInput = inputValue.toLowerCase();
-    let response: Message;
+    setInputValue('');
 
-    if (lowerInput.includes('quote') || lowerInput.includes('cost') || lowerInput.includes('price')) {
-      response = {
-        role: 'assistant',
-        content: "Great! To get an instant AI-powered quote, simply upload photos of your project and describe what you need. Our AI analyzes your photos and gives you accurate cost estimates in seconds!",
-        actions: [{ label: '📸 Get Instant Quote Now', href: '/#instant-quote', variant: 'primary' }]
-      };
-    } else if (lowerInput.includes('contractor') || lowerInput.includes('find') || lowerInput.includes('hire')) {
-      response = {
-        role: 'assistant',
-        content: "You can browse our verified contractors by category, location, and ratings. Once you get your AI quote, you can post your project and receive bids from qualified contractors.",
-        actions: [
-          { label: '👷 Browse Contractors', href: '/contractors', variant: 'primary' },
-          { label: '📸 Get Quote First', href: '/#instant-quote', variant: 'secondary' },
-        ]
-      };
-    } else if (lowerInput.includes('contract') || lowerInput.includes('proposal') || lowerInput.includes('quote')) {
-      response = {
-        role: 'assistant',
-        content: "Generate a professional, legally-formatted contract instantly! Just enter your project details and our AI creates a complete contract you can edit, print, or download.",
-        actions: [{ label: '📄 Generate Free Contract', href: '/ai-quote', variant: 'primary' }]
-      };
-    } else if (lowerInput.includes('job') || lowerInput.includes('work') || lowerInput.includes('lead')) {
-      response = {
-        role: 'assistant',
-        content: userType === 'contractor' 
-          ? "Browse available jobs in your categories and service area. You can filter by budget, location, and project type. Make sure you've set up your profile and selected categories!"
-          : "To post a job for contractors to bid on, first get an AI quote so you know what's fair. Then post your project details and verified contractors will send you proposals.",
-        actions: userType === 'contractor'
-          ? [
+    try {
+      let response: Message;
+
+      // Gate: logged-out users trying protected actions
+      if (!isSignedIn) {
+        const isProtectedRequest =
+          (lowerInput.includes('post my') && (lowerInput.includes('job') || lowerInput.includes('project'))) ||
+          (lowerInput.includes('send') && lowerInput.includes('message')) ||
+          (lowerInput.includes('message') && lowerInput.includes('contractor')) ||
+          lowerInput.includes('my dashboard') ||
+          lowerInput.includes('accept') && lowerInput.includes('job') ||
+          (lowerInput.includes('my profile') && !lowerInput.includes('create')) ||
+          lowerInput.includes('my estimate') ||
+          lowerInput.includes('my account');
+
+        if (isProtectedRequest) {
+          response = {
+            role: 'assistant',
+            content: 'Please sign in or create a free account to continue.',
+            actions: [
+              { label: '🔑 Sign In', href: '/sign-in', variant: 'primary' },
+              { label: '📝 Create Free Account', href: '/sign-up', variant: 'secondary' },
+            ]
+          };
+          setMessages(prev => [...prev, response]);
+          return;
+        }
+      }
+
+      if (
+        lowerInput.includes('what is quotexbert') ||
+        lowerInput.includes('about quotexbert') ||
+        lowerInput.includes('how does quotexbert work') ||
+        lowerInput.includes('tell me about') ||
+        (lowerInput.includes('about') && lowerInput.includes('platform'))
+      ) {
+        response = {
+          role: 'assistant',
+          content: "QuoteXbert is a GTA-based home renovation platform that connects homeowners with verified contractors.\n\n🏠 **For Homeowners:** Upload photos to get instant AI-powered quotes, generate professional contracts, and receive bids from local contractors — 100% free.\n\n👷 **For Contractors:** Access qualified leads, build your portfolio, and grow your renovation business.",
+          actions: isSignedIn
+            ? [{ label: '📸 Get an Instant Quote', href: '/#instant-quote', variant: 'primary' }]
+            : [
+                { label: '🏠 Sign Up as Homeowner', href: '/sign-up', variant: 'primary' },
+                { label: '👷 Sign Up as Contractor', href: '/sign-up', variant: 'secondary' },
+              ]
+        };
+      } else if (
+        lowerInput.includes('ai estimate') ||
+        lowerInput.includes('estimate work') ||
+        (lowerInput.includes('how does') && lowerInput.includes('estimate')) ||
+        (lowerInput.includes('how does') && lowerInput.includes('ai')) ||
+        (lowerInput.includes('how does') && lowerInput.includes('work'))
+      ) {
+        response = {
+          role: 'assistant',
+          content: "Our AI estimator works in 3 steps:\n\n1. 📸 **Upload photos** of your renovation project\n2. 📝 **Describe the work** you need done\n3. ⚡ **Get instant estimates** — our AI analyses your photos and description to provide accurate cost ranges based on real GTA market data\n\nNo account required to try it!",
+          actions: [{ label: '📸 Try the AI Estimator', href: '/#instant-quote', variant: 'primary' }]
+        };
+      } else if (
+        lowerInput.includes('contractors join') ||
+        lowerInput.includes('join as a contractor') ||
+        lowerInput.includes('become a contractor') ||
+        lowerInput.includes('how do contractors') ||
+        lowerInput.includes('contractor join') ||
+        lowerInput.includes('join quotexbert')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "Contractors can join QuoteXbert by:\n\n1. 📝 Creating a contractor account\n2. ✅ Setting up your profile with skills and service area\n3. 💳 Choosing a subscription plan to access leads\n4. 📋 Browsing and bidding on renovation jobs\n\nStart receiving qualified local leads today!",
+          actions: [
+            { label: '👷 Join as Contractor', href: '/sign-up', variant: 'primary' },
+            { label: '💳 View Plans', href: '/contractor/subscriptions', variant: 'secondary' },
+          ]
+        };
+      } else if (
+        lowerInput.includes('quote') ||
+        lowerInput.includes('cost') ||
+        lowerInput.includes('price')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "To get an instant AI-powered quote, simply upload photos of your project and describe what you need. Our AI analyses your photos and gives you accurate cost estimates in seconds!",
+          actions: [{ label: '📸 Get Instant Quote Now', href: '/#instant-quote', variant: 'primary' }]
+        };
+      } else if (
+        lowerInput.includes('contractor') ||
+        lowerInput.includes('find') ||
+        lowerInput.includes('hire')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "You can browse our verified contractors by category, location, and ratings. Once you get your AI quote, you can post your project and receive bids from qualified contractors.",
+          actions: [
+            { label: '👷 Browse Contractors', href: '/contractors', variant: 'primary' },
+            { label: '📸 Get Quote First', href: '/#instant-quote', variant: 'secondary' },
+          ]
+        };
+      } else if (
+        lowerInput.includes('contract') ||
+        lowerInput.includes('proposal')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "Generate a professional, legally-formatted contract instantly! Just enter your project details and our AI creates a complete contract you can edit, print, or download.",
+          actions: [{ label: '📄 Generate Free Contract', href: '/ai-quote', variant: 'primary' }]
+        };
+      } else if (
+        lowerInput.includes('post') ||
+        lowerInput.includes('renovation job') ||
+        lowerInput.includes('create a job') ||
+        (lowerInput.includes('job') && lowerInput.includes('how')) ||
+        lowerInput.includes('work') ||
+        lowerInput.includes('lead')
+      ) {
+        if (userType === 'contractor') {
+          response = {
+            role: 'assistant',
+            content: "Browse available jobs in your categories and service area. You can filter by budget, location, and project type. Make sure you've set up your profile and selected categories!",
+            actions: [
               { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'primary' },
               { label: '⚙️ Update Categories', href: '/profile?tab=categories', variant: 'secondary' },
             ]
-          : [{ label: '📸 Get Quote First', href: '/#instant-quote', variant: 'primary' }]
-      };
-    } else if (lowerInput.includes('subscription') || lowerInput.includes('plan') || lowerInput.includes('upgrade') || lowerInput.includes('payment') || lowerInput.includes('billing')) {
-      response = {
-        role: 'assistant',
-        content: userType === 'contractor'
-          ? "QuoteXbert offers contractor subscription plans with access to unlimited leads, priority listing, and AI tools. Head to your subscription page to compare plans."
-          : "QuoteXbert is completely free for homeowners — no subscription needed. Contractors pay to access leads.",
-        actions: userType === 'contractor'
-          ? [{ label: '💳 View Plans', href: '/contractor/subscriptions', variant: 'primary' }]
-          : [{ label: '📸 Get Free Quote', href: '/#instant-quote', variant: 'primary' }]
-      };
-    } else if (lowerInput.includes('sign up') || lowerInput.includes('register') || lowerInput.includes('account') || lowerInput.includes('login') || lowerInput.includes('sign in')) {
-      response = {
-        role: 'assistant',
-        content: "Creating an account is free and takes under a minute. Sign up as a homeowner to post projects, or as a contractor to start winning jobs.",
-        actions: [
-          { label: '🏠 Sign Up as Homeowner', href: '/sign-up', variant: 'primary' },
-          { label: '👷 Sign Up as Contractor', href: '/sign-up', variant: 'secondary' },
-        ]
-      };
-    } else if (lowerInput.includes('problem') || lowerInput.includes('issue') || lowerInput.includes('bug') || lowerInput.includes('error') || lowerInput.includes('help') || lowerInput.includes('support') || lowerInput.includes('not working')) {
-      response = {
-        role: 'assistant',
-        content: "Sorry to hear you're having trouble! Here are the most common fixes:\n\n• **Refresh the page** — clears most temporary issues\n• **Check your internet connection**\n• **Try a different browser** if the issue persists\n\nFor account or billing problems, reach out to our support team.",
-        actions: [
-          { label: '📧 Contact Support', href: 'mailto:support@quotexbert.com', variant: 'primary' },
-          { label: '🔄 Refresh Page', href: '#refresh', variant: 'secondary' },
-        ]
-      };
-    } else {
-      response = {
-        role: 'assistant',
-        content: "I'm your QuoteXbert assistant — I specialise in home renovation quotes, contractor connections, and project pricing in the GTA.\n\nHere's what I can help with:",
-        actions: [
-          { label: '📸 Get an Instant Quote', href: '/#instant-quote', variant: 'primary' },
-          { label: '👷 Find a Contractor', href: '/contractors', variant: 'secondary' },
-          { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'secondary' },
-        ]
-      };
-    }
+          };
+        } else if (!isSignedIn) {
+          response = {
+            role: 'assistant',
+            content: "To post a renovation job, you'll need a free homeowner account. Here's how it works:\n\n1. Create a free account\n2. Describe your project and upload photos\n3. Receive bids from verified contractors in your area\n\nIt's 100% free for homeowners!",
+            actions: [
+              { label: '🏠 Create Free Account', href: '/sign-up', variant: 'primary' },
+              { label: '📸 Get a Quote First', href: '/#instant-quote', variant: 'secondary' },
+            ]
+          };
+        } else {
+          response = {
+            role: 'assistant',
+            content: "To post a renovation job:\n\n1. Head to the Create Lead page\n2. Describe your project in detail\n3. Upload photos for accuracy\n4. Set your budget and timeline\n\nContractors in your area will send you proposals!",
+            actions: [{ label: '📋 Post a Job', href: '/create-lead', variant: 'primary' }]
+          };
+        }
+      } else if (
+        lowerInput.includes('subscription') ||
+        lowerInput.includes('plan') ||
+        lowerInput.includes('upgrade') ||
+        lowerInput.includes('payment') ||
+        lowerInput.includes('billing')
+      ) {
+        response = {
+          role: 'assistant',
+          content: userType === 'contractor'
+            ? "QuoteXbert offers contractor subscription plans with access to unlimited leads, priority listing, and AI tools. Head to your subscription page to compare plans."
+            : "QuoteXbert is completely free for homeowners — no subscription needed. Contractors pay to access leads.",
+          actions: userType === 'contractor'
+            ? [{ label: '💳 View Plans', href: '/contractor/subscriptions', variant: 'primary' }]
+            : [{ label: '📸 Get Free Quote', href: '/#instant-quote', variant: 'primary' }]
+        };
+      } else if (
+        lowerInput.includes('sign up') ||
+        lowerInput.includes('register') ||
+        lowerInput.includes('account') ||
+        lowerInput.includes('login') ||
+        lowerInput.includes('sign in')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "Creating an account is free and takes under a minute. Sign up as a homeowner to post projects, or as a contractor to start winning jobs.",
+          actions: [
+            { label: '🏠 Sign Up as Homeowner', href: '/sign-up', variant: 'primary' },
+            { label: '👷 Sign Up as Contractor', href: '/sign-up', variant: 'secondary' },
+          ]
+        };
+      } else if (
+        lowerInput.includes('contact') ||
+        lowerInput.includes('phone') ||
+        lowerInput.includes('reach') ||
+        lowerInput.includes('problem') ||
+        lowerInput.includes('issue') ||
+        lowerInput.includes('bug') ||
+        lowerInput.includes('error') ||
+        lowerInput.includes('help') ||
+        lowerInput.includes('support') ||
+        lowerInput.includes('not working')
+      ) {
+        response = {
+          role: 'assistant',
+          content: "You can reach the QuoteXbert support team directly:\n\n📧 **Email:** quotexbert@gmail.com\n📞 **Phone:** 905-242-9460\n\nFor page issues, try refreshing or switching browsers.",
+          actions: [
+            { label: '📧 Email Support', href: 'mailto:quotexbert@gmail.com', variant: 'primary' },
+            { label: '🔄 Refresh Page', href: '#refresh', variant: 'secondary' },
+          ]
+        };
+      } else {
+        response = {
+          role: 'assistant',
+          content: "I'm your QuoteXbert assistant — I specialise in home renovation quotes, contractor connections, and project pricing in the GTA.\n\nHere's what I can help with:",
+          actions: isSignedIn
+            ? [
+                { label: '📸 Get an Instant Quote', href: '/#instant-quote', variant: 'primary' },
+                { label: '👷 Find a Contractor', href: '/contractors', variant: 'secondary' },
+                { label: '📋 Browse Jobs', href: '/contractor/jobs', variant: 'secondary' },
+              ]
+            : [
+                { label: '📸 Get an Instant Quote', href: '/#instant-quote', variant: 'primary' },
+                { label: '👷 Find a Contractor', href: '/contractors', variant: 'secondary' },
+                { label: '📝 Create Free Account', href: '/sign-up', variant: 'secondary' },
+              ]
+        };
+      }
 
-    setMessages(prev => [...prev, response]);
-    setInputValue('');
+      setMessages(prev => [...prev, response]);
+    } catch {
+      const fallback: Message = {
+        role: 'assistant',
+        content: "I'm having trouble answering right now. You can contact QuoteXbert support at quotexbert@gmail.com or 905-242-9460.",
+        actions: [{ label: '📧 Email Support', href: 'mailto:quotexbert@gmail.com', variant: 'primary' }]
+      };
+      setMessages(prev => [...prev, fallback]);
+    }
   };
 
   return (
@@ -394,7 +550,9 @@ export default function AIAssistantPopup() {
           className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 sm:left-auto sm:right-4 mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
             maxHeight: '80vh',
-            bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem)',
+            bottom: keyboardOffset > 0
+              ? `${keyboardOffset + 8}px`
+              : 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 0.75rem)',
           }}
         >
           {/* Header */}

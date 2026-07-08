@@ -18,19 +18,61 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/durham-region`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
+      priority: 0.92,
+    },
+    {
+      url: `${baseUrl}/clarington`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ajax`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.85,
+      priority: 0.87,
     },
     {
       url: `${baseUrl}/bowmanville`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
+      priority: 0.87,
+    },
+    {
+      url: `${baseUrl}/oshawa`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/whitby`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/pickering`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.87,
+    },
+    {
+      url: `${baseUrl}/courtice`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
       priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/newcastle`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.84,
+    },
+    {
+      url: `${baseUrl}/port-perry`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.83,
     },
   ]
   
@@ -177,6 +219,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'roof-repair-vs-replacement-gta',
     'toronto-basement-renovation-complete-guide-2026',
     'toronto-home-renovation-costs-2026',
+    // Durham Region & Clarington blog posts (NEW)
+    'how-much-do-renovations-cost-in-durham-region',
+    'best-way-to-find-contractors-in-clarington',
+    'how-quotexbert-helps-durham-homeowners-compare-renovation-quotes',
+    'contractor-lead-generation-in-durham-region',
+    'how-oshawa-contractors-can-get-more-renovation-leads',
+    'renovation-pricing-guide-bowmanville-and-newcastle',
+    'quotexbert-vs-traditional-contractor-lead-sites-gta',
+    'why-durham-contractors-should-use-quotexbert-for-local-leads',
   ]
 
   const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map(slug => ({
@@ -229,6 +280,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'renovation-estimates-ajax',
     'renovation-estimates-whitby',
     'renovation-estimates-oshawa',
+    'renovation-estimates-clarington',
+    'renovation-estimates-courtice',
+    'renovation-estimates-newcastle',
+    'renovation-estimates-bowmanville',
+    'renovation-estimates-port-perry',
     'renovation-estimates-burlington',
     'renovation-estimates-oakville',
     'renovation-estimates-milton',

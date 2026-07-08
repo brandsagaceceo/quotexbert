@@ -165,6 +165,61 @@ export const GTA_CITIES: GTACity[] = [
     nearestCity: "Oshawa",
   },
   {
+    slug: "clarington",
+    name: "Clarington",
+    region: "Durham Region",
+    population: "110K",
+    avgHome: "$650K",
+    laborPremium: -18,
+    description:
+      "Clarington is the eastern municipality of Durham Region encompassing Bowmanville, Newcastle, Courtice, and Orono. Renovation costs are among the most affordable in the GTA corridor.",
+    nearestCity: "Oshawa",
+  },
+  {
+    slug: "courtice",
+    name: "Courtice",
+    region: "Durham Region (Clarington)",
+    population: "30K",
+    avgHome: "$660K",
+    laborPremium: -17,
+    description:
+      "Courtice is a fast-growing Clarington community bordering Oshawa. Newer housing stock with strong demand for basement finishing and kitchen upgrades.",
+    nearestCity: "Oshawa",
+  },
+  {
+    slug: "newcastle",
+    name: "Newcastle",
+    region: "Durham Region (Clarington)",
+    population: "15K",
+    avgHome: "$620K",
+    laborPremium: -19,
+    description:
+      "Newcastle is a charming small-town Clarington community east of Bowmanville. Renovation pricing is among the lowest in the GTA region.",
+    nearestCity: "Oshawa",
+  },
+  {
+    slug: "port-perry",
+    name: "Port Perry",
+    region: "Durham Region (Scugog)",
+    population: "18K",
+    avgHome: "$780K",
+    laborPremium: -14,
+    description:
+      "Port Perry is a lakeside community in Durham's Scugog Township. Heritage homes and lakefront cottages create unique renovation demand, with contractor costs lower than Toronto.",
+    nearestCity: "Oshawa",
+  },
+  {
+    slug: "uxbridge",
+    name: "Uxbridge",
+    region: "Durham Region",
+    population: "22K",
+    avgHome: "$830K",
+    laborPremium: -12,
+    description:
+      "Uxbridge is a scenic Durham Region town known for its trail systems and country homes. Renovation demand is growing as Toronto-area buyers relocate here.",
+    nearestCity: "Toronto",
+  },
+  {
     slug: "oakville",
     name: "Oakville",
     region: "Halton Region",

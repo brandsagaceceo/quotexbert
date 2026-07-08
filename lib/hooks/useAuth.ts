@@ -90,6 +90,7 @@ export function useAuth() {
       } else if (isLoaded) {
         setAuthUser(null);
         prevClerkIdRef.current = null;
+        setRoleLoading(false);
       }
     };
     

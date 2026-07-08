@@ -37,24 +37,28 @@ const interMono = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
   title: {
-    default: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA",
+    default: "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
     template: "%s | QuoteXbert"
   },
   description:
-    "Get instant AI-powered home renovation estimates in Toronto & the Greater Toronto Area. Upload photos, get free quotes from verified contractors. Kitchen, bathroom, basement renovations & more.",
+    "Get AI-assisted renovation estimates and connect with verified contractors across Toronto, Durham Region, Clarington, and the GTA. Free for homeowners. Kitchen, bathroom, basement renovations & more.",
   keywords: [
     "home renovation estimates Toronto",
-    "Toronto contractors",
+    "Durham Region contractors",
+    "Clarington renovation quotes",
     "GTA home repair quotes",
     "instant renovation estimates",
     "AI contractor quotes",
     "Toronto kitchen renovation cost",
     "Toronto bathroom renovation",
     "basement finishing Toronto",
-    "Durham Region contractors",
+    "Oshawa renovation quotes",
+    "Whitby contractors",
     "Ajax home renovation",
+    "Pickering contractors",
     "Bowmanville contractors",
-    "Whitby renovation quotes",
+    "Newcastle renovation",
+    "Courtice renovation",
     "verified contractors GTA",
     "home improvement Toronto",
     "renovation cost calculator"
@@ -77,9 +81,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_CA",
     url: "https://www.quotexbert.com",
-    title: "QuoteXbert | Instant Home Renovation Estimates in Toronto & GTA", 
+    title: "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
     description:
-      "Upload photos and get instant AI-powered renovation estimates. Connect with verified contractors across Toronto and the Greater Toronto Area. Free, fast, and accurate.",
+      "Upload photos and get AI-assisted renovation estimates. Connect with verified contractors across Toronto, Durham Region, Clarington, and the GTA. Free, fast, and accurate.",
     siteName: "QuoteXbert",
     images: [
       {
@@ -92,8 +96,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "QuoteXbert - AI Home Renovation Estimates Toronto & GTA",
-    description: "Get instant AI renovation estimates. Connect with verified GTA contractors. Upload photos, receive accurate quotes in minutes.",
+    title: "QuoteXbert - AI Renovation Estimates for Toronto, Durham Region & the GTA",
+    description: "Get AI renovation estimates for Toronto, Durham Region, Clarington & the GTA. Connect with verified local contractors. Upload photos, receive accurate quotes in minutes.",
     images: ["/twitter-image.svg"],
     creator: "@quotexbert",
   },

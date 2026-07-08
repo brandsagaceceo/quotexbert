@@ -440,10 +440,123 @@ export default function BlogPage() {
       imageUrl: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=500&fit=crop",
       seoTitle: "Historic Home Renovation Toronto 2026 | Heritage Preservation",
       seoDescription: "Renovate your historic Toronto home. Heritage permits, preserving character, modern upgrades, and specialized GTA restoration contractors."
+    },
+    // ── Durham Region & Clarington blog posts ──
+    {
+      id: "31",
+      title: "How Much Do Renovations Cost in Durham Region?",
+      slug: "how-much-do-renovations-cost-in-durham-region",
+      excerpt: "Durham Region homeowners often pay 12–20% less than Toronto for the same renovation work. Get a breakdown of kitchen, bathroom, basement, and exterior costs across Oshawa, Whitby, Ajax, Pickering, and Clarington.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-03-10",
+      readTime: 9,
+      category: "Durham Region",
+      tags: ["durham region renovation", "oshawa renovation costs", "whitby contractor", "clarington reno"],
+      imageUrl: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Durham Region Renovation Costs 2026 | Oshawa, Whitby, Ajax, Pickering Pricing",
+      seoDescription: "How much do renovations cost in Durham Region? Compare kitchen, bathroom, and basement pricing across Oshawa, Whitby, Ajax, Pickering, and Clarington vs Toronto."
+    },
+    {
+      id: "32",
+      title: "Best Way to Find Contractors in Clarington",
+      slug: "best-way-to-find-contractors-in-clarington",
+      excerpt: "Finding a qualified contractor in Clarington — covering Bowmanville, Newcastle, Courtice, and surrounding areas — requires a different approach than Toronto. Here's how to source, vet, and hire local pros.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-03-08",
+      readTime: 7,
+      category: "Durham Region",
+      tags: ["clarington contractors", "bowmanville renovation", "newcastle contractor", "courtice"],
+      imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop",
+      seoTitle: "Find Contractors in Clarington 2026 | Bowmanville, Newcastle & Courtice",
+      seoDescription: "How to find and hire reliable renovation contractors in Clarington, Bowmanville, Newcastle, and Courtice. Tips for vetting local Durham Region pros."
+    },
+    {
+      id: "33",
+      title: "How QuoteXbert Helps Durham Homeowners Compare Renovation Quotes",
+      slug: "how-quotexbert-helps-durham-homeowners-compare-renovation-quotes",
+      excerpt: "Durham Region homeowners are increasingly using AI tools to get a baseline price before calling contractors. Here's how QuoteXbert works for Oshawa, Whitby, Ajax, Pickering, and Clarington renovations.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-03-06",
+      readTime: 6,
+      category: "Durham Region",
+      tags: ["durham homeowner", "oshawa renovation", "ajax renovation quotes", "quotexbert durham"],
+      imageUrl: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop&q=80",
+      seoTitle: "QuoteXbert for Durham Homeowners | Compare Renovation Quotes in Oshawa & Ajax",
+      seoDescription: "How QuoteXbert helps Durham Region homeowners compare renovation quotes. Instant AI pricing for Oshawa, Whitby, Ajax, Pickering, and Clarington."
+    },
+    {
+      id: "34",
+      title: "Contractor Lead Generation in Durham Region",
+      slug: "contractor-lead-generation-in-durham-region",
+      excerpt: "Durham Region contractors compete in a growing but underserved market. Learn how to generate consistent renovation leads across Oshawa, Whitby, Ajax, Pickering, and Clarington without relying on word-of-mouth alone.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-03-04",
+      readTime: 8,
+      category: "Durham Region",
+      tags: ["durham contractor leads", "oshawa contractor", "whitby renovation leads", "contractor marketing"],
+      imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Contractor Lead Generation in Durham Region 2026 | Oshawa, Whitby & Ajax",
+      seoDescription: "How Durham Region contractors can generate more renovation leads across Oshawa, Whitby, Ajax, Pickering, and Clarington. Proven local strategies."
+    },
+    {
+      id: "35",
+      title: "How Oshawa Contractors Can Get More Renovation Leads",
+      slug: "how-oshawa-contractors-can-get-more-renovation-leads",
+      excerpt: "Oshawa's renovation market is growing fast. Contractors who set up digital profiles, respond quickly to leads, and price competitively are winning more jobs. Here's a practical guide.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-03-02",
+      readTime: 7,
+      category: "Durham Region",
+      tags: ["oshawa contractor", "oshawa renovation leads", "durham contractor growth"],
+      imageUrl: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=500&fit=crop&q=80",
+      seoTitle: "Get More Renovation Leads in Oshawa 2026 | Durham Region Contractor Guide",
+      seoDescription: "Oshawa contractors: how to get more renovation leads in Durham Region. Digital profiles, fast response, and competitive pricing strategies."
+    },
+    {
+      id: "36",
+      title: "Renovation Pricing Guide for Bowmanville and Newcastle",
+      slug: "renovation-pricing-guide-bowmanville-and-newcastle",
+      excerpt: "Bowmanville and Newcastle homeowners often have more renovation budget than they think — local contractor rates are 18–20% below Toronto. Here's what kitchen, bathroom, and basement projects actually cost in Clarington.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-02-28",
+      readTime: 8,
+      category: "Durham Region",
+      tags: ["bowmanville renovation costs", "newcastle contractor", "clarington pricing", "durham region reno"],
+      imageUrl: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=800&h=500&fit=crop",
+      seoTitle: "Renovation Costs in Bowmanville & Newcastle 2026 | Clarington Pricing Guide",
+      seoDescription: "What does a renovation cost in Bowmanville or Newcastle? Kitchen, bathroom, and basement pricing for Clarington homeowners in 2026."
+    },
+    {
+      id: "37",
+      title: "QuoteXbert vs Traditional Contractor Lead Sites in the GTA",
+      slug: "quotexbert-vs-traditional-contractor-lead-sites-gta",
+      excerpt: "HomeStars, Houzz, and Kijiji have dominated contractor marketing for years. Here's why GTA and Durham Region contractors are switching to AI-first lead platforms — and what the difference looks like in practice.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-02-26",
+      readTime: 9,
+      category: "Contractor Tips",
+      tags: ["contractor lead sites gta", "homestars alternative", "quotexbert vs", "durham contractor"],
+      imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=500&fit=crop&q=80",
+      seoTitle: "QuoteXbert vs Traditional Lead Sites | Best Contractor Platform in the GTA",
+      seoDescription: "Compare QuoteXbert vs HomeStars, Houzz, and other GTA contractor lead sites. Why Durham Region and Toronto contractors prefer AI-first lead generation."
+    },
+    {
+      id: "38",
+      title: "Why Durham Contractors Should Use QuoteXbert for Local Leads",
+      slug: "why-durham-contractors-should-use-quotexbert-for-local-leads",
+      excerpt: "Durham Region's renovation market is growing but still underleveraged digitally. Contractors in Oshawa, Whitby, Ajax, Pickering, Clarington, and surrounding areas who list on QuoteXbert get pre-qualified leads directly from local homeowners.",
+      author: "QuoteXbert Team",
+      publishedAt: "2026-02-24",
+      readTime: 7,
+      category: "Durham Region",
+      tags: ["durham contractor leads", "quotexbert contractor", "oshawa whitby ajax pickering leads"],
+      imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=500&fit=crop",
+      seoTitle: "Why Durham Region Contractors Use QuoteXbert | Local Renovation Leads",
+      seoDescription: "Durham Region contractors: why QuoteXbert delivers better local leads than traditional platforms. Serving Oshawa, Whitby, Ajax, Pickering & Clarington."
     }
   ];
 
-  const categories = ["all", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows", "Insurance", "Permits", "Landscaping", "Painting"];
+  const categories = ["all", "Durham Region", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows", "Insurance", "Permits", "Landscaping", "Painting"];
 
   const filteredPosts = selectedCategory === "all"
     ? blogPosts
@@ -461,9 +574,9 @@ export default function BlogPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Blog',
-            name: 'QuoteXbert Toronto Home Renovation Blog',
+            name: 'QuoteXbert Home Renovation Blog — Toronto, Durham Region & the GTA',
             description:
-              'Practical renovation, repair, and DIY advice for Toronto and GTA homeowners, reviewed by local contractors.',
+              'Practical renovation, repair, and DIY advice for Toronto, Durham Region, Clarington, and GTA homeowners, reviewed by local contractors.',,
             url: 'https://www.quotexbert.com/blog',
             inLanguage: 'en-CA',
             author: {
@@ -482,9 +595,9 @@ export default function BlogPage() {
                 <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
                 <span className="uppercase tracking-wide text-xs md:text-sm text-orange-100">For GTA homeowners</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">Toronto Home Renovation Blog</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">Home Renovation Blog — Toronto, Durham Region &amp; the GTA</h1>
               <p className="text-lg md:text-xl text-orange-100 max-w-2xl">
-                Straightforward, experience-based guides written for real Toronto and GTA homeowners.
+                Straightforward, experience-based guides written for real homeowners across Toronto, Durham Region, Clarington, and the GTA.
                 No fluff — just practical timelines, cost ranges, and decisions we see every week.
               </p>
             </div>

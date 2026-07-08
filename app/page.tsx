@@ -246,7 +246,7 @@ export default function Home() {
                 <div className="lg:hidden flex flex-wrap gap-2 mb-3">
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Real Toronto prices</span>
+                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
                 </div>
 
                 {/* Key Benefits - Desktop only */}
@@ -284,8 +284,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-bold text-base md:text-xl text-slate-900">Real Toronto Prices</div>
-                      <div className="text-slate-600 text-sm md:text-base">What contractors actually charge here</div>
+                      <div className="font-bold text-base md:text-xl text-slate-900">Real GTA &amp; Durham Prices</div>
+                      <div className="text-slate-600 text-sm md:text-base">Toronto, Durham Region &amp; surrounding area rates</div>
                     </div>
                   </Link>
                 </div>
@@ -350,8 +350,8 @@ export default function Home() {
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
           <div className="bg-rose-700 px-4 py-3 md:py-4 text-center">
-            <p className="text-white font-black text-sm md:text-lg">Real Toronto Homes. Real Savings.</p>
-            <p className="text-rose-200 text-xs md:text-sm mt-0.5">Homeowners avoid overpaying by knowing real prices <strong className="text-white">before</strong> calling a contractor</p>
+            <p className="text-white font-black text-sm md:text-lg">Real GTA &amp; Durham Region Homes. Real Savings.</p>
+            <p className="text-rose-200 text-xs md:text-sm mt-0.5">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white">before</strong> calling a contractor</p>
           </div>
         </section>
 
@@ -407,11 +407,59 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Toronto Focused</div>
-                  <div className="text-xs text-gray-600 hidden md:block">GTA marketplace</div>
+                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Toronto &amp; Durham Region</div>
+                  <div className="text-xs text-gray-600 hidden md:block">GTA &amp; Durham marketplace</div>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Areas We Serve Section */}
+        <section className="py-10 md:py-14 bg-gradient-to-br from-white to-slate-50 border-t border-slate-100">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Areas We Serve</h2>
+              <p className="text-slate-600 text-base max-w-2xl mx-auto">
+                QuoteXbert helps homeowners and contractors across Toronto, Durham Region, Clarington, and the GTA get fair renovation pricing.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">🏙️ Toronto</h3>
+                <ul className="space-y-1.5 text-sm text-slate-600">
+                  <li><Link href="/toronto" className="hover:text-rose-600 transition-colors">Toronto</Link></li>
+                  <li><Link href="/renovation-estimates-scarborough" className="hover:text-rose-600 transition-colors">Scarborough</Link></li>
+                  <li><Link href="/renovation-estimates-north-york" className="hover:text-rose-600 transition-colors">North York</Link></li>
+                  <li><Link href="/renovation-estimates-etobicoke" className="hover:text-rose-600 transition-colors">Etobicoke</Link></li>
+                  <li><Link href="/renovation-estimates-east-york" className="hover:text-rose-600 transition-colors">East York</Link></li>
+                </ul>
+              </div>
+              <div className="bg-white rounded-2xl border-2 border-rose-200 p-5 shadow-sm">
+                <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">📍 Durham Region</h3>
+                <ul className="space-y-1.5 text-sm text-slate-600">
+                  <li><Link href="/durham-region" className="hover:text-rose-600 transition-colors font-medium text-rose-700">Durham Region Hub</Link></li>
+                  <li><Link href="/renovation-estimates-oshawa" className="hover:text-rose-600 transition-colors">Oshawa</Link></li>
+                  <li><Link href="/renovation-estimates-whitby" className="hover:text-rose-600 transition-colors">Whitby</Link></li>
+                  <li><Link href="/renovation-estimates-ajax" className="hover:text-rose-600 transition-colors">Ajax</Link></li>
+                  <li><Link href="/renovation-estimates-pickering" className="hover:text-rose-600 transition-colors">Pickering</Link></li>
+                  <li><Link href="/clarington" className="hover:text-rose-600 transition-colors">Clarington · Bowmanville · Newcastle</Link></li>
+                </ul>
+              </div>
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">🌆 GTA</h3>
+                <ul className="space-y-1.5 text-sm text-slate-600">
+                  <li><Link href="/renovation-estimates-mississauga" className="hover:text-rose-600 transition-colors">Mississauga</Link></li>
+                  <li><Link href="/renovation-estimates-brampton" className="hover:text-rose-600 transition-colors">Brampton</Link></li>
+                  <li><Link href="/renovation-estimates-vaughan" className="hover:text-rose-600 transition-colors">Vaughan</Link></li>
+                  <li><Link href="/renovation-estimates-markham" className="hover:text-rose-600 transition-colors">Markham</Link></li>
+                  <li><Link href="/renovation-estimates-richmond-hill" className="hover:text-rose-600 transition-colors">Richmond Hill</Link></li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-center text-xs text-slate-500 mt-6">
+              Don&apos;t see your city? <Link href="/#get-estimate" className="text-rose-600 font-semibold hover:underline">Get an estimate anyway</Link> — our AI covers all Ontario postal codes.
+            </p>
           </div>
         </section>
 
@@ -423,7 +471,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-center sm:text-left">
                   <p className="font-black text-base md:text-lg">🎯 Ready to Grow Your Business?</p>
-                  <p className="text-sm text-rose-100">Browse active leads in Toronto &amp; GTA &bull; Get qualified projects today</p>
+                  <p className="text-sm text-rose-100">Browse active leads in Toronto, Durham Region &amp; the GTA &bull; Get qualified projects today</p>
                 </div>
                 <Link
                   href="/contractor/jobs"

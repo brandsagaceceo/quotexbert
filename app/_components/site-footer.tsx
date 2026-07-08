@@ -14,9 +14,9 @@ export default function SiteFooter() {
               <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
             </Link>
             <p className="text-ink-600 mb-4 text-sm leading-relaxed">
-              AI-powered renovation estimates for Toronto &amp; GTA homeowners. Verified contractor marketplace. Free for homeowners.
+              AI-powered renovation estimates for Toronto, Durham Region &amp; GTA homeowners. Verified contractor marketplace. Free for homeowners.
             </p>
-            <p className="text-xs text-slate-500">Toronto, Ontario · Canada</p>
+            <p className="text-xs text-slate-500">Toronto &amp; Durham Region, Ontario · Canada</p>
           </div>
 
           {/* For Homeowners */}
@@ -38,10 +38,12 @@ export default function SiteFooter() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/contractors/join" className="text-ink-600 hover:text-brand transition-colors font-semibold">Join as Contractor</Link></li>
               <li><Link href="/contractors/toronto" className="text-ink-600 hover:text-brand transition-colors">Contractors — Toronto</Link></li>
+              <li><Link href="/contractors/oshawa" className="text-ink-600 hover:text-brand transition-colors">Contractors — Oshawa</Link></li>
+              <li><Link href="/contractors/whitby" className="text-ink-600 hover:text-brand transition-colors">Contractors — Whitby</Link></li>
+              <li><Link href="/contractors/ajax" className="text-ink-600 hover:text-brand transition-colors">Contractors — Ajax</Link></li>
+              <li><Link href="/contractors/pickering" className="text-ink-600 hover:text-brand transition-colors">Contractors — Pickering</Link></li>
+              <li><Link href="/contractors/bowmanville" className="text-ink-600 hover:text-brand transition-colors">Contractors — Bowmanville</Link></li>
               <li><Link href="/contractors/mississauga" className="text-ink-600 hover:text-brand transition-colors">Contractors — Mississauga</Link></li>
-              <li><Link href="/contractors/brampton" className="text-ink-600 hover:text-brand transition-colors">Contractors — Brampton</Link></li>
-              <li><Link href="/contractors/vaughan" className="text-ink-600 hover:text-brand transition-colors">Contractors — Vaughan</Link></li>
-              <li><Link href="/contractors/join" className="text-ink-600 hover:text-brand transition-colors">Contractor Overview</Link></li>
             </ul>
           </div>
 
@@ -73,9 +75,65 @@ export default function SiteFooter() {
             <h3 className="text-sm font-bold text-ink-900 mt-6 mb-3 uppercase tracking-wide">Popular Guides</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/renovation-cost/mississauga/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Mississauga</Link></li>
-              <li><Link href="/renovation-cost/brampton/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Brampton</Link></li>
+              <li><Link href="/renovation-cost/oshawa/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Oshawa</Link></li>
+              <li><Link href="/renovation-cost/ajax/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Ajax</Link></li>
+              <li><Link href="/renovation-cost/whitby/basement" className="text-ink-600 hover:text-brand transition-colors">Basements — Whitby</Link></li>
               <li><Link href="/renovation-cost/scarborough/basement" className="text-ink-600 hover:text-brand transition-colors">Basements — Scarborough</Link></li>
             </ul>
+          </div>
+        </div>
+
+        {/* Areas We Serve */}
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <h3 className="text-sm font-bold text-ink-900 mb-4 uppercase tracking-wide text-center">Areas We Serve</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-sm text-ink-600">
+            <div>
+              <p className="font-semibold text-ink-900 mb-1">Toronto</p>
+              <ul className="space-y-1">
+                <li><Link href="/toronto" className="hover:text-brand transition-colors">Toronto</Link></li>
+                <li><Link href="/renovation-estimates-scarborough" className="hover:text-brand transition-colors">Scarborough</Link></li>
+                <li><Link href="/renovation-estimates-north-york" className="hover:text-brand transition-colors">North York</Link></li>
+                <li><Link href="/renovation-estimates-etobicoke" className="hover:text-brand transition-colors">Etobicoke</Link></li>
+                <li><Link href="/renovation-estimates-east-york" className="hover:text-brand transition-colors">East York</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-ink-900 mb-1">Durham Region</p>
+              <ul className="space-y-1">
+                <li><Link href="/durham-region" className="hover:text-brand transition-colors">Durham Region</Link></li>
+                <li><Link href="/renovation-estimates-oshawa" className="hover:text-brand transition-colors">Oshawa</Link></li>
+                <li><Link href="/renovation-estimates-whitby" className="hover:text-brand transition-colors">Whitby</Link></li>
+                <li><Link href="/renovation-estimates-ajax" className="hover:text-brand transition-colors">Ajax</Link></li>
+                <li><Link href="/renovation-estimates-pickering" className="hover:text-brand transition-colors">Pickering</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-ink-900 mb-1">Clarington</p>
+              <ul className="space-y-1">
+                <li><Link href="/clarington" className="hover:text-brand transition-colors">Clarington</Link></li>
+                <li><Link href="/bowmanville" className="hover:text-brand transition-colors">Bowmanville</Link></li>
+                <li><Link href="/ajax" className="hover:text-brand transition-colors">Newcastle</Link></li>
+                <li><Link href="/durham-region" className="hover:text-brand transition-colors">Courtice</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-ink-900 mb-1">West GTA</p>
+              <ul className="space-y-1">
+                <li><Link href="/renovation-estimates-mississauga" className="hover:text-brand transition-colors">Mississauga</Link></li>
+                <li><Link href="/renovation-estimates-brampton" className="hover:text-brand transition-colors">Brampton</Link></li>
+                <li><Link href="/renovation-estimates-oakville" className="hover:text-brand transition-colors">Oakville</Link></li>
+                <li><Link href="/renovation-estimates-burlington" className="hover:text-brand transition-colors">Burlington</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-ink-900 mb-1">York Region</p>
+              <ul className="space-y-1">
+                <li><Link href="/renovation-estimates-vaughan" className="hover:text-brand transition-colors">Vaughan</Link></li>
+                <li><Link href="/renovation-estimates-markham" className="hover:text-brand transition-colors">Markham</Link></li>
+                <li><Link href="/renovation-estimates-richmond-hill" className="hover:text-brand transition-colors">Richmond Hill</Link></li>
+                <li><Link href="/renovation-estimates-newmarket" className="hover:text-brand transition-colors">Newmarket</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
 
