@@ -10,7 +10,16 @@ export const metadata: Metadata = {
     title: 'Home Renovation Estimates Durham Region | QuoteXbert',
     description: 'Get instant AI-powered home renovation estimates across Durham Region.',
     url: 'https://www.quotexbert.com/durham-region',
-  }
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Home Renovation Estimates Durham Region | QuoteXbert',
+    description: 'AI-powered renovation estimates for Oshawa, Whitby, Ajax, Pickering & all Durham Region.',
+  },
+  alternates: {
+    canonical: 'https://www.quotexbert.com/durham-region',
+  },
 };
 
 const durhamCities = [
@@ -228,6 +237,39 @@ export default function DurhamRegionPage() {
             Get Your Free Estimate Now →
           </Link>
           <p className="text-sm mt-4 opacity-75">100% Free • No Credit Card Required</p>
+        </div>
+      </section>
+
+      {/* Internal Links */}
+      <section className="py-12 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4">
+          <h3 className="text-xl font-black text-gray-900 mb-5">Explore Durham Region</h3>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { label: 'Oshawa', href: '/oshawa' },
+              { label: 'Whitby', href: '/whitby' },
+              { label: 'Ajax', href: '/ajax' },
+              { label: 'Pickering', href: '/pickering' },
+              { label: 'Bowmanville', href: '/bowmanville' },
+              { label: 'Clarington', href: '/clarington' },
+              { label: 'Courtice', href: '/courtice' },
+              { label: 'Newcastle', href: '/newcastle' },
+              { label: 'Port Perry', href: '/port-perry' },
+              { label: 'Uxbridge', href: '/uxbridge' },
+              { label: 'Scugog', href: '/scugog' },
+              { label: 'Brock Township', href: '/brock' },
+              { label: 'Durham Renovation Estimates', href: '/durham-region-renovation-estimates' },
+              { label: 'Durham Renovation Costs', href: '/durham-region-renovation-costs' },
+              { label: 'Durham Contractors', href: '/durham-region-contractors' },
+              { label: 'Home Renovation Durham', href: '/durham-region-home-renovation' },
+              { label: 'General Contractors Durham', href: '/general-contractors-durham-region' },
+              { label: 'Get a Free Estimate', href: '/create-lead' },
+            ].map((link) => (
+              <Link key={link.href} href={link.href} className="bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

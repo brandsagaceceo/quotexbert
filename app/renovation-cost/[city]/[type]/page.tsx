@@ -15,6 +15,21 @@ import CostTable from "@/components/seo/CostTable";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import StructuredData from "@/components/seo/StructuredData";
 import { MapPin, ArrowRight, CheckCircle, Sparkles, TrendingUp, DollarSign } from "lucide-react";
+import ContractorLeadsBlock from "@/components/seo/ContractorLeadsBlock";
+
+// Maps renovation type slugs → contractor trade page slugs
+const RENO_TO_TRADE: Record<string, string> = {
+  "kitchen-renovation":  "kitchen-renovation-contractors",
+  "bathroom-renovation": "bathroom-renovation-contractors",
+  "basement-finishing":  "basement-renovation-contractors",
+  "roof-replacement":    "roofers",
+  "flooring-installation": "flooring-contractors",
+  "deck-building":       "deck-and-fence-contractors",
+  "house-painting":      "painters",
+  "home-renovation":     "general-contractors",
+  "plumbing-repair":     "plumbers",
+  "electrical-work":     "electricians",
+};
 
 // Static generation: all city × type combos
 export async function generateStaticParams() {
@@ -327,6 +342,14 @@ export default async function ProgrammaticCostPage({ params }: Props) {
               </Link>
             </div>
           </section>
+
+          {/* Contractor acquisition block */}
+          <ContractorLeadsBlock
+            cityName={city.name}
+            citySlug={citySlug}
+            renoName={reno.name}
+            tradeSlug={RENO_TO_TRADE[typeSlug]}
+          />
 
           {/* FAQs */}
           {torontoData && (

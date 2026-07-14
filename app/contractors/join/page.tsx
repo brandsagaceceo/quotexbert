@@ -4,6 +4,8 @@ import RenovationCTA from "@/components/seo/RenovationCTA";
 import FAQSection from "@/components/seo/FAQSection";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import EarningsCalculator from "./EarningsCalculator";
+import FoundingContractorBanner from "@/components/FoundingContractorBanner";
+import FoundingContractorSection from "@/components/FoundingContractorSection";
 
 export const metadata: Metadata = {
   title: "Join as a Renovation Contractor | QuoteXbert GTA",
@@ -237,6 +239,9 @@ export default function ContractorsJoinPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* Floating urgency banner */}
+      <FoundingContractorBanner />
+
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -304,6 +309,9 @@ export default function ContractorsJoinPage() {
           </div>
         </div>
       </section>
+
+      {/* Founding Contractor Program */}
+      <FoundingContractorSection />
 
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-16">
         {/* How it works */}

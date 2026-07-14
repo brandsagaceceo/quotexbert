@@ -6,6 +6,8 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { trackContractorJoinClicked } from "@/lib/tracking";
 import { CheckCircle, Shield, TrendingUp, Clock } from "lucide-react";
+import FoundingContractorBanner from "@/components/FoundingContractorBanner";
+import FoundingContractorSection from "@/components/FoundingContractorSection";
 
 const pricingTiers = [
   {
@@ -100,6 +102,8 @@ export default function ForContractorsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Floating urgency banner */}
+      <FoundingContractorBanner />
       {/* Hero Section */}
       <section className="relative bg-brand text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px_32px]" />
@@ -838,6 +842,9 @@ export default function ForContractorsPage() {
         </div>
       </section>
 
+      {/* Founding Contractor Program */}
+      <FoundingContractorSection />
+
       {/* FAQ */}
       <section className="py-20 bg-brand/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -871,6 +878,72 @@ export default function ForContractorsPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Internal SEO Links — Contractor Leads Hub */}
+      <section className="py-14 bg-white border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-black text-slate-900 mb-6">Find Contractor Leads in Ontario</h2>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">By City</h3>
+              <ul className="space-y-2">
+                {[
+                  { href: "/contractor-leads/toronto", label: "Contractor Leads in Toronto" },
+                  { href: "/contractor-leads/oshawa", label: "Contractor Leads in Oshawa" },
+                  { href: "/contractor-leads/whitby", label: "Contractor Leads in Whitby" },
+                  { href: "/contractor-leads/mississauga", label: "Contractor Leads in Mississauga" },
+                  { href: "/contractor-leads/vaughan", label: "Contractor Leads in Vaughan" },
+                  { href: "/contractor-leads", label: "All Cities →" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-rose-700 hover:underline font-medium">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">By Trade</h3>
+              <ul className="space-y-2">
+                {[
+                  { href: "/contractor-leads/trades/general-contractors", label: "General Contractor Leads" },
+                  { href: "/contractor-leads/trades/renovation-contractors", label: "Renovation Leads" },
+                  { href: "/contractor-leads/trades/roofers", label: "Roofing Leads" },
+                  { href: "/contractor-leads/trades/painters", label: "Painting Leads" },
+                  { href: "/contractor-leads/trades/electricians", label: "Electrician Leads" },
+                  { href: "/contractor-leads", label: "All Trades →" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-rose-700 hover:underline font-medium">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Resources</h3>
+              <ul className="space-y-2">
+                {[
+                  { href: "/contractor-leads", label: "Ontario Contractor Leads Hub" },
+                  { href: "/homestars-alternative", label: "HomeStars Alternative" },
+                  { href: "/how-to-get-contractor-leads", label: "How to Get More Leads" },
+                  { href: "/contractor-lead-generation-canada", label: "Lead Generation in Canada" },
+                  { href: "/best-app-for-contractors-canada", label: "Best App for Contractors" },
+                  { href: "/pay-per-lead-alternative", label: "Pay-Per-Lead Alternative" },
+                ].map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm text-rose-700 hover:underline font-medium">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>

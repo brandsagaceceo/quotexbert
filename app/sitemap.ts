@@ -2,78 +2,77 @@ import { MetadataRoute } from 'next'
 import { GTA_CITIES, RENOVATION_TYPES } from '@/lib/seo/gta-cities'
 import { TORONTO_NEIGHBOURHOODS, TORONTO_SERVICES } from '@/lib/seo/toronto-pinpoint'
 import { ALL_CONTRACTOR_CITY_SLUGS } from '@/lib/seo/contractor-city-data'
+import { ALL_CITY_SLUGS, ALL_TRADE_SLUGS, ALL_COMBO_PARAMS } from '@/lib/seo/contractor-acquisition-data'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
   
   // Location pages (NEW - highest priority for local SEO)
   const locationPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/toronto`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.95,
-    },
-    {
-      url: `${baseUrl}/durham-region`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.92,
-    },
-    {
-      url: `${baseUrl}/clarington`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/ajax`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.87,
-    },
-    {
-      url: `${baseUrl}/bowmanville`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.87,
-    },
-    {
-      url: `${baseUrl}/oshawa`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/whitby`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/pickering`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.87,
-    },
-    {
-      url: `${baseUrl}/courtice`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
-      url: `${baseUrl}/newcastle`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.84,
-    },
-    {
-      url: `${baseUrl}/port-perry`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.83,
-    },
+    { url: `${baseUrl}/toronto`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.95 },
+    { url: `${baseUrl}/durham-region`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.92 },
+    { url: `${baseUrl}/clarington`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/ajax`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.87 },
+    { url: `${baseUrl}/bowmanville`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.87 },
+    { url: `${baseUrl}/oshawa`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.88 },
+    { url: `${baseUrl}/whitby`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.88 },
+    { url: `${baseUrl}/pickering`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.87 },
+    { url: `${baseUrl}/courtice`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${baseUrl}/newcastle`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.84 },
+    { url: `${baseUrl}/port-perry`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.83 },
+    { url: `${baseUrl}/uxbridge`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.82 },
+    { url: `${baseUrl}/scugog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.81 },
+    { url: `${baseUrl}/brock`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.80 },
+    // Durham Region landing pages
+    { url: `${baseUrl}/durham-region-renovation-estimates`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.90 },
+    { url: `${baseUrl}/durham-region-contractors`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.90 },
+    { url: `${baseUrl}/durham-region-home-renovation`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.89 },
+    { url: `${baseUrl}/durham-region-renovation-costs`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.89 },
+    // Durham local content pages
+    { url: `${baseUrl}/kitchen-renovation-bowmanville`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/bathroom-renovation-courtice`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/basement-renovation-oshawa`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/deck-builders-whitby`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.84 },
+    { url: `${baseUrl}/flooring-ajax`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.84 },
+    { url: `${baseUrl}/roof-replacement-pickering`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.84 },
+    { url: `${baseUrl}/painting-bowmanville`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.83 },
+    { url: `${baseUrl}/drywall-oshawa`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.83 },
+    { url: `${baseUrl}/general-contractors-durham-region`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/home-renovation-durham-region`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    // Trust pages
+    { url: `${baseUrl}/why-quotexbert`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.80 },
+    { url: `${baseUrl}/how-ai-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.80 },
+    // Durham Region resource guides (Phase 2)
+    { url: `${baseUrl}/renovation-permit-guide-durham-region`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/best-roi-renovations-durham-region`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/ai-renovation-estimates-durham-region`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
+    // Durham city+trade pages (Phase 2)
+    { url: `${baseUrl}/kitchen-renovation-oshawa`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/kitchen-renovation-whitby`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/kitchen-renovation-ajax`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/kitchen-renovation-pickering`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/bathroom-renovation-oshawa`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/bathroom-renovation-whitby`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/bathroom-renovation-ajax`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/bathroom-renovation-pickering`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/basement-renovation-whitby`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/basement-renovation-ajax`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    { url: `${baseUrl}/basement-renovation-pickering`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.86 },
+    // Phase 3 — Authority Content (Pillar Pages)
+    { url: `${baseUrl}/ontario-renovation-cost-guide`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.96 },
+    { url: `${baseUrl}/durham-region-renovation-guide`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.94 },
+    { url: `${baseUrl}/contractor-growth-guide`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
+    { url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.93 },
+    // Phase 3 — Renovation Calculators
+    { url: `${baseUrl}/renovation-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
+    { url: `${baseUrl}/kitchen-renovation-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/bathroom-renovation-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/basement-renovation-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.87 },
+    { url: `${baseUrl}/flooring-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/painting-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/deck-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/roof-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${baseUrl}/window-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
   ]
   
   // Toronto-specific SEO landing pages (existing)
@@ -228,6 +227,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'renovation-pricing-guide-bowmanville-and-newcastle',
     'quotexbert-vs-traditional-contractor-lead-sites-gta',
     'why-durham-contractors-should-use-quotexbert-for-local-leads',
+    // NEW Durham Region blog posts
+    'bathroom-renovation-cost-durham-region',
+    'kitchen-renovation-trends-oshawa',
+    'best-flooring-options-ontario-homes',
+    'should-you-finish-your-basement',
+    'top-home-renovation-mistakes',
+    'how-ai-helps-homeowners-avoid-expensive-quotes',
+    'renovation-permits-durham-region',
+    'hiring-contractors-durham-region',
+    'home-renovation-checklist-ontario',
+    'kitchen-vs-bathroom-roi-ontario',
   ]
 
   const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map(slug => ({
@@ -427,5 +437,66 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: slug.startsWith('how-to') ? 0.82 : 0.80,
     })),
+
+    // ─── NEW: Contractor Acquisition SEO System ───────────────────────────────
+    // Main contractor leads hub
+    {
+      url: `${baseUrl}/contractor-leads`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.94,
+    },
+    // City contractor lead pages (17 cities)
+    ...ALL_CITY_SLUGS.map(city => ({
+      url: `${baseUrl}/contractor-leads/${city}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: ['toronto', 'mississauga', 'oshawa', 'vaughan', 'markham'].includes(city) ? 0.90 : 0.85,
+    })),
+    // Trade contractor lead pages (20 trades)
+    ...ALL_TRADE_SLUGS.map(trade => ({
+      url: `${baseUrl}/contractor-leads/trades/${trade}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: ['general-contractors', 'renovation-contractors', 'roofers', 'electricians', 'plumbers'].includes(trade) ? 0.88 : 0.83,
+    })),
+    // City + trade combination pages (14 combos)
+    ...ALL_COMBO_PARAMS.map(({ city, trade }) => ({
+      url: `${baseUrl}/contractor-leads/${city}/${trade}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: city === 'toronto' ? 0.87 : 0.82,
+    })),
+    // Comparison and alternative pages
+    {
+      url: `${baseUrl}/homestars-alternative`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/contractor-lead-generation-canada`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.86,
+    },
+    {
+      url: `${baseUrl}/pay-per-lead-alternative`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/how-to-get-contractor-leads`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.87,
+    },
+    {
+      url: `${baseUrl}/best-app-for-contractors-canada`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    },
   ]
 }

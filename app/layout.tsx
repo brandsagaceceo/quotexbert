@@ -233,6 +233,30 @@ export default function RootLayout({
                     "ratingValue": "5.0",
                     "reviewCount": "0"
                   }
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://www.quotexbert.com/#website",
+                  "url": "https://www.quotexbert.com",
+                  "name": "QuoteXbert",
+                  "description": "AI-powered home renovation estimates and verified contractor matching for Toronto, Durham Region, and all of Ontario.",
+                  "publisher": { "@id": "https://www.quotexbert.com/#organization" },
+                  "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://www.quotexbert.com/guides?q={search_term_string}"
+                    },
+                    "query-input": "required name=search_term_string"
+                  }
+                },
+                {
+                  "@type": "SoftwareApplication",
+                  "name": "QuoteXbert AI Renovation Estimator",
+                  "applicationCategory": "HomeAndGardenApplication",
+                  "operatingSystem": "Web",
+                  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "ratingCount": "1" }
                 }
               ]
             })

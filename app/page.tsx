@@ -21,6 +21,8 @@ import {
 } from "@/lib/tracking";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { useToast } from "@/components/ToastProvider";
+import FoundingContractorBanner from "@/components/FoundingContractorBanner";
+import FoundingContractorSection from "@/components/FoundingContractorSection";
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
@@ -189,6 +191,9 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Founding Contractor floating urgency banner — shown to non-contractors */}
+      {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorBanner />}
 
       {/* Review Capture Modal */}
       <Suspense fallback={null}>
@@ -796,6 +801,9 @@ export default function Home() {
           </div>
         </section>
         )}
+
+        {/* Founding Contractor Program */}
+        {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorSection />}
 
         {/* Final CTA */}
         <section className="py-12 md:py-16 bg-gradient-to-r from-rose-600 to-orange-600 text-white">

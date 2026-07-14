@@ -21,6 +21,17 @@ const nextConfig = {
         destination: '/contractors/join',
         permanent: true,
       },
+      // Durham Region alternate slugs → canonical pages
+      {
+        source: '/renovation-costs-durham-region',
+        destination: '/durham-region-renovation-costs',
+        permanent: true,
+      },
+      {
+        source: '/contractors-durham-region',
+        destination: '/durham-region-contractors',
+        permanent: true,
+      },
     ];
   },
   // Cache-control headers — prevent stale mobile/PWA caches from serving old pages

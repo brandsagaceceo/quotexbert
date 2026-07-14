@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { CATEGORY_GROUPS, getCategoryById, normalizeCategory, SIMPLE_CATEGORIES } from "@/lib/categories";
+import FoundingContractorSection from "@/components/FoundingContractorSection";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -379,6 +380,10 @@ export default function SubscriptionsPage() {
   return (
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
+        {/* Founding Contractor urgency section */}
+        {subscriptions.length === 0 && !loading && (
+          <FoundingContractorSection compact />
+        )}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12">
 
           {/* Success Message */}

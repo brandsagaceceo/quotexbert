@@ -37,13 +37,12 @@ export default function SiteFooter() {
             <h3 className="text-sm font-bold text-ink-900 mb-3 uppercase tracking-wide">Contractors</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/contractors/join" className="text-ink-600 hover:text-brand transition-colors font-semibold">Join as Contractor</Link></li>
-              <li><Link href="/contractors/toronto" className="text-ink-600 hover:text-brand transition-colors">Contractors — Toronto</Link></li>
-              <li><Link href="/contractors/oshawa" className="text-ink-600 hover:text-brand transition-colors">Contractors — Oshawa</Link></li>
-              <li><Link href="/contractors/whitby" className="text-ink-600 hover:text-brand transition-colors">Contractors — Whitby</Link></li>
-              <li><Link href="/contractors/ajax" className="text-ink-600 hover:text-brand transition-colors">Contractors — Ajax</Link></li>
-              <li><Link href="/contractors/pickering" className="text-ink-600 hover:text-brand transition-colors">Contractors — Pickering</Link></li>
-              <li><Link href="/contractors/bowmanville" className="text-ink-600 hover:text-brand transition-colors">Contractors — Bowmanville</Link></li>
-              <li><Link href="/contractors/mississauga" className="text-ink-600 hover:text-brand transition-colors">Contractors — Mississauga</Link></li>
+              <li><Link href="/contractor-leads" className="text-ink-600 hover:text-brand transition-colors">Contractor Leads</Link></li>
+              <li><Link href="/contractor-leads/toronto" className="text-ink-600 hover:text-brand transition-colors">Contractor Leads — Toronto</Link></li>
+              <li><Link href="/contractor-leads/oshawa" className="text-ink-600 hover:text-brand transition-colors">Contractor Leads — Durham Region</Link></li>
+              <li><Link href="/homestars-alternative" className="text-ink-600 hover:text-brand transition-colors">HomeStars Alternative</Link></li>
+              <li><Link href="/how-to-get-contractor-leads" className="text-ink-600 hover:text-brand transition-colors">How to Get More Leads</Link></li>
+              <li><Link href="/for-contractors" className="text-ink-600 hover:text-brand transition-colors">For Contractors Overview</Link></li>
             </ul>
           </div>
 

@@ -44,8 +44,20 @@ const config: Config = {
       lineHeight: {
         relaxed: "1.75",
       },
+      keyframes: {
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateX(-50%) translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateX(-50%) translateY(0)' },
+        },
+      },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'shimmer': 'shimmer 2s ease-in-out infinite',
+        'slide-up': 'slideUp 0.4s ease-out forwards',
       },
     },
   },

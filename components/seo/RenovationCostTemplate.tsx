@@ -6,6 +6,7 @@ import RenovationCTA from "@/components/seo/RenovationCTA";
 import CostTable from "@/components/seo/CostTable";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import StructuredData from "@/components/seo/StructuredData";
+import ContractorLeadsBlock from "@/components/seo/ContractorLeadsBlock";
 
 interface Props {
   page: RenovationCostData;
@@ -163,6 +164,15 @@ export default function RenovationCostTemplate({ page }: Props) {
 
         {/* CTA banner */}
         <RenovationCTA />
+
+        {/* Contractor acquisition block */}
+        <div className="px-4 max-w-4xl mx-auto pb-2">
+          <ContractorLeadsBlock
+            cityName="Toronto"
+            citySlug="toronto"
+            renoName={page.h1}
+          />
+        </div>
 
         {/* FAQ */}
         <FAQSection faqs={page.faqs} title={`${page.h1} — FAQ`} />
