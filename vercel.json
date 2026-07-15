@@ -68,7 +68,7 @@
   "crons": [
     {
       "path": "/api/cron/contractor-followup",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/cron/daily-digest",
