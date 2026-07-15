@@ -206,7 +206,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
   return (
     <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-4 md:p-6 lg:p-8 border-2 border-orange-100">
       <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
-        <div className="bg-gradient-to-br from-rose-500 to-orange-500 p-1.5 md:p-2 rounded-lg">
+        <div className="bg-[#800020] p-1.5 md:p-2 rounded-lg">
           <PhotoIcon className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </div>
         <h3 className="text-xl md:text-2xl font-bold text-slate-900">Instant Photo Quote</h3>
@@ -223,9 +223,9 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
           <button
             type="button"
             onClick={openCamera}
-            className="w-full mb-2 md:mb-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white 
+            className="w-full mb-2 md:mb-3 bg-[#800020] hover:bg-[#600018] text-white 
                      py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl font-semibold text-base md:text-lg flex items-center justify-center gap-2 md:gap-3
-                     hover:from-rose-600 hover:to-orange-600 transition-all shadow-md md:shadow-lg
+                     transition-all shadow-md md:shadow-lg
                      md:hidden"
           >
             <PhotoIcon className="w-7 h-7" />
@@ -360,8 +360,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                   hover:to-orange-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
+          className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
                    transition-all transform hover:scale-[1.02] disabled:opacity-50 
                    disabled:cursor-not-allowed disabled:transform-none shadow-lg md:shadow-xl"
         >

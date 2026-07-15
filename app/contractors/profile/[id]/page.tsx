@@ -181,7 +181,7 @@ export default function ContractorProfilePage() {
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
           {/* Cover/Header Section */}
-          <div className="bg-gradient-to-r from-rose-600 to-orange-600 h-32 sm:h-40"></div>
+          <div className="bg-[#800020] h-32 sm:h-40"></div>
           
           {/* Profile Info */}
           <div className="px-6 sm:px-8 pb-8">
@@ -218,7 +218,7 @@ export default function ContractorProfilePage() {
                     {authUser?.role === 'homeowner' ? (
                       <button
                         onClick={handleContact}
-                        className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
+                        className="flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
                       >
                         <MessageCircle size={20} />
                         <span>Get a Quote</span>
@@ -226,7 +226,7 @@ export default function ContractorProfilePage() {
                     ) : (
                       <button
                         onClick={handleContact}
-                        className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                        className="flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                       >
                         <MessageCircle size={20} />
                         <span>Contact</span>

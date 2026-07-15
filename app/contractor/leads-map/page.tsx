@@ -269,7 +269,7 @@ export default function ContractorLeadsMapPage() {
                             </button>
                             <button
                               onClick={() => handleAcceptJob(job.id)}
-                              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                              className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 bg-[#800020] hover:bg-[#600018] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
                             >
                               <CheckCircle size={15} />
                               <span>Accept</span>

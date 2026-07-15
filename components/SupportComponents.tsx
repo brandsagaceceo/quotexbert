@@ -12,7 +12,7 @@ export function MobileSupportButton() {
     <div className="fixed bottom-4 right-4 z-50 md:hidden">
       <a
         href="tel:9052429460"
-        className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-3 rounded-full shadow-2xl hover:from-rose-700 hover:to-orange-700 transition-all animate-bounce"
+        className="flex items-center gap-2 bg-[#800020] text-white px-4 py-3 rounded-full shadow-lg hover:bg-[#600018] transition-colors"
       >
         <Phone className="w-5 h-5" />
         <span className="font-bold text-sm">Call Support</span>

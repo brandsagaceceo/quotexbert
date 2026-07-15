@@ -13579,7 +13579,7 @@ export default function BlogPostPage() {
             <p className="text-slate-600 mb-8">The blog post you're looking for doesn't exist.</p>
             <Link 
               href="/blog"
-              className="inline-flex items-center bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:from-red-700 hover:to-orange-700 transition-colors"
+              className="inline-flex items-center bg-[#800020] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#600018] transition-colors"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               Back to Blog
@@ -13778,7 +13778,7 @@ export default function BlogPostPage() {
             </p>
             <Link 
               href="/"
-              className="inline-block bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105"
+              className="inline-block bg-[#800020] hover:bg-[#600018] text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105"
             >
               Get Free Estimate
             </Link>

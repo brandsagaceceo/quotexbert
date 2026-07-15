@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
 import { NotificationService } from '@/lib/notifications';
+import { normalizeEstimatePricing } from '@/lib/estimate-pricing';
 
 const prisma = new PrismaClient();
 
@@ -76,10 +77,6 @@ export async function POST(
       );
     }
 
-    // Calculate total cost from selected items
-    const totalMin = estimate.items.reduce((sum, item) => sum + item.minCost, 0);
-    const totalMax = estimate.items.reduce((sum, item) => sum + item.maxCost, 0);
-
     // Create a comprehensive description from selected items
     const itemDescriptions = estimate.items.map(
       (item) =>
@@ -148,12 +145,36 @@ export async function POST(
       finalPhotos = [...finalPhotos, visualizationUrl];
     }
 
+    // Price consistency: the saved AIEstimate row (estimate.minCost/maxCost) is the single
+    // source of truth for the project's price range — it is NEVER recalculated here from
+    // the currently-selected items (that was the bug: selecting/deselecting items produced
+    // a different "average" budget than the range the homeowner saw on the review page).
+    // The homeowner may deliberately override the suggested posting budget on the review
+    // page; if they did, `body.budget` carries that explicit choice through. Otherwise we
+    // fall back to the same `recommended` value the review page displayed by default.
+    const pricing = normalizeEstimatePricing(estimate);
+    const submittedBudget = typeof body.budget === 'number' ? body.budget : parseFloat(body.budget);
+    const finalBudget = Number.isFinite(submittedBudget) && submittedBudget > 0
+      ? Math.round(submittedBudget)
+      : pricing.recommended;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[POST-TO-JOB-BOARD] Price consistency check', {
+        estimateId: estimate.id,
+        originalLow: pricing.low,
+        originalHigh: pricing.high,
+        recommended: pricing.recommended,
+        homeownerEditedBudget: submittedBudget !== pricing.recommended ? finalBudget : null,
+        finalLeadBudget: finalBudget,
+      });
+    }
+
     // Create the lead (job post)
     const lead = await prisma.lead.create({
       data: {
         title: `Home Renovation: ${estimate.description.substring(0, 50)}${estimate.description.length > 50 ? '...' : ''}`,
         description: fullDescription,
-        budget: Math.round((totalMin + totalMax) / 2).toString(), // Use average as budget
+        budget: finalBudget.toString(),
         zipCode: zipCode,
         category: primaryCategory,
         status: 'open',

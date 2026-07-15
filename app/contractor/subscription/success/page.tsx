@@ -24,8 +24,7 @@ export default function SubscriptionSuccess() {
     try {
       const response = await fetch(`/api/contractor/verify-subscription?session_id=${sessionId}`);
       if (response.ok) {
-        const data = await response.json();
-        console.log("Subscription verified:", data);
+        await response.json();
       }
     } catch (error) {
       console.error("Error verifying subscription:", error);
@@ -56,7 +55,7 @@ export default function SubscriptionSuccess() {
           </div>
 
           {/* Success Message */}
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#800020] mb-4">
             Subscription Activated!
           </h1>
           
@@ -114,7 +113,7 @@ export default function SubscriptionSuccess() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/profile"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               Go to Profile
               <ArrowRight className="w-5 h-5" />

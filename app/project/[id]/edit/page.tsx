@@ -303,7 +303,7 @@ export default function EditProjectPage() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all font-semibold shadow-md hover:shadow-lg disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#800020] text-white rounded-lg hover:bg-[#600018] transition-all font-semibold shadow-md hover:shadow-lg disabled:opacity-50"
             >
               <Save className="w-5 h-5" />
               {isSaving ? "Saving..." : "Save Changes"}

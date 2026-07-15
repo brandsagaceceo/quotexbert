@@ -62,7 +62,7 @@ export default function ContactPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-              Get in Touch with <span className="bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent">QuoteXbert Support</span>
+              Get in Touch with <span className="text-[#800020]">QuoteXbert Support</span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Whether you're a homeowner seeking help with estimates or a contractor needing assistance with our platform, our support team is here to help. We typically respond within 2-4 hours during business hours.
@@ -72,7 +72,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-6">Send us a Message</h2>
+              <h2 className="text-2xl font-bold text-[#800020] mb-6">Send us a Message</h2>
               
               {submitted ? (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
@@ -166,7 +166,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-red-800 to-orange-600 hover:from-red-900 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors text-white"
+                    className="w-full bg-[#800020] hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors text-white"
                   >
                     {isSubmitting ? "Sending Message..." : "Send Message"}
                   </button>
@@ -177,7 +177,7 @@ export default function ContactPage() {
             {/* Contact Information */}
             <div>
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-8 mb-8 shadow-lg">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-6">Contact Information</h2>
+                <h2 className="text-2xl font-bold text-[#800020] mb-6">Contact Information</h2>
                 
                 <div className="space-y-6">
                   <div className="flex items-start space-x-4">
@@ -215,7 +215,7 @@ export default function ContactPage() {
               </div>
 
               <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-orange-200 rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Quick Help</h3>
+                <h3 className="text-lg font-semibold text-[#800020] mb-3">Quick Help</h3>
                 <p className="text-slate-600 mb-4">
                   For faster assistance, check out our frequently asked questions or browse our help documentation.
                 </p>

@@ -73,7 +73,7 @@ export function UpgradeModal({ isOpen, onClose, generationsUsed, generationsLimi
                 <p className="text-gray-600 font-semibold">Unlimited AI room transformations</p>
               </div>
               <div className="text-right">
-                <div className="text-5xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
+                <div className="text-5xl font-black text-[#800020]">
                   $6.99
                 </div>
                 <div className="text-sm font-semibold text-gray-600">/month CAD</div>

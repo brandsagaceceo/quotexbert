@@ -139,16 +139,13 @@ export default function ConversationsPage() {
 
   const fetchConversations = async () => {
     if (!user) {
-      console.log('[Conversations] No user, skipping fetch');
       return;
     }
     
     try {
-      console.log('[Conversations] Fetching conversations for user:', user.id);
       const response = await fetch(`/api/conversations?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('[Conversations] Loaded conversations:', data.length);
         setConversations(data);
       } else {
         const error = await response.json();
@@ -205,12 +202,6 @@ export default function ConversationsPage() {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if ((!newMessage.trim() && !imageFile) || !selectedConversation || !user) {
-      console.log('[Conversations] Cannot send - missing requirements:', {
-        hasMessage: !!newMessage.trim(),
-        hasImage: !!imageFile,
-        hasConversation: !!selectedConversation,
-        hasUser: !!user
-      });
       return;
     }
 
@@ -243,15 +234,6 @@ export default function ConversationsPage() {
     setNewMessage('');
     
     try {
-      console.log('[Conversations] Sending message:', {
-        conversationId: selectedConversation.id,
-        senderId: user.id,
-        senderRole: senderRole,
-        receiverId: selectedConversation.otherParticipant.id,
-        receiverRole: receiverRole,
-        content: messageContent
-      });
-
       const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -271,7 +253,6 @@ export default function ConversationsPage() {
         setNewMessage(messageContent); // Restore message content
       } else {
         const sentMessage = await response.json();
-        console.log('[Conversations] Message sent successfully:', sentMessage);
         setImagePreview(null);
         setImageFile(null);
         // Replace optimistic message with real one
@@ -434,7 +415,7 @@ export default function ConversationsPage() {
             <p className="text-gray-600 mb-6">Please sign in to view your conversations.</p>
             <Link 
               href="/sign-in" 
-              className="inline-block w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-rose-800 hover:to-orange-700 transition-all"
+              className="inline-block w-full bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#600018] transition-all"
             >
               Sign In
             </Link>
@@ -538,7 +519,7 @@ export default function ConversationsPage() {
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-[#800020] flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
                             {conv.otherParticipant.name?.[0] || conv.otherParticipant.email?.[0]?.toUpperCase() || '?'}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -579,7 +560,7 @@ export default function ConversationsPage() {
                       <div className="flex items-center gap-4">
                         <div className="relative">
                           {/* Profile Picture */}
-                          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 via-rose-600 to-orange-500 flex items-center justify-center text-white font-bold text-xl shadow-lg ring-2 ring-white">
+                          <div className="w-14 h-14 rounded-full bg-[#800020] flex items-center justify-center text-white font-bold text-xl shadow-lg ring-2 ring-white">
                             {selectedConversation.otherParticipant.name?.[0] || selectedConversation.otherParticipant.email?.[0]?.toUpperCase() || '?'}
                           </div>
                           {/* Online Indicator */}
@@ -606,7 +587,7 @@ export default function ConversationsPage() {
                           <button
                             type="button"
                             onClick={() => setShowQuoteBuilder(true)}
-                            className="flex items-center gap-1.5 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-3 py-2 rounded-xl text-sm font-semibold hover:from-rose-700 hover:to-orange-600 transition-all shadow-sm hover:shadow-md mr-1"
+                            className="flex items-center gap-1.5 bg-[#800020] text-white px-3 py-2 rounded-xl text-sm font-semibold hover:bg-[#600018] transition-all shadow-sm hover:shadow-md mr-1"
                           >
                             <DocumentTextIcon className="w-4 h-4" />
                             <span className="hidden sm:inline">Generate Quote</span>
@@ -654,7 +635,7 @@ export default function ConversationsPage() {
                               {!isOwn && (
                                 <div className="flex-shrink-0">
                                   {showAvatar ? (
-                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 via-rose-600 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+                                    <div className="w-9 h-9 rounded-full bg-[#800020] flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
                                       {message.sender.name?.[0] || message.sender.email?.[0]?.toUpperCase() || '?'}
                                     </div>
                                   ) : <div className="w-9" />}
@@ -703,7 +684,7 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                           {!isOwn && (
                             <div className="flex-shrink-0">
                               {showAvatar ? (
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 via-rose-600 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+                                <div className="w-9 h-9 rounded-full bg-[#800020] flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
                                   {message.sender.name?.[0] || message.sender.email?.[0]?.toUpperCase() || '?'}
                                 </div>
                               ) : (
@@ -724,7 +705,7 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                             <div
                               className={`group relative ${
                                 isOwn
-                                  ? 'bg-gradient-to-br from-rose-600 to-orange-500 text-white shadow-md hover:shadow-lg'
+                                  ? 'bg-[#800020] text-white shadow-md hover:shadow-lg'
                                   : 'bg-white text-gray-900 shadow-sm hover:shadow-md border border-gray-100'
                               } px-4 py-2.5 transition-all duration-200 ${
                                 isOwn
@@ -893,7 +874,7 @@ isOwn ? 'justify-end' : 'justify-start'}`}
                       <button
                         type="submit"
                         disabled={(!newMessage.trim() && !imageFile) || sending}
-                        className="flex-shrink-0 bg-gradient-to-br from-rose-600 to-orange-500 text-white p-3 rounded-xl font-semibold hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95"
+                        className="flex-shrink-0 bg-[#800020] text-white p-3 rounded-xl font-semibold hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95"
                         title="Send Message"
                       >
                         {sending ? (

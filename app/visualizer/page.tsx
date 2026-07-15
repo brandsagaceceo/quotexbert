@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -221,13 +221,13 @@ export default function VisualizerPage() {
           </Link>
 
           <div className="inline-block mb-4">
-            <div className="flex items-center gap-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-full font-bold shadow-lg">
+            <div className="flex items-center gap-3 bg-[#800020] text-white px-6 py-3 rounded-full font-bold shadow-lg">
               <span className="text-2xl">✨</span>
               <span>AI HOME VISUALIZER</span>
             </div>
           </div>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black bg-gradient-to-r from-rose-900 via-pink-700 to-rose-950 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-[#800020] mb-4">
             Visualize Your Dream Space
             <br />
             With AI Magic
@@ -243,12 +243,12 @@ export default function VisualizerPage() {
           {isSignedIn && usage && (
             <div className="mt-6 inline-block">
               {usage.isPaidSubscriber ? (
-                <div className="bg-gradient-to-r from-rose-100 to-orange-100 border-2 border-rose-300 px-6 py-3 rounded-full">
+                <div className="bg-rose-50 border-2 border-rose-300 px-6 py-3 rounded-full">
                   <span className="font-black text-rose-950">♾️ UNLIMITED</span>
                   <span className="text-rose-800 ml-2">• Pro Member</span>
                 </div>
               ) : (
-                <div className="bg-gradient-to-r from-rose-100 to-orange-100 border-2 border-rose-300 px-6 py-3 rounded-full">
+                <div className="bg-rose-50 border-2 border-rose-300 px-6 py-3 rounded-full">
                   <span className="font-black text-gray-900">{usage.generationsRemaining} of {usage.generationsUsed + usage.generationsRemaining} Free Generations Left</span>
                   <button
                     onClick={() => setShowUpgradeModal(true)}
@@ -369,7 +369,7 @@ export default function VisualizerPage() {
               <button
                 onClick={handleGenerate}
                 disabled={loading || !beforeImage || !description.trim()}
-                className="w-full mt-6 bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 text-white py-5 rounded-2xl font-black text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+                className="w-full mt-6 bg-[#800020] text-white py-5 rounded-2xl font-black text-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
                 {loading ? (
                   <>
@@ -389,7 +389,7 @@ export default function VisualizerPage() {
             {/* Right: Why Different Section */}
             <div className="space-y-6 order-2 lg:order-2">
               {/* Why QuoteXbert is Different */}
-              <div className="bg-gradient-to-br from-rose-600 via-rose-500 to-orange-500 rounded-3xl shadow-2xl p-8 text-white border-4 border-white">
+              <div className="bg-[#800020] rounded-3xl shadow-2xl p-8 text-white border-4 border-white">
                 <h2 className="text-3xl font-black mb-6 flex items-center gap-3 drop-shadow-lg">
                   <span className="text-4xl">🏆</span>
                   <span className="drop-shadow-md">Why QuoteXbert is Different</span>
@@ -531,7 +531,7 @@ export default function VisualizerPage() {
                 </button>
                 <button
                   onClick={() => setShowQuoteModal(true)}
-                  className="bg-gradient-to-r from-rose-600 to-orange-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                  className="bg-[#800020] text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                 >
                   📋 Get Real Contractor Quotes →
                 </button>

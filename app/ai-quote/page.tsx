@@ -168,7 +168,7 @@ export default function AIQuotePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-rose-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-16">
+      <div className="bg-[#800020] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -359,7 +359,7 @@ export default function AIQuotePage() {
               <button
                 onClick={generateQuote}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all flex items-center justify-center gap-3"
+                className="w-full bg-[#800020] text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all flex items-center justify-center gap-3"
               >
                 {loading ? (
                   <>
@@ -436,7 +436,7 @@ export default function AIQuotePage() {
 
                   {/* QuoteXbert Stamp */}
                   <div className="mt-8 pt-6 border-t-2 border-gray-200 text-center">
-                    <div className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl shadow-lg">
+                    <div className="inline-block bg-[#800020] text-white px-6 py-3 rounded-xl shadow-lg">
                       <div className="flex items-center gap-3">
                         <Check className="w-6 h-6" />
                         <div className="text-left">

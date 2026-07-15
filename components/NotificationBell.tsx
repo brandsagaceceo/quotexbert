@@ -374,7 +374,7 @@ export default function NotificationBell() {
         </svg>
 
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold px-1.5 shadow-md">
+          <span className="absolute -top-1 -right-1 bg-[#800020] text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center font-bold px-1.5 shadow-md">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -417,7 +417,7 @@ export default function NotificationBell() {
                 onClick={() => setActiveFilter(filter.key)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeFilter === filter.key
-                    ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-md"
+                    ? "bg-[#800020] text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -497,7 +497,7 @@ export default function NotificationBell() {
                   setIsOpen(false);
                   window.location.href = "/notifications";
                 }}
-                className="w-full text-center text-sm text-rose-600 hover:text-white hover:bg-gradient-to-r hover:from-rose-600 hover:to-orange-600 font-bold py-2 rounded-lg transition-all"
+                className="w-full text-center text-sm text-rose-600 hover:text-white hover:bg-[#800020] font-bold py-2 rounded-lg transition-all"
               >
                 View all notifications →
               </button>

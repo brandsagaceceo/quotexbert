@@ -106,7 +106,7 @@ export default function BasementRenovationCalculatorPage() {
               <div className="flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-gray-900 text-lg mb-6">Your Estimated Range</h3>
-                  <div className="bg-gradient-to-br from-rose-600 to-orange-600 rounded-2xl p-6 text-white mb-4">
+                  <div className="bg-[#800020] rounded-2xl p-6 text-white mb-4">
                     <p className="text-rose-100 text-sm mb-1">Estimated Basement Renovation Cost</p>
                     <p className="text-4xl font-black mb-1">{fmt(mid)}</p>
                     <p className="text-rose-200 text-sm">Range: {fmt(low)} – {fmt(high)}</p>
@@ -124,7 +124,7 @@ export default function BasementRenovationCalculatorPage() {
                     <p className="text-xs text-amber-800">Basement finishing requires permits in all Ontario municipalities. Budget $600–$2,000 for permit fees.</p>
                   </div>
                 </div>
-                <Link href="/create-lead" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-6 py-4 rounded-2xl hover:shadow-lg transition-all text-center block">
+                <Link href="/create-lead" className="bg-[#800020] text-white font-bold px-6 py-4 rounded-2xl hover:shadow-lg transition-all text-center block">
                   📸 Get Accurate AI Estimate (Free) →
                 </Link>
               </div>

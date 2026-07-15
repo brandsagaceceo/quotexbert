@@ -18,7 +18,7 @@ export default function RenovationCTA({
     <section
       className={`py-16 px-4 ${
         isPrimary
-          ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white"
+          ? "bg-[#800020] text-white"
           : "bg-gradient-to-br from-rose-50 to-orange-50"
       }`}
     >
@@ -41,7 +41,7 @@ export default function RenovationCTA({
             className={`flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:scale-105 ${
               isPrimary
                 ? "bg-white text-rose-600 hover:bg-rose-50"
-                : "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:shadow-rose-300"
+                : "bg-[#800020] text-white hover:shadow-rose-300"
             }`}
           >
             <Camera className="w-5 h-5" />

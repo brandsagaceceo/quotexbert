@@ -16,6 +16,7 @@ import ExplainQuoteModal from '@/components/ExplainQuoteModal';
 import PriceConfidenceIndicator from '@/components/PriceConfidenceIndicator';
 import LocalTrustMicrocopy from '@/components/LocalTrustMicrocopy';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { normalizeEstimatePricing } from '@/lib/estimate-pricing';
 
 interface EstimateItem {
   id: string;
@@ -67,6 +68,11 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
   const [photos, setPhotos] = useState<string[]>([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  // Price consistency: the posting budget always starts as the AI estimate's own
+  // recommended value (see lib/estimate-pricing.ts) — never a value recalculated from
+  // item selection. The homeowner may deliberately type a different number.
+  const [postingBudget, setPostingBudget] = useState<number>(0);
+  const [budgetEdited, setBudgetEdited] = useState(false);
 
   useEffect(() => {
     params.then(setUnwrappedParams);
@@ -95,6 +101,9 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
             foundEstimate.items.filter((item: EstimateItem) => item.selected).map((item: EstimateItem) => item.id)
           );
           setSelectedItems(selected);
+          // Posting budget defaults to the estimate's own recommended value — the same
+          // number computed by normalizeEstimatePricing() everywhere else in this flow.
+          setPostingBudget(normalizeEstimatePricing(foundEstimate).recommended);
           // Prefill photos from the estimate's persisted images (server-side URLs, not localStorage)
           try {
             const parsedImages = JSON.parse(foundEstimate.images || '[]');
@@ -201,14 +210,14 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
         throw new Error('Failed to save selections');
       }
 
-      // Post to job board — include the (possibly edited) photo list so the final
-      // Lead carries the same photos the homeowner reviewed here.
+      // Post to job board — include the (possibly edited) photo list and the homeowner's
+      // confirmed posting budget so the final Lead matches exactly what was reviewed here.
       const response = await fetch(`/api/ai-estimates/${estimate.id}/post`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ photos }),
+        body: JSON.stringify({ photos, budget: postingBudget }),
       });
 
       const data = await response.json();
@@ -299,6 +308,8 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
   const selectedCosts = calculateSelectedCosts();
   const isPosted = estimate.status === 'posted' || !!estimate.leadId;
+  // Source of truth for every price shown below — same helper used server-side when posting.
+  const pricing = normalizeEstimatePricing(estimate);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -339,9 +350,9 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
           {/* Total Cost */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Total Cost Range</p>
+              <p className="text-sm text-gray-600 mb-1">AI Estimated Range</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
+                ${pricing.low.toLocaleString()} - ${pricing.high.toLocaleString()}
               </p>
               <PriceConfidenceIndicator 
                 photoCount={0}
@@ -523,23 +534,51 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
           </div>
         )}
 
-        {/* Selected Items Summary & Post Button */}
+        {/* Posting Budget & Post Button */}
         {!isPosted && (
           <div className="bg-white rounded-lg shadow-md p-6 sticky bottom-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Selected Items Summary</h3>
-                <div className="flex items-center gap-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Post to Job Board</h3>
+                <div className="flex flex-wrap items-end gap-6">
                   <div>
-                    <p className="text-sm text-gray-600">Items Selected</p>
-                    <p className="text-xl font-bold text-gray-900">
-                      {selectedItems.size} of {estimate.items.length}
+                    <p className="text-sm text-gray-600">AI Estimated Range</p>
+                    <p className="text-lg font-semibold text-gray-700">
+                      ${pricing.low.toLocaleString()} - ${pricing.high.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Cost Range</p>
-                    <p className="text-xl font-bold text-green-600">
-                      ${selectedCosts.min.toLocaleString()} - ${selectedCosts.max.toLocaleString()}
+                    <label htmlFor="posting-budget" className="block text-sm text-gray-600 mb-1">
+                      Suggested Posting Budget
+                    </label>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-500 font-medium">$</span>
+                      <input
+                        id="posting-budget"
+                        type="number"
+                        min={0}
+                        step={50}
+                        value={postingBudget}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          setPostingBudget(Number.isFinite(value) ? value : 0);
+                          setBudgetEdited(true);
+                        }}
+                        className="w-32 px-3 py-2 border border-gray-300 rounded-lg text-lg font-bold text-green-700 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                        style={{ fontSize: '16px' }}
+                      />
+                    </div>
+                    {budgetEdited && postingBudget !== pricing.recommended && (
+                      <p className="text-xs text-amber-600 mt-1">
+                        You've adjusted the AI-suggested budget (${pricing.recommended.toLocaleString()}).
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Items Selected</p>
+                    <p className="text-base font-medium text-gray-700">
+                      {selectedItems.size} of {estimate.items.length} scope item{estimate.items.length === 1 ? '' : 's'}
+                      <span className="text-gray-400"> (${selectedCosts.min.toLocaleString()}-${selectedCosts.max.toLocaleString()} subtotal)</span>
                     </p>
                   </div>
                 </div>

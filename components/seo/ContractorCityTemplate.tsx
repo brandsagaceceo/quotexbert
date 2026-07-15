@@ -91,7 +91,7 @@ export default function ContractorCityTemplate({ data }: Props) {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/onboarding"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
               >
                 <Briefcase className="w-5 h-5" />
                 Join as a {data.tradeName.replace(/s$/, "")} — Free
@@ -169,7 +169,7 @@ export default function ContractorCityTemplate({ data }: Props) {
             <div className="mt-8 text-center">
               <Link
                 href="/onboarding"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
               >
                 <Sparkles className="w-5 h-5" />
                 View All Available Leads
@@ -180,7 +180,7 @@ export default function ContractorCityTemplate({ data }: Props) {
         </div>
 
         {/* CTA Banner */}
-        <div className="py-16 px-4 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+        <div className="py-16 px-4 bg-[#800020] text-white">
           <div className="max-w-3xl mx-auto text-center">
             <Star className="w-12 h-12 text-white/80 mx-auto mb-4" />
             <h2 className="text-3xl font-bold mb-4">Start Getting {data.tradeName} Leads Today</h2>

@@ -33,7 +33,7 @@ export default function BowmanvillePage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Instant Home Renovation<br />Estimates in Bowmanville
               </span>
             </h1>
@@ -60,7 +60,7 @@ export default function BowmanvillePage() {
             <div className="pt-6">
               <Link
                 href="/create-lead"
-                className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-5 px-10 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 text-lg transition-all"
+                className="inline-block bg-[#800020] hover:bg-[#600018] text-white font-bold py-5 px-10 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 text-lg transition-all"
               >
                 📸 Upload Photos → Get Instant Estimate
               </Link>
@@ -105,7 +105,7 @@ export default function BowmanvillePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-gradient-to-br from-rose-600 via-red-600 to-orange-600">
+      <section className="py-20 bg-[#800020]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Start Your Bowmanville Renovation Today

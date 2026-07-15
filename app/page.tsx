@@ -233,9 +233,6 @@ export default function Home() {
         <section id="get-estimate" className="relative py-4 md:py-16 lg:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
-          <div className="hidden sm:block absolute top-20 left-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-          <div className="hidden sm:block absolute top-40 right-10 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-          <div className="hidden sm:block absolute bottom-20 left-1/2 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
@@ -247,11 +244,11 @@ export default function Home() {
                 </div>
                 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
-                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+                  <span className="text-[#800020]">
                     Get an AI Renovation
                   </span>
                   <br />
-                  <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+                  <span className="text-[#800020]">
                     Estimate Before You Hire
                   </span>
                 </h1>
@@ -265,7 +262,7 @@ export default function Home() {
                 {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
                 <a
                   href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold text-base py-4 px-6 rounded-2xl shadow-lg shadow-rose-600/25 active:scale-[0.98] transition-all mb-6"
+                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-colors mb-6"
                 >
                   <Camera className="w-5 h-5" strokeWidth={2} />
                   Upload Photos — Free AI Estimate
@@ -385,7 +382,7 @@ export default function Home() {
             </div>
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
-          <div className="bg-gradient-to-r from-rose-800 to-rose-700 px-4 py-4 md:py-5 text-center">
+          <div className="bg-[#800020] px-4 py-4 md:py-5 text-center">
             <p className="text-white font-bold text-sm md:text-lg tracking-tight">Real GTA &amp; Durham Region Homes. Real Savings.</p>
             <p className="text-rose-200 text-xs md:text-sm mt-1">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white font-semibold">before</strong> calling a contractor</p>
           </div>
@@ -398,8 +395,8 @@ export default function Home() {
               {[
                 { Icon: Gift, tint: "text-emerald-600 bg-emerald-50 ring-emerald-100", label: "Free for Homeowners", sub: "$0, always" },
                 { Icon: Tag, tint: "text-rose-600 bg-rose-50 ring-rose-100", label: "Ontario Renovation Pricing", sub: "Real regional rates" },
-                { Icon: Sparkles, tint: "text-purple-600 bg-purple-50 ring-purple-100", label: "AI-Powered Estimates", sub: "Instant & detailed" },
-                { Icon: Map, tint: "text-blue-600 bg-blue-50 ring-blue-100", label: "Durham Region & GTA", sub: "Toronto to Durham" },
+                { Icon: Sparkles, tint: "text-[#800020] bg-[#800020]/10 ring-[#800020]/20", label: "AI-Powered Estimates", sub: "Instant & detailed" },
+                { Icon: Map, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Durham Region & GTA", sub: "Toronto to Durham" },
                 { Icon: Lock, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Secure Accounts", sub: "Your data, protected" },
                 { Icon: HeartHandshake, tint: "text-amber-600 bg-amber-50 ring-amber-100", label: "No Obligation to Hire", sub: "Estimates are always free" },
               ].map((item) => (
@@ -467,7 +464,7 @@ export default function Home() {
 
         {/* Contractor CTA Banner - shown only to signed-in contractors, below trust strip */}
         {user?.role === 'contractor' && (
-          <section className="relative bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-4 md:py-5 overflow-hidden">
+          <section className="relative bg-[#800020] text-white py-4 md:py-5 overflow-hidden">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="max-w-7xl mx-auto px-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -477,7 +474,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/contractor/jobs"
-                  className="flex-shrink-0 bg-white text-rose-700 font-bold px-6 py-2.5 rounded-xl hover:bg-rose-50 transition-all shadow-xl text-sm whitespace-nowrap"
+                  className="flex-shrink-0 bg-white text-[#800020] font-bold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm whitespace-nowrap"
                 >
                   Browse Available Leads &rarr;
                 </Link>
@@ -559,7 +556,7 @@ export default function Home() {
                 <p className="text-rose-400 font-bold text-xs md:text-sm uppercase tracking-widest mb-2 md:mb-3">Toronto GTA &mdash; First-Time Homeowners</p>
                 <h2 className="text-2xl md:text-5xl font-black text-white leading-tight mb-3 md:mb-4">
                   Stop overpaying.<br />
-                  <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">Know before you sign.</span>
+                  <span className="text-[#800020]">Know before you sign.</span>
                 </h2>
                 <p className="text-slate-300 text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
                   First-time homeowners in the GTA avoid costly surprises by getting an AI estimate <strong className="text-white">before</strong> hiring a contractor.
@@ -829,7 +826,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link
                     href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/contractors/join"}
-                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-6 py-3 rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all transform hover:scale-105 shadow-xl"
+                    className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#600018] transition-all transform hover:scale-105 shadow-xl"
                   >
                     {isSignedIn && user?.role === 'contractor' ? "Browse Leads Now" : "Join as Contractor"}
                   </Link>
@@ -840,7 +837,7 @@ export default function Home() {
               <div className="hidden md:space-y-4 md:block">
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
@@ -851,7 +848,7 @@ export default function Home() {
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
@@ -862,7 +859,7 @@ export default function Home() {
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     </div>
                     <div>
@@ -881,7 +878,7 @@ export default function Home() {
         {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorSection />}
 
         {/* Final CTA */}
-        <section className="py-16 md:py-20 bg-gradient-to-br from-rose-700 via-rose-600 to-orange-600 text-white relative overflow-hidden">
+        <section className="py-16 md:py-20 bg-[#800020] text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_50%)]" aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
             <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-white/15 flex items-center justify-center ring-1 ring-white/20">

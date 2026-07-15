@@ -19,7 +19,7 @@ export default function CostTable({ title = "Cost Breakdown", rows }: CostTableP
       <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+            <tr className="bg-[#800020] text-white">
               <th className="text-left px-4 py-3 font-semibold">Item</th>
               <th className="text-left px-4 py-3 font-semibold">Low Estimate</th>
               <th className="text-left px-4 py-3 font-semibold">High Estimate</th>

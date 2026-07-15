@@ -270,7 +270,6 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
     try {
       // Filter out example photos and compress real photos before sending
       const realPhotos = realPhotosForCount;
-      console.log("Uploading photos:", realPhotos.length);
 
       // Compress photos — fall back to sending description-only if compression fails
       let photoBase64: string[] = [];
@@ -381,7 +380,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
       <div className="px-3 md:px-6 pb-3">
         {/* Header */}
         <div className="text-center mb-4 pt-2">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold mb-2">
+          <div className="inline-flex items-center gap-2 bg-[#800020] text-white px-3 py-1.5 rounded-full text-xs font-bold mb-2">
             <SparklesIcon className="w-4 h-4" />
             AI Instant Estimate — 100% Free
           </div>
@@ -427,7 +426,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               `}
             >
               {/* Camera icon with background */}
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-600 to-orange-500 flex items-center justify-center mb-3 shadow-lg">
+              <div className="w-14 h-14 rounded-2xl bg-[#800020] flex items-center justify-center mb-3 shadow-lg">
                 <CloudArrowUpIcon className="w-8 h-8 text-white" />
               </div>
               <p className="text-lg md:text-base font-black text-slate-900 mb-1">
@@ -574,8 +573,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
                     : '/';
                   router.push(`/sign-in?redirect_url=${encodeURIComponent(redirectPath)}`);
                 }}
-                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700
-                         hover:to-orange-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm
+                className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-2.5 px-4 rounded-lg text-sm
                          transition-all shadow-md"
               >
                 Sign In / Create Free Account
@@ -594,8 +592,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                     hover:to-orange-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
+            className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg md:rounded-xl text-sm md:text-base
                      transition-all transform hover:scale-[1.02] disabled:opacity-50 
                      disabled:cursor-not-allowed disabled:transform-none shadow-lg md:shadow-xl
                      focus:outline-none focus:ring-4 focus:ring-orange-300"

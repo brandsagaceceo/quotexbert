@@ -169,7 +169,7 @@ export function ReviewModal({
             <button
               type="submit"
               disabled={submitting || rating === 0}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-semibold rounded-xl hover:from-rose-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 bg-[#800020] text-white font-semibold rounded-xl hover:bg-[#600018] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Submitting..." : "Submit Review"}
             </button>

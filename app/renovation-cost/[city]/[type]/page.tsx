@@ -169,7 +169,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
 
       <div className="min-h-screen bg-white">
         {/* Hero */}
-        <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white py-14 px-4">
+        <div className="bg-[#800020] text-white py-14 px-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-4 text-rose-200 text-sm font-medium">
               <MapPin className="w-4 h-4" />
@@ -329,7 +329,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/#estimate"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
               >
                 <Sparkles className="w-4 h-4" />
                 Upload Photo — Get Free Estimate

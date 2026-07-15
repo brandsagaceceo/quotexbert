@@ -72,7 +72,7 @@ export default function ProfileMessagesPreview({ contractorId }: { contractorId:
         </p>
         <Link 
           href="/contractor/jobs"
-          className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+          className="inline-block bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
         >
           Browse Jobs
         </Link>
@@ -98,7 +98,7 @@ export default function ProfileMessagesPreview({ contractorId }: { contractorId:
                   className="w-14 h-14 rounded-full object-cover border-2 border-rose-200"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-[#800020] flex items-center justify-center">
                   <User className="h-7 w-7 text-white" />
                 </div>
               )}
@@ -109,7 +109,7 @@ export default function ProfileMessagesPreview({ contractorId }: { contractorId:
               <div className="flex items-center justify-between mb-1">
                 <h3 className="font-bold text-gray-900 text-lg truncate">{conversation.homeownerName}</h3>
                 {conversation.unreadCount > 0 && (
-                  <span className="bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  <span className="bg-[#800020] text-white text-xs font-bold px-2.5 py-1 rounded-full">
                     {conversation.unreadCount}
                   </span>
                 )}

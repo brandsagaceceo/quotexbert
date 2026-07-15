@@ -40,7 +40,7 @@ export function FloatingAIPrompt() {
     >
       {/* Main bubble */}
       <Link href="/#ai-estimator" onClick={handleClose}>
-        <div className="relative bg-gradient-to-br from-rose-600 via-rose-700 to-orange-600 text-white rounded-2xl shadow-2xl p-6 max-w-sm hover:scale-105 transition-transform duration-300 animate-pulse-glow cursor-pointer">
+        <div className="relative bg-[#800020] text-white rounded-2xl shadow-2xl p-6 max-w-sm hover:scale-105 transition-transform duration-300 animate-pulse-glow cursor-pointer">
           {/* Close button */}
           <button
             onClick={(e) => {

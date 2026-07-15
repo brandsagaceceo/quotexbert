@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -130,11 +130,11 @@ export default function AffiliatePage() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="inline-block mb-6">
-            <span className="px-6 py-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-full text-sm font-bold shadow-lg animate-float">
+            <span className="px-6 py-2 bg-[#800020] text-white rounded-full text-sm font-bold shadow-lg animate-float">
               🎉 Now Accepting New Affiliates - Limited Spots!
             </span>
           </div>
-          <h1 className="text-6xl md:text-7xl font-black mb-6 bg-gradient-to-r from-orange-600 via-rose-600 to-amber-600 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-6xl md:text-7xl font-black mb-6 text-[#800020] leading-tight">
             Earn While You Help Others
           </h1>
           <p className="text-2xl text-gray-700 mb-4 font-medium max-w-3xl mx-auto">
@@ -157,7 +157,7 @@ export default function AffiliatePage() {
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button className="group relative overflow-hidden rounded-2xl px-8 py-4 font-black text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-rose-500 to-orange-500 bg-[length:200%_100%] animate-gradient"></div>
+              <div className="absolute inset-0 bg-[#800020] bg-[length:200%_100%] animate-gradient"></div>
               <div className="relative text-white flex items-center justify-center gap-2">
                 <span>Join Free Today</span>
                 <span className="text-2xl group-hover:translate-x-1 transition-transform">→</span>
@@ -176,7 +176,7 @@ export default function AffiliatePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-2xl shadow-xl p-6 text-center transform hover:scale-105 transition-all border-2 border-orange-100">
-              <div className="text-4xl font-black bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl font-black text-[#800020] mb-2">
                 {stat.number}
               </div>
               <div className="text-sm text-gray-600 font-semibold">{stat.label}</div>
@@ -186,7 +186,7 @@ export default function AffiliatePage() {
 
         {/* Benefits Section */}
         <div className="mb-20">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             Why Partner With Us?
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">Everything you need to succeed as an affiliate</p>
@@ -205,12 +205,12 @@ export default function AffiliatePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
               <div key={index} className="group relative">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-rose-400 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                <div className="absolute -inset-1 bg-[#800020] rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
                 <div className="relative bg-white rounded-3xl shadow-xl p-8 h-full transform hover:scale-105 transition-all duration-300">
                   <div className="text-5xl mb-4">{benefit.icon}</div>
                   <h3 className="text-xl font-black text-gray-900 mb-3">{benefit.title}</h3>
                   <p className="text-gray-600 mb-4">{benefit.description}</p>
-                  <div className="inline-block px-4 py-2 bg-gradient-to-r from-orange-100 to-rose-100 rounded-full">
+                  <div className="inline-block px-4 py-2 bg-rose-50 rounded-full">
                     <span className="text-sm font-bold text-orange-700">{benefit.highlight}</span>
                   </div>
                 </div>
@@ -239,7 +239,7 @@ export default function AffiliatePage() {
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-orange-500 to-rose-500 rounded-2xl shadow-2xl p-8 text-center transform hover:scale-110 transition-all text-white relative overflow-hidden">
+            <div className="bg-[#800020] rounded-2xl shadow-2xl p-8 text-center transform hover:scale-110 transition-all text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-bl-xl font-black text-xs">
                 BEST VALUE
               </div>
@@ -257,7 +257,7 @@ export default function AffiliatePage() {
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center transform hover:scale-105 transition-all">
               <div className="text-6xl mb-4">🎁</div>
               <h3 className="text-2xl font-black text-gray-900 mb-2">Performance Bonuses</h3>
-              <div className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent mb-2">
+              <div className="text-4xl font-black text-[#800020] mb-2">
                 Extra
               </div>
               <p className="text-gray-600 text-sm mb-4">Quarterly rewards for top performers</p>
@@ -319,7 +319,7 @@ export default function AffiliatePage() {
 
         {/* How It Works */}
         <div id="how-it-works" className="mb-20 bg-white rounded-3xl shadow-2xl p-12">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             How It Works
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">Start earning in 4 simple steps</p>
@@ -327,7 +327,7 @@ export default function AffiliatePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {howItWorks.map((item, index) => (
               <div key={index} className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-rose-500 rounded-full mx-auto mb-6 flex items-center justify-center text-white text-3xl font-black shadow-xl transform hover:scale-110 transition-all">
+                <div className="w-20 h-20 bg-[#800020] rounded-full mx-auto mb-6 flex items-center justify-center text-white text-3xl font-black shadow-xl transform hover:scale-110 transition-all">
                   {item.step}
                 </div>
                 <div className="text-4xl mb-4">{item.icon}</div>
@@ -340,7 +340,7 @@ export default function AffiliatePage() {
 
         {/* Who It's For Section */}
         <div className="mb-20">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             Who Is This For?
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">Perfect for anyone connected to the home improvement industry</p>
@@ -414,7 +414,7 @@ export default function AffiliatePage() {
 
         {/* Real World Examples */}
         <div className="mb-20 bg-gradient-to-br from-rose-50 to-orange-50 rounded-3xl p-12 border-4 border-rose-200">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             Real-World Examples
           </h2>
           <p className="text-center text-gray-700 text-lg mb-12">See how affiliates are earning with QuoteXbert</p>
@@ -496,7 +496,7 @@ export default function AffiliatePage() {
 
         {/* How Payouts Work */}
         <div className="mb-20 bg-white rounded-3xl shadow-2xl p-12">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             How Payouts Work
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">Transparent, fast, and reliable payments</p>
@@ -586,7 +586,7 @@ export default function AffiliatePage() {
 
         {/* Testimonials */}
         <div className="mb-20">
-          <h2 className="text-5xl font-black text-center mb-4 bg-gradient-to-r from-orange-600 to-rose-600 bg-clip-text text-transparent">
+          <h2 className="text-5xl font-black text-center mb-4 text-[#800020]">
             Success Stories
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">Hear from our top-performing affiliates</p>

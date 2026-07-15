@@ -117,7 +117,7 @@ export default function PickeringPage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Instant Renovation<br />Estimates in Pickering
               </span>
             </h1>
@@ -146,7 +146,7 @@ export default function PickeringPage() {
             <div className="pt-4">
               <Link
                 href="/create-lead"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg"
               >
                 📸 Get My Free Pickering Estimate
                 <ArrowRight className="w-5 h-5" />
@@ -275,7 +275,7 @@ export default function PickeringPage() {
           </div>
           <Link
             href="/create-lead"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base"
+            className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base"
           >
             Get a Free Estimate for Your Pickering Project →
           </Link>

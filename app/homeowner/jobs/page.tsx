@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { formatBudgetDisplay } from '@/lib/currency';
 import LoadingState from '@/components/ui/LoadingState';
 import { Plus, Users, MessageCircle, Clock, DollarSign, Edit, Trash2 } from 'lucide-react';
 
@@ -211,7 +212,7 @@ export default function HomeownerJobsPage() {
                   <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-4">
                     <span className="flex items-center">
                       <DollarSign className="w-4 h-4 mr-1" />
-                      Budget: ${job.budget.toLocaleString()}
+                      Budget: {formatBudgetDisplay(job.budget)}
                     </span>
                     <span>Category: {job.category}</span>
                     <span>ZIP: {job.zipCode}</span>

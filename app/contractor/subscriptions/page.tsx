@@ -1,4 +1,4 @@
-﻿// PRODUCTION PRICING ROUTE — /contractor/subscriptions (plural)
+// PRODUCTION PRICING ROUTE — /contractor/subscriptions (plural)
 // This is the LIVE subscription/pricing page. All internal links must point here.
 // DO NOT confuse with /contractor/subscription (singular) — that is a deprecated redirect.
 "use client";
@@ -463,7 +463,7 @@ export default function SubscriptionsPage() {
           {/* ── Pricing Tiers ── */}
           <div className="bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 rounded-3xl shadow-xl p-4 md:p-8 mb-8">
             <div className="text-center mb-6">
-              <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-2">
+              <h2 className="text-3xl md:text-4xl font-black text-[#800020] mb-2">
                 Choose Your Plan
               </h2>
               <p className="text-gray-600 text-sm md:text-base">One monthly fee · Pick your categories · Keep every dollar you earn</p>
@@ -524,7 +524,7 @@ export default function SubscriptionsPage() {
                   <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'renovation' ? 'bg-orange-400 opacity-90' : 'bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 opacity-60 group-hover:opacity-90'}`}></div>
                   <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'renovation' ? 'border-4 border-orange-500 ring-4 ring-orange-200' : 'border-4 border-orange-400 hover:scale-105 hover:shadow-3xl'}`}>
                     <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-30">
-                      <span className="bg-gradient-to-r from-orange-500 to-rose-600 text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white whitespace-nowrap">
+                      <span className="bg-[#800020] text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white whitespace-nowrap">
                         ⭐ MOST POPULAR
                       </span>
                     </div>
@@ -532,7 +532,7 @@ export default function SubscriptionsPage() {
                       <div className="text-5xl mb-4">🏗️</div>
                       <h3 className="text-2xl font-black text-gray-900 mb-2">Renovation Xbert</h3>
                       <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-orange-500 to-rose-700 bg-clip-text text-transparent">$99</span>
+                        <span className="text-5xl font-black text-[#800020]">$99</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
@@ -548,7 +548,7 @@ export default function SubscriptionsPage() {
                       <button 
                         onClick={() => handleTierSubscription('renovation')}
                         disabled={checkoutLoading !== null}
-                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'renovation' ? 'bg-orange-600 text-white ring-2 ring-orange-300' : 'bg-gradient-to-r from-orange-500 to-rose-600 text-white hover:from-orange-600 hover:to-rose-700'}`}>
+                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'renovation' ? 'bg-orange-600 text-white ring-2 ring-orange-300' : 'bg-[#800020] text-white hover:bg-[#600018]'}`}>
                         {checkoutLoading === 'renovation' ? (
                           <span className="flex items-center justify-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>Processing...</span>
                         ) : selectedPlan === 'renovation' ? '✓ Selected — Proceed to Payment' : '🚀 Get Access →'}
@@ -559,10 +559,10 @@ export default function SubscriptionsPage() {
 
                 {/* General Contractor Tier */}
                 <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
-                  <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'general' ? 'bg-rose-400 opacity-80' : 'bg-gradient-to-br from-rose-400 via-orange-600 to-rose-600 opacity-50 group-hover:opacity-80'}`}></div>
+                  <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'general' ? 'bg-rose-400 opacity-80' : 'bg-[#800020] opacity-50 group-hover:opacity-80'}`}></div>
                   <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'general' ? 'border-4 border-rose-600 ring-4 ring-rose-200' : 'border-4 border-rose-400 hover:scale-105 hover:shadow-3xl'}`}>
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-rose-700 to-orange-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
+                      <span className="bg-[#800020] text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         PRO
                       </span>
                     </div>
@@ -570,7 +570,7 @@ export default function SubscriptionsPage() {
                       <div className="text-5xl mb-4">👷</div>
                       <h3 className="text-2xl font-black text-gray-900 mb-2">General Contractor</h3>
                       <div className="mb-3">
-                        <span className="text-5xl font-black bg-gradient-to-r from-rose-500 to-orange-700 bg-clip-text text-transparent">$149</span>
+                        <span className="text-5xl font-black text-[#800020]">$149</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
@@ -586,7 +586,7 @@ export default function SubscriptionsPage() {
                       <button 
                         onClick={() => handleTierSubscription('general')}
                         disabled={checkoutLoading !== null}
-                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'general' ? 'bg-rose-700 text-white ring-2 ring-rose-300' : 'bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700'}`}>
+                        className={`w-full rounded-xl font-black text-base py-3.5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${selectedPlan === 'general' ? 'bg-rose-700 text-white ring-2 ring-rose-300' : 'bg-[#800020] text-white hover:bg-[#600018]'}`}>
                         {checkoutLoading === 'general' ? (
                           <span className="flex items-center justify-center gap-2"><span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>Processing...</span>
                         ) : selectedPlan === 'general' ? '✓ Selected — Proceed to Payment' : '👑 Get Access →'}
@@ -1044,7 +1044,7 @@ export default function SubscriptionsPage() {
                     className={`flex-1 py-3 rounded-xl font-black text-white shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm ${
                       tierColor === 'green'
                         ? 'bg-gradient-to-r from-green-500 to-emerald-600'
-                        : 'bg-gradient-to-r from-orange-500 to-rose-600'
+                        : 'bg-[#800020]'
                     }`}
                   >
                     Continue to Payment →

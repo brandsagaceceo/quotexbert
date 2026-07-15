@@ -91,7 +91,7 @@ export function HowItWorksSection() {
                 estimatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             }}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold px-8 py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg"
           >
             <PhotoIcon className="w-6 h-6" />
             Get Started Now - It's Free

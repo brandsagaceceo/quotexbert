@@ -686,7 +686,7 @@ export default function BlogPage() {
       />
       <div className="min-h-screen bg-white -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px))]">
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 text-white py-16">
+        <section className="bg-[#800020] text-white py-16">
           <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm mb-4">
@@ -734,7 +734,7 @@ export default function BlogPage() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCategory === category
-                      ? "bg-gradient-to-r from-rose-700 to-orange-600 text-white shadow-md"
+                      ? "bg-[#800020] text-white shadow-md"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
@@ -757,7 +757,7 @@ export default function BlogPage() {
               <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-8">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
-                    <div className="w-16 h-16 bg-gradient-to-br from-rose-100 to-orange-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-rose-50 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-2xl">🔨</span>
                     </div>
                     <h4 className="font-semibold text-slate-800 mb-2">Coming Soon</h4>
@@ -919,7 +919,7 @@ export default function BlogPage() {
         )}
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-rose-900 to-orange-900 text-white py-16 mt-12">
+        <section className="bg-[#800020] text-white py-16 mt-12">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-4xl font-bold mb-4">Ready to Start Your Renovation?</h2>
             <p className="text-xl text-orange-100 mb-8">

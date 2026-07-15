@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -146,14 +146,14 @@ export default function AdminBlogPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font-bold text-[#800020] mb-2">
               Blog Management
             </h1>
             <p className="text-xl text-slate-600">
               Create and manage blog posts for SEO and customer engagement
             </p>
           </div>
-          <button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center">
+          <button className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center">
             <PlusIcon className="h-5 w-5 mr-2" />
             New Post
           </button>

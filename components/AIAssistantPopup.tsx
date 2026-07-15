@@ -53,7 +53,6 @@ export default function AIAssistantPopup() {
     if (lastDismissed) {
       const hoursSinceDismissed = (Date.now() - parseInt(lastDismissed)) / (1000 * 60 * 60);
       if (hoursSinceDismissed < 24) {
-        console.log('[AIAssistant] In cooldown period, will not auto-open');
         return;
       }
     }
@@ -61,7 +60,6 @@ export default function AIAssistantPopup() {
     // Only auto-open once per session
     const shownThisSession = sessionStorage.getItem('aiAssistantShownThisSession');
     if (shownThisSession) {
-      console.log('[AIAssistant] Already shown this session');
       return;
     }
 
@@ -530,7 +528,7 @@ export default function AIAssistantPopup() {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className={`floating-widget-safe bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center gap-1.5 md:gap-2 group${
+          className={`floating-widget-safe bg-[#800020] hover:bg-[#600018] text-white rounded-full shadow-lg hover:shadow-xl transition-colors duration-200 flex items-center gap-1.5 md:gap-2 group${
             isHidden ? ' widget-hidden' : ''
           }`}
           aria-label="Open AI Assistant"
@@ -556,7 +554,7 @@ export default function AIAssistantPopup() {
           }}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white p-4 flex items-center justify-between">
+          <div className="bg-[#800020] text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
                 <Sparkles className="h-5 w-5" />
@@ -582,7 +580,7 @@ export default function AIAssistantPopup() {
           <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" style={{ minHeight: '120px', maxHeight: 'calc(80vh - 160px)' }}>
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85vw] sm:max-w-[85%] ${msg.role === 'user' ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
+                <div className={`max-w-[85vw] sm:max-w-[85%] ${msg.role === 'user' ? 'bg-[#800020] text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
                   <p className="text-sm whitespace-pre-line">{msg.content}</p>
                   {msg.actions && (
                     <div className="mt-3 space-y-2">
@@ -592,7 +590,7 @@ export default function AIAssistantPopup() {
                           onClick={() => handleActionClick(action.href, action.label)}
                           className={`w-full text-left px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                             action.variant === 'primary'
-                              ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:shadow-lg'
+                              ? 'bg-[#800020] text-white hover:shadow-lg'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -621,7 +619,7 @@ export default function AIAssistantPopup() {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim()}
-                className="bg-gradient-to-r from-rose-600 to-orange-600 text-white p-2 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#800020] hover:bg-[#600018] text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />
               </button>
@@ -708,7 +706,7 @@ export default function AIAssistantPopup() {
                     router.push('/sign-up?role=contractor');
                   }
                 }}
-                className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+                className="flex-1 bg-[#800020] hover:bg-[#600018] text-white py-3 rounded-xl font-bold transition-colors"
               >
                 {isSignedIn ? 'I Understand' : 'Sign Up as Contractor'}
               </button>

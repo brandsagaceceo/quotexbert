@@ -87,7 +87,7 @@ export default function FloatingActionStack({
               ? 'bg-rose-700 text-white hover:bg-rose-800' 
               : action.variant === 'secondary'
               ? 'bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300'
-              : 'bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700'
+              : 'bg-[#800020] text-white hover:bg-[#600018]'
             }
           `}
           aria-label={action.label}

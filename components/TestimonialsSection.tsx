@@ -158,7 +158,7 @@ export function TestimonialsSection() {
           </p>
           <a
             href="/create-lead"
-            className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-5 px-10 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+            className="inline-block bg-[#800020] hover:bg-[#600018] text-white font-bold py-5 px-10 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
           >
             📸 Upload Photos – Get Free Estimate
           </a>

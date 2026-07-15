@@ -105,7 +105,7 @@ export default function DurhamRegionRenovationEstimatesPage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Durham Region<br />Renovation Estimates
               </span>
             </h1>
@@ -134,7 +134,7 @@ export default function DurhamRegionRenovationEstimatesPage() {
             <div className="pt-4">
               <Link
                 href="/create-lead"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-5 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-xl"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-5 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-xl"
               >
                 📸 Get My Free AI Estimate
                 <ArrowRight className="w-6 h-6" />
@@ -261,7 +261,7 @@ export default function DurhamRegionRenovationEstimatesPage() {
           <div className="text-center">
             <Link
               href="/create-lead"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base"
+              className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base"
             >
               Get My Free Durham Renovation Estimate →
             </Link>

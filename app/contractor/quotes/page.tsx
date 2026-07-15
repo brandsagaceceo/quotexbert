@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { formatBudgetDisplay } from '@/lib/currency';
 
 interface Quote {
   id: string;
@@ -306,7 +307,7 @@ export default function QuoteManagementPage() {
                         <h2 className="text-2xl font-bold text-gray-900">{selectedQuote.job.title}</h2>
                         <p className="text-gray-600 mt-1">{selectedQuote.job.description}</p>
                         <p className="text-sm text-gray-500 mt-2">
-                          Budget: ${selectedQuote.job.budget.toLocaleString()} | Category: {selectedQuote.job.category}
+                          Budget: {formatBudgetDisplay(selectedQuote.job.budget)} | Category: {selectedQuote.job.category}
                         </p>
                       </div>
                       <div className="flex space-x-2">

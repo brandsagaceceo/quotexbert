@@ -87,7 +87,7 @@ export default function KitchenRenovationWhitbyPage() {
 
           <div className="text-center space-y-6">
             <h1 className="text-5xl md:text-6xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Kitchen Renovation<br />in Whitby, Ontario
               </span>
             </h1>
@@ -104,7 +104,7 @@ export default function KitchenRenovationWhitbyPage() {
             </div>
 
             <div className="pt-4">
-              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
+              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
                 📸 Get My Free Whitby Kitchen Estimate <ArrowRight className="w-5 h-5" />
               </Link>
               <p className="text-sm text-gray-500 mt-3">Free · No commitment · Takes 2 minutes</p>
@@ -161,7 +161,7 @@ export default function KitchenRenovationWhitbyPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+      <section className="py-16 bg-[#800020] text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Ready to Renovate Your Whitby Kitchen?</h2>
           <p className="text-rose-100 text-lg mb-8">AI estimate calibrated to Whitby&apos;s local market. Verified kitchen contractors. Free for homeowners.</p>

@@ -99,7 +99,7 @@ export default function ExampleEstimates() {
                       {example.title}
                     </h3>
                     <p className="text-sm text-slate-500 mb-2 break-words">📍 {example.location}</p>
-                    <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-xl font-bold rounded-lg shadow-lg min-w-0 max-w-full">
+                    <div className="inline-flex items-center px-4 py-2 bg-[#800020] text-white text-xl font-bold rounded-lg shadow-lg min-w-0 max-w-full">
                       <span className="truncate">
                         ${example.costLow.toLocaleString()} - ${example.costHigh.toLocaleString()}
                       </span>
@@ -114,7 +114,7 @@ export default function ExampleEstimates() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-rose-700 to-orange-600 px-8 py-6 text-white">
+              <div className="bg-[#800020] px-8 py-6 text-white">
                 <h3 className="text-2xl font-bold mb-2">{selectedExample.title}</h3>
                 <p className="text-blue-100">📍 {selectedExample.location}</p>
               </div>
@@ -190,7 +190,7 @@ export default function ExampleEstimates() {
         <div className="text-center mt-12">
           <a
             href="#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-[#800020] hover:bg-[#600018] text-white text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Your Free Estimate Now
           </a>

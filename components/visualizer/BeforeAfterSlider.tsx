@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 
 interface BeforeAfterSliderProps {
@@ -14,11 +14,6 @@ export function BeforeAfterSlider({ beforeImage, afterImage, className = "" }: B
   const [isDragging, setIsDragging] = useState(false);
   const [imageError, setImageError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Debug logging
-  useEffect(() => {
-    console.log("BeforeAfterSlider props:", { beforeImage, afterImage });
-  }, [beforeImage, afterImage]);
 
   const handleMove = (clientX: number) => {
     if (!containerRef.current) return;

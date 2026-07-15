@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import Link from 'next/link';
+import { formatBudgetDisplay } from '@/lib/currency';
 
 interface Quote {
   id: string;
@@ -310,7 +311,7 @@ export default function HomeownerQuotesPage() {
                       </div>
                       <div>
                         <span className="font-medium text-gray-700">Your Budget:</span>
-                        <span className="ml-2">${selectedQuote.job.budget.toLocaleString()}</span>
+                        <span className="ml-2">{formatBudgetDisplay(selectedQuote.job.budget)}</span>
                       </div>
                       <div>
                         <span className="font-medium text-gray-700">Location:</span>

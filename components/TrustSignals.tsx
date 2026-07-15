@@ -62,7 +62,7 @@ export function TrustSignals() {
           {/* GTA Coverage */}
           <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="bg-gradient-to-br from-rose-600 to-orange-500 rounded-full p-3">
+              <div className="bg-[#800020] rounded-full p-3">
                 <MapPin className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -78,7 +78,7 @@ export function TrustSignals() {
           {/* Happy Homeowners */}
           <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="bg-gradient-to-br from-rose-400 to-pink-500 rounded-full p-3">
+              <div className="bg-[#800020] rounded-full p-3">
                 <Users className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -106,7 +106,7 @@ export function TrustSignals() {
             </div>
 
             <div className="flex flex-col md:flex-row items-center gap-4">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-xl p-4">
+              <div className="bg-rose-50 rounded-xl p-4">
                 <MapPin className="w-8 h-8 text-rose-700" />
               </div>
               <div>
@@ -134,7 +134,7 @@ export function TrustSignals() {
           </p>
           <a
             href="/create-lead"
-            className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="inline-block bg-[#800020] hover:bg-[#600018] text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Get Your Free Estimate Now →
           </a>

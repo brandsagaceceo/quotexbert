@@ -54,7 +54,6 @@ export default function CreateLeadPage() {
     if (savedFormData && !hasLoadedSavedData) {
       try {
         const draft = JSON.parse(savedFormData);
-        console.log('💾 Restoring saved form data from previous session');
         setFormData(draft);
         setHasLoadedSavedData(true);
         
@@ -69,7 +68,6 @@ export default function CreateLeadPage() {
     if (savedPhotos && !hasLoadedSavedData) {
       try {
         const photoUrls = JSON.parse(savedPhotos);
-        console.log('💾 Restoring', photoUrls.length, 'saved photos from previous session');
         setPhotos(photoUrls);
       } catch (error) {
         console.error('Error loading saved photos:', error);
@@ -83,7 +81,6 @@ export default function CreateLeadPage() {
     if (estimateData && !savedFormData) {
       try {
         const estimate = JSON.parse(estimateData);
-        console.log('Loading estimate data:', estimate);
         
         // Pre-fill form with estimate data
         if (estimate.projectDescription) {
@@ -106,7 +103,6 @@ export default function CreateLeadPage() {
         if (estimatePhotos) {
           try {
             const photosArray = JSON.parse(estimatePhotos);
-            console.log('Loading photos from estimate:', photosArray.length);
             
             // Upload base64 photos to storage
             uploadBase64Photos(photosArray);
@@ -130,7 +126,6 @@ export default function CreateLeadPage() {
     const hasData = formData.title || formData.description || formData.category || formData.budget || formData.zipCode;
     
     if (hasData) {
-      console.log('💾 Auto-saving form data...');
       localStorage.setItem('create_lead_draft', JSON.stringify(formData));
     }
   }, [formData]);
@@ -138,15 +133,12 @@ export default function CreateLeadPage() {
   // Auto-save photos to localStorage
   useEffect(() => {
     if (photos.length > 0) {
-      console.log('💾 Auto-saving', photos.length, 'photos...');
       localStorage.setItem('create_lead_draft_photos', JSON.stringify(photos));
     }
   }, [photos]);
 
   // Function to upload base64 photos to storage
   const uploadBase64Photos = async (base64Photos: string[]) => {
-    console.log('Uploading', base64Photos.length, 'base64 photos to storage...');
-    
     try {
       const uploadPromises = base64Photos.map(async (base64, index) => {
         try {
@@ -175,7 +167,6 @@ export default function CreateLeadPage() {
           const result = await uploadResponse.json();
           const uploadedUrl = result.files?.[0] || result.url;
           
-          console.log('Photo', index + 1, 'uploaded:', uploadedUrl);
           return uploadedUrl || base64;
         } catch (error) {
           console.error('Error uploading photo', index + 1, error);
@@ -184,7 +175,6 @@ export default function CreateLeadPage() {
       });
       
       const uploadedUrls = await Promise.all(uploadPromises);
-      console.log('All photos uploaded, setting photos state');
       setPhotos(uploadedUrls);
     } catch (error) {
       console.error('Error uploading base64 photos:', error);
@@ -264,7 +254,6 @@ export default function CreateLeadPage() {
         // Clear saved draft from localStorage
         localStorage.removeItem('create_lead_draft');
         localStorage.removeItem('create_lead_draft_photos');
-        console.log('💾 Cleared saved draft after successful submission');
         
         // Redirect after showing success message
         setTimeout(() => {
@@ -399,11 +388,11 @@ export default function CreateLeadPage() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-gradient-to-br from-rose-700 via-rose-600 to-orange-600 p-3 rounded-xl shadow-lg">
+            <div className="bg-[#800020] p-3 rounded-xl shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl font-bold text-[#800020]">
                 Post Your Project
               </h1>
               <p className="text-sm sm:text-base text-rose-800 font-medium mt-1">
@@ -684,7 +673,7 @@ export default function CreateLeadPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || successMessage !== ""}
-                className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white py-3 sm:py-4 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl hover:from-rose-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-[#800020] text-white py-3 sm:py-4 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-[#600018] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

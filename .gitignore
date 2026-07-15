@@ -13,6 +13,13 @@
 # testing
 /coverage
 
+# playwright QA harness output
+/qa-screenshots
+/test-results
+/playwright-report
+# playwright authenticated storage state (contains session tokens — never commit)
+/qa-auth
+
 # next.js
 /.next/
 /out/

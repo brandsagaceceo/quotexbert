@@ -151,7 +151,7 @@ export default function VisualizerLibrary() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold text-[#800020] mb-4">
             ✨ AI Visualizer Library
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
@@ -167,7 +167,7 @@ export default function VisualizerLibrary() {
               onClick={() => setSelectedCategory(category)}
               className={`px-6 py-2 rounded-full font-semibold transition-all ${
                 selectedCategory === category
-                  ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg'
+                  ? 'bg-[#800020] text-white shadow-lg'
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
               }`}
             >
@@ -303,7 +303,7 @@ export default function VisualizerLibrary() {
                 
                 <a
                   href="/visualizer"
-                  className="flex-1 max-w-md bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all text-center"
+                  className="flex-1 max-w-md bg-[#800020] text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all text-center"
                 >
                   Try AI Visualizer
                 </a>

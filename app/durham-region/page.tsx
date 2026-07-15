@@ -63,7 +63,7 @@ export default function DurhamRegionPage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Instant Home Renovation<br />Estimates in Durham Region
               </span>
             </h1>
@@ -90,7 +90,7 @@ export default function DurhamRegionPage() {
             <div className="pt-6">
               <Link
                 href="/create-lead"
-                className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-5 px-10 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+                className="inline-block bg-[#800020] hover:bg-[#600018] text-white font-bold py-5 px-10 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
               >
                 📸 Upload Photos → Get Instant Estimate
               </Link>
@@ -147,7 +147,7 @@ export default function DurhamRegionPage() {
             {popularProjects.map((project) => (
               <div key={project.name} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
                 <div className="flex items-start gap-4">
-                  <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-xl p-3">
+                  <div className="bg-rose-50 rounded-xl p-3">
                     <Wrench className="w-6 h-6 text-rose-600" />
                   </div>
                   <div className="flex-1">
@@ -199,7 +199,7 @@ export default function DurhamRegionPage() {
             </div>
 
             <div className="text-center space-y-4">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
+              <div className="bg-rose-50 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
                 <Clock className="w-10 h-10 text-indigo-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900">Fast & Accurate Estimates</h3>
@@ -209,7 +209,7 @@ export default function DurhamRegionPage() {
             </div>
 
             <div className="text-center space-y-4">
-              <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
+              <div className="bg-rose-50 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
                 <Home className="w-10 h-10 text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900">Transparent Pricing</h3>
@@ -222,7 +222,7 @@ export default function DurhamRegionPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-rose-600 via-red-600 to-orange-600">
+      <section className="py-20 bg-[#800020]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Start Your Durham Region Renovation?

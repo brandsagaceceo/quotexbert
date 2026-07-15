@@ -258,7 +258,7 @@ export default function NotificationsPage() {
           <p className="text-gray-600 mt-2 mb-6">Please sign in to view your notifications.</p>
           <Link
             href="/sign-in"
-            className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold"
+            className="inline-block bg-[#800020] text-white px-5 py-2.5 rounded-xl font-semibold"
           >
             Sign In
           </Link>
@@ -334,7 +334,7 @@ export default function NotificationsPage() {
               {authUser?.role === 'homeowner' && activeFilter === 'all' && (
                 <Link
                   href="/create-lead"
-                  className="inline-block mt-4 px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all shadow-sm"
+                  className="inline-block mt-4 px-4 py-2 bg-[#800020] text-white text-sm font-semibold rounded-lg hover:bg-[#600018] transition-all shadow-sm"
                 >
                   Post a Job
                 </Link>

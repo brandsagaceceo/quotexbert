@@ -218,7 +218,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
             });
           }
         }}
-        className="fixed right-3 z-50 bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 rounded-full shadow-2xl hover:shadow-rose-500/50 transition-all duration-300 hover:scale-110 group pointer-events-auto"
+        className="fixed right-3 z-50 bg-[#800020] text-white p-3 rounded-full shadow-lg hover:bg-[#600018] hover:shadow-xl transition-colors duration-200 group pointer-events-auto"
         style={{
           bottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 4.5rem)',
         }}
@@ -245,7 +245,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
     >
       <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-2xl border-2 border-rose-200 overflow-hidden h-full flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-3 md:p-4 flex items-center justify-between">
+        <div className="bg-[#800020] text-white p-3 md:p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="bg-white/20 p-1.5 md:p-2 rounded-full backdrop-blur-sm">
               <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
@@ -278,7 +278,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="text-center mb-3 md:mb-4">
-            <div className="text-3xl md:text-5xl mb-2 md:mb-3 animate-bounce">{currentTip.icon}</div>
+            <div className="text-3xl md:text-5xl mb-2 md:mb-3">{currentTip.icon}</div>
             <h4 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">
               {currentTip.title}
             </h4>
@@ -290,7 +290,7 @@ export default function ProactiveAIHelper({ delayMs = 8000 }: AIHelperProps) {
           {/* CTA Button */}
           <button
             onClick={currentTip.action}
-            className="w-full bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 group text-sm md:text-base"
+            className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 group text-sm md:text-base"
           >
             <span>{currentTip.cta}</span>
             <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />

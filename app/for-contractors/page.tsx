@@ -949,7 +949,7 @@ export default function ForContractorsPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-rose-600 to-orange-600 text-white">
+      <section className="py-20 bg-[#800020] text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-6">
             Ready to Grow Your Business?

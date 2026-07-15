@@ -39,7 +39,7 @@ export default function ScarboroughPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white py-16 px-4">
+      <div className="bg-[#800020] text-white py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="w-6 h-6" />
@@ -110,7 +110,7 @@ export default function ScarboroughPage() {
             </div>
             <Link 
               href="/#instant-quote"
-              className="mt-6 w-full bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all block text-center"
+              className="mt-6 w-full bg-[#800020] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#600018] transition-all block text-center"
             >
               Get Your Free Estimate Now
             </Link>
@@ -130,7 +130,7 @@ export default function ScarboroughPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 p-4 bg-gradient-to-r from-rose-100 to-orange-100 rounded-lg">
+            <div className="mt-6 p-4 bg-rose-50 rounded-lg">
               <p className="text-sm text-gray-800">
                 <strong>Serving all of Scarborough</strong> including postal codes: M1B, M1C, M1E, M1G, M1H, M1J, M1K, M1L, M1M, M1N, M1P, M1R, M1S, M1T, M1V, M1W, M1X
               </p>
@@ -145,21 +145,21 @@ export default function ScarboroughPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-rose-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-8 h-8 text-rose-600" />
               </div>
               <h3 className="font-bold text-lg mb-2">Instant AI Estimates</h3>
               <p className="text-gray-600">Upload photos, get accurate Scarborough market pricing in 30 seconds</p>
             </div>
             <div className="text-center">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-rose-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-rose-600" />
               </div>
               <h3 className="font-bold text-lg mb-2">Verified Local Contractors</h3>
               <p className="text-gray-600">Connect with licensed, insured contractors who specialize in Scarborough</p>
             </div>
             <div className="text-center">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="bg-rose-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8 text-rose-600" />
               </div>
               <h3 className="font-bold text-lg mb-2">Real Local Pricing</h3>
@@ -169,7 +169,7 @@ export default function ScarboroughPage() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-rose-600 to-orange-600 rounded-2xl shadow-2xl p-8 md:p-12 text-center text-white">
+        <div className="bg-[#800020] rounded-2xl shadow-2xl p-8 md:p-12 text-center text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Start Your Scarborough Renovation?
           </h2>

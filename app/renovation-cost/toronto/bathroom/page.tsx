@@ -12,7 +12,7 @@ export default function BathroomRenovationCostPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-gradient-to-r from-rose-600 to-orange-600 text-white py-16">
+      <header className="bg-[#800020] text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <Link href="/" className="inline-block mb-6 text-sm hover:underline opacity-90">
             ← Back to QuoteXbert
@@ -212,7 +212,7 @@ export default function BathroomRenovationCostPage() {
         </section>
 
         {/* CTA to Estimate Tool */}
-        <section className="bg-gradient-to-r from-rose-600 to-orange-600 rounded-2xl p-10 text-white text-center shadow-2xl">
+        <section className="bg-[#800020] rounded-2xl p-10 text-white text-center shadow-2xl">
           <Sparkles className="w-16 h-16 mx-auto mb-4" />
           <h2 className="text-3xl md:text-4xl font-black mb-4">
             Get Your Bathroom Renovation Estimate
@@ -266,7 +266,7 @@ export default function BathroomRenovationCostPage() {
       <footer className="bg-slate-900 text-white py-8 mt-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Link href="/" className="inline-block mb-4">
-            <span className="text-2xl font-black bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="text-2xl font-black text-[#800020]">
               QuoteXbert
             </span>
           </Link>

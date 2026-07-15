@@ -119,7 +119,7 @@ export default function AffiliateDashboard() {
           <p className="text-slate-600 mb-6">Please sign in to access your affiliate dashboard</p>
           <Link
             href="/sign-in"
-            className="inline-block bg-gradient-to-r from-rose-700 to-rose-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            className="inline-block bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             Sign In
           </Link>
@@ -135,7 +135,7 @@ export default function AffiliateDashboard() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-rose-900 via-rose-700 to-rose-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-black mb-4 text-[#800020]">
             Affiliate Dashboard
           </h1>
           <p className="text-slate-600 text-lg">
@@ -187,7 +187,7 @@ export default function AffiliateDashboard() {
           {/* Referral Link */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-rose-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-rose-600 to-rose-700 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
                 <ClipboardDocumentIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -242,7 +242,7 @@ export default function AffiliateDashboard() {
           {/* QR Code */}
           <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-rose-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
                 <QrCodeIcon className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -264,7 +264,7 @@ export default function AffiliateDashboard() {
               </div>
               <button
                 onClick={downloadQRCode}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-[#800020] text-white rounded-xl font-semibold hover:shadow-lg transition-all"
               >
                 <ArrowDownTrayIcon className="w-5 h-5" />
                 Download QR Code
@@ -397,7 +397,7 @@ export default function AffiliateDashboard() {
               <p className="text-slate-500 mb-6">Start sharing your link to see your referrals here!</p>
               <Link
                 href="/affiliate-university"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
               >
                 <AcademicCapIcon className="w-5 h-5" />
                 Learn How to Get Referrals

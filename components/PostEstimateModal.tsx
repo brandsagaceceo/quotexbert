@@ -122,7 +122,7 @@ export default function PostEstimateModal({
           >
             <div className="border-2 border-rose-200 bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-6 hover:border-rose-500 hover:from-rose-100 hover:to-orange-100 transition-all cursor-pointer">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-gradient-to-r from-rose-500 to-orange-500 rounded-lg group-hover:shadow-lg transition-shadow">
+                <div className="p-3 bg-[#800020] rounded-lg group-hover:shadow-lg transition-shadow">
                   <Globe className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-left">

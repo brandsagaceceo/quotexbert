@@ -427,13 +427,13 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   animation: slide-up 0.6s ease-out;
 }
 
-/* Glow animation for featured elements */
+/* Glow animation for featured elements (restrained, burgundy) */
 @keyframes glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(236, 72, 153, 0.2);
+    box-shadow: 0 0 16px rgba(128, 0, 32, 0.25);
   }
   50% {
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 0 24px rgba(128, 0, 32, 0.4);
   }
 }
 
@@ -441,9 +441,9 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   animation: glow 2s ease-in-out infinite;
 }
 
-/* Modern gradient text */
+/* Modern gradient text (burgundy brand) */
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #800020 0%, #a0002a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -451,12 +451,12 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 
 /* Card hover effects */
 .card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.18);
 }
 
 /* Smooth message animations */
@@ -667,4 +667,74 @@ body:has(.sticky-cta-bar) .floating-widget-safe {
     gap: 1.5rem !important;
   }
   .footer-brand-col { grid-column: 1 / -1; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROFESSIONAL MOTION SYSTEM
+   Restrained, reusable motion. ~150–220ms, subtle opacity +
+   small translate only. No scale-zoom, no glow, no bounce.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Standard UI transition timing token — apply via `transition` on interactive
+   elements. Kept short so it never delays interaction. */
+:root {
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle press feedback for buttons — max 0.98 scale, no bounce. */
+.press-feedback:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Desktop-only card hover lift: translateY(-2px) + slightly stronger shadow.
+   No hover simulation on touch devices, no scale. */
+@media (hover: hover) and (pointer: fine) {
+  .card-lift {
+    transition: transform var(--motion-base) var(--motion-ease),
+                box-shadow var(--motion-base) var(--motion-ease);
+  }
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.18);
+  }
+}
+
+/* Newly-inserted chat message entrance — subtle fade + 6px rise.
+   Apply ONLY to the latest inserted bubble, never the whole history. */
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-message-in {
+  animation: message-in var(--motion-base) var(--motion-ease);
+}
+
+/* ── Reduced-motion: honor the user's OS preference ──
+   Neutralize decorative/looping/large animations while keeping essential
+   feedback (e.g. spinners) barely moving rather than fully frozen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Stop decorative loops entirely so nothing drifts in the background. */
+  .animate-blob,
+  .animate-float,
+  .animate-glow,
+  .animate-gradient,
+  .animate-scroll,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
+  /* Remove hover lift/press translate for reduced-motion users. */
+  .card-lift:hover,
+  .press-feedback:active {
+    transform: none !important;
+  }
 }

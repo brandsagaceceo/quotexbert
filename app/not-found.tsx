@@ -12,7 +12,7 @@ export default function NotFound() {
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <a
           href="/#get-estimate"
-          className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+          className="bg-[#800020] text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
         >
           📸 Get Free Estimate →
         </a>

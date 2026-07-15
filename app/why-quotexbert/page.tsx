@@ -87,7 +87,7 @@ export default function WhyQuoteXbertPage() {
 
           <div className="text-center space-y-6">
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Why QuoteXbert
               </span>
             </h1>
@@ -103,7 +103,7 @@ export default function WhyQuoteXbertPage() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-4 pt-4">
-              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
+              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
                 📸 Get My Free AI Estimate <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/how-ai-works" className="inline-flex items-center gap-2 bg-white border-2 border-rose-600 text-rose-600 font-bold px-8 py-4 rounded-2xl hover:bg-rose-50 transition-all text-lg">

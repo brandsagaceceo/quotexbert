@@ -128,11 +128,11 @@ export function AIQuoteEstimator() {
     <div className="max-w-5xl mx-auto">
       {/* Header */}
       <div className="text-center mb-10 animate-fade-in-up">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-100 to-orange-100 rounded-full mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 rounded-full mb-4">
           <Sparkles className="w-5 h-5 text-rose-700 animate-pulse" />
           <span className="text-rose-900 font-semibold">AI-Powered Estimator</span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent mb-4">
+        <h2 className="text-4xl md:text-5xl font-bold text-[#800020] mb-4">
           Get Instant AI Cost Estimate
         </h2>
         <p className="text-xl text-slate-600">
@@ -235,7 +235,7 @@ export function AIQuoteEstimator() {
           <button
             onClick={handleGetQuote}
             disabled={loading}
-            className="group relative w-full bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-rose-500/50 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
+            className="group relative w-full bg-[#800020] text-white py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-rose-500/50 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
           >
             {/* Animated background shine effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -275,7 +275,7 @@ export function AIQuoteEstimator() {
             </div>
             
             <div className="text-center mb-8">
-              <div className="text-5xl font-bold bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent mb-2">
+              <div className="text-5xl font-bold text-[#800020] mb-2">
                 ${quote.estimatedCostLow.toLocaleString()} - ${quote.estimatedCostHigh.toLocaleString()}
               </div>
               <p className="text-slate-600">CAD (Toronto/GTA rates)</p>
@@ -387,7 +387,7 @@ export function AIQuoteEstimator() {
               <button
                 onClick={handleGenerateVisualization}
                 disabled={generatingViz}
-                className="w-full bg-gradient-to-r from-rose-700 to-orange-600 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                className="w-full bg-[#800020] text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
                 {generatingViz ? (
                   <>
@@ -422,7 +422,7 @@ export function AIQuoteEstimator() {
                     {generatingViz ? "Generating..." : "Generate New Vision"}
                   </button>
                   <button
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                    className="flex-1 px-4 py-3 bg-[#800020] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
                   >
                     📸 Post with This Photo
                   </button>
@@ -443,7 +443,7 @@ export function AIQuoteEstimator() {
               Try Another Quote
             </button>
             <button
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="flex-1 px-6 py-3 bg-[#800020] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               {visualizationUrl ? "Post to Job Board with Photos" : "Get Professional Quotes"}
             </button>

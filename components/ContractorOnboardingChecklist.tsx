@@ -73,7 +73,7 @@ export function ContractorOnboardingChecklist() {
       {/* Progress bar */}
       <div className="h-1 bg-gray-100">
         <div
-          className="h-1 bg-gradient-to-r from-rose-500 to-orange-500 transition-all duration-500"
+          className="h-1 bg-[#800020] transition-all duration-500"
           style={{ width: `${(completedCount / STEPS.length) * 100}%` }}
         />
       </div>

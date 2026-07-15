@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-900 to-orange-700 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold text-[#800020] mb-4">
             QuoteXbert Admin Dashboard
           </h1>
           <p className="text-xl text-slate-600">

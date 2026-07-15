@@ -94,7 +94,7 @@ export default function JobCard({
         </div>
 
         <div className="text-right flex-shrink-0 ml-4">
-          <div className="inline-block px-3 py-1.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-base rounded-lg shadow-sm">{lead.estimate}</div>
+          <div className="inline-block px-3 py-1.5 bg-[#800020] text-white font-bold text-base rounded-lg shadow-sm">{lead.estimate}</div>
         </div>
       </div>
 

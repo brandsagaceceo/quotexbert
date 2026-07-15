@@ -91,7 +91,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
             filter === 'all' 
-              ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg' 
+              ? 'bg-[#800020] text-white shadow-lg' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -101,7 +101,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
           onClick={() => setFilter('active')}
           className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
             filter === 'active' 
-              ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg' 
+              ? 'bg-[#800020] text-white shadow-lg' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -111,7 +111,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
           onClick={() => setFilter('completed')}
           className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
             filter === 'completed' 
-              ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg' 
+              ? 'bg-[#800020] text-white shadow-lg' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -132,7 +132,7 @@ export default function AcceptedJobsList({ contractorId }: { contractorId: strin
           {filter === 'all' && (
             <Link 
               href="/contractor/jobs"
-              className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+              className="inline-block bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
             >
               Browse Jobs
             </Link>

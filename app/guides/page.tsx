@@ -243,7 +243,7 @@ export default function GuidesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+      <section className="py-16 bg-[#800020] text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Ready to Start Your Renovation?</h2>
           <p className="text-rose-100 text-lg mb-8">Get a free AI estimate calibrated to your Ontario city. Know the fair price before talking to any contractor.</p>

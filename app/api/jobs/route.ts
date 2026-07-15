@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { getAllOpenLeads } from '@/lib/subscription-access';
+import { formatBudgetDisplay } from '@/lib/currency';
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       title: lead.title || `${lead.category} Project`,
       description: lead.description || 'No description available',
       category: lead.category || 'General',
-      budget: lead.budget ? `$${lead.budget}` : '$0',
+      budget: formatBudgetDisplay(lead.budget),
       location: lead.zipCode || 'Location TBD',
       status: lead.status || 'open',
       homeowner: lead.homeowner?.name || 'Anonymous',

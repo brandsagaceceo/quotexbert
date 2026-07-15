@@ -393,7 +393,7 @@ export default function LiveQuoteBuilder({
       {/* Panel */}
       <div className="relative w-full max-w-lg bg-white shadow-2xl flex flex-col h-full overflow-hidden animate-slideInRight">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-rose-600 to-orange-500">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-[#800020]">
           <div className="flex items-center gap-3">
             <DocumentTextIcon className="w-6 h-6 text-white" />
             <div>
@@ -426,7 +426,7 @@ export default function LiveQuoteBuilder({
           {/* Generate state — only shown when not in revision mode */}
           {!quote && (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-              <div className="bg-gradient-to-br from-rose-100 to-orange-100 rounded-full p-6">
+              <div className="bg-rose-50 rounded-full p-6">
                 {reviseQuoteId ? (
                   <ArrowPathIcon className="w-12 h-12 text-rose-600 animate-spin" />
                 ) : (
@@ -447,7 +447,7 @@ export default function LiveQuoteBuilder({
                 <button
                   onClick={generateQuote}
                   disabled={generating}
-                  className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-rose-700 hover:to-orange-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                  className="flex items-center gap-2 bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
                 >
                   {generating ? (
                     <>
@@ -739,7 +739,7 @@ export default function LiveQuoteBuilder({
                 type="button"
                 onClick={() => saveQuote('sent')}
                 disabled={saving || sending || !quote.title.trim() || !quote.scope.trim()}
-                className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#600018] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
               >
                 {sending ? (
                   <>
@@ -787,7 +787,7 @@ export default function LiveQuoteBuilder({
                 type="button"
                 onClick={startNewQuote}
                 disabled={generating}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-rose-600 to-orange-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 transition-all shadow-md"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-[#800020] hover:bg-[#600018] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 transition-all shadow-md"
               >
                 <SparklesIcon className="w-4 h-4" />
                 New Quote

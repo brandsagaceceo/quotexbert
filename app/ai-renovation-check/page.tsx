@@ -104,7 +104,7 @@ export default function AIRenovationCheckPage() {
           <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight">
             Snap Your Reno.
             <br />
-            <span className="bg-gradient-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="text-[#800020]">
               AI Be the Judge.
             </span>
           </h1>
@@ -209,7 +209,7 @@ export default function AIRenovationCheckPage() {
         <button
           onClick={handleAskQuestion}
           disabled={isAnalyzing || !question.trim()}
-          className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-black py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all text-lg shadow-xl shadow-rose-500/20"
+          className="w-full bg-[#800020] hover:bg-[#600018] text-white font-black py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-all text-lg shadow-xl shadow-rose-500/20"
         >
           {isAnalyzing ? (
             <span className="flex items-center justify-center gap-2">
@@ -239,7 +239,7 @@ export default function AIRenovationCheckPage() {
               result.severity === "good"
                 ? "bg-gradient-to-r from-emerald-600 to-green-600"
                 : result.severity === "poor"
-                ? "bg-gradient-to-r from-red-700 to-rose-600"
+                ? "bg-[#800020]"
                 : "bg-gradient-to-r from-amber-600 to-orange-600"
             }`}>
               <span className="text-2xl">

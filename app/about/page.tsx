@@ -20,7 +20,7 @@ export default function AboutPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-              About <span className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
+              About <span className="text-[#800020]">QuoteXbert</span>
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Revolutionizing home repairs through AI-powered estimates and trusted contractor connections
@@ -29,7 +29,7 @@ export default function AboutPage() {
 
           {/* Mission Statement */}
           <div className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-xl p-8 mb-12 shadow-lg">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-4">Our Mission</h2>
+            <h2 className="text-2xl font-bold text-[#800020] mb-4">Our Mission</h2>
             <p className="text-lg text-slate-700 leading-relaxed mb-4">
               To <strong>stop homeowners from being taken advantage of</strong> by bringing transparency to home repair pricing. 
               We believe every homeowner deserves to know what a fair price looks like <em>before</em> contractors submit quotes.
@@ -222,37 +222,37 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🔒</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Secure Payments</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">Secure Payments</h3>
                 <p className="text-slate-600">Bank-level security through Stripe encryption. Your payment information is always protected.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🤖</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">AI-Powered Estimates</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">AI-Powered Estimates</h3>
                 <p className="text-slate-600">Advanced AI technology analyzes your project to provide detailed cost breakdowns based on GTA market data.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">⭐</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Review System</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">Review System</h3>
                 <p className="text-slate-600">We're building a transparent review system to help homeowners make informed decisions.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">✅</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Contractor Screening</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">Contractor Screening</h3>
                 <p className="text-slate-600">We aim to connect homeowners with qualified, professional contractors in the GTA.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">💰</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Transparent Pricing</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">Transparent Pricing</h3>
                 <p className="text-slate-600">No hidden fees for homeowners or contractors - everything is upfront.</p>
               </div>
               
               <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-lg">
                 <div className="text-3xl mb-4">🛠️</div>
-                <h3 className="text-xl font-semibold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent mb-3">Quality Focus</h3>
+                <h3 className="text-xl font-semibold text-[#800020] mb-3">Quality Focus</h3>
                 <p className="text-slate-600">We're committed to helping homeowners find quality contractors and get fair quotes.</p>
               </div>
             </div>
@@ -267,7 +267,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/"
-                className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 hover:from-rose-950 hover:via-rose-800 hover:to-orange-700 px-6 py-3 rounded-lg font-medium transition-colors text-white"
+                className="bg-[#800020] hover:bg-[#600018] px-6 py-3 rounded-lg font-medium transition-colors text-white"
               >
                 Get My Estimate
               </Link>

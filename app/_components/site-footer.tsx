@@ -11,7 +11,7 @@ export default function SiteFooter() {
           {/* Brand — spans 2 cols on desktop, full width on mobile */}
           <div className="footer-brand-col col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center mb-4">
-              <span className="text-2xl font-bold bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">QuoteXbert</span>
+              <span className="text-2xl font-bold text-[#800020]">QuoteXbert</span>
             </Link>
             <p className="text-ink-600 mb-4 text-sm leading-relaxed">
               AI-powered renovation estimates for Toronto, Durham Region &amp; GTA homeowners. Verified contractor marketplace. Free for homeowners.

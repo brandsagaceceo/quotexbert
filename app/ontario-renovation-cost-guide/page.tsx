@@ -263,7 +263,7 @@ export default function OntarioRenovationCostGuidePage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-rose-900 via-red-800 to-orange-900 text-white py-20">
+      <section className="bg-[#800020] text-white py-20">
         <div className="max-w-6xl mx-auto px-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-rose-200 mb-6">
             <Link href="/" className="hover:text-white">Home</Link>
@@ -339,7 +339,7 @@ export default function OntarioRenovationCostGuidePage() {
             <p className="font-black text-gray-900 text-lg">Don&apos;t want to read the whole guide?</p>
             <p className="text-gray-600">Get an instant AI estimate calibrated to your Ontario city — in 2 minutes.</p>
           </div>
-          <Link href="/create-lead" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg transition-all flex-shrink-0">
+          <Link href="/create-lead" className="bg-[#800020] text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg transition-all flex-shrink-0">
             📸 Get My Free AI Estimate →
           </Link>
         </div>
@@ -627,7 +627,7 @@ export default function OntarioRenovationCostGuidePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+      <section className="py-20 bg-[#800020] text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black mb-4">
             Get Your Free Ontario Renovation Estimate

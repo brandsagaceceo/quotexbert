@@ -78,7 +78,7 @@ function ConvAvatar({ user }: { user: UserInThread | null | undefined }) {
     return <img src={photo} alt={name} className="avatar-img w-11 h-11 rounded-full object-cover flex-shrink-0 shadow-sm" />;
   }
   return (
-    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+    <div className="w-11 h-11 rounded-full bg-[#800020] flex items-center justify-center flex-shrink-0 shadow-sm">
       <span className="text-sm font-bold text-white">{name.charAt(0).toUpperCase()}</span>
     </div>
   );
@@ -768,7 +768,7 @@ export default function MessagesPage() {
                     <button
                       onClick={handleGenerateQuote}
                       disabled={bridgeLoading || showQuoteBuilder}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-700 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#800020] hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
                     >
                       {bridgeLoading ? (
                         <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -811,14 +811,14 @@ export default function MessagesPage() {
                       onClick={() => setShowQuoteSheet(true)}
                       className={`flex-shrink-0 w-full border-b transition-all duration-150 text-left active:scale-[0.99] ${
                         isNewForHomeowner
-                          ? 'border-rose-300 bg-gradient-to-r from-rose-100 to-orange-50 hover:from-rose-200 hover:to-orange-100 shadow-sm'
+                          ? 'border-rose-300 bg-rose-50 hover:bg-rose-100 shadow-sm'
                           : 'border-rose-100 bg-gradient-to-r from-rose-50/70 to-orange-50/40 hover:from-rose-100/80 hover:to-orange-100/60'
                       }`}
                     >
                       <div className="flex items-center gap-3 px-3 py-2.5">
                         {/* Icon pill */}
                         <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${
-                          isNewForHomeowner ? 'bg-gradient-to-br from-rose-600 to-orange-500' : 'bg-gradient-to-br from-rose-500 to-orange-500'
+                          isNewForHomeowner ? 'bg-[#800020]' : 'bg-[#800020]'
                         }`}>
                           <DocumentTextIcon className="w-5 h-5 text-white" />
                         </div>

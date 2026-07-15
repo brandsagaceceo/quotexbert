@@ -86,10 +86,10 @@ export default function AffiliateSeoPage({
       <div className="max-w-4xl mx-auto px-4 pb-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-block mb-4 px-5 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-full font-bold text-sm shadow-lg">
+          <div className="inline-block mb-4 px-5 py-2 bg-[#800020] text-white rounded-full font-bold text-sm shadow-lg">
             {badge}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-rose-900 via-orange-700 to-amber-900 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-4xl md:text-5xl font-black mb-4 text-[#800020] leading-tight">
             {headline}
           </h1>
           <p className="text-xl text-slate-700 max-w-2xl mx-auto font-medium">
@@ -104,13 +104,13 @@ export default function AffiliateSeoPage({
 
         {/* Earnings Table */}
         <div className="mb-10">
-          <h2 className="text-2xl md:text-3xl font-black text-center mb-6 bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-3xl font-black text-center mb-6 text-[#800020]">
             Your Earning Potential
           </h2>
           <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-orange-100">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-rose-700 to-orange-600 text-white">
+                <thead className="bg-[#800020] text-white">
                   <tr>
                     <th className="px-5 py-4 text-left font-bold text-sm">
                       Referrals
@@ -166,7 +166,7 @@ export default function AffiliateSeoPage({
                 className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg text-center"
               >
                 <div className="text-3xl mb-3">{step.icon}</div>
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-2">
+                <h3 className="text-lg font-semibold text-[#800020] mb-2">
                   {step.title}
                 </h3>
                 <p className="text-slate-600 text-sm">{step.desc}</p>
@@ -206,7 +206,7 @@ export default function AffiliateSeoPage({
                   className={`shrink-0 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                     copied
                       ? "bg-green-600 text-white"
-                      : "bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:shadow-md"
+                      : "bg-[#800020] text-white hover:shadow-md"
                   }`}
                 >
                   {copied ? "Copied!" : "Copy"}
@@ -235,7 +235,7 @@ export default function AffiliateSeoPage({
                 <button
                   type="submit"
                   disabled={isJoining}
-                  className="bg-gradient-to-r from-red-800 to-orange-600 hover:from-red-900 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap text-white"
+                  className="bg-[#800020] hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap text-white"
                 >
                   {isJoining ? "Joining..." : "Join Free →"}
                 </button>

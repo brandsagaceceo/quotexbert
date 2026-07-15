@@ -241,7 +241,7 @@ export default function MaterialOptimizer() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl font-bold text-[#800020] mb-4">
           🛠️ Material Optimizer AI
         </h1>
         <p className="text-xl text-slate-600">
@@ -312,7 +312,7 @@ export default function MaterialOptimizer() {
           <button
             onClick={generateRecommendations}
             disabled={!roomType || isLoading}
-            className="w-full bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-[#800020] text-white font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -330,7 +330,7 @@ export default function MaterialOptimizer() {
       ) : (
         <div className="space-y-6">
           {/* Results Header */}
-          <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-2xl p-6">
+          <div className="bg-[#800020] text-white rounded-2xl p-6">
             <h2 className="text-2xl font-bold mb-2">
               Best Materials for Your {result.roomType}
             </h2>
@@ -443,7 +443,7 @@ export default function MaterialOptimizer() {
             </button>
             <button
               onClick={() => window.location.href = '/create-lead'}
-              className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all"
+              className="flex-1 bg-[#800020] text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all"
             >
               Get Contractor Quotes
             </button>

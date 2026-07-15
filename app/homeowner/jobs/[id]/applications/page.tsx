@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -231,7 +231,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
                   onClick={() => setSortKey(k)}
                   className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                     sortKey === k
-                      ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-sm'
+                      ? 'bg-[#800020] text-white shadow-sm'
                       : 'bg-white border border-gray-200 text-gray-600 hover:border-rose-300'
                   }`}
                 >
@@ -285,7 +285,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
                         {photo ? (
                           <img src={photo} alt={displayName} className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100" />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center ring-2 ring-gray-100">
+                          <div className="w-12 h-12 rounded-full bg-[#800020] flex items-center justify-center ring-2 ring-gray-100">
                             <span className="text-white font-bold text-sm">{displayName.charAt(0).toUpperCase()}</span>
                           </div>
                         )}
@@ -334,7 +334,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
                           <button
                             onClick={() => handleApplicationAction(app.id, 'accept')}
                             disabled={processingApplicationId === app.id}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-sm font-bold rounded-xl disabled:opacity-60 transition-colors shadow-sm"
+                            className="flex items-center gap-1.5 px-4 py-2 bg-[#800020] hover:bg-[#600018] text-white text-sm font-bold rounded-xl disabled:opacity-60 transition-colors shadow-sm"
                           >
                             {processingApplicationId === app.id ? (
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

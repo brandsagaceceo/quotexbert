@@ -88,7 +88,7 @@ export function ReviewCaptureModal({ isOpen, onClose, googleReviewUrl }: ReviewC
             <div className="space-y-3 pt-4">
               <button
                 onClick={handleLeaveReview}
-                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base touch-target"
+                className="w-full bg-[#800020] hover:bg-[#600018] text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base touch-target"
               >
                 Leave a Google Review ⭐
               </button>

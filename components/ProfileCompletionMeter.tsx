@@ -46,7 +46,7 @@ export default function ProfileCompletionMeter({ profile, isContractor }: Profil
       
       <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
         <div 
-          className="bg-gradient-to-r from-rose-700 to-orange-600 h-2 rounded-full transition-all duration-300"
+          className="bg-[#800020] h-2 rounded-full transition-all duration-300"
           style={{ width: `${percentage}%` }}
         />
       </div>

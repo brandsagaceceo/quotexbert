@@ -134,7 +134,7 @@ export default function HomeownerJobDetailPage() {
         <p className="text-slate-500 mb-6">The job may have been removed or you may not have permission to view it.</p>
         <Link
           href="/homeowner/jobs"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold"
+          className="inline-flex items-center gap-2 bg-[#800020] text-white px-5 py-2.5 rounded-xl font-semibold"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to My Jobs
@@ -240,7 +240,7 @@ export default function HomeownerJobDetailPage() {
               <div className="space-y-2">
                 {job.applications.slice(0, 3).map((app) => (
                   <div key={app.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-[#800020] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                       {(app.contractor.contractorProfile?.companyName || app.contractor.name || 'C').charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -266,7 +266,7 @@ export default function HomeownerJobDetailPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
             href={`/homeowner/jobs/${job.id}/applications`}
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-3.5 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all"
+            className="flex items-center justify-center gap-2 bg-[#800020] text-white px-5 py-3.5 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all"
           >
             <Users className="w-5 h-5" />
             View Applications

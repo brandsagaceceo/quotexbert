@@ -1,4 +1,4 @@
-﻿// LIVE PRODUCTION ROUTE — /contractor/jobs
+// LIVE PRODUCTION ROUTE — /contractor/jobs
 // Contractor job board: browse and accept leads.
 "use client";
 
@@ -201,12 +201,6 @@ function ContractorJobsContent() {
         _matchType = 'fallback';
       }
 
-      console.log("MATCH SYSTEM:", {
-        job: job.category,
-        contractor: normalizedContractorCats,
-        matchType: _matchType,
-      });
-
       return { ...job, _matchType };
     });
 
@@ -322,15 +316,6 @@ function ContractorJobsContent() {
     const isSubscribed = subscriptions.some(sub => {
       const normalizedJob = normalizeCategory(job.category);
       const normalizedContractor = normalizeCategory(sub.category);
-      console.log("MATCH CHECK:", {
-        job: job.category,
-        contractor: sub.category,
-        normalizedJob,
-        normalizedContractor,
-        match: normalizedJob === normalizedContractor,
-        subStatus: sub.status,
-        subCanClaim: sub.canClaimLeads,
-      });
       return normalizedJob === normalizedContractor && sub.status === 'active' && sub.canClaimLeads;
     });
 
@@ -417,11 +402,11 @@ function ContractorJobsContent() {
   if (!isSignedIn || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 flex items-center justify-center">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 max-w-md w-full">
           <h1 className="text-2xl font-bold text-center mb-4">Access Restricted</h1>
           <p className="text-center mb-6">You need to sign in as a contractor to view jobs.</p>
           <div className="text-center">
-            <Link href="/sign-in" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold">
+            <Link href="/sign-in" className="bg-[#800020] text-white px-6 py-3 rounded-lg font-semibold">
               Sign In
             </Link>
           </div>
@@ -435,10 +420,10 @@ function ContractorJobsContent() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold text-[#800020] mb-4">
             Available Jobs
           </h1>
           <p className="text-xl text-gray-600">
@@ -458,7 +443,7 @@ function ContractorJobsContent() {
                 <div className="mt-2">
                   <Link 
                     href="/contractor/subscriptions" 
-                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-[#800020] text-white rounded-lg hover:bg-[#600018] transition-colors"
                   >
                     View Subscriptions →
                   </Link>
@@ -505,7 +490,7 @@ function ContractorJobsContent() {
 
         {/* New Job Alert Banner */}
         {newJobAlert && (
-          <div className="mb-6 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-2xl p-6 shadow-2xl animate-pulse">
+          <div className="mb-6 bg-[#800020] text-white rounded-2xl p-6 shadow-md">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -538,7 +523,7 @@ function ContractorJobsContent() {
         )}
 
         {/* Quick Hot Leads Filters */}
-        <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 p-4">
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => {
@@ -549,7 +534,7 @@ function ContractorJobsContent() {
               }}
               className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${
                 !filters.urgency && !filters.sortBy
-                  ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-lg'
+                  ? 'bg-[#800020] text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -564,7 +549,7 @@ function ContractorJobsContent() {
               }}
               className={`px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 ${
                 filters.urgency === 'hot'
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                  ? 'bg-[#800020] text-white shadow-lg'
                   : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-2 border-orange-200'
               }`}
             >
@@ -604,7 +589,7 @@ function ContractorJobsContent() {
         </div>
 
         {/* Filter Section */}
-        <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/50">
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-4 border-b border-gray-200">
             <button 
               onClick={() => setShowFilters(!showFilters)}
@@ -760,7 +745,7 @@ function ContractorJobsContent() {
                 <p className="text-gray-500 text-sm max-w-xs mx-auto mb-5 leading-relaxed">
                   Homeowner projects are posted daily. You&apos;ll be notified instantly when a matching job appears, or try expanding your subscribed categories to see more.
                 </p>
-                <Link href="/contractor/subscriptions" className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow hover:shadow-md transition-all">
+                <Link href="/contractor/subscriptions" className="inline-block bg-[#800020] text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow hover:shadow-md transition-all">
                   Expand My Categories
                 </Link>
               </>
@@ -775,7 +760,7 @@ function ContractorJobsContent() {
                 <p className="text-gray-500 text-sm mb-5">Try adjusting your filters to see more available projects.</p>
                 <button
                   onClick={clearFilters}
-                  className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-6 py-3 rounded-lg font-semibold text-sm transition-all shadow-md"
+                  className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold text-sm transition-all shadow-md"
                 >
                   Clear All Filters
                 </button>
@@ -799,7 +784,7 @@ function ContractorJobsContent() {
               <div 
                 key={job.id} 
                 id={`job-${job.id}`}
-                className={`bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-lg border border-white/50 transition-all duration-300 ${highlightedJobId === job.id ? 'ring-4 ring-rose-500 ring-offset-2' : ''}`}
+                className={`bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-200 transition-shadow duration-200 hover:shadow-md ${highlightedJobId === job.id ? 'ring-2 ring-[#800020] ring-offset-2' : ''}`}
               >
                 <div className="flex justify-between items-start gap-3 mb-3">
                   <div className="flex-1 min-w-0">
@@ -807,7 +792,7 @@ function ContractorJobsContent() {
                     <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2 mb-2">
                       <span className="whitespace-nowrap">📍 {_displayLocation}{!_hasAccess && ' (area only)'}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
-                      <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
+                      <span className="bg-[#800020]/10 text-[#800020] px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
                       {/* Match type badge */}
                       {job._matchType === 'exact' && (
                         <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">⭐ Best Match</span>
@@ -871,7 +856,7 @@ function ContractorJobsContent() {
                     </p>
                     <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
                       <Link href="/contractor/subscriptions"
-                        className="bg-gradient-to-r from-rose-600 to-orange-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all">
+                        className="bg-[#800020] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all">
                         Subscribe to {job.category} to unlock
                       </Link>
                     </div>
@@ -940,7 +925,7 @@ function ContractorJobsContent() {
                         <button 
                           onClick={() => openAcceptanceModal(job.id, job.title)}
                           disabled={accepting === job.id}
-                          className="bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
+                          className="bg-[#800020] hover:bg-[#600018] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
                         >
                           {accepting === job.id ? 'Accepting...' : 'Accept Job'}
                         </button>
@@ -1031,7 +1016,7 @@ function ContractorJobsContent() {
                 <button
                   type="submit"
                   disabled={accepting === acceptanceModal.jobId}
-                  className="flex-1 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white py-2 px-4 rounded-lg font-semibold disabled:opacity-50 transition-colors"
+                  className="flex-1 bg-[#800020] hover:bg-[#600018] text-white py-2 px-4 rounded-lg font-semibold disabled:opacity-50 transition-colors"
                 >
                   {accepting === acceptanceModal.jobId ? 'Accepting...' : 'Accept Job'}
                 </button>

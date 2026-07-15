@@ -76,7 +76,7 @@ export default function WindowReplacementCalculatorPage() {
               <div className="flex flex-col justify-between">
                 <div>
                   <h3 className="font-black text-gray-900 text-lg mb-6">Estimated Cost</h3>
-                  <div className="bg-gradient-to-br from-rose-600 to-orange-600 rounded-2xl p-6 text-white mb-4">
+                  <div className="bg-[#800020] rounded-2xl p-6 text-white mb-4">
                     <p className="text-rose-100 text-sm mb-1">Window Replacement Cost</p>
                     <p className="text-4xl font-black mb-1">{fmt(mid)}</p>
                     <p className="text-rose-200 text-sm">Range: {fmt(low)} – {fmt(high)}</p>
@@ -86,7 +86,7 @@ export default function WindowReplacementCalculatorPage() {
                     <p className="text-xs text-green-700">Check eligibility for Canada Greener Homes Grant — up to $5,600 for qualifying window upgrades. nrcan.gc.ca</p>
                   </div>
                 </div>
-                <Link href="/create-lead" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-6 py-4 rounded-2xl hover:shadow-lg transition-all text-center block">📸 Get Accurate AI Estimate →</Link>
+                <Link href="/create-lead" className="bg-[#800020] text-white font-bold px-6 py-4 rounded-2xl hover:shadow-lg transition-all text-center block">📸 Get Accurate AI Estimate →</Link>
               </div>
             </div>
           </div>

@@ -69,7 +69,7 @@ export default function RenovationCalculatorHubPage() {
               Calculators give good rough estimates. For the most accurate price — specific to your home, your neighbourhood, and your project scope — upload photos and get a free AI estimate from QuoteXbert.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/create-lead" className="bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-lg transition-all text-lg">
+              <Link href="/create-lead" className="bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl hover:shadow-lg transition-all text-lg">
                 📸 Get My Free AI Estimate →
               </Link>
               <Link href="/how-ai-works" className="border border-gray-300 text-gray-700 font-semibold px-8 py-4 rounded-2xl hover:border-rose-300 hover:text-rose-600 transition-colors">

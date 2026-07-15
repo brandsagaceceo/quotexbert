@@ -30,7 +30,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
         "Portfolio showcase",
         "Customer reviews"
       ],
-      color: "from-rose-600 to-orange-600",
+      color: "bg-[#800020]",
       recommended: false
     },
     {
@@ -49,7 +49,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
         "Advanced analytics",
         "Lead notifications"
       ],
-      color: "from-rose-600 to-orange-600",
+      color: "bg-[#800020]",
       recommended: true
     },
     {
@@ -70,7 +70,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
         "Dedicated account manager",
         "Custom branding"
       ],
-      color: "from-rose-700 to-orange-700",
+      color: "bg-[#800020]",
       recommended: false
     }
   ];
@@ -80,7 +80,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
       <div className="min-h-full flex items-start justify-center p-3 sm:p-4 pt-6 sm:pt-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-8">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-6xl w-full animate-scale-in">
           {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-rose-600 to-orange-600 text-white p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl">
+        <div className="sticky top-0 bg-[#800020] text-white p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl">
           <button
             onClick={onClose}
             className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1 hover:bg-white/20 rounded-full transition-colors"
@@ -155,7 +155,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
               >
                 {tier.recommended && (
                   <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
+                    <span className="bg-[#800020] text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
                       MOST POPULAR
                     </span>
                   </div>
@@ -164,12 +164,12 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
                 <div className="text-center mb-4 sm:mb-6">
                   <h4 className="text-lg sm:text-2xl font-bold text-slate-900 mb-2">{tier.name}</h4>
                   <div className="flex items-baseline justify-center gap-1 sm:gap-2 mb-3 sm:mb-4">
-                    <span className={`text-3xl sm:text-5xl font-black bg-gradient-to-r ${tier.color} bg-clip-text text-transparent`}>
+                    <span className={`text-3xl sm:text-5xl font-black text-[#800020]`}>
                       ${tier.price}
                     </span>
                     <span className="text-xs sm:text-lg text-slate-600 font-semibold">/month</span>
                   </div>
-                  <div className={`bg-gradient-to-r ${tier.color} bg-opacity-10 px-3 sm:px-4 py-2 sm:py-3 rounded-xl`}>
+                  <div className={`bg-rose-50 px-3 sm:px-4 py-2 sm:py-3 rounded-xl`}>
                     <p className="text-base sm:text-lg font-bold text-slate-900">
                       {tier.categories} Trade Categories
                     </p>
@@ -193,7 +193,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
                   onClick={onClose}
                   className={`block w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-lg text-center transition-all duration-300 ${
                     tier.recommended
-                      ? `bg-gradient-to-r ${tier.color} text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1`
+                      ? `bg-[#800020] hover:bg-[#600018] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1`
                       : "bg-slate-100 text-slate-800 hover:bg-slate-200"
                   }`}
                 >

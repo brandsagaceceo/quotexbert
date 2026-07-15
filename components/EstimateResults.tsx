@@ -214,7 +214,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
     <div className="w-full max-w-full px-4 sm:px-6 lg:px-8">
     <div className="bg-white rounded-2xl shadow-2xl border-2 border-slate-200 overflow-hidden w-full max-w-3xl mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-4 sm:p-6 text-white">
+      <div className="bg-[#800020] p-4 sm:p-6 text-white">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
           <div className="min-w-0 flex-1 overflow-hidden">
             <h2 className="text-2xl sm:text-3xl font-bold mb-2 overflow-wrap-anywhere">Your AI Estimate</h2>
@@ -250,7 +250,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         <div className="bg-gradient-to-br from-orange-50 to-rose-50 rounded-xl p-4 sm:p-6 border-2 border-orange-200">
           <div className="text-center">
             <p className="text-xs sm:text-sm font-semibold text-slate-600 mb-2">Estimated Total Cost</p>
-            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700 mb-1 break-words px-2 leading-tight">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#800020] mb-1 break-words px-2 leading-tight">
               {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
             </div>
             <p className="text-xs text-slate-500">CAD, including HST estimate</p>
@@ -405,7 +405,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
                 </tr>
                 <tr className="border-t-2 border-slate-900 text-lg font-bold">
                   <td colSpan={4} className="py-3 px-2 text-right text-slate-900">Estimated Total:</td>
-                  <td className="text-right py-3 px-2 text-transparent bg-clip-text bg-gradient-to-r from-rose-700 to-orange-700">
+                  <td className="text-right py-3 px-2 text-[#800020]">
                     {formatCurrency(data.totals.total_low)} - {formatCurrency(data.totals.total_high)}
                   </td>
                 </tr>
@@ -480,8 +480,7 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
         <div className="flex flex-col sm:flex-row gap-3 pt-4 pb-safe min-w-0">
           <button
             onClick={onGetContractorBids}
-            className="w-full sm:flex-1 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 
-                     hover:to-orange-700 text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
+            className="w-full sm:flex-1 bg-[#800020] hover:bg-[#600018] text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
                      transition-all transform hover:scale-[1.02] shadow-lg text-sm sm:text-base break-words"
           >
             Get 3 Contractor Bids

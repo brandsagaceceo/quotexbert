@@ -40,7 +40,7 @@ export function QuoteCtaModal({ isOpen, onClose, generationId, beforeImage, afte
       <div className="min-h-full flex items-center justify-center p-4 py-8">
         <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slideUp">
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-rose-600 via-orange-600 to-rose-600 p-8 text-white rounded-t-3xl">
+        <div className="relative bg-[#800020] p-8 text-white rounded-t-3xl">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors"
@@ -146,7 +146,7 @@ export function QuoteCtaModal({ isOpen, onClose, generationId, beforeImage, afte
             <button
               onClick={handleSendToQuote}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-rose-600 to-orange-600 text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="w-full bg-[#800020] text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               {loading ? (
                 <>

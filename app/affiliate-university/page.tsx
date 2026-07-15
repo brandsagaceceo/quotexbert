@@ -187,7 +187,7 @@ export default function AffiliateUniversity() {
             <AcademicCapIcon className="w-6 h-6" />
             Affiliate University
           </div>
-          <h1 className="text-4xl md:text-6xl font-black mb-4 bg-gradient-to-r from-purple-900 via-rose-700 to-orange-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-black mb-4 text-[#800020]">
             Master the Art of Affiliate Marketing
           </h1>
           <p className="text-xl text-slate-700 max-w-3xl mx-auto mb-8">
@@ -263,7 +263,7 @@ export default function AffiliateUniversity() {
             <div key={category} className="mb-8">
               <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 overflow-hidden">
                 {/* Module Header */}
-                <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white p-6">
+                <div className="bg-[#800020] text-white p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl font-black">
@@ -298,7 +298,7 @@ export default function AffiliateUniversity() {
                         >
                           <div className="flex items-center gap-4 flex-1">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              isCompleted ? 'bg-green-600' : 'bg-gradient-to-br from-rose-600 to-orange-600'
+                              isCompleted ? 'bg-green-600' : 'bg-[#800020]'
                             }`}>
                               {isCompleted ? (
                                 <CheckCircleIcon className="w-6 h-6 text-white" />
@@ -398,7 +398,7 @@ export default function AffiliateUniversity() {
 
             {/* Month 2 */}
             <div className="relative">
-              <div className="absolute -top-4 left-6 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+              <div className="absolute -top-4 left-6 bg-[#800020] text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
                 Month 2
               </div>
               <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl p-6 pt-8 border-2 border-rose-200">
@@ -503,7 +503,7 @@ export default function AffiliateUniversity() {
                           >
                             <div className="flex items-center gap-4 flex-1">
                               <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                                isCompleted ? 'bg-green-600' : 'bg-gradient-to-br from-rose-600 to-orange-600'
+                                isCompleted ? 'bg-green-600' : 'bg-[#800020]'
                               }`}>
                                 {isCompleted ? (
                                   <CheckCircleIcon className="w-7 h-7 text-white" />
@@ -535,7 +535,7 @@ export default function AffiliateUniversity() {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-2xl p-12 text-center shadow-2xl">
+        <div className="bg-[#800020] text-white rounded-2xl p-12 text-center shadow-2xl">
           <h2 className="text-4xl font-black mb-4">Ready to Start Earning?</h2>
           <p className="text-xl text-rose-50 mb-8 max-w-2xl mx-auto">
             Apply what you've learned and start referring contractors today. Your first commission is just one referral away!

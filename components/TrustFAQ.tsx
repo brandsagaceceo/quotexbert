@@ -98,7 +98,7 @@ export default function TrustFAQ() {
           </p>
           <a
             href="#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-[#800020] text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Free Estimate Now
           </a>

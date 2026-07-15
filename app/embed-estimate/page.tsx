@@ -34,7 +34,7 @@ export default function EmbedEstimatePage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-black">
-                <span className="bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+                <span className="text-[#800020]">
                   QuoteXbert
                 </span>
                 <span className="text-slate-900"> Embed Tool</span>
@@ -75,7 +75,7 @@ export default function EmbedEstimatePage() {
                       onClick={() => setPreviewSize(size)}
                       className={`py-3 px-4 rounded-lg font-semibold text-sm transition ${
                         previewSize === size
-                          ? 'bg-gradient-to-r from-rose-600 to-orange-600 text-white'
+                          ? 'bg-[#800020] text-white'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
@@ -157,7 +157,7 @@ export default function EmbedEstimatePage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href="tel:9052429460"
-                  className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-5 rounded-lg hover:opacity-90 transition text-sm"
+                  className="flex items-center justify-center gap-2 bg-[#800020] text-white font-bold py-3 px-5 rounded-lg hover:opacity-90 transition text-sm"
                 >
                   📞 905-242-9460
                 </a>
@@ -191,7 +191,7 @@ export default function EmbedEstimatePage() {
                   {/* Embedded Estimator Preview */}
                   <div className="h-full flex flex-col bg-gradient-to-br from-rose-50 to-orange-50">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white p-6">
+                    <div className="bg-[#800020] text-white p-6">
                       <h3 className="text-2xl font-black mb-2">QuoteXbert</h3>
                       <p className="text-sm opacity-90">AI Renovation Estimates</p>
                     </div>
@@ -238,7 +238,7 @@ export default function EmbedEstimatePage() {
                           </div>
                         </div>
 
-                        <button className="w-full bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition">
+                        <button className="w-full bg-[#800020] text-white font-bold py-4 rounded-xl hover:opacity-90 transition">
                           Get Free Estimate →
                         </button>
 

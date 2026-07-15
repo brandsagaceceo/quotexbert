@@ -135,7 +135,7 @@ export default function ContractorSettingsPage() {
           <p className="text-gray-600 mt-2 mb-6">Please sign in to manage your settings.</p>
           <Link
             href="/sign-in"
-            className="inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold"
+            className="inline-block bg-[#800020] text-white px-5 py-2.5 rounded-xl font-semibold"
           >
             Sign In
           </Link>

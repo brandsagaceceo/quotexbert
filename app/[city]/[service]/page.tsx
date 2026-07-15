@@ -294,7 +294,7 @@ export default async function LocalServicePage({ params }: Props) {
 
           <a
             href="/#get-estimate"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-rose-700 to-orange-600 text-white text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            className="inline-block px-8 py-4 bg-[#800020] text-white text-lg font-bold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
           >
             🚀 Get Free Instant Estimate
           </a>
@@ -374,7 +374,7 @@ export default async function LocalServicePage({ params }: Props) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-rose-700 to-orange-600">
+      <section className="py-16 bg-[#800020]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
             Ready to Get Your Free Estimate?

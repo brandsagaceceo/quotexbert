@@ -116,7 +116,7 @@ export default function ShowcasePage() {
             <div className="flex gap-3">
               <Link 
                 href="/sign-in"
-                className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-2 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 transition-all"
+                className="bg-[#800020] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#600018] transition-all"
               >
                 Sign In
               </Link>
@@ -475,7 +475,7 @@ export default function ShowcasePage() {
         </div>
 
         {/* Call to Action */}
-        <div className="mt-12 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl p-8 text-white text-center">
+        <div className="mt-12 bg-[#800020] rounded-xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Explore?</h2>
           <p className="text-orange-100 mb-6">Experience the complete job marketplace with all features working seamlessly</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

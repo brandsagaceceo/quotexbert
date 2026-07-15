@@ -94,7 +94,7 @@ function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; s
     );
   }
   return (
-    <div className={`${sizeClass} rounded-full flex items-center justify-center font-bold flex-shrink-0 ring-2 ring-white bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-sm`}>
+    <div className={`${sizeClass} rounded-full flex items-center justify-center font-bold flex-shrink-0 ring-2 ring-white bg-[#800020] text-white shadow-sm`}>
       {initial}
     </div>
   );
@@ -665,15 +665,18 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
             // Show "Seen" only under the last outgoing message that has been read by recipient
             const isLastOutgoing = isMine && (!items.slice(idx + 1).some(i => i.type === "msg" && i.msg.fromUser.id === currentUserId));
             const seenByRecipient = isLastOutgoing && !!msg.readAt;
+            // Entrance motion applies only to the newest bubble; keyed by msg.id so
+            // existing nodes never re-animate during polling.
+            const isLastMessage = idx === items.length - 1;
             return (
-              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group ${isFirstInGroup ? "mt-3" : "mt-0.5"}`}>
+              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group ${isFirstInGroup ? "mt-3" : "mt-0.5"} ${isLastMessage ? "animate-message-in" : ""}`}>
                 <div className={`w-8 flex-shrink-0 ${showAvatar ? "" : "invisible"}`}>
                   <Avatar user={msg.fromUser} size="sm" />
                 </div>
                   <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[70%] lg:max-w-[520px]`}>
                   <div className={`px-3 sm:px-4 py-2.5 rounded-xl text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 w-full ${
                     isMine
-                      ? "bg-rose-700 text-white rounded-br-md"
+                      ? "bg-[#800020] text-white rounded-br-md"
                       : "bg-white border border-slate-200 text-slate-800 rounded-bl-md shadow-sm"
                   }`}>
                     {msg.body}
@@ -683,7 +686,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
                       {formatTime(msg.createdAt)}
                     </span>
                     {seenByRecipient && (
-                      <span className="text-[10px] text-rose-500 font-semibold flex items-center gap-0.5">
+                      <span className="text-[10px] text-[#800020] font-semibold flex items-center gap-0.5">
                         <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
                           <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
                         </svg>
@@ -789,7 +792,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
                       setInstantSending(false);
                     }
                   }}
-                  className="px-3 py-1.5 bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-700 hover:to-orange-600 text-white text-xs font-semibold rounded-lg transition-all shadow-sm disabled:opacity-60 flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-[#800020] hover:bg-[#600018] text-white text-xs font-semibold rounded-lg transition-all shadow-sm disabled:opacity-60 flex items-center gap-1.5"
                 >
                   {instantSending ? (
                     <>
@@ -928,7 +931,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 active:from-rose-700 active:to-orange-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all duration-150 shadow-md hover:shadow-lg"
+            className="w-10 h-10 flex-shrink-0 bg-[#800020] hover:bg-[#600018] active:bg-[#500014] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all duration-150 shadow-md hover:shadow-lg"
           >
             {sending ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

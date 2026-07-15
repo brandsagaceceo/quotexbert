@@ -68,7 +68,7 @@ export default function RenovationCostTemplate({ page }: Props) {
 
       <div className="min-h-screen bg-white">
         {/* Hero */}
-        <div className="bg-gradient-to-r from-rose-600 to-orange-600 text-white py-16 px-4">
+        <div className="bg-[#800020] text-white py-16 px-4">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-4 text-rose-200">
               <MapPin className="w-4 h-4" />

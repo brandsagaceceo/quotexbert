@@ -355,13 +355,13 @@ export default function ContractorsJoinPage() {
                 }`}
               >
                 {plan.highlighted && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-block bg-gradient-to-r from-rose-700 to-orange-600 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-block bg-[#800020] text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
                     ⭐ MOST POPULAR
                   </span>
                 )}
                 <h3 className="text-xl font-bold text-slate-900 mt-2">{plan.name}</h3>
                 <div className="flex items-end gap-1 my-2">
-                  <span className="text-3xl font-bold bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">{plan.price}</span>
+                  <span className="text-3xl font-bold text-[#800020]">{plan.price}</span>
                   <span className="text-slate-500 text-sm mb-1">/ {plan.period}</span>
                 </div>
                 <ul className="space-y-2 my-5">
@@ -376,7 +376,7 @@ export default function ContractorsJoinPage() {
                   href={plan.href}
                   className={`block w-full text-center py-2.5 rounded-xl font-semibold transition ${
                     plan.highlighted
-                      ? "bg-gradient-to-r from-rose-700 to-orange-600 hover:from-rose-800 hover:to-orange-700 text-white shadow-lg"
+                      ? "bg-[#800020] hover:bg-[#600018] text-white shadow-lg"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-900"
                   }`}
                 >
@@ -400,7 +400,7 @@ export default function ContractorsJoinPage() {
               <thead>
                 <tr className="bg-slate-800 text-white">
                   <th className="text-left px-4 py-3 rounded-tl-xl">Feature</th>
-                  <th className="px-4 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white font-bold">
+                  <th className="px-4 py-3 bg-[#800020] text-white font-bold">
                     QuoteXbert
                   </th>
                   <th className="px-4 py-3">HomeStars</th>

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = "force-dynamic";
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { formatBudgetDisplay } from '@/lib/currency';
 
 export async function GET(req: Request) {
   try {
@@ -114,7 +115,7 @@ export async function GET(req: Request) {
       id: app.lead.id,
       title: app.lead.title,
       description: app.lead.description,
-      budget: app.lead.budget,
+      budget: formatBudgetDisplay(app.lead.budget),
       location: 'Toronto Area',
       status: app.status,
       acceptedAt: app.updatedAt.toISOString(),
@@ -130,7 +131,7 @@ export async function GET(req: Request) {
       id: acc.lead.id,
       title: acc.lead.title,
       description: acc.lead.description,
-      budget: acc.lead.budget,
+      budget: formatBudgetDisplay(acc.lead.budget),
       location: 'Toronto Area',
       status: acc.status,
       acceptedAt: acc.updatedAt.toISOString(),

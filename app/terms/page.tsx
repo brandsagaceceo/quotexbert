@@ -259,7 +259,7 @@ export default function TermsOfServicePage() {
         <div className="mt-12 pt-8 border-t border-gray-200 text-center">
           <Link 
             href="/"
-            className="inline-block bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-all"
+            className="inline-block bg-[#800020] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#600018] transition-all"
           >
             Back to Home
           </Link>

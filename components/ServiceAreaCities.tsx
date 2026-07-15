@@ -28,7 +28,7 @@ export function ServiceAreaCities() {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-100 to-orange-100 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full mb-4">
             <MapPinIcon className="w-5 h-5 text-rose-600" />
             <span className="text-sm font-bold text-rose-900">SERVING THE GTA</span>
           </div>
@@ -47,7 +47,7 @@ export function ServiceAreaCities() {
               className={`
                 px-5 py-2.5 rounded-full font-semibold text-sm transition-all
                 ${city.highlight
-                  ? "bg-gradient-to-r from-rose-600 to-orange-600 text-white shadow-md hover:shadow-lg hover:scale-105"
+                  ? "bg-[#800020] text-white shadow-md hover:shadow-lg hover:scale-105"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:scale-105"
                 }
                 cursor-default

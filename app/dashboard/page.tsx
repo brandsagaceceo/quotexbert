@@ -1,4 +1,4 @@
-﻿// LIVE PRODUCTION ROUTE — /dashboard
+// LIVE PRODUCTION ROUTE — /dashboard
 // Generic role-agnostic dashboard. Used as landing page after onboarding role selection.
 // For the full contractor experience → /contractor/dashboard
 // For the full homeowner experience → /homeowner/dashboard
@@ -18,7 +18,7 @@ export default function DashboardPage() {
           <p className="text-gray-600 mb-6">Please sign in to access your dashboard</p>
           <Link 
             href="/sign-in"
-            className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-orange-700 hover:to-red-700 transition-all"
+            className="bg-[#800020] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#600018] transition-all"
           >
             Sign In
           </Link>
@@ -46,7 +46,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/create-lead"
-              className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-4 rounded-lg font-medium hover:from-orange-700 hover:to-red-700 transition-all text-center block"
+              className="bg-[#800020] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#600018] transition-all text-center block"
             >
                Post New Job
             </Link>

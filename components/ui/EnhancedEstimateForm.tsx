@@ -32,13 +32,11 @@ export function EnhancedEstimateForm({ onEstimateComplete }: EnhancedEstimateFor
 
   const handleVoiceRecording = (audioBlob: Blob, transcript: string) => {
     setVoiceTranscript(transcript);
-    console.log("Voice recording completed:", { audioBlob, transcript });
   };
 
   const handleImageUpload = (newImages: File[], previews: string[]) => {
     setImages(newImages);
     setImagePreviews(previews);
-    console.log("Images uploaded:", newImages);
   };
 
   const generateEstimate = async () => {

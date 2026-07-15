@@ -79,8 +79,8 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
             {/* Icon */}
             <div className="flex justify-center pt-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-orange-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-              <div className="relative bg-gradient-to-br from-rose-500 to-orange-500 rounded-full p-5">
+              <div className="absolute inset-0 bg-[#800020] rounded-full blur-xl opacity-50 animate-pulse"></div>
+              <div className="relative bg-[#800020] rounded-full p-5">
                 <Camera className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </div>
             </div>
@@ -119,7 +119,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold py-4 sm:py-5 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
+                className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-4 sm:py-5 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
               >
                 📸 Upload Photos → Get Free Estimate
               </button>

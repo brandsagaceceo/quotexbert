@@ -1254,7 +1254,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Start Your Toronto Renovation with Confidence</h3>
         <p class="text-slate-700 mb-4">Get an instant AI-powered estimate for your project in under 3 minutes. No phone calls, no site visits, no pressure - just accurate baseline pricing based on thousands of real GTA renovations.</p>
-        <a href="/" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -1393,7 +1393,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Experience AI-Powered Estimates for Your Toronto Project</h3>
         <p class="text-slate-700 mb-4">See how accurate AI technology is for your specific renovation. Get instant baseline pricing, then compare with quotes from verified GTA contractors.</p>
-        <a href="/" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate Now</a>
+        <a href="/" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate Now</a>
       </div>
     </div>
   `,
@@ -1731,7 +1731,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Find Verified Toronto Contractors for Your Project</h3>
         <p class="text-slate-700 mb-4">Every contractor on QuoteXbert has passed our 7-step verification: business license, WSIB, insurance, background check, references, and portfolio review. Get quotes from pre-vetted GTA professionals.</p>
-        <a href="/" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Browse Verified Contractors</a>
+        <a href="/" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Browse Verified Contractors</a>
       </div>
     </div>
   `,
@@ -2114,7 +2114,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-orange-50 border-l-4 border-orange-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Get Transparent Renovation Pricing for Your Toronto Project</h3>
         <p class="text-slate-700 mb-4">QuoteXbert's AI estimates include permits, disposal, and common hidden costs that contractors miss. Get an accurate picture of total project costs before committing.</p>
-        <a href="/" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Complete Cost Breakdown</a>
+        <a href="/" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Complete Cost Breakdown</a>
       </div>
     </div>  `,
 
@@ -2199,7 +2199,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Get Your Free Bathroom Renovation Estimate in Durham Region</h3>
         <p class="text-slate-700 mb-4">Upload photos of your bathroom, describe your project, and get an instant AI estimate calibrated to your Durham city. Then connect with verified local contractors — free for homeowners.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -2263,7 +2263,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Should You Finish Your Durham Region Basement?</h3>
         <p class="text-slate-700 mb-4">Get a free AI estimate in minutes. Know exactly what your basement renovation will cost in your Durham city — before talking to a single contractor.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free Basement Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free Basement Estimate</a>
       </div>
     </div>
   `,
@@ -2328,7 +2328,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Get Your Free AI Renovation Estimate</h3>
         <p class="text-slate-700 mb-4">Stop guessing what your renovation should cost. Get an AI-powered estimate calibrated to your Durham Region city in minutes — free for homeowners.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -2413,7 +2413,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Work with Contractors Who Handle Durham Permits</h3>
         <p class="text-slate-700 mb-4">QuoteXbert-connected contractors are familiar with Durham Region permit requirements and include permit applications as part of their service. Get a free AI estimate today.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -2499,7 +2499,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Find Verified Contractors in Durham Region</h3>
         <p class="text-slate-700 mb-4">QuoteXbert verifies every contractor's licence, insurance, WSIB, background, and references before listing them. Get a free AI estimate, then connect with verified Durham Region contractors.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -2600,7 +2600,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Start Your Ontario Renovation on the Right Foot</h3>
         <p class="text-slate-700 mb-4">Get a free AI estimate calibrated to your Ontario region. Then connect with verified, licensed contractors who serve your area. Free for homeowners.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,
@@ -2672,7 +2672,7 @@ export const blogContent: Record<string, string> = {
       <div class="bg-rose-50 border-l-4 border-rose-600 p-6 my-8">
         <h3 class="text-lg font-bold text-slate-900 mb-2">Not Sure Which to Renovate? Get an AI Estimate for Both</h3>
         <p class="text-slate-700 mb-4">QuoteXbert can generate AI estimates for kitchen AND bathroom renovations for your specific Durham Region home. Compare the costs and make a data-driven decision.</p>
-        <a href="/create-lead" class="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-rose-700 hover:to-orange-700 transition-all">Get Free AI Estimate</a>
+        <a href="/create-lead" class="inline-block bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all">Get Free AI Estimate</a>
       </div>
     </div>
   `,

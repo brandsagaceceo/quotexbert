@@ -370,7 +370,7 @@ export default function ContractorPortfolioPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white text-sm font-bold rounded-xl disabled:opacity-60 transition-colors"
+                    className="flex-1 py-2.5 bg-[#800020] hover:bg-[#600018] text-white text-sm font-bold rounded-xl disabled:opacity-60 transition-colors"
                   >
                     {submitting ? 'Saving…' : 'Post to Portfolio'}
                   </button>

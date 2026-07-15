@@ -133,7 +133,7 @@ export default function HomeownerDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)]" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
+    <div className="min-h-screen bg-gray-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)]" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
@@ -147,19 +147,19 @@ export default function HomeownerDashboard() {
 
         {/* First-time onboarding banner */}
         {statsLoaded && stats.postedJobs === 0 && (
-          <div className="mb-8 bg-gradient-to-r from-rose-600 to-orange-600 rounded-2xl p-6 text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mb-8 bg-[#800020] rounded-2xl p-6 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xl">🏠</span>
                 <h2 className="text-lg font-bold">Ready to start your renovation?</h2>
               </div>
-              <p className="text-sm text-rose-100 leading-snug">
+              <p className="text-sm text-white/80 leading-snug">
                 Post your project and get quotes from verified local contractors — it only takes 2 minutes.
               </p>
             </div>
             <Link
               href="/create-lead"
-              className="flex-shrink-0 bg-white hover:bg-gray-50 text-rose-700 font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+              className="flex-shrink-0 bg-white hover:bg-gray-50 text-[#800020] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm hover:shadow whitespace-nowrap"
             >
               Post a Job →
             </Link>
@@ -213,12 +213,12 @@ export default function HomeownerDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
               href="/create-lead"
-              className="flex items-center gap-4 p-4 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+              className="flex items-center gap-4 p-4 bg-[#800020] text-white rounded-xl hover:bg-[#600018] transition-colors"
             >
               <Briefcase className="w-8 h-8" />
               <div>
                 <div className="font-bold text-lg">Post a Project</div>
-                <div className="text-sm text-rose-100">Get quotes from contractors</div>
+                <div className="text-sm text-white/80">Get quotes from contractors</div>
               </div>
             </Link>
 

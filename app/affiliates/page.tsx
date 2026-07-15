@@ -52,10 +52,10 @@ export default function AffiliatePage() {
         <div className="max-w-7xl mx-auto px-4 pb-16">
           {/* Hero Section with Image */}
           <div className="text-center mb-16">
-            <div className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-full font-bold shadow-lg">
+            <div className="inline-block mb-6 px-6 py-3 bg-[#800020] text-white rounded-full font-bold shadow-lg">
               ✨ AFFILIATE PROGRAM
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-rose-900 via-orange-700 to-amber-900 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-5xl md:text-6xl font-black mb-6 text-[#800020] leading-tight">
               Earn Recurring Income
               <br />
               Referring Contractors
@@ -81,19 +81,19 @@ export default function AffiliatePage() {
 
           {/* How It Works */}
           <div className="bg-white rounded-3xl p-8 md:p-12 mb-16 shadow-2xl border-2 border-orange-100">
-            <h2 className="text-4xl font-black bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent mb-12 text-center">
+            <h2 className="text-4xl font-black text-[#800020] mb-12 text-center">
               How It Works
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-rose-700 to-rose-800 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <div className="bg-[#800020] text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   1
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-slate-900">Share Your Link</h3>
                 <p className="text-slate-600">Get your unique referral link from your dashboard and share it with contractors</p>
               </div>
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-rose-600 to-orange-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <div className="bg-[#800020] text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   2
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-slate-900">They Subscribe</h3>
@@ -107,7 +107,7 @@ export default function AffiliatePage() {
                 <p className="text-slate-600">You automatically earn 20% of their subscription fees for 12 full months</p>
               </div>
               <div className="text-center group">
-                <div className="bg-gradient-to-br from-orange-600 to-orange-700 text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <div className="bg-[#800020] text-white rounded-2xl w-16 h-16 flex items-center justify-center text-2xl font-black mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   4
                 </div>
                 <h3 className="font-bold text-xl mb-3 text-slate-900">Get Paid</h3>
@@ -118,14 +118,14 @@ export default function AffiliatePage() {
 
           {/* Earning Potential Table */}
           <div className="mb-16">
-            <h2 className="text-4xl font-black text-center mb-4 bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-transparent">Your Income Potential</h2>
+            <h2 className="text-4xl font-black text-center mb-4 text-[#800020]">Your Income Potential</h2>
             <p className="text-center text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
               Real numbers. Real income. Based on average contractor subscription of $149/month.
             </p>
             <div className="bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-orange-100">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-rose-700 to-orange-600 text-white">
+                  <thead className="bg-[#800020] text-white">
                     <tr>
                       <th className="px-6 py-5 text-left font-bold text-base">Contractors</th>
                       <th className="px-6 py-5 text-left font-bold text-base">Their Revenue</th>
@@ -146,7 +146,7 @@ export default function AffiliatePage() {
                       <td className="px-6 py-5 font-bold text-rose-700 text-lg">$298/mo</td>
                       <td className="px-6 py-5 font-bold text-slate-900">$3,576/yr</td>
                     </tr>
-                    <tr className="bg-gradient-to-r from-rose-50 to-orange-50 hover:from-rose-100 hover:to-orange-100 transition-colors">
+                    <tr className="bg-rose-50 hover:bg-rose-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-lg">25 contractors ⭐</td>
                       <td className="px-6 py-5 text-slate-700 font-semibold">$3,725/mo</td>
                       <td className="px-6 py-5 font-black text-rose-700 text-xl">$745/mo</td>
@@ -161,7 +161,7 @@ export default function AffiliatePage() {
                     <tr className="bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-colors">
                       <td className="px-6 py-5 font-black text-slate-900 text-xl">100 contractors 🚀</td>
                       <td className="px-6 py-5 text-slate-700 font-bold text-lg">$14,900/mo</td>
-                      <td className="px-6 py-5 font-black text-transparent bg-gradient-to-r from-rose-700 to-orange-600 bg-clip-text text-2xl">$2,980/mo</td>
+                      <td className="px-6 py-5 font-black text-[#800020] text-2xl">$2,980/mo</td>
                       <td className="px-6 py-5 font-black text-slate-900 text-xl">$35,760/yr</td>
                     </tr>
                   </tbody>
@@ -177,19 +177,19 @@ export default function AffiliatePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
             <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">💰</div>
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">High Commission Rate</h3>
+              <h3 className="text-xl font-semibold text-[#800020] mb-3">High Commission Rate</h3>
               <p className="text-slate-600">20% commission on all contractor subscriptions - earn consistent recurring revenue</p>
             </div>
             
             <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📈</div>
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Recurring Revenue</h3>
+              <h3 className="text-xl font-semibold text-[#800020] mb-3">Recurring Revenue</h3>
               <p className="text-slate-600">Earn from each contractor for 12 months - true passive income potential</p>
             </div>
             
             <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="text-3xl mb-4">📊</div>
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Real-Time Tracking</h3>
+              <h3 className="text-xl font-semibold text-[#800020] mb-3">Real-Time Tracking</h3>
               <p className="text-slate-600">Dashboard with live stats, earnings, and detailed analytics</p>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function AffiliatePage() {
                 <div className="flex flex-col gap-3">
                   <a
                     href="/affiliate-dashboard"
-                    className="bg-gradient-to-r from-rose-600 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all text-center"
+                    className="bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all text-center"
                   >
                     Go to Dashboard →
                   </a>
@@ -246,7 +246,7 @@ export default function AffiliatePage() {
                   <button
                     type="submit"
                     disabled={isJoining}
-                    className="bg-gradient-to-r from-red-800 to-orange-600 hover:from-red-900 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap text-white"
+                    className="bg-[#800020] hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap text-white"
                   >
                     {isJoining ? "Joining..." : "Join Program"}
                   </button>
@@ -260,22 +260,22 @@ export default function AffiliatePage() {
             <h2 className="text-3xl font-bold text-center mb-8 text-slate-900">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How much can I earn?</h3>
+                <h3 className="text-lg font-semibold text-[#800020] mb-3">How much can I earn?</h3>
                 <p className="text-slate-600">With 20% commission, your earnings depend on how many contractors you refer. Our top affiliates earn $2,000+ monthly.</p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">When do I get paid?</h3>
+                <h3 className="text-lg font-semibold text-[#800020] mb-3">When do I get paid?</h3>
                 <p className="text-slate-600">Monthly payments on the 15th via direct deposit or PayPal. Minimum payout threshold is $50.</p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">How long do I earn from referrals?</h3>
+                <h3 className="text-lg font-semibold text-[#800020] mb-3">How long do I earn from referrals?</h3>
                 <p className="text-slate-600">You earn 20% commission for 12 months from each contractor you refer.</p>
               </div>
               
               <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-red-800 to-orange-600 bg-clip-text text-transparent mb-3">Is there a cost to join?</h3>
+                <h3 className="text-lg font-semibold text-[#800020] mb-3">Is there a cost to join?</h3>
                 <p className="text-slate-600">No cost to join. No monthly fees. You just earn commission on successful referrals.</p>
               </div>
             </div>

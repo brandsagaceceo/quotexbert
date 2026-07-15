@@ -35,7 +35,6 @@ export default function PhotoUploadFixed({
   // Initialize from photos prop (for base64 images from home page estimate)
   useEffect(() => {
     if (!initializedFromProps && photos && photos.length > 0) {
-      console.log('PhotoUploadFixed: Initializing with', photos.length, 'photos from props');
       
       // Convert base64/URL photos to PhotoItem format
       const items: PhotoItem[] = photos.map((photoUrl, index) => ({
@@ -140,7 +139,6 @@ export default function PhotoUploadFixed({
       
       // Skip if already uploaded (loaded from props)
       if (item.uploadedUrl && !item.uploadedUrl.startsWith('blob:')) {
-        console.log('Skipping upload for already-uploaded photo:', item.id);
         continue;
       }
       
@@ -303,7 +301,7 @@ export default function PhotoUploadFixed({
         />
         
         <div className="flex flex-col items-center">
-          <div className="bg-gradient-to-r from-rose-100 to-orange-100 p-4 rounded-full mb-4">
+          <div className="bg-rose-50 p-4 rounded-full mb-4">
             <Upload className="w-8 h-8 text-rose-600" />
           </div>
           
@@ -319,7 +317,7 @@ export default function PhotoUploadFixed({
                 openFileSelector();
               }}
               disabled={disabled}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg font-medium hover:from-rose-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-[#800020] text-white rounded-lg font-medium hover:bg-[#600018] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-4 h-4" />
               Choose Files

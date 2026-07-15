@@ -55,7 +55,7 @@ export default function SharedEstimatePage() {
           <p className="text-slate-600 mb-6">This estimate may have expired or been removed.</p>
           <Link
             href="/"
-            className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition"
+            className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition"
           >
             Get Your Own Estimate
           </Link>
@@ -72,7 +72,7 @@ export default function SharedEstimatePage() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-2xl font-black">
-            <span className="bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent">
+            <span className="text-[#800020]">
               QuoteXbert
             </span>
           </Link>
@@ -90,7 +90,7 @@ export default function SharedEstimatePage() {
         {/* Shared Estimate Card */}
         <div className="bg-white rounded-2xl shadow-2xl border-2 border-orange-200 overflow-hidden">
           {/* Card Header */}
-          <div className="bg-gradient-to-r from-rose-600 to-orange-600 p-8 text-white">
+          <div className="bg-[#800020] p-8 text-white">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-6 h-6" />
               <span className="text-sm font-semibold uppercase tracking-wide opacity-90">
@@ -120,7 +120,7 @@ export default function SharedEstimatePage() {
               <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">
                 Estimated Cost
               </p>
-              <p className="text-5xl md:text-6xl font-black bg-gradient-to-r from-rose-600 to-orange-600 bg-clip-text text-transparent mb-4">
+              <p className="text-5xl md:text-6xl font-black text-[#800020] mb-4">
                 {estimateRange}
               </p>
               <p className="text-sm text-slate-600">
@@ -140,7 +140,7 @@ export default function SharedEstimatePage() {
                   AI-powered renovation estimates for Toronto & GTA
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#800020] flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function SharedEstimatePage() {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-12 bg-gradient-to-r from-rose-600 to-orange-600 rounded-2xl p-8 text-white text-center shadow-xl">
+        <div className="mt-12 bg-[#800020] rounded-2xl p-8 text-white text-center shadow-xl">
           <h2 className="text-2xl md:text-3xl font-black mb-3">
             Get Your Own AI Renovation Estimate
           </h2>

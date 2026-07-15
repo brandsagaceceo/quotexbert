@@ -161,7 +161,7 @@ export default function BestROIRenovationsDurhamPage() {
               <span className="font-semibold text-gray-900">Ranked by Return on Investment — Durham Region 2025</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
+              <span className="text-[#800020]">
                 Best ROI Renovations<br />in Durham Region
               </span>
             </h1>
@@ -170,7 +170,7 @@ export default function BestROIRenovationsDurhamPage() {
               Ranked by ROI percentage with real cost and value data for Oshawa, Whitby, Ajax, Pickering, and Clarington.
             </p>
             <div className="pt-4">
-              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
+              <Link href="/create-lead" className="inline-flex items-center gap-2 bg-[#800020] text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-lg">
                 📸 Get My Free AI Estimate <ArrowRight className="w-5 h-5" />
               </Link>
               <p className="text-sm text-gray-500 mt-3">Free · No commitment · Takes 2 minutes</p>
@@ -241,7 +241,7 @@ export default function BestROIRenovationsDurhamPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
+      <section className="py-16 bg-[#800020] text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Know Your Renovation ROI Before You Start</h2>
           <p className="text-rose-100 text-lg mb-8">Get a free AI estimate to understand your renovation cost — then calculate your ROI with confidence. Free for Durham Region homeowners.</p>

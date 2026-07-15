@@ -54,7 +54,7 @@ export default function TorontoRenovationQuotesPage() {
             </p>
 
             {/* CTA Block */}
-            <div className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 rounded-2xl p-8 text-white mb-8 shadow-2xl">
+            <div className="bg-[#800020] rounded-2xl p-8 text-white mb-8 shadow-2xl">
               <h2 className="text-3xl font-bold mb-4">Get Your Free Renovation Quote in Minutes</h2>
               <p className="text-lg mb-6 opacity-95">
                 Upload a photo of your space or describe your project. Our AI instantly estimates costs based on real Toronto market rates.
@@ -178,7 +178,7 @@ export default function TorontoRenovationQuotesPage() {
               
               <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
                 <table className="w-full text-left">
-                  <thead className="bg-gradient-to-r from-rose-900 to-orange-600 text-white">
+                  <thead className="bg-[#800020] text-white">
                     <tr>
                       <th className="p-4 font-bold">Factor</th>
                       <th className="p-4 font-bold">Traditional Quotes</th>
@@ -275,7 +275,7 @@ export default function TorontoRenovationQuotesPage() {
             </section>
 
             {/* Final CTA */}
-            <section className="bg-gradient-to-r from-rose-900 via-rose-700 to-orange-600 rounded-2xl p-8 text-white text-center shadow-2xl">
+            <section className="bg-[#800020] rounded-2xl p-8 text-white text-center shadow-2xl">
               <h2 className="text-3xl font-bold mb-4">Ready to Get Your Toronto Renovation Quote?</h2>
               <p className="text-lg mb-6 opacity-95">
                 Stop wondering about costs. Upload a photo, describe your project, and get an instant AI estimate based on real Toronto market data.

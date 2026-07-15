@@ -68,7 +68,7 @@ export default function RenovationCostsHubPage() {
       />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-rose-700 to-orange-600 text-white py-14 px-4">
+      <section className="bg-[#800020] text-white py-14 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-rose-200 text-sm font-semibold uppercase tracking-widest mb-3">
             Toronto & GTA · 2026 Pricing
@@ -270,7 +270,7 @@ export default function RenovationCostsHubPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-2xl p-8 text-center">
+        <section className="bg-[#800020] text-white rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-3">
             Get a Personalized AI Estimate
           </h2>

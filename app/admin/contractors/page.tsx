@@ -218,7 +218,7 @@ export default function AdminVerificationPage() {
             <button
               onClick={sendBroadcast}
               disabled={broadcastLoading}
-              className="bg-gradient-to-r from-orange-600 to-rose-600 hover:from-orange-700 hover:to-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow"
+              className="bg-[#800020] hover:bg-[#600018] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-2.5 rounded-lg transition-all shadow"
             >
               {broadcastLoading ? '⏳ Sending...' : '🚀 Send Signup Email to Contractors'}
             </button>

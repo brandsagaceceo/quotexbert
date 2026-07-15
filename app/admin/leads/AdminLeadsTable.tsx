@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatBudgetDisplay } from "@/lib/currency";
 
 interface Lead {
   id: string;
@@ -98,7 +99,7 @@ export default function AdminLeadsTable({ leads }: AdminLeadsTableProps) {
                     {lead.zipCode}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${lead.budget.toLocaleString()}
+                    {formatBudgetDisplay(lead.budget)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span

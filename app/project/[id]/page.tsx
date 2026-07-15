@@ -383,7 +383,7 @@ export default function ProjectDetailPage() {
                 {project.status !== "posted" && project.status !== "completed" && (
                   <button
                     onClick={handlePostToBoard}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all font-semibold shadow-md hover:shadow-lg"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#800020] text-white rounded-lg hover:bg-[#600018] transition-all font-semibold shadow-md hover:shadow-lg"
                   >
                     <Upload className="w-5 h-5" />
                     Post to Job Board

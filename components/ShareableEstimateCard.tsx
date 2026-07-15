@@ -63,7 +63,7 @@ export function ShareableEstimateCard({ estimate }: ShareableEstimateCardProps) 
         <h3 className="text-lg font-bold text-gray-900">Share This Estimate</h3>
         <button
           onClick={() => setShowShareMenu(!showShareMenu)}
-          className="flex items-center gap-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all"
+          className="flex items-center gap-2 bg-[#800020] text-white px-4 py-2 rounded-lg hover:bg-[#600018] transition-all"
         >
           <Share2 className="w-4 h-4" />
           Share

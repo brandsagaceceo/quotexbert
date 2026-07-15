@@ -120,7 +120,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
         </p>
         <a
           href="/"
-          className="inline-block bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-shadow"
+          className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-shadow"
         >
           Get Your First Estimate
         </a>
@@ -148,7 +148,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
               className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow"
             >
               {/* Project Image */}
-              <div className="relative h-48 bg-gradient-to-br from-rose-100 to-orange-100">
+              <div className="relative h-48 bg-rose-50">
                 {allImages.length > 0 ? (
                   <Image
                     src={allImages[0]}
@@ -220,7 +220,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
                     <button
                       onClick={() => handlePostToBoard(project)}
                       disabled={isPosting}
-                      className="flex-1 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-2 px-3 rounded-lg hover:shadow-lg transition-shadow text-sm flex items-center justify-center gap-1 disabled:opacity-50"
+                      className="flex-1 bg-[#800020] text-white font-bold py-2 px-3 rounded-lg hover:shadow-lg transition-shadow text-sm flex items-center justify-center gap-1 disabled:opacity-50"
                     >
                       <ArrowUpCircle className="w-4 h-4" />
                       Post to Board

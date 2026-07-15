@@ -41,7 +41,7 @@ export default function ProfileHeader({
         <div className="flex flex-row gap-4 items-start md:flex-row">
           {/* Avatar */}
           <div className="relative flex-shrink-0 group">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-rose-100 to-orange-100 border-2 border-white shadow-md">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-rose-50 border-2 border-white shadow-md">
               {profile.profilePhoto ? (
                 <img 
                   src={profile.profilePhoto} 
@@ -49,7 +49,7 @@ export default function ProfileHeader({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-700 to-orange-600">
+                <div className="w-full h-full flex items-center justify-center bg-[#800020]">
                   <User className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
               )}
@@ -107,7 +107,7 @@ export default function ProfileHeader({
                 {!isEditing ? (
                   <button
                     onClick={onEditToggle}
-                    className="touch-target px-4 py-2 bg-gradient-to-r from-rose-700 to-orange-600 text-white rounded-lg font-medium text-sm hover:from-rose-800 hover:to-orange-700 transition-all flex items-center gap-2"
+                    className="touch-target px-4 py-2 bg-[#800020] text-white rounded-lg font-medium text-sm hover:bg-[#600018] transition-all flex items-center gap-2"
                   >
                     <Edit3 className="w-4 h-4" />
                     <span className="hidden sm:inline">Edit</span>

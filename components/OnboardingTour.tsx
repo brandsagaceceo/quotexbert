@@ -279,7 +279,7 @@ export default function OnboardingTour({ role }: { role: "homeowner" | "contract
           )}
           <button
             onClick={next}
-            className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-bold shadow-lg hover:opacity-90 transition-opacity"
+            className="flex-1 py-2.5 rounded-xl bg-[#800020] text-white text-sm font-bold shadow-lg hover:opacity-90 transition-opacity"
           >
             {isLast ? "Let's go! 🚀" : "Next →"}
           </button>
