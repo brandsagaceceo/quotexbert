@@ -28,12 +28,33 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+// Keep the visible stack small so toasts don't pile up and clutter the screen.
+const MAX_VISIBLE_TOASTS = 3;
+
+// Low-priority (success/info) toasts should clear themselves quickly; errors are
+// important and stay until the user dismisses them, unless the caller overrides.
+const DEFAULT_DURATION_BY_TYPE: Record<ToastType, number> = {
+  success: 4000,
+  info: 4000,
+  warning: 6000,
+  error: 0,
+};
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   const showToast = useCallback((message: string, type: ToastType, options?: ToastOptions) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    setToasts(prev => [...prev, { id, message, type, ...options }]);
+    setToasts(prev => {
+      // Dedup: don't stack an identical message+type that's already showing.
+      if (prev.some(t => t.message === message && t.type === type)) {
+        return prev;
+      }
+      const id = Math.random().toString(36).substr(2, 9);
+      const duration = options?.duration !== undefined ? options.duration : DEFAULT_DURATION_BY_TYPE[type];
+      const next = [...prev, { id, message, type, ...options, duration }];
+      // Drop the oldest toast(s) once we exceed the visible cap.
+      return next.length > MAX_VISIBLE_TOASTS ? next.slice(next.length - MAX_VISIBLE_TOASTS) : next;
+    });
   }, []);
 
   const success = useCallback((message: string, options?: ToastOptions) => showToast(message, 'success', options), [showToast]);

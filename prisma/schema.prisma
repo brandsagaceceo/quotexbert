@@ -49,6 +49,12 @@ model User {
   notifyMessageInApp   Boolean @default(true)
   notifyMarketingEmail Boolean @default(false)
 
+  // Daily/weekly digest cadence preference — independent of the immediate
+  // per-event toggles above. "daily" | "weekly" | "off".
+  digestFrequency        String    @default("daily")
+  lastContractorDigestAt DateTime?
+  lastHomeownerDigestAt  DateTime?
+
   // Affiliate tracking — set when contractor subscribes via referral link
   referredByAffiliateId String?
 

@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logEventServer } from "@/lib/analytics";
+import { sendContractorHiredEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +25,9 @@ export async function POST(
     // Get the lead
     const lead = await prisma.lead.findUnique({
       where: { id },
+      include: {
+        homeowner: { select: { name: true } },
+      },
     });
 
     if (!lead) {
@@ -42,7 +46,7 @@ export async function POST(
     // The caller may pass a Clerk user ID or a DB UUID — handle both paths.
     const contractorUser = await prisma.user.findFirst({
       where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
-      select: { id: true },
+      select: { id: true, email: true, name: true },
     });
     const dbContractorId = contractorUser?.id ?? contractorId;
 
@@ -63,6 +67,19 @@ export async function POST(
       leadId: id,
       homeownerId: lead.homeownerId,
     });
+
+    // Notify the contractor by email that they were hired — non-blocking (chat gap fix)
+    if (contractorUser?.email) {
+      try {
+        await sendContractorHiredEmail(
+          { id: contractorUser.id, email: contractorUser.email, name: contractorUser.name },
+          { name: lead.homeowner?.name },
+          { id: lead.id, title: lead.title, category: lead.category, city: lead.zipCode },
+        );
+      } catch (emailError) {
+        console.error("Failed to send contractor hired email (non-fatal):", emailError);
+      }
+    }
 
     return NextResponse.json({
       success: true,

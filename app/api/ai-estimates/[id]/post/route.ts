@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 import { NotificationService } from '@/lib/notifications';
 
 const prisma = new PrismaClient();
@@ -10,7 +11,21 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    
+
+    // Require an authenticated homeowner and verify they own this estimate — otherwise
+    // any signed-in user could post (and thus read back) someone else's estimate photos.
+    const { userId: clerkUserId } = await auth();
+    if (!clerkUserId) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+    const requester = await prisma.user.findFirst({
+      where: { OR: [{ id: clerkUserId }, { clerkUserId }] },
+      select: { id: true },
+    });
+
     // Fetch the estimate with selected items and homeowner profile
     const estimate = await prisma.aIEstimate.findUnique({
       where: { id },
@@ -37,6 +52,13 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'No homeowner associated with this estimate. Please sign in and try again.' },
         { status: 400 }
+      );
+    }
+
+    if (!requester || requester.id !== estimate.homeownerId) {
+      return NextResponse.json(
+        { success: false, error: 'You do not have permission to post this estimate.' },
+        { status: 403 }
       );
     }
 
@@ -101,6 +123,31 @@ export async function POST(
     const categories = estimate.items.map(item => item.category);
     const primaryCategory = categories[0] || 'General Contractor';
 
+    // Get visualization URL + reviewed photo list from the request body, if provided.
+    const body = await request.json().catch(() => ({}));
+    const visualizationUrl = body.visualizationUrl || null;
+
+    // Photo carryover: the AI estimate's own uploaded photos (estimate.images, persisted
+    // server-side at estimate-save time — see app/api/ai-estimates/save/route.ts) are the
+    // default source of truth. The homeowner may review/edit that set client-side before
+    // posting (add/remove) and send the final list back as `photos` — if present, that
+    // list wins since it reflects the homeowner's edits. Either way we never rely on
+    // localStorage or client-only state for the final job's photos.
+    let finalPhotos: string[];
+    if (Array.isArray(body.photos)) {
+      finalPhotos = body.photos.filter((p: unknown): p is string => typeof p === 'string').slice(0, 10);
+    } else {
+      try {
+        const estimateImages = JSON.parse(estimate.images || '[]');
+        finalPhotos = Array.isArray(estimateImages) ? estimateImages.filter((p: unknown): p is string => typeof p === 'string') : [];
+      } catch {
+        finalPhotos = [];
+      }
+    }
+    if (visualizationUrl && !finalPhotos.includes(visualizationUrl)) {
+      finalPhotos = [...finalPhotos, visualizationUrl];
+    }
+
     // Create the lead (job post)
     const lead = await prisma.lead.create({
       data: {
@@ -112,12 +159,9 @@ export async function POST(
         status: 'open',
         published: true,
         homeownerId: estimate.homeownerId,
+        photos: JSON.stringify(finalPhotos),
       },
     });
-
-    // Get visualization image URL from request body if provided
-    const body = await request.json().catch(() => ({}));
-    const visualizationUrl = body.visualizationUrl || null;
 
     // Update the estimate with the lead ID and status
     const updatedEstimate = await prisma.aIEstimate.update({
@@ -128,17 +172,6 @@ export async function POST(
         isPublic: true,
       },
     });
-
-    // If visualization URL provided, update the lead with it
-    if (visualizationUrl) {
-      await prisma.lead.update({
-        where: { id: lead.id },
-        data: {
-          // Store visualization in photos field (JSON array)
-          photos: JSON.stringify([visualizationUrl]),
-        },
-      });
-    }
 
     // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
     try {
@@ -158,6 +191,7 @@ export async function POST(
         // Only include city when we have a concrete string value
         ...(city ? { city } : {}),
         createdAt: lead.createdAt.toISOString(),
+        isSeeded: lead.isSeeded,
       });
     } catch (notificationError) {
       console.error('Failed to notify contractors, but job was posted:', notificationError);

@@ -138,13 +138,16 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   animation: slide-in-right 0.3s ease-out;
 }
 
+/* NOTE: intentionally uses translateY, not scale() — a scale() transform on a
+   modal can be misread by mobile browsers as a viewport zoom gesture and cause
+   the page to visually "jump" zoom level on open. */
 @keyframes scale-in {
   from {
-    transform: scale(0.9);
+    transform: translateY(8px);
     opacity: 0;
   }
   to {
-    transform: scale(1);
+    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -287,15 +290,15 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   animation: shimmer 2s infinite;
 }
 
-/* Fade out animation */
+/* Fade out animation — translateY instead of scale() to avoid mobile zoom artifacts */
 @keyframes fade-out {
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: scale(0.95);
+    transform: translateY(-4px);
   }
 }
 

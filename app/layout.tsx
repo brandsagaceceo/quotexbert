@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -128,6 +128,18 @@ export const metadata: Metadata = {
   verification: {
     google: "your-google-verification-code-here",
   },
+};
+
+// Single source of truth for the viewport tag — Next.js injects this once into <head>.
+// width=device-width + initialScale=1 avoids any default browser zoom on load; allowing
+// user pinch-zoom (no maximumScale:1 / userScalable:false) for accessibility, while
+// viewportFit=cover lets safe-area-inset-* CSS env() vars work correctly in the Capacitor shell.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

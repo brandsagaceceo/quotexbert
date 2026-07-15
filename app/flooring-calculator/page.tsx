@@ -65,7 +65,7 @@ export default function FlooringCalculatorPage() {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
-                  <select value={city} onChange={(e) => setCity(e.target.value)} className="w-full p-3 border border-gray-200 rounded-lg text-sm">
+                  <select value={city} onChange={(e) => setCity(e.target.value)} className="w-full p-3 border border-gray-200 rounded-lg text-base">
                     {CITIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
                 </div>

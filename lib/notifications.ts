@@ -99,6 +99,25 @@ export class NotificationService {
         throw new Error("User not found");
       }
 
+      // Dedup: skip creating (and re-emailing) a notification that already exists for this
+      // user/type/lead combo within the last 24h. Prevents duplicate LEAD_MATCHED notifications
+      // if notifyAllContractors is ever triggered twice for the same lead.
+      if (payload.leadId) {
+        const existing = await prisma.notification.findFirst({
+          where: {
+            userId,
+            type,
+            createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+            payload: { path: ['leadId'], equals: payload.leadId },
+          },
+          select: { id: true },
+        });
+        if (existing) {
+          console.log(`[NOTIFY] Skipping duplicate ${type} notification for user ${userId}, lead ${payload.leadId}`);
+          return existing;
+        }
+      }
+
       // Create better title and message based on type
       let title = payload.title || `New ${type.replace('_', ' ')}`;
       let message = payload.message || `You have a new ${type.replace('_', ' ').toLowerCase()}`;
@@ -145,7 +164,13 @@ export class NotificationService {
     category?: string;
     /** ISO timestamp — used for urgency labelling in email */
     createdAt?: string;
+    /** true = demo/seed lead — must never generate visible in-app or email alerts */
+    isSeeded?: boolean;
   }): Promise<void> {
+    if (jobDetails.isSeeded) {
+      console.log(`[LEADS] Skipping notifications for seeded/demo lead ${jobDetails.leadId}`);
+      return;
+    }
     try {
       // Fetch all active contractors with their subscriptions for category filtering
       const allContractors = await prisma.user.findMany({

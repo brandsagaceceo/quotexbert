@@ -70,13 +70,13 @@ export default function ExampleEstimates() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-block mb-4 px-4 py-2 bg-rose-100 text-rose-900 rounded-full text-sm font-bold">
-            SEE HOW IT WORKS
+            SAMPLE ESTIMATES
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-            Real Estimate Examples
+            Sample AI Estimate Breakdown
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            See the level of detail our AI provides. No vague ranges—actual line items, materials, and labor breakdowns.
+            Illustrative examples of the level of detail our AI provides. No vague ranges—actual line items, materials, and labor breakdowns.
           </p>
         </div>
 

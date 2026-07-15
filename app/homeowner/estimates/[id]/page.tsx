@@ -9,6 +9,8 @@ import {
   Send,
   AlertCircle,
   Sparkles,
+  X,
+  ImagePlus,
 } from 'lucide-react';
 import ExplainQuoteModal from '@/components/ExplainQuoteModal';
 import PriceConfidenceIndicator from '@/components/PriceConfidenceIndicator';
@@ -40,6 +42,7 @@ interface Estimate {
   status: string;
   isPublic: boolean;
   createdAt: string;
+  images?: string;
   items: EstimateItem[];
   leadId?: string;
   lead?: {
@@ -59,6 +62,11 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
   const [error, setError] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [unwrappedParams, setUnwrappedParams] = useState<{ id: string } | null>(null);
+  // Photo carryover: the AI estimate's uploaded photos, prefilled from estimate.images.
+  // The homeowner can review/add/remove before posting to the job board.
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
 
   useEffect(() => {
     params.then(setUnwrappedParams);
@@ -87,6 +95,13 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
             foundEstimate.items.filter((item: EstimateItem) => item.selected).map((item: EstimateItem) => item.id)
           );
           setSelectedItems(selected);
+          // Prefill photos from the estimate's persisted images (server-side URLs, not localStorage)
+          try {
+            const parsedImages = JSON.parse(foundEstimate.images || '[]');
+            setPhotos(Array.isArray(parsedImages) ? parsedImages.filter((p: unknown) => typeof p === 'string') : []);
+          } catch {
+            setPhotos([]);
+          }
         } else {
           setError('Estimate not found');
         }
@@ -186,12 +201,14 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
         throw new Error('Failed to save selections');
       }
 
-      // Post to job board
+      // Post to job board — include the (possibly edited) photo list so the final
+      // Lead carries the same photos the homeowner reviewed here.
       const response = await fetch(`/api/ai-estimates/${estimate.id}/post`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ photos }),
       });
 
       const data = await response.json();
@@ -208,6 +225,43 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
       setError('Failed to post to job board. Please check your connection and try again.');
     } finally {
       setPosting(false);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPhotos = async (files: FileList | null) => {
+    if (!files || files.length === 0 || !user?.id) return;
+    setPhotoError(null);
+    setUploadingPhotos(true);
+    try {
+      const remainingSlots = Math.max(0, 10 - photos.length);
+      const filesToUpload = Array.from(files).slice(0, remainingSlots);
+      if (filesToUpload.length === 0) {
+        setPhotoError('Maximum of 10 photos reached.');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('userId', user.id);
+      formData.append('type', 'leads');
+      filesToUpload.forEach((file) => formData.append('photos', file));
+
+      const response = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to upload photos');
+      }
+
+      const uploadedUrls: string[] = Array.isArray(data.files) ? data.files : [];
+      setPhotos((prev) => [...prev, ...uploadedUrls]);
+    } catch (err) {
+      console.error('Error uploading photos:', err);
+      setPhotoError(err instanceof Error ? err.message : 'Failed to upload photos');
+    } finally {
+      setUploadingPhotos(false);
     }
   };
 
@@ -418,6 +472,56 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
             ))}
           </div>
         </div>
+
+        {/* Photos — carried over from the AI estimate; reviewable/editable before posting */}
+        {(photos.length > 0 || !isPosted) && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Photos</h3>
+            {photos.length === 0 && isPosted ? null : (
+              <>
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {photos.map((url, index) => (
+                    <div key={`${url}-${index}`} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt={`Project photo ${index + 1}`} className="w-full h-full object-cover" />
+                      {!isPosted && (
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(index)}
+                          aria-label={`Remove photo ${index + 1}`}
+                          className="absolute top-1 right-1 w-6 h-6 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {!isPosted && photos.length < 10 && (
+                    <label className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 hover:border-rose-400 flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:text-rose-600 transition-colors">
+                      <ImagePlus className="w-6 h-6 mb-1" />
+                      <span className="text-[11px] font-medium">{uploadingPhotos ? 'Uploading…' : 'Add photo'}</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple
+                        className="hidden"
+                        disabled={uploadingPhotos}
+                        onChange={(e) => {
+                          handleAddPhotos(e.target.files);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+                {photos.length === 0 && (
+                  <p className="text-sm text-gray-500">No photos yet — this is optional and posting will work fine without any.</p>
+                )}
+                {photoError && <p className="text-sm text-red-600 mt-1">{photoError}</p>}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Selected Items Summary & Post Button */}
         {!isPosted && (

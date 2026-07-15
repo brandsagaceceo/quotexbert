@@ -211,6 +211,19 @@ export default function MessagesPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threads, searchParams]);
 
+  // Body-scroll lock: while a thread is open, only the message list inside Chat
+  // should scroll — the page behind it must stay locked so it can't be scrolled
+  // out from under the chat (this was the "chat feels unstable" bug on mobile).
+  // Restored automatically when the thread is closed or this page unmounts.
+  useEffect(() => {
+    if (!selectedThread) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [selectedThread]);
+
   // Phase 2: Bridge + quotes — runs whenever the selected thread changes.
   // Calls the bridge API to find/create a Conversation for this Thread's lead,
   // then fetches any existing quotes. Only fires when a contractor is assigned.
@@ -519,15 +532,15 @@ export default function MessagesPage() {
           </div>
         </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-6 flex-1 min-h-0 overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
-          <div className={`lg:col-span-4 xl:col-span-3 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
-            <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
+          <div className={`lg:w-[340px] xl:w-[380px] lg:flex-shrink-0 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
-              <div className="p-3 sm:p-5 border-b border-gray-200 flex-shrink-0">
+              <div className="p-3 sm:p-5 border-b border-slate-200 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-slate-900">Conversations</h2>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-rose-600 to-orange-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-rose-700 flex items-center justify-center">
                     <ChatBubbleLeftRightIcon className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -537,6 +550,7 @@ export default function MessagesPage() {
                   <input
                     type="text"
                     placeholder="Search conversations..."
+                    aria-label="Search conversations"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all duration-200 placeholder-slate-400"
@@ -621,7 +635,7 @@ export default function MessagesPage() {
                         <>
                           <p className="font-semibold text-slate-800">No conversations yet</p>
                           <p className="text-sm mt-1 text-slate-400 leading-snug">Post a job to connect with<br/>verified local contractors</p>
-                          <Link href="/create-lead" className="mt-4 inline-block px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all shadow-sm">
+                          <Link href="/create-lead" className="mt-4 inline-block px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
                             Post a Job
                           </Link>
                         </>
@@ -629,7 +643,7 @@ export default function MessagesPage() {
                         <>
                           <p className="font-semibold text-slate-800">No conversations yet</p>
                           <p className="text-sm mt-1 text-slate-400 leading-snug">Accept a job lead to start<br/>messaging homeowners</p>
-                          <Link href="/contractor/jobs" className="mt-4 inline-block px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white text-sm font-semibold rounded-lg hover:from-rose-700 hover:to-orange-700 transition-all shadow-sm">
+                          <Link href="/contractor/jobs" className="mt-4 inline-block px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
                             Browse Jobs
                           </Link>
                         </>
@@ -650,12 +664,12 @@ export default function MessagesPage() {
                         <div
                           key={thread.id}
                           onClick={() => selectThread(thread)}
-                          className={`group relative p-3 cursor-pointer rounded-xl transition-all duration-150 active:scale-[0.99] ${
+                          className={`group relative p-3.5 cursor-pointer rounded-xl border-b border-slate-100 last:border-b-0 transition-all duration-150 active:scale-[0.99] ${
                             isSelected
-                              ? 'bg-rose-100 border-l-4 border-rose-600 shadow-md'
+                              ? 'bg-rose-50 border-l-4 border-l-rose-700 shadow-sm'
                               : (thread.unreadCount ?? 0) > 0
-                                ? 'bg-gradient-to-r from-rose-50/90 to-slate-50 border-l-4 border-rose-500 shadow-sm ring-1 ring-rose-100'
-                                : 'hover:bg-slate-50 border-l-4 border-transparent'
+                                ? 'bg-rose-50/50 border-l-4 border-l-rose-400 hover:bg-rose-50/80'
+                                : 'hover:bg-slate-50 border-l-4 border-l-transparent'
                           }`}
                         >
                           {/* Delete Button — always visible on mobile, hover-reveal on desktop */}
@@ -666,55 +680,53 @@ export default function MessagesPage() {
                             }}
                             className="absolute top-3 right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 w-7 h-7 rounded-md bg-red-100 hover:bg-red-500 text-red-500 hover:text-white flex items-center justify-center transition-all duration-200 z-20"
                             title="Delete conversation"
+                            aria-label={`Delete conversation with ${getDisplayName(otherUser)}`}
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                           </button>
 
-                          <div className="flex items-start space-x-3">
+                          <div className="flex items-start gap-3">
                             {/* Avatar with unread dot */}
                             <div className="relative flex-shrink-0">
                               <ConvAvatar user={otherUser} />
                               {(thread.unreadCount ?? 0) > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1.5 bg-rose-600 rounded-full flex items-center justify-center shadow-sm">
+                                <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1.5 bg-rose-700 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white">
                                   <span className="text-[10px] font-bold text-white leading-none">
                                     {(thread.unreadCount ?? 0) > 9 ? '9+' : thread.unreadCount}
                                   </span>
                                 </span>
                               )}
-                              {(thread.unreadCount ?? 0) > 0 && !isSelected && (
-                                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
-                              )}
                             </div>
                             
                             {/* Content */}
-                            <div className="flex-1 min-w-0 pr-8">
-                              <div className="flex items-center justify-between gap-1">
+                            <div className="flex-1 min-w-0 pr-7">
+                              <div className="flex items-center justify-between gap-2">
                                 <p className={`text-sm truncate leading-tight ${
                                   (thread.unreadCount ?? 0) > 0
-                                    ? 'font-extrabold text-slate-900'
+                                    ? 'font-bold text-slate-900'
                                     : 'font-medium text-slate-600'
                                 }`}>
                                   {getDisplayName(otherUser)}
                                 </p>
                                 {lastMessage && (
-                                  <span className={`text-xs flex-shrink-0 ${
-                                    (thread.unreadCount ?? 0) > 0 ? 'text-rose-500 font-semibold' : 'text-slate-400'
+                                  <span className={`text-[11px] flex-shrink-0 ${
+                                    (thread.unreadCount ?? 0) > 0 ? 'text-rose-600 font-semibold' : 'text-slate-400'
                                   }`}>
                                     {formatTime(lastMessage.createdAt)}
                                   </span>
                                 )}
                               </div>
 
-                              <p className={`text-xs truncate ${
+                              <p className={`text-xs truncate mt-0.5 ${
                                 (thread.unreadCount ?? 0) > 0 ? 'text-slate-600 font-medium' : 'text-slate-400'
                               }`}>
                                 {thread.lead.title}
                               </p>
 
                               {lastMessage ? (
-                                <p className={`text-xs mt-0.5 line-clamp-1 leading-relaxed ${
+                                <p className={`text-xs mt-1 line-clamp-1 leading-relaxed ${
                                   (thread.unreadCount ?? 0) > 0
                                     ? 'text-slate-800 font-semibold'
                                     : 'text-slate-400'
@@ -736,9 +748,9 @@ export default function MessagesPage() {
           </div>
 
           {/* Modern Chat Area */}
-          <div className={`lg:col-span-8 xl:col-span-9 flex-col min-h-0 overflow-hidden ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
+          <div className={`lg:flex-1 flex-col min-h-0 overflow-hidden ${selectedThread ? 'flex' : 'hidden lg:flex'}`}>
             {selectedThread ? (
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col overflow-hidden relative z-10 h-full min-h-0">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative z-10 h-full min-h-0">
 
                 {/* Phase 2: Generate Quote — contractor only, requires contractor assigned to lead */}
                 {user?.role === 'contractor' && selectedThread?.lead?.contractor?.id && (
@@ -947,7 +959,7 @@ export default function MessagesPage() {
                         <p className="text-slate-500 max-w-xs mx-auto leading-relaxed text-sm">
                           Describe your project and get quotes from verified contractors in your area.
                         </p>
-                        <Link href="/create-lead" className="mt-5 inline-block px-5 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-semibold rounded-lg text-sm hover:from-rose-700 hover:to-orange-700 transition-all shadow-md">
+                        <Link href="/create-lead" className="mt-5 inline-block px-5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm">
                           Post Your First Job
                         </Link>
                       </>
@@ -957,16 +969,16 @@ export default function MessagesPage() {
                         <p className="text-slate-500 max-w-xs mx-auto leading-relaxed text-sm">
                           Accept a lead to open a conversation with the homeowner.
                         </p>
-                        <Link href="/contractor/jobs" className="mt-5 inline-block px-5 py-2.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-semibold rounded-lg text-sm hover:from-rose-700 hover:to-orange-700 transition-all shadow-md">
+                        <Link href="/contractor/jobs" className="mt-5 inline-block px-5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm">
                           Browse Available Jobs
                         </Link>
                       </>
                     )
                   ) : (
                     <>
-                      <h3 className="text-xl font-semibold text-slate-700 mb-2">Select a Conversation</h3>
+                      <h3 className="text-xl font-semibold text-slate-700 mb-2">No Conversation Selected</h3>
                       <p className="text-slate-500 max-w-sm mx-auto leading-relaxed text-sm">
-                        Choose a conversation from the sidebar to start messaging.
+                        Choose a project conversation from the sidebar to view messages.
                       </p>
                     </>
                   )}

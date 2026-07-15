@@ -68,6 +68,18 @@ function getProfilePhoto(user: UserProfile | null | undefined): string | null {
   return user.contractorProfile?.profilePhoto || user.homeownerProfile?.profilePhoto || null;
 }
 
+// Presentation-only label map for the existing `thread.lead.status` field
+// (values already supported by the schema: draft | open | reviewing | assigned | completed | closed).
+// Purely visual — does not affect any business logic.
+const LEAD_STATUS_META: Record<string, { label: string; className: string }> = {
+  draft: { label: "Draft", className: "bg-slate-100 text-slate-600" },
+  open: { label: "Open", className: "bg-blue-50 text-blue-700" },
+  reviewing: { label: "Reviewing", className: "bg-amber-50 text-amber-700" },
+  assigned: { label: "Contractor Accepted", className: "bg-emerald-50 text-emerald-700" },
+  completed: { label: "Completed", className: "bg-slate-100 text-slate-600" },
+  closed: { label: "Closed", className: "bg-slate-100 text-slate-500" },
+};
+
 function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; size?: "sm" | "md" }) {
   const photo = getProfilePhoto(user);
   const name = getDisplayName(user);
@@ -118,6 +130,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
   const lastMessageIdRef = useRef<string | null>(null);
   const hasMarkedReadRef = useRef(false);
   const isFirstRenderRef = useRef(true);
@@ -461,6 +474,24 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const formatTime = (ts: string) =>
     new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+  // Composer auto-grow: expands to fit content up to COMPOSER_MAX_HEIGHT, then scrolls
+  // internally instead of growing further. Keeps the chat layout stable on long messages.
+  const COMPOSER_MIN_HEIGHT = 44;
+  const COMPOSER_MAX_HEIGHT = 140;
+  const resizeComposer = useCallback(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const next = Math.min(Math.max(el.scrollHeight, COMPOSER_MIN_HEIGHT), COMPOSER_MAX_HEIGHT);
+    el.style.height = `${next}px`;
+    el.style.overflowY = el.scrollHeight > COMPOSER_MAX_HEIGHT ? "auto" : "hidden";
+  }, []);
+
+  // Re-measure whenever the message text changes (typing, clearing after send, AI enhance, etc.)
+  useEffect(() => {
+    resizeComposer();
+  }, [newMessage, resizeComposer]);
+
   // Guard: parent should prevent rendering without currentUserId, but catch it safely.
   // Placed AFTER all hooks to satisfy React Rules of Hooks.
   if (!currentUserId) {
@@ -507,12 +538,12 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden">
       {/* Header — compact on mobile */}
-      <div className="flex-shrink-0 px-3 sm:px-5 py-2 sm:py-3.5 border-b border-gray-100 bg-white flex items-center justify-between shadow-sm">
+      <div className="flex-shrink-0 px-3 sm:px-5 py-2.5 sm:py-3.5 border-b border-slate-200 bg-white flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition-colors flex-shrink-0"
+              className="lg:hidden w-9 h-9 -ml-1 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition-colors flex-shrink-0"
               aria-label="Back to conversations"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -525,7 +556,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
               <Avatar user={otherUser} size="md" />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900 truncate leading-tight group-hover:text-rose-700 transition-colors">{getDisplayName(otherUser)}</p>
-                <p className="text-xs text-rose-500 font-medium">View Profile →</p>
+                <p className="text-xs text-rose-600 font-medium group-hover:underline">View Profile →</p>
               </div>
             </Link>
           ) : (
@@ -537,6 +568,15 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
               </div>
             </>
           )}
+          {thread.lead.status && LEAD_STATUS_META[thread.lead.status] && (() => {
+            const statusMeta = LEAD_STATUS_META[thread.lead.status];
+            if (!statusMeta) return null;
+            return (
+              <span className={`hidden sm:inline-flex items-center flex-shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusMeta.className}`}>
+                {statusMeta.label}
+              </span>
+            );
+          })()}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Delete chat */}
@@ -544,7 +584,8 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
             <button
               onClick={() => setShowDeleteConfirm(true)}
               title="Delete chat"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              aria-label="Delete conversation"
+              className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -581,10 +622,10 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
       {/* Messages — single primary scroll container */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 pt-4 min-h-0 space-y-1 overscroll-contain"
+        className="flex-1 overflow-y-auto px-4 pt-4 min-h-0 overscroll-contain"
         style={{
           scrollbarWidth: "thin",
-          scrollbarColor: "#f97316 #f9fafb",
+          scrollbarColor: "#e11d48 #f9fafb",
           paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -595,52 +636,54 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
       >
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-16">
-            <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <p className="text-sm font-semibold text-gray-700">Start the conversation</p>
-            <p className="text-xs text-gray-400 mt-1">Say hello to {getDisplayName(otherUser)}</p>
+            <p className="text-sm font-semibold text-slate-700">No messages yet</p>
+            <p className="text-xs text-slate-400 mt-1 max-w-[220px] leading-relaxed">
+              Start the conversation about {thread.lead.title ? `"${thread.lead.title}"` : "this project"} with {getDisplayName(otherUser)}.
+            </p>
           </div>
         ) : (
           items.map((item, idx) => {
             if (item.type === "sep") {
               return (
-                <div key={item.key} className="flex items-center gap-3 my-5">
-                  <hr className="flex-1 border-gray-100" />
-                  <span className="text-[11px] text-gray-400 font-medium px-2 whitespace-nowrap">{formatDateSeparator(item.date)}</span>
-                  <hr className="flex-1 border-gray-100" />
+                <div key={item.key} className="flex items-center justify-center my-4">
+                  <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full">{formatDateSeparator(item.date)}</span>
                 </div>
               );
             }
             const { msg } = item;
             const isMine = msg.fromUser.id === currentUserId;
+            const prevItem = items[idx - 1];
             const nextItem = items[idx + 1];
             const showAvatar = !nextItem || nextItem.type === "sep" || (nextItem.type === "msg" && nextItem.msg.fromUser.id !== msg.fromUser.id);
+            const isFirstInGroup = !prevItem || prevItem.type === "sep" || (prevItem.type === "msg" && prevItem.msg.fromUser.id !== msg.fromUser.id);
             // Show "Seen" only under the last outgoing message that has been read by recipient
             const isLastOutgoing = isMine && (!items.slice(idx + 1).some(i => i.type === "msg" && i.msg.fromUser.id === currentUserId));
             const seenByRecipient = isLastOutgoing && !!msg.readAt;
             return (
-              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group`}>
+              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group ${isFirstInGroup ? "mt-3" : "mt-0.5"}`}>
                 <div className={`w-8 flex-shrink-0 ${showAvatar ? "" : "invisible"}`}>
                   <Avatar user={msg.fromUser} size="sm" />
                 </div>
-                  <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[80%] sm:max-w-[72%]`}>
-                  <div className={`px-3 sm:px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words whitespace-pre-wrap shadow-sm min-w-0 w-full ${
+                  <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[70%] lg:max-w-[520px]`}>
+                  <div className={`px-3 sm:px-4 py-2.5 rounded-xl text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 w-full ${
                     isMine
-                      ? "bg-gradient-to-br from-rose-500 to-orange-500 text-white rounded-br-sm"
-                      : "bg-gray-100 text-gray-900 rounded-bl-sm"
+                      ? "bg-rose-700 text-white rounded-br-md"
+                      : "bg-white border border-slate-200 text-slate-800 rounded-bl-md shadow-sm"
                   }`}>
                     {msg.body}
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className={`text-[10px] text-gray-400 transition-opacity ${seenByRecipient ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                    <span className={`text-[10px] text-slate-400 transition-opacity ${seenByRecipient ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`}>
                       {formatTime(msg.createdAt)}
                     </span>
                     {seenByRecipient && (
-                      <span className="text-[10px] text-rose-400 font-semibold flex items-center gap-0.5">
+                      <span className="text-[10px] text-rose-500 font-semibold flex items-center gap-0.5">
                         <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
                           <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
                         </svg>
@@ -656,11 +699,11 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
 
         {/* Typing indicator */}
         {otherUserTyping && (
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-2 mt-3">
             <Avatar user={otherUser} size="sm" />
-            <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl rounded-bl-md px-4 py-3 flex items-center gap-1 shadow-sm">
               {[0, 150, 300].map((delay) => (
-                <div key={delay} className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                <div key={delay} className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
                   style={{ animationDelay: `${delay}ms` }} />
               ))}
             </div>
@@ -786,23 +829,23 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
         )}
 
         {sendError && (
-          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600">
+          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600" role="alert">
             <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-9v4h2V9H9zm0-4v2h2V5H9z" clipRule="evenodd" />
             </svg>
             <span className="flex-1">{sendError}</span>
-            <button onClick={() => setSendError(null)} className="ml-auto text-red-400 hover:text-red-600">✕</button>
+            <button onClick={() => setSendError(null)} aria-label="Dismiss error" className="ml-auto text-red-400 hover:text-red-600">✕</button>
           </div>
         )}
 
         {/* AI Reply Assistant — error banner */}
         {aiEnhanceError && (
-          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+          <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700" role="alert">
             <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             <span className="flex-1">{aiEnhanceError}</span>
-            <button onClick={() => setAiEnhanceError(null)} className="ml-auto text-amber-500 hover:text-amber-700">✕</button>
+            <button onClick={() => setAiEnhanceError(null)} aria-label="Dismiss AI error" className="ml-auto text-amber-500 hover:text-amber-700">✕</button>
           </div>
         )}
 
@@ -813,14 +856,15 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
               <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" />
             </svg>
             <span className="flex-1">✨ AI enhanced — edit the message below then send</span>
-            <button type="button" onClick={() => setAiEnhanced(false)} className="text-violet-400 hover:text-violet-700">✕</button>
+            <button type="button" onClick={() => setAiEnhanced(false)} aria-label="Dismiss AI enhanced notice" className="text-violet-400 hover:text-violet-700">✕</button>
           </div>
         )}
 
         <form onSubmit={sendMessage} className="flex items-end gap-2">
           <textarea
+            ref={composerRef}
             value={newMessage}
-            rows={aiEnhanced ? 4 : 1}
+            rows={1}
             onChange={(e) => {
               setNewMessage(e.target.value);
               sendTyping("start");
@@ -841,7 +885,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
             }}
             placeholder={`Message ${getDisplayName(otherUser)}...`}
             className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder-gray-400 resize-none"
-            style={{ fontSize: '16px' }}
+            style={{ fontSize: '16px', minHeight: COMPOSER_MIN_HEIGHT, maxHeight: COMPOSER_MAX_HEIGHT, overflowY: 'hidden' }}
           />
           {/* AI sparkle button — always visible when AI is enabled.
                One-time session hint chip explains what it does. */}

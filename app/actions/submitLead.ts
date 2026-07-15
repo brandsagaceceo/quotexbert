@@ -485,6 +485,7 @@ export async function submitLead(formData: FormData) {
         city: data.postalCode,
         category: data.projectType,
         createdAt: lead.createdAt.toISOString(),
+        isSeeded: lead.isSeeded,
       });
       console.log(`[submitLead:${requestId}] Contractor notifications sent`);
     } catch (notificationError) {

@@ -235,14 +235,15 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
           }
         }
 
+        /* translateY instead of scale() — avoids mobile browsers misreading this as a viewport zoom gesture */
         @keyframes scale-in {
           from {
             opacity: 0;
-            transform: scale(0.95);
+            transform: translateY(8px);
           }
           to {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0);
           }
         }
 

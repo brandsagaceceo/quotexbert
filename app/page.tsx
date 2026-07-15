@@ -23,6 +23,28 @@ import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { useToast } from "@/components/ToastProvider";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import {
+  Sparkles,
+  Gift,
+  MapPin,
+  Bookmark,
+  Users,
+  Star,
+  CheckCircle2,
+  Tag,
+  Map,
+  Lock,
+  HeartHandshake,
+  Camera,
+  Calculator,
+  BarChart3,
+  Palette,
+  Search,
+  Briefcase,
+  TrendingUp,
+  BookOpen,
+  ArrowRight,
+} from "lucide-react";
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
@@ -219,32 +241,34 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
               {/* Left Column - Headline & Benefits - Mobile-Optimized */}
               <div className="text-center lg:text-left space-y-3 md:space-y-6">
-                <div className="inline-block mb-3 md:mb-6 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-rose-700 via-rose-600 to-orange-600 text-white rounded-full shadow-lg md:shadow-2xl animate-pulse-glow">
-                  <span className="text-xs md:text-sm lg:text-base font-bold">🤖 AI-POWERED ESTIMATES • FREE TO START</span>
+                <div className="inline-flex items-center gap-2 mb-4 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-600" strokeWidth={2} />
+                  <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Estimates · Free to Start</span>
                 </div>
                 
-                <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 md:mb-8 leading-tight animate-fade-in-up">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
                   <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
-                    Take a Photo.
+                    Get an AI Renovation
                   </span>
                   <br />
                   <span className="bg-gradient-to-r from-rose-900 via-red-800 to-orange-900 bg-clip-text text-transparent">
-                    Get Instant Price.
+                    Estimate Before You Hire
                   </span>
                 </h1>
 
-                <p className="text-lg md:text-2xl lg:text-3xl text-slate-700 mb-4 md:mb-10 leading-relaxed font-medium">
-                  <span className="text-rose-700 font-bold">Upload photos</span> of your project —
-                  get a real, contractor-style estimate in <span className="text-rose-700 font-bold">30 seconds</span>.
+                <p className="text-base md:text-xl lg:text-2xl text-slate-600 mb-6 md:mb-10 leading-relaxed">
+                  <span className="text-rose-700 font-semibold">Describe your project or upload photos</span> to get a
+                  detailed renovation cost range based on <span className="text-rose-700 font-semibold">Ontario pricing</span>.
                   Free for homeowners — quick free account required.
                 </p>
 
                 {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
                 <a
                   href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-black text-base py-4 px-6 rounded-2xl shadow-xl active:scale-95 transition-all mb-6"
+                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-700 hover:to-orange-700 text-white font-bold text-base py-4 px-6 rounded-2xl shadow-lg shadow-rose-600/25 active:scale-[0.98] transition-all mb-6"
                 >
-                  📸 Upload Photos — Free AI Estimate ↓
+                  <Camera className="w-5 h-5" strokeWidth={2} />
+                  Upload Photos — Free AI Estimate
                 </a>
 
                 {/* Mobile-only compact benefits (desktop shows full cards below) */}
@@ -254,75 +278,82 @@ export default function Home() {
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
                 </div>
 
-                {/* Key Benefits - Desktop only */}
-                <div className="hidden lg:block space-y-3 md:space-y-6 mb-6 md:mb-10">
-                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
-                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
-                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
+                {/* Trust Points - Desktop only */}
+                <div className="hidden lg:block space-y-2.5 md:space-y-3 mb-6 md:mb-10">
+                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
+                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center ring-1 ring-emerald-100">
+                      <Gift className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" strokeWidth={2} />
                     </div>
                     <div>
-                      <div className="font-bold text-base md:text-xl text-slate-900">Get Prices in 30 Seconds</div>
-                      <div className="text-slate-600 text-sm md:text-base">Detailed breakdown, not guesswork</div>
+                      <div className="font-semibold text-sm md:text-base text-slate-900">Free for Homeowners</div>
+                      <div className="text-slate-500 text-xs md:text-sm">No cost to get your estimate</div>
                     </div>
                   </Link>
 
-                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
-                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-700 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
-                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
+                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-rose-50 rounded-xl flex items-center justify-center ring-1 ring-rose-100">
+                      <MapPin className="w-5 h-5 md:w-6 md:h-6 text-rose-600" strokeWidth={2} />
                     </div>
                     <div>
-                      <div className="font-bold text-base md:text-xl text-slate-900">Just Upload Photos</div>
-                      <div className="text-slate-600 text-sm md:text-base">Or describe it—works both ways</div>
+                      <div className="font-semibold text-sm md:text-base text-slate-900">Ontario-Focused Pricing</div>
+                      <div className="text-slate-500 text-xs md:text-sm">Real Toronto, Durham &amp; GTA rates</div>
                     </div>
                   </Link>
 
-                  <Link href="#get-estimate" className="flex items-center gap-3 md:gap-4 text-left bg-white/60 backdrop-blur-sm p-3 md:p-5 rounded-xl md:rounded-2xl shadow-md md:shadow-lg hover:shadow-xl transition-all duration-300 card-hover cursor-pointer">
-                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-600 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg md:shadow-xl">
-                      <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
+                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-orange-50 rounded-xl flex items-center justify-center ring-1 ring-orange-100">
+                      <Bookmark className="w-5 h-5 md:w-6 md:h-6 text-orange-600" strokeWidth={2} />
                     </div>
                     <div>
-                      <div className="font-bold text-base md:text-xl text-slate-900">Real GTA &amp; Durham Prices</div>
-                      <div className="text-slate-600 text-sm md:text-base">Toronto, Durham Region &amp; surrounding area rates</div>
+                      <div className="font-semibold text-sm md:text-base text-slate-900">Save Estimates to Your Account</div>
+                      <div className="text-slate-500 text-xs md:text-sm">Revisit anytime after signing up</div>
+                    </div>
+                  </Link>
+
+                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
+                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center ring-1 ring-blue-100">
+                      <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" strokeWidth={2} />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm md:text-base text-slate-900">Connect With Contractors When Ready</div>
+                      <div className="text-slate-500 text-xs md:text-sm">No pressure — you&apos;re always in control</div>
                     </div>
                   </Link>
                 </div>
 
                 {/* Social Proof - Real faces + badges */}
-                <div className="flex flex-wrap gap-3 md:gap-4 justify-center lg:justify-start items-center">
+                <div className="flex flex-wrap gap-2.5 md:gap-3 justify-center lg:justify-start items-center">
                   {/* Stacked real homeowner faces */}
-                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-rose-200">
+                  <div className="flex items-center gap-2 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
                     <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover object-center border-2 border-white" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
+                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
                     </div>
-                    <span className="text-xs md:text-sm font-bold text-slate-700">500+ homeowners</span>
+                    <span className="text-xs md:text-sm font-semibold text-slate-700">500+ homeowners</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-3 md:px-5 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-amber-200">
-                    <span className="text-xs md:text-sm font-bold text-slate-700">⭐ Top Rated GTA</span>
+                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
+                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    <span className="text-xs md:text-sm font-semibold text-slate-700">Top Rated GTA</span>
                   </div>
-                  <div className="bg-white/90 backdrop-blur-sm px-3 md:px-5 py-1.5 md:py-2.5 rounded-full shadow-lg border-2 border-green-200">
-                    <span className="text-xs md:text-sm font-bold text-slate-700">✓ GTA Verified</span>
+                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA Verified</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Column - iPhone Estimator */}
-              <div className="lg:pl-8" id="estimator-tool" data-estimator>
-                <EstimatorMain 
-                  onEstimateComplete={handleEstimateComplete}
-                  userId={user?.id || undefined}
-                  isBlocked={isEstimatorBlocked}
-                  onBlocked={handleShowSignUpGate}
-                />
+              <div className="relative lg:pl-8">
+                <div className="hidden lg:block absolute -inset-6 bg-gradient-to-br from-rose-200/40 via-orange-200/30 to-transparent rounded-[2rem] blur-2xl -z-10" aria-hidden="true" />
+                <div id="estimator-tool" data-estimator>
+                  <EstimatorMain 
+                    onEstimateComplete={handleEstimateComplete}
+                    userId={user?.id || undefined}
+                    isBlocked={isEstimatorBlocked}
+                    onBlocked={handleShowSignUpGate}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -335,87 +366,53 @@ export default function Home() {
             <div className="relative overflow-hidden group">
               <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=1000&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Kitchen · $28k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Kitchen · $28k saved</span>
             </div>
             <div className="relative overflow-hidden group">
               <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=1000&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Bathroom · $9k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Bathroom · $9k saved</span>
             </div>
             <div className="relative overflow-hidden group">
               <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=1000&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Basement · $15k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Basement · $15k saved</span>
             </div>
             <div className="relative overflow-hidden group">
               <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=top&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 text-white text-xs font-bold drop-shadow">Exterior · $22k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Exterior · $22k saved</span>
             </div>
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
-          <div className="bg-rose-700 px-4 py-3 md:py-4 text-center">
-            <p className="text-white font-black text-sm md:text-lg">Real GTA &amp; Durham Region Homes. Real Savings.</p>
-            <p className="text-rose-200 text-xs md:text-sm mt-0.5">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white">before</strong> calling a contractor</p>
+          <div className="bg-gradient-to-r from-rose-800 to-rose-700 px-4 py-4 md:py-5 text-center">
+            <p className="text-white font-bold text-sm md:text-lg tracking-tight">Real GTA &amp; Durham Region Homes. Real Savings.</p>
+            <p className="text-rose-200 text-xs md:text-sm mt-1">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white font-semibold">before</strong> calling a contractor</p>
           </div>
         </section>
 
-        {/* Trust Strip - Added below hero */}
-        <section className="py-8 bg-white border-y border-gray-200">
+        {/* Trust Bar - compact facts, directly beneath hero */}
+        <section className="py-8 md:py-10 bg-white border-y border-slate-100">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {/* Badge 1 */}
-              <div className="flex items-center gap-3 justify-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-5 md:gap-6">
+              {[
+                { Icon: Gift, tint: "text-emerald-600 bg-emerald-50 ring-emerald-100", label: "Free for Homeowners", sub: "$0, always" },
+                { Icon: Tag, tint: "text-rose-600 bg-rose-50 ring-rose-100", label: "Ontario Renovation Pricing", sub: "Real regional rates" },
+                { Icon: Sparkles, tint: "text-purple-600 bg-purple-50 ring-purple-100", label: "AI-Powered Estimates", sub: "Instant & detailed" },
+                { Icon: Map, tint: "text-blue-600 bg-blue-50 ring-blue-100", label: "Durham Region & GTA", sub: "Toronto to Durham" },
+                { Icon: Lock, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Secure Accounts", sub: "Your data, protected" },
+                { Icon: HeartHandshake, tint: "text-amber-600 bg-amber-50 ring-amber-100", label: "No Obligation to Hire", sub: "Estimates are always free" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-3 justify-center group">
+                  <div className={`w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center flex-shrink-0 ring-1 transition-transform duration-200 group-hover:scale-105 ${item.tint}`}>
+                    <item.Icon className="w-5 h-5" strokeWidth={2} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-slate-900 text-xs md:text-sm">{item.label}</div>
+                    <div className="text-xs text-slate-500 hidden md:block">{item.sub}</div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ AI Estimates</div>
-                  <div className="text-xs text-gray-600 hidden md:block">Instant pricing</div>
-                </div>
-              </div>
-
-              {/* Badge 2 */}
-              <div className="flex items-center gap-3 justify-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Verified Contractors</div>
-                  <div className="text-xs text-gray-600 hidden md:block">Licensed pros</div>
-                </div>
-              </div>
-
-              {/* Badge 3 */}
-              <div className="flex items-center gap-3 justify-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Real Reviews</div>
-                  <div className="text-xs text-gray-600 hidden md:block">Verified feedback</div>
-                </div>
-              </div>
-
-              {/* Badge 4 */}
-              <div className="flex items-center gap-3 justify-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-rose-100 to-rose-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-gray-900 text-xs md:text-sm">✔ Toronto &amp; Durham Region</div>
-                  <div className="text-xs text-gray-600 hidden md:block">GTA &amp; Durham marketplace</div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -430,7 +427,7 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                 <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">🏙️ Toronto</h3>
                 <ul className="space-y-1.5 text-sm text-slate-600">
                   <li><Link href="/toronto" className="hover:text-rose-600 transition-colors">Toronto</Link></li>
@@ -440,7 +437,7 @@ export default function Home() {
                   <li><Link href="/renovation-estimates-east-york" className="hover:text-rose-600 transition-colors">East York</Link></li>
                 </ul>
               </div>
-              <div className="bg-white rounded-2xl border-2 border-rose-200 p-5 shadow-sm">
+              <div className="bg-white rounded-2xl border-2 border-rose-200 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                 <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">📍 Durham Region</h3>
                 <ul className="space-y-1.5 text-sm text-slate-600">
                   <li><Link href="/durham-region" className="hover:text-rose-600 transition-colors font-medium text-rose-700">Durham Region Hub</Link></li>
@@ -451,7 +448,7 @@ export default function Home() {
                   <li><Link href="/clarington" className="hover:text-rose-600 transition-colors">Clarington · Bowmanville · Newcastle</Link></li>
                 </ul>
               </div>
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                 <h3 className="font-black text-slate-900 mb-3 flex items-center gap-2 text-base">🌆 GTA</h3>
                 <ul className="space-y-1.5 text-sm text-slate-600">
                   <li><Link href="/renovation-estimates-mississauga" className="hover:text-rose-600 transition-colors">Mississauga</Link></li>
@@ -492,61 +489,6 @@ export default function Home() {
         {/* Quick-start paths — desktop only, homeowner-first */}
         {!estimateResult && (
           <div className="hidden md:block">
-          <section className="py-10 bg-gradient-to-br from-white to-orange-50">
-            <div className="max-w-4xl mx-auto px-4">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-black text-slate-900 mb-2">
-                  What would you like to do?
-                </h2>
-                <p className="text-base text-slate-600">
-                  Pick a tool to get started — homeowner tools are free (account required)
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
-                {/* Homeowner Path */}
-                <Link
-                  href="/#get-estimate"
-                  className="group bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl p-6 border-2 border-rose-200 hover:border-rose-400 hover:shadow-xl transition-all"
-                >
-                  <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">🏠</div>
-                  <h3 className="text-xl font-black text-slate-900 mb-2">Get a Project Quote</h3>
-                  <p className="text-slate-600 text-sm mb-4 leading-relaxed">
-                    Upload photos, get instant AI estimates, and connect with verified GTA contractors.
-                  </p>
-                  <div className="flex items-center gap-2 text-rose-700 font-bold text-sm group-hover:gap-4 transition-all">
-                    <span>Get My Estimate</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </Link>
-
-                {/* AI Inspector */}
-                <Link
-                  href="/ai-renovation-check"
-                  className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-4xl group-hover:scale-110 transition-transform">🔍</span>
-                      <div className="inline-block bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded-full">
-                        QUALITY CHECK
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-black text-slate-900 mb-2">AI Renovation Inspector</h3>
-                    <p className="text-slate-600 text-sm leading-snug">
-                      Upload photos — AI checks if the work looks correct and flags issues.
-                    </p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-purple-700 font-bold text-sm mt-4 group-hover:gap-2 transition-all">
-                    Try Free →
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </section>
-
           {/* Popular in the GTA — surfaces SEO pages */}
           <section className="py-14 bg-white border-t border-slate-100">
             <div className="max-w-5xl mx-auto px-4">
@@ -654,10 +596,116 @@ export default function Home() {
           </section>
         )}
 
-        {/* Example Estimates - Show Trust */}
+        {/* How It Works */}
+        <HowItWorksSection />
+
+        {/* Explore QuoteXbert — feature grid linking to existing tools */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-10 md:mb-12">
+              <div className="inline-flex items-center gap-1.5 mb-4 px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full">
+                <span className="text-xs font-semibold tracking-wide uppercase">Explore QuoteXbert</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-3 tracking-tight">
+                Everything You Need to Renovate Smarter
+              </h2>
+              <p className="text-base md:text-lg text-slate-500 max-w-2xl mx-auto">
+                One platform for AI estimates, cost guides, calculators, and contractor opportunities across Ontario.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+              {[
+                { href: "#get-estimate", Icon: Camera, label: "AI Renovation Estimate", desc: "Upload photos or describe your project for an instant cost range." },
+                { href: "/renovation-calculator", Icon: Calculator, label: "Renovation Calculators", desc: "Quick calculators for kitchens, bathrooms, basements & more." },
+                { href: "/renovation-costs", Icon: BarChart3, label: "Renovation Cost Guides", desc: "Detailed cost guides by city and project type." },
+                { href: "/visualizer", Icon: Palette, label: "AI Photo Visualizer", desc: "See what your space could look like before you renovate." },
+                { href: "/ai-renovation-check", Icon: Search, label: "AI Renovation Inspector", desc: "Upload photos and let AI flag potential quality issues." },
+                { href: "/contractor/jobs", Icon: Briefcase, label: "Find Contractor Opportunities", desc: "Contractors: browse renovation opportunities near you." },
+                { href: "/contractor-leads", Icon: TrendingUp, label: "Contractor Leads", desc: "See how QuoteXbert connects contractors with homeowners." },
+                { href: "/guides", Icon: BookOpen, label: "Learning Center", desc: "Guides, permit info, and ROI data for every project type." },
+              ].map((card) => (
+                <Link
+                  key={card.label}
+                  href={card.href}
+                  className="group bg-white rounded-2xl p-5 border border-slate-200 hover:border-rose-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+                >
+                  <div className="w-11 h-11 mb-4 rounded-xl bg-rose-50 flex items-center justify-center group-hover:bg-rose-100 transition-colors">
+                    <card.Icon className="w-5 h-5 text-rose-600" strokeWidth={2} />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 text-sm mb-1.5 leading-tight group-hover:text-rose-700 transition-colors">{card.label}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">{card.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Sample AI Estimates - Show Trust */}
         <Suspense fallback={<div className="py-12" />}>
           <ExampleEstimates />
         </Suspense>
+
+        {/* Renovation Calculator Preview */}
+        <section className="py-16 md:py-20 bg-gradient-to-br from-slate-50 to-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Free Renovation Calculators</h2>
+                <p className="text-slate-500 mt-1">Get a rough budget in seconds — no photos required.</p>
+              </div>
+              <Link href="/renovation-calculator" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">Explore All Renovation Calculators →</Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+              {[
+                { href: "/kitchen-renovation-calculator", emoji: "🍳", label: "Kitchen" },
+                { href: "/bathroom-renovation-calculator", emoji: "🚿", label: "Bathroom" },
+                { href: "/basement-renovation-calculator", emoji: "🏠", label: "Basement" },
+                { href: "/flooring-calculator", emoji: "⬛", label: "Flooring" },
+                { href: "/painting-calculator", emoji: "🖌", label: "Painting" },
+                { href: "/deck-calculator", emoji: "🌲", label: "Deck" },
+                { href: "/roof-replacement-calculator", emoji: "🏠", label: "Roof" },
+                { href: "/window-replacement-calculator", emoji: "🪩", label: "Windows" },
+              ].map((c) => (
+                <Link key={c.href} href={c.href} className="bg-white border border-slate-200 rounded-xl p-4 text-center hover:border-rose-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
+                  <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-slate-50 group-hover:bg-rose-50 flex items-center justify-center text-xl transition-colors">{c.emoji}</div>
+                  <div className="text-xs font-semibold text-slate-700 group-hover:text-rose-700 transition-colors">{c.label}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Learning Center Preview */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Learning Center</h2>
+                <p className="text-slate-500 mt-1">In-depth guides on costs, permits, ROI, and hiring contractors.</p>
+              </div>
+              <Link href="/guides" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">Explore the Learning Center →</Link>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+              {[
+                { href: "/ontario-renovation-cost-guide", label: "Ontario Renovation Cost Guide", desc: "Real pricing for every project type across Ontario cities." },
+                { href: "/durham-region-renovation-guide", label: "Durham Region Renovation Guide", desc: "Everything homeowners need to renovate in Durham Region." },
+                { href: "/contractor-growth-guide", label: "Contractor Growth Guide", desc: "How contractors get more leads and grow their business." },
+                { href: "/renovation-permit-guide-durham-region", label: "Permit Guide", desc: "When you need a permit — and how to get one — in Durham Region." },
+                { href: "/best-roi-renovations-durham-region", label: "Best ROI Renovations", desc: "Which projects add the most value before you sell." },
+                { href: "/how-ai-works", label: "How AI Estimates Work", desc: "How QuoteXbert's AI calculates your renovation cost range." },
+              ].map((g) => (
+                <Link key={g.href} href={g.href} className="bg-white rounded-xl p-5 border border-slate-200 hover:border-rose-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="font-semibold text-slate-900 leading-tight group-hover:text-rose-700 transition-colors">{g.label}</h3>
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-rose-500 flex-shrink-0 mt-0.5 transition-all group-hover:translate-x-0.5" />
+                  </div>
+                  <p className="text-slate-500 text-sm leading-relaxed">{g.desc}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Trust Signals Section */}
         <TrustSignals />
@@ -674,8 +722,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <HowItWorksSection />
+        {/* Trust & Transparency */}
+        <section className="py-14 md:py-16 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Trust &amp; Transparency</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">How QuoteXbert estimates work — and what they don&apos;t promise.</p>
+            </div>
+            <ul className="grid sm:grid-cols-2 gap-3 md:gap-4 mb-8">
+              {[
+                "Estimates are starting ranges, not binding contractor quotes",
+                "Final pricing depends on site conditions, materials, labour, permits, and scope",
+                "Homeowners can save and revisit their estimates",
+                "Contractors provide the final, professional quote",
+                "QuoteXbert does not guarantee project prices",
+              ].map((point) => (
+                <li key={point} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-200 text-sm text-slate-600 leading-relaxed hover:border-slate-300 transition-colors">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                  {point}
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link href="/how-ai-works" className="bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">How AI Works</Link>
+              <Link href="/why-quotexbert" className="bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">Why QuoteXbert</Link>
+              <Link href="/privacy" className="bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">Privacy</Link>
+              <Link href="/terms" className="bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">Terms</Link>
+            </div>
+          </div>
+        </section>
 
         {/* Trust FAQ - How Pricing Works, Contractor Verification */}
         <Suspense fallback={<div className="py-12" />}>
@@ -728,11 +803,11 @@ export default function Home() {
                   <span className="text-rose-400 font-semibold text-sm">FOR CONTRACTORS</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-                  Get Quality Leads.<br />Grow Your Business.
+                  Get Local Renovation<br />Opportunities Across Ontario
                 </h2>
                 <p className="text-base md:text-lg text-slate-300 mb-4 md:mb-6">
-                  Stop chasing leads. Access real projects from GTA homeowners.
-                  Every job is posted with project details and a budget.
+                  Create your contractor profile, choose your trades and service areas, and discover
+                  relevant homeowner opportunities across Durham Region, Toronto, Clarington, and the GTA.
                 </p>
                 
                 {/* Quick Stats */}
@@ -806,13 +881,16 @@ export default function Home() {
         {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorSection />}
 
         {/* Final CTA */}
-        <section className="py-12 md:py-16 bg-gradient-to-r from-rose-600 to-orange-600 text-white">
-          <div className="max-w-3xl mx-auto px-4 text-center">
-            <div className="text-4xl mb-4">📸</div>
-            <h2 className="text-3xl md:text-4xl font-black mb-3">
+        <section className="py-16 md:py-20 bg-gradient-to-br from-rose-700 via-rose-600 to-orange-600 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_50%)]" aria-hidden="true" />
+          <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
+            <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-white/15 flex items-center justify-center ring-1 ring-white/20">
+              <Camera className="w-7 h-7 text-white" strokeWidth={2} />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">
               Take a photo. Get your price.
             </h2>
-            <p className="text-lg mb-6 text-rose-100">
+            <p className="text-lg mb-8 text-rose-100">
               Free AI estimate in 30 seconds. Free account required.
             </p>
             <button
@@ -822,13 +900,11 @@ export default function Home() {
                   estimatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
               }}
-              className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-4 rounded-xl transition-all transform hover:scale-105 shadow-2xl text-lg"
+              className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl hover:shadow-2xl text-lg"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Get Free AI Estimate →
+              <Camera className="w-5 h-5" strokeWidth={2} />
+              Get Free AI Estimate
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </section>

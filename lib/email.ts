@@ -1,5 +1,6 @@
 ﻿import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+import { buildUnsubscribeUrl } from "@/lib/unsubscribe";
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -78,16 +79,32 @@ async function checkEmailRateLimit(userId: string, emailType: string = 'new_lead
   }
 }
 
-interface LeadEmailPayload {
-  postalCode: string;
-  projectType: string;
-  description: string;
-  estimate: string;
-  source?: string;
-  affiliateId?: string;
+/**
+ * Anti-spam cooldown for new-message emails: at most one "new message" email per
+ * (recipient, thread) pair every `cooldownMinutes`. Reuses the existing EmailEvent
+ * log (relatedMessageId stores the threadId for this email type) — no new table.
+ * Returns true if an email may be sent now (i.e. NOT within cooldown).
+ */
+async function checkMessageEmailCooldown(userId: string, threadId: string, cooldownMinutes = 20): Promise<boolean> {
+  try {
+    const since = new Date(Date.now() - cooldownMinutes * 60 * 1000);
+    const recent = await prisma.emailEvent.findFirst({
+      where: {
+        userId,
+        type: 'new_message',
+        relatedMessageId: threadId,
+        status: 'sent',
+        createdAt: { gte: since },
+      },
+      select: { id: true },
+    });
+    return !recent;
+  } catch (error) {
+    console.error('[EMAIL] Failed to check message cooldown:', error);
+    // On error, allow the email (fail open) — matches checkEmailRateLimit behaviour
+    return true;
+  }
 }
-
-// Utility function to get user email by ID
 async function getUserEmail(userId: string): Promise<string | null> {
   try {
     const user = await prisma.user.findFirst({
@@ -118,7 +135,11 @@ function escHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function buildEmail(subject: string, blocks: EmailBlock[]): string {
+function buildEmail(
+  subject: string,
+  blocks: EmailBlock[],
+  footer?: { unsubscribeUrl?: string; unsubscribeLabel?: string }
+): string {
   const renderedBlocks = blocks.map((b) => {
     // When rawHtml is set, the caller has already sanitised the content (e.g. email
     // templates that compose their own inner HTML). Otherwise, escape by default.
@@ -176,6 +197,9 @@ function buildEmail(subject: string, blocks: EmailBlock[]): string {
           <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
           or call <a href="tel:9052429460" style="color:#9f1239;text-decoration:none;font-weight:600;">905-242-9460</a>
         </p>
+        <p style="margin:0 0 6px;font-size:12px;">
+          <a href="${BASE_URL}/notifications" style="color:#9f1239;text-decoration:none;font-weight:600;">Manage email preferences</a>${footer?.unsubscribeUrl ? ` &middot; <a href="${footer.unsubscribeUrl}" style="color:#94a3b8;text-decoration:none;">${footer.unsubscribeLabel || 'Unsubscribe'}</a>` : ''}
+        </p>
         <p style="margin:0;font-size:11px;color:#94a3b8;">Â© ${new Date().getFullYear()} QuoteXbert Â· All rights reserved</p>
       </td></tr>
 
@@ -187,7 +211,7 @@ function buildEmail(subject: string, blocks: EmailBlock[]): string {
 }
 
 // Email templates
-function createMessageReceivedTemplate(preview: string, threadId: string, senderName?: string, jobTitle?: string): string {
+function createMessageReceivedTemplate(preview: string, threadId: string, senderName?: string, jobTitle?: string, recipientId?: string): string {
   const safePreview = escHtml(preview);
   const safeSender = senderName ? escHtml(senderName) : null;
   const safeJob = jobTitle ? escHtml(jobTitle) : null;
@@ -197,8 +221,8 @@ function createMessageReceivedTemplate(preview: string, threadId: string, sender
     ...(safeJob ? [{ type: 'text' as const, content: `Re: <strong>${safeJob}</strong>`, rawHtml: true }] : []),
     { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Message Preview', rawHtml: true },
     { type: 'cta', content: 'Reply Now →', href: `${baseUrl}/messages?threadId=${threadId}` },
-    { type: 'text', content: `View all your conversations at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>.`, rawHtml: true },
-  ]);
+    { type: 'text', content: `View all your conversations at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>. For your security, never share payment details or send money outside QuoteXbert.`, rawHtml: true },
+  ], recipientId ? { unsubscribeUrl: buildUnsubscribeUrl(recipientId, 'message'), unsubscribeLabel: 'Turn off message emails' } : undefined);
 }
 
 function createContractSentTemplate(contractId: string): string {
@@ -374,13 +398,22 @@ export async function sendNewMessageEmail(
     return { success: false, error: 'Email service not configured' };
   }
 
+  // Anti-spam: suppress repeated emails for the same thread within the cooldown window.
+  // The recipient still sees the message instantly in-app; this only limits email volume.
+  const canSend = await checkMessageEmailCooldown(recipient.id, threadId);
+  if (!canSend) {
+    await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'failed', 'skipped: cooldown active for this thread');
+    console.log(`[EMAIL] Skipped message notification to ${recipient.email} — cooldown active for thread ${threadId}`);
+    return { success: false, skipped: true, reason: 'cooldown' };
+  }
+
   try {
     await resend.emails.send({
       from: fromEmail,
       replyTo: REPLY_TO,
       to: recipient.email,
       subject: `New message from ${sender.name || 'a user'} on QuoteXbert`,
-      html: createMessageReceivedTemplate(messagePreview, threadId, sender.name ?? undefined, jobTitle),
+      html: createMessageReceivedTemplate(messagePreview, threadId, sender.name ?? undefined, jobTitle, recipient.id),
     });
 
     await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'sent');
@@ -618,6 +651,50 @@ export async function sendJobAcceptedEmail(
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     await logEmailEvent('job_accepted', homeowner.email, homeowner.id, job.id, undefined, 'failed', errorMsg);
     console.error('[EMAIL] Failed to send job accepted email:', error);
+    return { success: false, error };
+  }
+}
+
+// Contractor Hired Email (contractor is notified when a homeowner hires them directly from a chat thread)
+export async function sendContractorHiredEmail(
+  contractor: { id: string; email: string; name?: string | null },
+  homeowner: { name?: string | null },
+  job: { id: string; title: string; category?: string | null; city?: string | null }
+) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor hired email');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    const safeHomeownerName = homeowner.name ? escHtml(homeowner.name) : 'A homeowner';
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `You were hired for "${job.title}" on QuoteXbert`,
+      html: buildEmail(`You Were Hired — QuoteXbert`, [
+        { type: 'tag', content: 'Job Accepted' },
+        { type: 'heading', content: `${safeHomeownerName} hired you!`, rawHtml: true },
+        { type: 'text', content: `<strong>${safeHomeownerName}</strong> has hired you for <strong>${escHtml(job.title)}</strong>.`, rawHtml: true },
+        ...(job.category || job.city ? [{
+          type: 'card' as const,
+          label: 'Job Details',
+          rawHtml: true,
+          content: `${job.category ? `<strong>Category:</strong> ${escHtml(job.category)}` : ''}${job.city ? `<br><strong>Location:</strong> ${escHtml(job.city)}` : ''}`,
+        }] : []),
+        { type: 'card', label: 'Suggested next steps', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Message the homeowner to confirm project details</li><li style="margin-bottom:6px;">Schedule a site visit if needed</li><li>Send your formal quote through QuoteXbert</li></ul>' },
+        { type: 'cta', content: 'Message Homeowner', href: `${baseUrl}/messages` },
+      ], { unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'job'), unsubscribeLabel: 'Turn off job emails' }),
+    });
+
+    await logEmailEvent('job_accepted', contractor.email, contractor.id, job.id, undefined, 'sent');
+    console.log(`[EMAIL] Contractor hired notification sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('job_accepted', contractor.email, contractor.id, job.id, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor hired email:', error);
     return { success: false, error };
   }
 }
@@ -923,6 +1000,156 @@ export async function sendSubscriptionRenewalEmail(params: {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     await logEmailEvent('subscription_renewed', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
     console.error('[EMAIL] Failed to send renewal email:', error);
+    return { success: false, error };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Daily digests — ONE contractor digest + ONE homeowner digest.
+// Called from app/api/cron/daily-digest/route.ts. Not rate-limited via
+// checkEmailRateLimit (that's for high-frequency per-event emails); cadence
+// here is governed by the caller checking User.digestFrequency /
+// lastContractorDigestAt / lastHomeownerDigestAt before invoking these.
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function sendContractorDigestEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  matchedJobs: Array<{ id: string; title: string; category: string; city?: string | null | undefined; budget?: string | null | undefined }>;
+  unreadMessageCount: number;
+  awaitingReplyCount: number;
+  profileIncomplete?: boolean;
+  foundingSpotsRemaining?: number | null;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor digest');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, matchedJobs, unreadMessageCount, awaitingReplyCount, profileIncomplete, foundingSpotsRemaining } = params;
+
+  const blocks: EmailBlock[] = [
+    { type: 'tag', content: 'Daily Update' },
+    {
+      type: 'heading',
+      content: matchedJobs.length > 0
+        ? `${matchedJobs.length} new opportunit${matchedJobs.length === 1 ? 'y' : 'ies'} near you`
+        : 'Your QuoteXbert update',
+    },
+  ];
+
+  if (matchedJobs.length > 0) {
+    const rows = matchedJobs
+      .slice(0, 10)
+      .map((j) => `<strong>${escHtml(j.title)}</strong> — ${escHtml(j.category)}${j.city ? ` · ${escHtml(j.city)}` : ''}${j.budget ? ` · ${escHtml(j.budget)}` : ''}`)
+      .join('<br>');
+    blocks.push({ type: 'card', label: `Matching jobs (${matchedJobs.length})`, rawHtml: true, content: rows });
+  }
+
+  if (unreadMessageCount > 0 || awaitingReplyCount > 0) {
+    const parts: string[] = [];
+    if (unreadMessageCount > 0) parts.push(`<strong>${unreadMessageCount}</strong> unread message${unreadMessageCount === 1 ? '' : 's'}`);
+    if (awaitingReplyCount > 0) parts.push(`<strong>${awaitingReplyCount}</strong> homeowner${awaitingReplyCount === 1 ? '' : 's'} waiting on your reply`);
+    blocks.push({ type: 'card', label: 'Your inbox', rawHtml: true, content: parts.join('<br>') });
+  }
+
+  if (profileIncomplete) {
+    blocks.push({ type: 'text', content: 'Tip: a complete profile (photos, bio, verified badge) gets noticed first by homeowners.' });
+  }
+
+  if (typeof foundingSpotsRemaining === 'number' && foundingSpotsRemaining > 0) {
+    blocks.push({
+      type: 'text',
+      rawHtml: true,
+      content: `<strong>${foundingSpotsRemaining}</strong> Founding Contractor spots remain — <a href="${BASE_URL}/contractors/join" style="color:#9f1239;font-weight:600;">learn more</a>.`,
+    });
+  }
+
+  blocks.push({ type: 'cta', content: 'View All Opportunities', href: `${BASE_URL}/contractor/jobs` });
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: matchedJobs.length > 0
+        ? `${matchedJobs.length} new opportunit${matchedJobs.length === 1 ? 'y' : 'ies'} near you — QuoteXbert`
+        : 'Your QuoteXbert contractor update',
+      html: buildEmail('Your QuoteXbert Contractor Update', blocks, {
+        unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'digest'),
+        unsubscribeLabel: 'Turn off daily digest',
+      }),
+    });
+    await logEmailEvent('contractor_digest', contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Contractor digest sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('contractor_digest', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor digest:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendHomeownerDigestEmail(params: {
+  homeowner: { id: string; email: string; name?: string | null };
+  newContractorResponses: number;
+  unreadMessageCount: number;
+  savedEstimateCount: number;
+  openJobsAwaitingContractor: number;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping homeowner digest');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { homeowner, newContractorResponses, unreadMessageCount, savedEstimateCount, openJobsAwaitingContractor } = params;
+
+  const blocks: EmailBlock[] = [
+    { type: 'tag', content: 'Project Update' },
+    { type: 'heading', content: 'Your QuoteXbert Project Update' },
+  ];
+
+  const activityParts: string[] = [];
+  if (newContractorResponses > 0) activityParts.push(`<strong>${newContractorResponses}</strong> new contractor response${newContractorResponses === 1 ? '' : 's'}`);
+  if (unreadMessageCount > 0) activityParts.push(`<strong>${unreadMessageCount}</strong> unread message${unreadMessageCount === 1 ? '' : 's'}`);
+  if (activityParts.length > 0) {
+    blocks.push({ type: 'card', label: 'Your conversations', rawHtml: true, content: activityParts.join('<br>') });
+  }
+
+  if (openJobsAwaitingContractor > 0) {
+    blocks.push({
+      type: 'text',
+      content: `You have <strong>${openJobsAwaitingContractor}</strong> open project${openJobsAwaitingContractor === 1 ? '' : 's'} still waiting for a contractor response.`,
+      rawHtml: true,
+    });
+  }
+
+  if (savedEstimateCount > 0) {
+    blocks.push({
+      type: 'text',
+      rawHtml: true,
+      content: `You have <strong>${savedEstimateCount}</strong> saved estimate${savedEstimateCount === 1 ? '' : 's'} — <a href="${BASE_URL}/my-estimates" style="color:#9f1239;font-weight:600;">review them</a> or post a job to get contractor quotes.`,
+    });
+  }
+
+  blocks.push({ type: 'cta', content: 'View Your Projects', href: `${BASE_URL}/messages` });
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: homeowner.email,
+      subject: 'Your QuoteXbert Project Update',
+      html: buildEmail('Your QuoteXbert Project Update', blocks, {
+        unsubscribeUrl: buildUnsubscribeUrl(homeowner.id, 'digest'),
+        unsubscribeLabel: 'Turn off project updates',
+      }),
+    });
+    await logEmailEvent('homeowner_digest', homeowner.email, homeowner.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Homeowner digest sent to ${homeowner.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('homeowner_digest', homeowner.email, homeowner.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send homeowner digest:', error);
     return { success: false, error };
   }
 }

@@ -203,7 +203,7 @@ export default function AIQuotePage() {
                 <select
                   value={formData.projectType}
                   onChange={(e) => setFormData({...formData, projectType: e.target.value})}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 text-base"
                 >
                   <option value="">Select project type...</option>
                   <option value="Kitchen Renovation">Kitchen Renovation</option>
@@ -249,7 +249,7 @@ export default function AIQuotePage() {
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   rows={4}
                   placeholder="E.g., Complete kitchen renovation including new cabinets, countertops, appliances... (Click Voice button to dictate)"
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 ${
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 text-base ${
                     isRecording ? 'border-red-500 ring-2 ring-red-200' : 'border-gray-300'
                   }`}
                 />

@@ -87,7 +87,7 @@ export default function BathroomRenovationCalculatorPage() {
 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Your City</label>
-                  <select value={cityKey} onChange={(e) => setCityKey(e.target.value)} className="w-full p-3 border border-gray-200 rounded-lg text-sm">
+                  <select value={cityKey} onChange={(e) => setCityKey(e.target.value)} className="w-full p-3 border border-gray-200 rounded-lg text-base">
                     {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
