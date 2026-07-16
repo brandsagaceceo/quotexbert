@@ -174,24 +174,31 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update contractor's average rating — only counts published (non-seeded, non-hidden) reviews
-    const [avgRating, reviewCount] = await Promise.all([
-      prisma.review.aggregate({
-        where: { contractorId: validatedData.contractorId, status: "published" },
-        _avg: { rating: true },
-      }),
-      prisma.review.count({
-        where: { contractorId: validatedData.contractorId, status: "published" },
-      }),
-    ]);
+    // Update contractor's average rating — only counts published (non-seeded, non-hidden) reviews.
+    // Non-fatal: the review itself is already saved above, so a missing/failed profile
+    // update (e.g. contractor has no ContractorProfile row yet) must never surface as a
+    // "failed to create review" error to the homeowner.
+    try {
+      const [avgRating, reviewCount] = await Promise.all([
+        prisma.review.aggregate({
+          where: { contractorId: validatedData.contractorId, status: "published" },
+          _avg: { rating: true },
+        }),
+        prisma.review.count({
+          where: { contractorId: validatedData.contractorId, status: "published" },
+        }),
+      ]);
 
-    await prisma.contractorProfile.update({
-      where: { userId: validatedData.contractorId },
-      data: {
-        avgRating: avgRating._avg.rating || 0,
-        reviewCount,
-      },
-    });
+      await prisma.contractorProfile.update({
+        where: { userId: validatedData.contractorId },
+        data: {
+          avgRating: avgRating._avg.rating || 0,
+          reviewCount,
+        },
+      });
+    } catch (ratingUpdateError) {
+      console.error("Failed to update contractor avgRating/reviewCount:", ratingUpdateError);
+    }
 
     // Only notify the contractor for real (non-seeded) reviews
     if (review.status === "published") {

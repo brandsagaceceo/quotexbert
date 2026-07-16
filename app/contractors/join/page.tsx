@@ -35,6 +35,7 @@ const PLANS = [
     name: "Handyman",
     price: "$49",
     period: "per month",
+    firstMonth: "First month $0.99",
     features: [
       "3 Trade Categories",
       "Unlimited job applications",
@@ -51,6 +52,7 @@ const PLANS = [
     name: "Renovation Xbert",
     price: "$99",
     period: "per month",
+    firstMonth: "First month $0.99",
     features: [
       "6 Trade Categories",
       "Everything in Handyman",
@@ -67,6 +69,7 @@ const PLANS = [
     name: "General Contractor",
     price: "$149",
     period: "per month",
+    firstMonth: "First month $0.99",
     features: [
       "ALL 10+ Categories",
       "Everything in Renovation Xbert",
@@ -364,6 +367,9 @@ export default function ContractorsJoinPage() {
                   <span className="text-3xl font-bold text-[#800020]">{plan.price}</span>
                   <span className="text-slate-500 text-sm mb-1">/ {plan.period}</span>
                 </div>
+                <p className="inline-block text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-full px-3 py-1 mb-3">
+                  🎉 {plan.firstMonth} — then {plan.price}/mo
+                </p>
                 <ul className="space-y-2 my-5">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-slate-700">

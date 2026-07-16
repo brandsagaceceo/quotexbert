@@ -154,14 +154,14 @@ export default function HomeownerDashboard() {
                 <h2 className="text-lg font-bold">Ready to start your renovation?</h2>
               </div>
               <p className="text-sm text-white/80 leading-snug">
-                Post your project and get quotes from verified local contractors — it only takes 2 minutes.
+                Get a free AI estimate, then post your project to get quotes from verified local contractors — it only takes 2 minutes.
               </p>
             </div>
             <Link
-              href="/create-lead"
+              href="/"
               className="flex-shrink-0 bg-white hover:bg-gray-50 text-[#800020] font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm hover:shadow whitespace-nowrap"
             >
-              Post a Job →
+              Get AI Estimate →
             </Link>
           </div>
         )}
@@ -212,24 +212,24 @@ export default function HomeownerDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
+              href="/"
+              className="flex items-center gap-4 p-4 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+            >
+              <FileText className="w-8 h-8" />
+              <div>
+                <div className="font-bold text-lg">Get AI Estimate</div>
+                <div className="text-sm text-white/80">Instant quote, then post to job board</div>
+              </div>
+            </Link>
+
+            <Link
               href="/create-lead"
               className="flex items-center gap-4 p-4 bg-[#800020] text-white rounded-xl hover:bg-[#600018] transition-colors"
             >
               <Briefcase className="w-8 h-8" />
               <div>
-                <div className="font-bold text-lg">Post a Project</div>
-                <div className="text-sm text-white/80">Get quotes from contractors</div>
-              </div>
-            </Link>
-
-            <Link
-              href="/"
-              className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-            >
-              <FileText className="w-8 h-8" />
-              <div>
-                <div className="font-bold text-lg">New Estimate</div>
-                <div className="text-sm text-blue-100">Get instant AI quote</div>
+                <div className="font-bold text-lg">Post a Job Manually</div>
+                <div className="text-sm text-white/80">Skip the AI and fill out the form yourself</div>
               </div>
             </Link>
           </div>

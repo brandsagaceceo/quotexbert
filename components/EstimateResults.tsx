@@ -6,7 +6,7 @@ import {
   ExclamationTriangleIcon, 
   ClipboardDocumentIcon,
   ShareIcon,
-  EnvelopeIcon,
+  BookmarkIcon,
   ArrowDownTrayIcon
 } from "@heroicons/react/24/outline";
 
@@ -51,9 +51,10 @@ interface EstimateResultsProps {
   data: EstimateResultData;
   onGetContractorBids?: () => void;
   onSaveEstimate?: () => void;
+  savingEstimate?: boolean;
 }
 
-export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: EstimateResultsProps) {
+export function EstimateResults({ data, onGetContractorBids, onSaveEstimate, savingEstimate = false }: EstimateResultsProps) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
@@ -487,12 +488,17 @@ export function EstimateResults({ data, onGetContractorBids, onSaveEstimate }: E
           </button>
           <button
             onClick={onSaveEstimate}
+            disabled={savingEstimate}
             className="w-full sm:flex-1 bg-white border-2 border-slate-300 hover:border-orange-500 
                      text-slate-900 font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-xl
-                     transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
+                     transition-all flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <EnvelopeIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="truncate">Save / Email Estimate</span>
+            {savingEstimate ? (
+              <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <BookmarkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            )}
+            <span className="truncate">{savingEstimate ? 'Saving...' : 'Save Estimate'}</span>
           </button>
         </div>
 

@@ -59,6 +59,7 @@ export default function Home() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [hasUsedFree, setHasUsedFree] = useState(false);
   const [showSignUpGate, setShowSignUpGate] = useState(false);
+  const [savingEstimate, setSavingEstimate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const toast = useToast();
 
@@ -74,6 +75,39 @@ export default function Home() {
       setHasUsedFree(false);
     }
   }, [isSignedIn]);
+
+  // Attach-after-auth: if the homeowner clicked "Save Estimate" while signed out,
+  // the estimate was preserved in localStorage before redirecting to sign-in. Once
+  // they're back and signed in, finish the save automatically — no need to redo
+  // the estimate or click Save again.
+  useEffect(() => {
+    if (!isSignedIn || !user?.id) return;
+    const pendingRaw = localStorage.getItem('pending_save_estimate');
+    if (!pendingRaw) return;
+    let pending: any = null;
+    try { pending = JSON.parse(pendingRaw); } catch { pending = null; }
+    localStorage.removeItem('pending_save_estimate');
+    if (!pending) return;
+
+    (async () => {
+      try {
+        const response = await fetch('/api/ai-estimates/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...pending, homeownerId: user.id }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          toast.success('Your estimate was saved to Profile > AI Estimates.');
+        } else {
+          toast.error(data.error || 'Failed to save your estimate. Please try again from Profile.');
+        }
+      } catch {
+        toast.error('Failed to save your estimate. Please try again from Profile.');
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, user?.id]);
 
   // Block the estimator for unauthenticated visitors who have already used their 1 free estimate
   const isEstimatorBlocked = !isSignedIn && hasUsedFree;
@@ -110,12 +144,61 @@ export default function Home() {
     }
   };
 
-  const handleSaveEstimate = () => {
-    if (isSignedIn) {
-      toast.success('Coming soon — save & email estimates!');
-    } else {
-      toast.error('Please sign in to save your estimate');
-      setTimeout(() => { window.location.href = '/sign-in'; }, 1200);
+  // Maps the current /api/estimate result (EstimateResultData shape) onto the
+  // existing AI-estimate persistence system's expected save payload — reuses
+  // /api/ai-estimates/save (creates an AIEstimate row) which is exactly what
+  // Profile > AI Estimates reads from. No new persistence system is created.
+  const buildSaveEstimatePayload = () => ({
+    description: estimateResult?.summary || 'Renovation project estimate',
+    minCost: estimateResult?.totals?.total_low || 0,
+    maxCost: estimateResult?.totals?.total_high || 0,
+    confidence: Math.round((estimateResult?.confidence || 0) * 100),
+    aiPowered: true,
+    enhancedDescription: estimateResult?.summary || null,
+    factors: estimateResult?.scope || [],
+    reasoning: null,
+    hasVoice: false,
+    imageCount: 0,
+    images: [],
+  });
+
+  const handleSaveEstimate = async () => {
+    if (!estimateResult) {
+      toast.error('Generate an estimate first, then save it.');
+      return;
+    }
+
+    if (!isSignedIn) {
+      // Preserve the estimate so it isn't lost — attach it automatically once
+      // the homeowner finishes signing in/up (see the effect above).
+      try {
+        localStorage.setItem('pending_save_estimate', JSON.stringify(buildSaveEstimatePayload()));
+      } catch {
+        // localStorage unavailable/full — non-fatal, sign-in flow still works
+      }
+      toast.error('Please sign in to save your estimate — we\'ll save it automatically once you\'re signed in.');
+      setTimeout(() => { window.location.href = '/sign-in?redirect_url=%2F'; }, 1200);
+      return;
+    }
+
+    setSavingEstimate(true);
+    try {
+      const response = await fetch('/api/ai-estimates/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...buildSaveEstimatePayload(), homeownerId: user?.id }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success('Estimate saved! Find it anytime in Profile > AI Estimates.');
+        trackCTAClick('estimate_results', 'Save Estimate');
+      } else {
+        toast.error(data.error || 'Failed to save your estimate. Please try again.');
+      }
+    } catch {
+      toast.error('Failed to save your estimate. Please check your connection and try again.');
+    } finally {
+      setSavingEstimate(false);
     }
   };
 
@@ -222,7 +305,7 @@ export default function Home() {
         <ReviewCaptureModal 
           isOpen={showReviewModal} 
           onClose={() => setShowReviewModal(false)}
-          googleReviewUrl={process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL || undefined}
+          {...(process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL ? { googleReviewUrl: process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL } : {})}
         />
       </Suspense>
 
@@ -230,20 +313,20 @@ export default function Home() {
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
         {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
         <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
-        <section id="get-estimate" className="relative py-4 md:py-16 lg:py-24 overflow-hidden">
+        <section id="get-estimate" className="relative py-3 md:py-16 lg:py-24 overflow-hidden">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
 
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
               {/* Left Column - Headline & Benefits - Mobile-Optimized */}
-              <div className="text-center lg:text-left space-y-3 md:space-y-6">
-                <div className="inline-flex items-center gap-2 mb-4 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
+              <div className="text-center lg:text-left space-y-2 md:space-y-6">
+                <div className="inline-flex items-center gap-2 mb-2 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-600" strokeWidth={2} />
                   <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Estimates · Free to Start</span>
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-3 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
                   <span className="text-[#800020]">
                     Get an AI Renovation
                   </span>
@@ -253,7 +336,7 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="text-base md:text-xl lg:text-2xl text-slate-600 mb-6 md:mb-10 leading-relaxed">
+                <p className="text-sm md:text-xl lg:text-2xl text-slate-600 mb-4 md:mb-10 leading-relaxed">
                   <span className="text-rose-700 font-semibold">Describe your project or upload photos</span> to get a
                   detailed renovation cost range based on <span className="text-rose-700 font-semibold">Ontario pricing</span>.
                   Free for homeowners — quick free account required.
@@ -262,14 +345,14 @@ export default function Home() {
                 {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
                 <a
                   href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-2 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-colors mb-6"
+                  className="lg:hidden flex items-center justify-center gap-1.5 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-sm py-2.5 px-5 rounded-xl shadow-md active:scale-[0.98] transition-colors mb-3"
                 >
-                  <Camera className="w-5 h-5" strokeWidth={2} />
+                  <Camera className="w-4 h-4" strokeWidth={2} />
                   Upload Photos — Free AI Estimate
                 </a>
 
                 {/* Mobile-only compact benefits (desktop shows full cards below) */}
-                <div className="lg:hidden flex flex-wrap gap-2 mb-3">
+                <div className="lg:hidden flex flex-wrap gap-1.5 mb-2">
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
                   <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
@@ -382,14 +465,14 @@ export default function Home() {
             </div>
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
-          <div className="bg-[#800020] px-4 py-4 md:py-5 text-center">
-            <p className="text-white font-bold text-sm md:text-lg tracking-tight">Real GTA &amp; Durham Region Homes. Real Savings.</p>
-            <p className="text-rose-200 text-xs md:text-sm mt-1">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white font-semibold">before</strong> calling a contractor</p>
+          <div className="bg-[#800020] px-4 py-2.5 md:py-5 text-center">
+            <p className="text-white font-bold text-xs md:text-lg tracking-tight">Real GTA &amp; Durham Region Homes. Real Savings.</p>
+            <p className="text-rose-200 text-[11px] md:text-sm mt-0.5 md:mt-1">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white font-semibold">before</strong> calling a contractor</p>
           </div>
         </section>
 
         {/* Trust Bar - compact facts, directly beneath hero */}
-        <section className="py-8 md:py-10 bg-white border-y border-slate-100">
+        <section className="py-5 md:py-10 bg-white border-y border-slate-100">
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-5 md:gap-6">
               {[
@@ -589,6 +672,7 @@ export default function Home() {
               data={estimateResult}
               onGetContractorBids={handleGetContractorBids}
               onSaveEstimate={handleSaveEstimate}
+              savingEstimate={savingEstimate}
             />
           </section>
         )}

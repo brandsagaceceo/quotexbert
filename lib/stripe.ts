@@ -69,6 +69,74 @@ export const SUBSCRIPTION_PLANS = {
 
 export type SubscriptionPlan = keyof typeof SUBSCRIPTION_PLANS;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FOUNDING CONTRACTOR OFFER — "First month $0.99, then renews at the regular
+// tier price." Implemented as a Stripe Coupon with `duration: "once"`, which
+// Stripe applies ONLY to the very first invoice of a subscription — every
+// invoice after that automatically bills the subscription's normal recurring
+// price with zero extra code. This intentionally avoids creating a second,
+// permanent $0.99 recurring Price (which would keep charging $0.99 forever).
+//
+// Coupons are created via the Stripe API at runtime (idempotent, deterministic
+// ID per tier) so nothing needs to be pre-created by hand in the Stripe
+// Dashboard. If a coupon with that ID already exists, it is reused as-is.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Cents charged for the discounted first month. */
+export const FOUNDING_OFFER_FIRST_MONTH_CENTS = 99; // $0.99
+
+/**
+ * Master on/off switch for the founding offer, controlled via env var so it can
+ * be disabled the moment the promotion ends without a code deploy.
+ * Set FOUNDING_OFFER_ENABLED=false in the environment to turn it off.
+ */
+export function isFoundingOfferEnabled(): boolean {
+  return process.env.FOUNDING_OFFER_ENABLED !== "false";
+}
+
+/**
+ * Returns (creating if necessary) a Stripe Coupon ID that discounts exactly one
+ * invoice down to $0.99 for the given tier's regular monthly price. Safe to call
+ * on every checkout — Stripe coupon IDs are deterministic per tier/price so the
+ * same coupon is reused instead of creating duplicates.
+ */
+export async function getOrCreateFoundingOfferCoupon(
+  tierKey: string,
+  regularPriceCents: number,
+): Promise<string> {
+  const couponId = `founding-${tierKey}-099`;
+  const amountOff = regularPriceCents - FOUNDING_OFFER_FIRST_MONTH_CENTS;
+
+  if (amountOff <= 0) {
+    throw new Error(
+      `Founding offer misconfigured for tier "${tierKey}": regular price (${regularPriceCents}c) must exceed $0.99`,
+    );
+  }
+
+  try {
+    await stripe.coupons.retrieve(couponId);
+    return couponId;
+  } catch {
+    // Not found — create it. Race-safe: if a concurrent request creates it
+    // first, Stripe returns a "resource_already_exists" error which we swallow.
+    try {
+      await stripe.coupons.create({
+        id: couponId,
+        name: "Founding Contractor — First Month $0.99",
+        amount_off: amountOff,
+        currency: "cad",
+        duration: "once",
+      });
+    } catch (createErr: any) {
+      if (createErr?.code !== "resource_already_exists") {
+        throw createErr;
+      }
+    }
+    return couponId;
+  }
+}
+
+
 // Platform fee configuration
 export const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% platform fee
 export const STRIPE_FEE_PERCENTAGE = 0.029; // 2.9% + $0.30

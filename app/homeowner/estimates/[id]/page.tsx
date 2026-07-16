@@ -536,7 +536,9 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Posting Budget & Post Button */}
         {!isPosted && (
-          <div className="bg-white rounded-lg shadow-md p-6 sticky bottom-4">
+          <div
+            className="bg-white rounded-lg shadow-md p-6 sticky bottom-[calc(var(--bottom-nav-height,64px)+env(safe-area-inset-bottom,0px)+1rem)] md:bottom-4 z-10"
+          >
             <div className="flex flex-col gap-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Post to Job Board</h3>
@@ -583,11 +585,11 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                   </div>
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={saveToProfile}
                   disabled={posting}
-                  className="px-6 py-3 rounded-lg font-medium flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+                  className="px-4 sm:px-6 py-3 rounded-lg font-medium flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 text-sm sm:text-base"
                 >
                   <Check className="w-5 h-5" />
                   {posting ? 'Saving...' : 'Save to Profile'}
@@ -595,7 +597,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                 <button
                   onClick={postToJobBoard}
                   disabled={selectedItems.size === 0 || posting}
-                  className={`px-6 py-3 rounded-lg font-medium flex items-center gap-2 ${
+                  className={`px-4 sm:px-6 py-3 rounded-lg font-medium flex items-center gap-2 text-sm sm:text-base ${
                     selectedItems.size === 0 || posting
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-rose-600 text-white hover:bg-rose-700'

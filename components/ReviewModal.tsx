@@ -71,8 +71,12 @@ export function ReviewModal({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
-      <div className="min-h-full flex items-center justify-center p-4 py-6">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+      <div className="min-h-full flex items-start sm:items-center justify-center p-3 sm:p-4 pt-8 sm:py-6">
+      <div
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[85dvh] overflow-y-auto relative"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <div className="p-5 sm:p-6">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -175,6 +179,7 @@ export function ReviewModal({
             </button>
           </div>
         </form>
+        </div>
       </div>
       </div>
     </div>

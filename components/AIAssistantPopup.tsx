@@ -116,7 +116,7 @@ export default function AIAssistantPopup() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (window.innerWidth >= 768) return; // desktop: no-op
+        if (!entry || window.innerWidth >= 768) return; // desktop: no-op
         if (entry.isIntersecting) {
           setIsHidden(true);
           if (isOpen) setIsOpen(false);
@@ -528,14 +528,14 @@ export default function AIAssistantPopup() {
             setIsOpen(true);
             if (messages.length === 0) initializeChat();
           }}
-          className={`floating-widget-safe bg-[#800020] hover:bg-[#600018] text-white rounded-full shadow-lg hover:shadow-xl transition-colors duration-200 flex items-center gap-1.5 md:gap-2 group${
+          className={`floating-widget-safe bg-[#800020] hover:bg-[#600018] text-white rounded-full shadow-lg hover:shadow-xl transition-colors duration-200 flex items-center gap-1 md:gap-1.5 group${
             isHidden ? ' widget-hidden' : ''
           }`}
           aria-label="Open AI Assistant"
         >
-          <Sparkles className="h-4 w-4 md:h-5 md:w-5" />
-          <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-semibold text-xs md:text-sm">
+          <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <MessageCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap font-semibold text-[11px] md:text-xs">
             Need Help?
           </span>
         </button>

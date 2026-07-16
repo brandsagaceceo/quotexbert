@@ -17,7 +17,7 @@
 
   /* ── Layout heights — used in calc() across all pages ── */
   --header-height: 64px;
-  --bottom-nav-height: 64px;
+  --bottom-nav-height: 56px;
 
   /* ── Mobile Design System ── */
   --section-py-mobile: 2rem;      /* 32px section padding on mobile */
@@ -72,6 +72,16 @@ body {
 /* Ensure all elements use border-box sizing */
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+/* iOS Safari auto-zooms the page when a focused form field's computed font-size is
+   under 16px, and can fail to zoom back out once the keyboard closes. Force a 16px
+   minimum on every input/textarea/select on mobile widths (overriding any smaller
+   Tailwind text-* utility) so focusing a field never triggers unwanted zoom. */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
 
 /* Interactive cursor */
@@ -632,7 +642,7 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 1rem);
   transition: opacity 0.25s, transform 0.25s;
   /* Slightly smaller on mobile so it intrudes less */
-  padding: 0.625rem;
+  padding: 0.5rem;
 }
 /* When StickyCTA is visible (logged-out) add extra clearance for the CTA bar */
 body:has(.sticky-cta-bar) .floating-widget-safe {

@@ -759,14 +759,14 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Profile Identity Section */}
-      <div className="relative bg-[#800020] pb-4 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 16px)' }}>
+      <div className="relative bg-[#800020] pb-3 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 10px)' }}>
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-row items-center gap-3 md:gap-6">
             {/* Profile Picture + Business Logo stacked */}
             <div className="flex flex-col items-center gap-2 flex-shrink-0">
               {/* Profile Picture */}
               <div className="relative group">
-                <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-[#800020]/10">
+                <div className="relative w-24 h-24 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-[#800020]/10">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -823,9 +823,9 @@ export default function UnifiedProfilePage() {
 
             {/* Profile Info Card */}
             <div className="flex-1">
-              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-5 md:p-6 border border-slate-200">
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-4 md:p-6 border border-slate-200">
                   {/* Mobile Edit/Save Buttons - Inline (shown only on mobile) */}
-                  <div className="md:hidden flex justify-end gap-2 mb-3">
+                  <div className="md:hidden flex justify-end gap-2 mb-2">
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
@@ -860,11 +860,11 @@ export default function UnifiedProfilePage() {
                   </div>
 
                   <div>
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-2 break-words">{displayName}</h1>
-                    <p className="text-rose-900 font-semibold text-sm md:text-base lg:text-lg capitalize mb-3">
-                      {profile?.trade || authUser.role}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-1.5 text-slate-500 text-xs md:text-sm mt-1">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1.5 break-words">{displayName}</h1>
+                    <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-900 border border-rose-200 text-xs md:text-sm font-semibold capitalize px-2.5 py-1 rounded-full mb-2">
+                      {isContractor ? (profile?.trade || 'Contractor') : 'Homeowner'}
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5 text-slate-500 text-xs md:text-sm">
                       {(profile?.avgRating ?? 0) > 0 && (
                         <>
                           <span className="flex items-center gap-0.5">
@@ -903,15 +903,15 @@ export default function UnifiedProfilePage() {
       <div className="bg-white sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
         <div className="container mx-auto">
           {/* Mobile: Scrollable pill tabs */}
-          <nav data-tour="profile-tabs" className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
+          <nav data-tour="profile-tabs" className="md:hidden flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'recently-used', 'contact']
+              : ['overview', 'projects', 'estimates', 'jobs', 'recently-used', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-shrink-0 px-5 py-2.5 rounded-full font-semibold text-sm capitalize whitespace-nowrap min-h-[44px] transition-all ${
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full font-semibold text-xs capitalize whitespace-nowrap min-h-[40px] transition-all ${
                   activeTab === tab
                     ? 'bg-rose-700 text-white shadow-md'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -919,7 +919,6 @@ export default function UnifiedProfilePage() {
               >
                 {tab === 'projects' ? 'My Projects' : 
                  tab === 'estimates' ? 'AI Estimates' : 
-                 tab === 'quotes' ? 'AI Quotes' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
                  tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
@@ -933,7 +932,7 @@ export default function UnifiedProfilePage() {
           <nav data-tour="profile-tabs" className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'recently-used', 'contact']
+              : ['overview', 'projects', 'estimates', 'jobs', 'recently-used', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
@@ -946,7 +945,6 @@ export default function UnifiedProfilePage() {
               >
                 {tab === 'projects' ? 'My Projects' : 
                  tab === 'estimates' ? 'AI Estimates' : 
-                 tab === 'quotes' ? 'AI Quotes' : 
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
                  tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
@@ -958,15 +956,15 @@ export default function UnifiedProfilePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-4 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="container mx-auto px-4 md:px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6 md:space-y-8">
+          <div className="lg:col-span-2 space-y-4 md:space-y-8">
             {activeTab === 'overview' && (
               <>
                 {/* Bio Section */}
-                <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
-                  <div className="flex items-center justify-between mb-4 md:mb-4">
+                <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-4 md:p-6 border border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
                     <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900">About</h2>
                     {isEditing && (
                       <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
@@ -1081,18 +1079,18 @@ export default function UnifiedProfilePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Link
-                        data-tour="post-job-link"
-                        href="/create-lead"
+                        data-tour="ai-estimate-link"
+                        href="/"
                         className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white px-5 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
                       >
-                        Post a Job on Job Board
+                        Get a Free AI Estimate
                       </Link>
                       <Link
-                        data-tour="ai-estimate-link"
-                        href="/ai-quote"
+                        data-tour="post-job-link"
+                        href="/create-lead"
                         className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold border border-rose-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition-colors"
                       >
-                        Bonus: Free AI Quote Generator
+                        Post a Job Manually
                       </Link>
                     </div>
                   </div>
@@ -1393,7 +1391,7 @@ export default function UnifiedProfilePage() {
 
             {activeTab === 'estimates' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">My Estimates & Posted Jobs</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">My AI Estimates</h2>
                 {savedEstimates.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-4">
                     {savedEstimates.map((estimate) => (
@@ -1435,12 +1433,12 @@ export default function UnifiedProfilePage() {
                               View Job
                             </Link>
                           ) : (
-                            <button
-                              onClick={() => window.location.href = '/create-lead'}
-                              className="flex-1 text-xs bg-rose-700 text-white py-2 px-3 rounded-lg hover:bg-rose-800 transition-colors"
+                            <Link
+                              href={`/homeowner/estimates/${estimate.id}`}
+                              className="flex-1 text-xs bg-rose-700 text-white py-2 px-3 rounded-lg hover:bg-rose-800 transition-colors text-center"
                             >
-                              Post Job
-                            </button>
+                              Review &amp; Post Job
+                            </Link>
                           )}
                           <button
                             onClick={async () => {
@@ -1470,32 +1468,24 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
-            {activeTab === 'quotes' && !isContractor && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">AI Quote Generator</h2>
-                <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
-                  <div className="text-6xl mb-4">📄</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Generate Professional Quotes Instantly</h3>
-                  <p className="text-slate-600 mb-4">Create detailed, legally-formatted contracts and quotes in seconds</p>
-                  <div className="flex gap-3 justify-center">
-                    <a href="/ai-quote" className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
-                      Generate Free Quote
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {activeTab === 'jobs' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                   <h2 className="text-2xl font-bold text-slate-900">My Posted Jobs</h2>
-                  <Link
-                    href="/create-lead"
-                    className="inline-flex items-center justify-center bg-[#800020] text-white font-semibold px-4 py-2.5 rounded-lg hover:shadow-lg transition-all"
-                  >
-                    Post New Job
-                  </Link>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href="/"
+                      className="inline-flex items-center justify-center bg-[#800020] text-white font-semibold px-4 py-2.5 rounded-lg hover:shadow-lg transition-all"
+                    >
+                      Get AI Estimate
+                    </Link>
+                    <Link
+                      href="/create-lead"
+                      className="inline-flex items-center justify-center text-rose-800 bg-rose-50 border border-rose-200 font-semibold px-4 py-2.5 rounded-lg hover:bg-rose-100 transition-all"
+                    >
+                      Post Manually
+                    </Link>
+                  </div>
                 </div>
                 {jobs.length > 0 ? (
                   <div className="space-y-4">
@@ -1549,9 +1539,9 @@ export default function UnifiedProfilePage() {
                   <div className="text-center py-12 bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl">
                     <div className="text-6xl mb-4">📝</div>
                     <h3 className="text-xl font-bold text-slate-900 mb-2">No Posted Jobs Yet</h3>
-                    <p className="text-slate-600 mb-4">Post a job to get quotes from verified contractors</p>
-                    <a href="/create-lead" className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
-                      Post a Job
+                    <p className="text-slate-600 mb-4">Get an AI estimate, then post it to get quotes from verified contractors</p>
+                    <a href="/" className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Get AI Estimate
                     </a>
                   </div>
                 )}
@@ -1638,140 +1628,16 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
-            {activeTab === 'quotes' && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Saved Quotes</h2>
-                
-                {savedEstimates.length > 0 ? (
-                  <div className="space-y-6">
-                    {savedEstimates.map((estimate) => (
-                      <div key={estimate.id} className="border-2 border-slate-200 rounded-2xl p-6 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-slate-50">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              {estimate.aiPowered && (
-                                <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-900 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
-                                  ✨ AI-Powered
-                                </span>
-                              )}
-                              {estimate.hasVoice && (
-                                <span className="inline-flex items-center gap-1 bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                  🎤 Voice
-                                </span>
-                              )}
-                              {estimate.imageCount > 0 && (
-                                <span className="inline-flex items-center gap-1 bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1 rounded-full">
-                                  📸 {estimate.imageCount} {estimate.imageCount === 1 ? 'Photo' : 'Photos'}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-slate-700 font-medium text-lg leading-relaxed">
-                              {estimate.description}
-                            </p>
-                            <p className="text-xs text-slate-500 mt-2">
-                              Created {new Date(estimate.createdAt).toLocaleDateString('en-US', { 
-                                month: 'long', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                              })}
-                            </p>
-                          </div>
-                          <button
-                            onClick={async () => {
-                              if (confirm('Are you sure you want to delete this estimate?')) {
-                                try {
-                                  const response = await fetch(`/api/estimates?id=${estimate.id}&homeownerId=${authUser?.id}`, {
-                                    method: 'DELETE'
-                                  });
-                                  if (response.ok) {
-                                    setSavedEstimates(prev => prev.filter(e => e.id !== estimate.id));
-                                  }
-                                } catch (error) {
-                                  console.error('Error deleting estimate:', error);
-                                }
-                              }
-                            }}
-                            className="text-slate-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                          >
-                            <Trash className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-xl p-6 border-2 border-rose-100 mb-4">
-                          <div className="flex items-baseline justify-center gap-3 mb-2">
-                            <span className="text-4xl font-black text-[#800020]">
-                              ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-center gap-2 text-sm">
-                            <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                            <span className="text-slate-600 font-semibold">
-                              {estimate.confidence}% Confidence
-                            </span>
-                          </div>
-                        </div>
-
-                        {estimate.enhancedDescription && (
-                          <p className="text-slate-600 text-sm mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                            {estimate.enhancedDescription}
-                          </p>
-                        )}
-
-                        {estimate.factors && estimate.factors.length > 0 && (
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-slate-900 text-sm">Cost Factors:</h4>
-                            <ul className="space-y-2">
-                              {estimate.factors.map((factor, index) => (
-                                <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
-                                  <span className="text-rose-700 mt-1">•</span>
-                                  <span>{factor}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        <div className="mt-6 pt-4 border-t border-slate-200">
-                          <Link
-                            href={`/?estimate=${estimate.id}`}
-                            className="inline-flex items-center gap-2 bg-[#800020] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
-                          >
-                            Post Job & Get Quotes
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-rose-50 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-rose-50 rounded-full mb-6">
-                      <DollarSign className="h-10 w-10 text-rose-700" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">No Saved Quotes Yet</h3>
-                    <p className="text-slate-600 mb-6 max-w-md mx-auto">
-                      Get instant AI-powered estimates for your home projects. Upload photos and describe your needs using voice or text.
-                    </p>
-                    <Link
-                      href="/"
-                      className="bg-[#800020] text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all inline-flex items-center gap-2"
-                    >
-                      Get Your First Quote
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-
             {activeTab === 'contact' && (
-              <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900">Contact Information</h2>
+              <div className="bg-white rounded-xl shadow-lg p-5 md:p-6 border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900">Contact Information</h2>
                   {isEditing && (
                     <span className="text-xs text-rose-700 font-semibold bg-rose-50 px-3 py-1 rounded-full">Editing Mode</span>
                   )}
                 </div>
                 
-                <div className="space-y-5">
+                <div className="space-y-3">
                   {isEditing ? (
                     <>
                       {isContractor ? (
@@ -1870,63 +1736,63 @@ export default function UnifiedProfilePage() {
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                        <div className="flex-shrink-0 w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
-                          <Mail className="h-6 w-6 text-white" />
+                      <div className="flex items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                        <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
+                          <Mail className="h-5 w-5 text-white" />
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-3">
                           <p className="text-xs font-semibold text-slate-500 uppercase">Email</p>
-                          <p className="text-base font-medium text-slate-900">{authUser.email}</p>
+                          <p className="text-sm font-medium text-slate-900">{authUser.email}</p>
                         </div>
                       </div>
                       {profile?.phone ? (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
-                            <Phone className="h-6 w-6 text-white" />
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
+                            <Phone className="h-5 w-5 text-white" />
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-3">
                             <p className="text-xs font-semibold text-slate-500 uppercase">Phone</p>
-                            <p className="text-base font-medium text-slate-900">{profile.phone}</p>
+                            <p className="text-sm font-medium text-slate-900">{profile.phone}</p>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
-                          <Phone className="h-5 w-5 text-slate-400 mr-3" />
-                          <span className="text-slate-500 italic">No phone number added</span>
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <Phone className="h-4 w-4 text-slate-400 mr-2.5" />
+                          <span className="text-sm text-slate-500 italic">No phone number added</span>
                         </div>
                       )}
                       {profile?.website ? (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
-                            <Globe className="h-6 w-6 text-white" />
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
+                            <Globe className="h-5 w-5 text-white" />
                           </div>
-                          <div className="ml-4 flex-1 min-w-0">
+                          <div className="ml-3 flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-500 uppercase">Website</p>
-                            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-base font-medium text-rose-700 hover:text-rose-900 hover:underline truncate block">
+                            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-rose-700 hover:text-rose-900 hover:underline truncate block">
                               {profile.website}
                             </a>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
-                          <Globe className="h-5 w-5 text-slate-400 mr-3" />
-                          <span className="text-slate-500 italic">No website added</span>
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <Globe className="h-4 w-4 text-slate-400 mr-2.5" />
+                          <span className="text-sm text-slate-500 italic">No website added</span>
                         </div>
                       )}
                       {profile?.city ? (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                          <div className="flex-shrink-0 w-12 h-12 bg-[#800020] rounded-xl flex items-center justify-center">
-                            <MapPin className="h-6 w-6 text-white" />
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                          <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
+                            <MapPin className="h-5 w-5 text-white" />
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-3">
                             <p className="text-xs font-semibold text-slate-500 uppercase">Location</p>
-                            <p className="text-base font-medium text-slate-900">{profile.city}</p>
+                            <p className="text-sm font-medium text-slate-900">{profile.city}</p>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
-                          <MapPin className="h-5 w-5 text-slate-400 mr-3" />
-                          <span className="text-slate-500 italic">No location added</span>
+                        <div className="flex items-center p-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">
+                          <MapPin className="h-4 w-4 text-slate-400 mr-2.5" />
+                          <span className="text-sm text-slate-500 italic">No location added</span>
                         </div>
                       )}
                     </>

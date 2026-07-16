@@ -14,6 +14,14 @@ import FoundingContractorSection from "@/components/FoundingContractorSection";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// Regular (post-promo) monthly price shown alongside the founding $0.99 first-month
+// offer. Must match TIER_PRICING in app/api/subscriptions/create-checkout/route.ts.
+const TIER_REGULAR_PRICE_LABEL: Record<'handyman' | 'renovation' | 'general', string> = {
+  handyman: '$49.00',
+  renovation: '$99.00',
+  general: '$149.00',
+};
+
 interface Subscription {
   id: string;
   category: string;
@@ -51,6 +59,8 @@ export default function SubscriptionsPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showCancelMessage, setShowCancelMessage] = useState(false);
+  const [successFoundingOffer, setSuccessFoundingOffer] = useState(false);
+  const [successTier, setSuccessTier] = useState<'handyman' | 'renovation' | 'general' | null>(null);
   
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -73,9 +83,12 @@ export default function SubscriptionsPage() {
     const canceled = searchParams.get('canceled');
     const tier = searchParams.get('tier');
     const sessionId = searchParams.get('session_id');
+    const founding = searchParams.get('founding');
 
     if (success === 'true') {
       setShowSuccessMessage(true);
+      setSuccessFoundingOffer(founding === '1');
+      setSuccessTier(tier === 'handyman' || tier === 'renovation' || tier === 'general' ? tier : null);
       setTimeout(() => setShowSuccessMessage(false), 10000);
 
       // Activate selected categories stored before Stripe redirect
@@ -102,14 +115,18 @@ export default function SubscriptionsPage() {
             .catch((err) => console.error('[Activate] Error:', err));
         };
 
-        // authUser may not be loaded yet — poll briefly
+        // authUser may not be loaded yet — poll briefly.
+        // getUser() is a stable getter that captures authUser without triggering
+        // TypeScript's `else`-branch narrowing to `null | never` inside closures.
+        const getUser = (): typeof authUser => authUser;
         if (authUser) {
           activate(authUser.id);
         } else {
           const poll = setInterval(() => {
             // Re-read authUser each tick to detect when it loads
             void (function check() {
-              if (authUser) { clearInterval(poll); activate(authUser.id); }
+              const u = getUser();
+              if (u) { clearInterval(poll); activate(u.id); }
             }());
           }, 300);
           setTimeout(() => clearInterval(poll), 5000);
@@ -394,9 +411,17 @@ export default function SubscriptionsPage() {
               </svg>
               <div className="flex-1">
                 <h3 className="text-green-800 font-medium">Subscription Activated!</h3>
-                <p className="text-green-700 mt-1">
-                  Your subscription payment was successful. You can now select your categories below to start receiving leads.
-                </p>
+                {successFoundingOffer && successTier ? (
+                  <p className="text-green-700 mt-1">
+                    🎉 Founding Contractor Offer applied — you were charged <strong>$0.99</strong> for your first month.
+                    Your subscription renews at the regular <strong>{TIER_REGULAR_PRICE_LABEL[successTier]}/month</strong> starting
+                    next billing cycle. Cancel anytime. You can now select your categories below to start receiving leads.
+                  </p>
+                ) : (
+                  <p className="text-green-700 mt-1">
+                    Your subscription payment was successful. You can now select your categories below to start receiving leads.
+                  </p>
+                )}
                 <button
                   onClick={() => setShowSuccessMessage(false)}
                   className="text-green-600 hover:text-green-800 text-sm font-medium mt-2"
@@ -495,6 +520,12 @@ export default function SubscriptionsPage() {
                           <span className="text-5xl font-black bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">$49</span>
                           <span className="text-gray-600 font-bold text-lg">/month</span>
                         </div>
+                        {subscriptions.length === 0 && (
+                          <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
+                            <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
+                            <p className="text-[11px] text-amber-700">Then $49.00/month · Cancel anytime</p>
+                          </div>
+                        )}
                         <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-200">
                           <p className="text-sm font-black text-green-800">3 Categories — Perfect for solo contractors</p>
                         </div>
@@ -535,6 +566,12 @@ export default function SubscriptionsPage() {
                         <span className="text-5xl font-black text-[#800020]">$99</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
+                      {subscriptions.length === 0 && (
+                        <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
+                          <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
+                          <p className="text-[11px] text-amber-700">Then $99.00/month · Cancel anytime</p>
+                        </div>
+                      )}
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
                         <p className="text-sm font-black text-orange-800">6 Categories — Best value for growing businesses</p>
                       </div>
@@ -573,6 +610,12 @@ export default function SubscriptionsPage() {
                         <span className="text-5xl font-black text-[#800020]">$149</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
+                      {subscriptions.length === 0 && (
+                        <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
+                          <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
+                          <p className="text-[11px] text-amber-700">Then $149.00/month · Cancel anytime</p>
+                        </div>
+                      )}
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
                         <p className="text-sm font-black text-rose-900">ALL 10+ Categories — Full-service contractors</p>
                       </div>
@@ -1029,6 +1072,11 @@ export default function SubscriptionsPage() {
                 {pickedCategories.length < maxAllowed && (
                   <p className="text-center text-sm text-gray-500 mb-3">
                     Select {maxAllowed - pickedCategories.length} more to continue
+                  </p>
+                )}
+                {subscriptions.length === 0 && pendingTier && (
+                  <p className="text-center text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 mb-3">
+                    🎉 Founding Offer: first month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. Cancel anytime.
                   </p>
                 )}
                 <div className="flex items-center gap-3">

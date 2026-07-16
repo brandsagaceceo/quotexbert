@@ -1,13 +1,37 @@
 "use client";
 
-import { Camera } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Camera, X } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 export function StickyCTA() {
   const { isSignedIn } = useAuth();
+  const [dismissed, setDismissed] = useState(false);
+  const [estimatorInView, setEstimatorInView] = useState(false);
 
-  if (isSignedIn) {
+  // Dismiss persists for the tab session only (not permanently) — the CTA reappears
+  // on the homeowner's next visit/tab.
+  useEffect(() => {
+    if (sessionStorage.getItem('stickyCtaDismissed') === '1') {
+      setDismissed(true);
+    }
+  }, []);
+
+  // Hide the CTA whenever the actual estimator tool is already visible on screen —
+  // it would otherwise duplicate/obstruct the live form (item 12 requirement).
+  useEffect(() => {
+    const target = document.querySelector('[data-estimator]');
+    if (!target || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      ([entry]) => entry && setEstimatorInView(entry.isIntersecting),
+      { threshold: 0.15 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  if (isSignedIn || dismissed || estimatorInView) {
     return null;
   }
 
@@ -15,19 +39,28 @@ export function StickyCTA() {
     <>
       {/* Mobile Only - Sticky Bottom Bar */}
       <div className="sticky-cta-bar md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
-        <div className="bg-[#800020] shadow-lg">
-          <Link 
+        <div className="bg-[#800020] shadow-lg flex items-stretch">
+          <Link
             href="/#estimator-tool"
-            className="flex items-center justify-center gap-3 px-6 py-4 text-white font-bold text-lg active:opacity-90 transition-opacity"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-white font-bold text-sm active:opacity-90 transition-opacity min-w-0"
           >
-            <Camera className="w-6 h-6" />
-            <span>📸 Upload Photos – Free Estimate</span>
+            <Camera className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">Upload Photos — Free Estimate</span>
+            <span className="flex-shrink-0 bg-amber-400 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded-full">
+              FREE
+            </span>
           </Link>
-        </div>
-        
-        {/* Floating notification badge (optional) */}
-        <div className="absolute -top-2 right-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-          100% FREE
+          <button
+            type="button"
+            onClick={() => {
+              setDismissed(true);
+              sessionStorage.setItem('stickyCtaDismissed', '1');
+            }}
+            aria-label="Dismiss"
+            className="flex-shrink-0 flex items-center justify-center w-10 text-white/70 hover:text-white border-l border-white/15"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -35,25 +68,12 @@ export function StickyCTA() {
       <style jsx global>{`
         @media (max-width: 768px) {
           body {
-            padding-bottom: 72px;
+            padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px));
           }
         }
         
         .safe-area-bottom {
           padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-5px);
-          }
-        }
-        
-        .animate-bounce {
-          animation: bounce 2s infinite;
         }
       `}</style>
     </>

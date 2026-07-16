@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { stripe, getOrCreateFoundingOfferCoupon, isFoundingOfferEnabled, FOUNDING_OFFER_FIRST_MONTH_CENTS } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { isGodUser } from "@/lib/god-access";
 import { ALL_CATEGORIES } from "@/lib/categories";
@@ -180,6 +180,29 @@ export async function POST(req: Request) {
     }
     // ── END GOD USER BYPASS ────────────────────────────────────────────────────
 
+    // ── FOUNDING CONTRACTOR OFFER ELIGIBILITY ──────────────────────────────────
+    // Only offered to contractors who have NEVER had a ContractorSubscription
+    // record (any category, any status) — i.e. genuinely first-time subscribers.
+    // This intentionally excludes anyone reactivating/upgrading an existing or
+    // past subscription, per the "do not apply to existing subscriptions" rule.
+    let foundingOfferApplied = false;
+    let foundingCouponId: string | null = null;
+    if (isFoundingOfferEnabled()) {
+      const priorSubscriptionCount = await prisma.contractorSubscription.count({
+        where: { contractorId: dbUserId },
+      });
+      if (priorSubscriptionCount === 0) {
+        try {
+          foundingCouponId = await getOrCreateFoundingOfferCoupon(tier, tierConfig.price);
+          foundingOfferApplied = true;
+        } catch (couponErr) {
+          console.error('[API] Failed to prepare founding offer coupon (continuing at regular price):', couponErr);
+          foundingOfferApplied = false;
+        }
+      }
+    }
+    // ── END FOUNDING CONTRACTOR OFFER ELIGIBILITY ──────────────────────────────
+
     let customerId = contractor.billing?.stripeCustomerId;
 
     // Create Stripe customer if doesn't exist
@@ -218,6 +241,8 @@ export async function POST(req: Request) {
       ? JSON.stringify(selectedCategories)
       : '';
 
+    const promotionStart = new Date().toISOString();
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
@@ -229,6 +254,10 @@ export async function POST(req: Request) {
             recurring: {
               interval: "month"
             },
+            // Always the tier's normal recurring price — the founding offer
+            // discounts the FIRST invoice only via a "duration: once" coupon
+            // below; it never changes this recurring price itself, so every
+            // invoice after the first bills at the regular tier price.
             unit_amount: tierConfig.price,
             product_data: {
               name: `${tierConfig.name} Plan`,
@@ -242,20 +271,31 @@ export async function POST(req: Request) {
           quantity: 1
         }
       ],
-      success_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?success=true&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
+      ...(foundingOfferApplied && foundingCouponId
+        ? { discounts: [{ coupon: foundingCouponId }] }
+        : {}),
+      success_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?success=true&tier=${tier}&session_id={CHECKOUT_SESSION_ID}${foundingOfferApplied ? '&founding=1' : ''}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"}/contractor/subscriptions?canceled=true`,
       metadata: {
         contractorId: dbUserId,
         tier: tier,
         categories: tierConfig.categories.toString(),
         selectedCategories: selectedCategoriesJson,
+        // Founding-offer audit trail (item 1 requirement) — enough to reconstruct
+        // exactly what was promised/charged without re-deriving it from Stripe.
+        foundingOfferApplied: foundingOfferApplied ? "true" : "false",
+        regularPriceCents: tierConfig.price.toString(),
+        firstChargeCents: foundingOfferApplied ? FOUNDING_OFFER_FIRST_MONTH_CENTS.toString() : tierConfig.price.toString(),
+        firstRenewalAmountCents: tierConfig.price.toString(),
+        promotionStart: foundingOfferApplied ? promotionStart : "",
       }
     });
 
     return NextResponse.json({
       success: true,
       checkoutUrl: session.url,
-      sessionId: session.id
+      sessionId: session.id,
+      foundingOfferApplied,
     });
 
   } catch (error) {

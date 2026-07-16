@@ -198,33 +198,43 @@ export default function HomeownerJobsPage() {
               : null;
 
             return (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow">
+              <Card key={job.id} className="hover:shadow-lg transition-shadow overflow-hidden">
                 <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-semibold">{job.title}</h3>
-                      <p className="mt-2 text-base text-gray-600">
-                        {job.description}
-                      </p>
-                    </div>
+                  {/* Title gets its own full-width row so a long title never has to
+                      compete with the status badge for space (was clipping "Open for
+                      Applications" on mobile). */}
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 break-words">
+                    {job.title}
+                  </h3>
+                  <div className="mt-1.5">
                     <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
                   </div>
-                  
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-4">
-                    <span className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-1" />
-                      Budget: {formatBudgetDisplay(job.budget)}
+                  <p className="mt-2 text-sm sm:text-base text-gray-600 line-clamp-2">
+                    {job.description}
+                  </p>
+
+                  {/* Details in a responsive grid instead of inline spans — prevents
+                      "Category / ZIP / Applications" from visually running together
+                      and wrapping mid-word on narrow screens. */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm text-gray-600 mt-4">
+                    <span className="flex items-center gap-1 min-w-0">
+                      <DollarSign className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{formatBudgetDisplay(job.budget)}</span>
                     </span>
-                    <span>Category: {job.category}</span>
-                    <span>ZIP: {job.zipCode}</span>
-                    <span className="flex items-center">
-                      <Users className="w-4 h-4 mr-1" />
-                      {applicationCount}/{job.maxContractors} Applications
+                    <span className="flex items-center gap-1 min-w-0">
+                      <span className="truncate capitalize">{job.category}</span>
+                    </span>
+                    <span className="flex items-center gap-1 min-w-0">
+                      <span className="truncate">ZIP {job.zipCode}</span>
+                    </span>
+                    <span className="flex items-center gap-1 min-w-0">
+                      <Users className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{applicationCount}/{job.maxContractors} Applications</span>
                     </span>
                     {lowestBid && (
-                      <span className="flex items-center text-green-600">
-                        <DollarSign className="w-4 h-4 mr-1" />
-                        Lowest Bid: ${lowestBid.toLocaleString()}
+                      <span className="flex items-center gap-1 text-green-600 col-span-2 sm:col-span-4 min-w-0">
+                        <DollarSign className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">Lowest Bid: ${lowestBid.toLocaleString()}</span>
                       </span>
                     )}
                   </div>

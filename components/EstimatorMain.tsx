@@ -379,8 +379,8 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
     <IPhoneFrame>
       <div className="px-3 md:px-6 pb-3">
         {/* Header */}
-        <div className="text-center mb-4 pt-2">
-          <div className="inline-flex items-center gap-2 bg-[#800020] text-white px-3 py-1.5 rounded-full text-xs font-bold mb-2">
+        <div className="text-center mb-3 pt-2">
+          <div className="inline-flex items-center gap-2 bg-[#800020] text-white px-3 py-1 rounded-full text-xs font-bold mb-1.5">
             <SparklesIcon className="w-4 h-4" />
             AI Instant Estimate — 100% Free
           </div>
@@ -402,7 +402,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-2.5 md:space-y-4">
           {/* Photo Upload Area - Big Drag & Drop */}
           <div>
             <label className="block text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -416,8 +416,8 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`
-                border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer
-                transition-all duration-200 relative min-h-[175px] flex flex-col items-center justify-center
+                border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer
+                transition-all duration-200 relative min-h-[148px] flex flex-col items-center justify-center
                 shadow-md
                 ${isDragging
                   ? "border-orange-500 bg-orange-50 scale-[1.02] shadow-lg"
@@ -426,16 +426,16 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               `}
             >
               {/* Camera icon with background */}
-              <div className="w-14 h-14 rounded-2xl bg-[#800020] flex items-center justify-center mb-3 shadow-lg">
-                <CloudArrowUpIcon className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 rounded-2xl bg-[#800020] flex items-center justify-center mb-2 shadow-lg">
+                <CloudArrowUpIcon className="w-7 h-7 text-white" />
               </div>
-              <p className="text-lg md:text-base font-black text-slate-900 mb-1">
+              <p className="text-base font-black text-slate-900 mb-0.5">
                 📷 Upload Your Photos Here
               </p>
               <p className="text-sm font-bold text-rose-600">
                 Tap here to browse · or drag &amp; drop
               </p>
-              <p className="text-xs text-slate-500 mt-2 bg-white/70 px-3 py-1 rounded-full">
+              <p className="text-xs text-slate-500 mt-1.5 bg-white/70 px-3 py-1 rounded-full">
                 Photos = faster &amp; more accurate estimates
               </p>
               

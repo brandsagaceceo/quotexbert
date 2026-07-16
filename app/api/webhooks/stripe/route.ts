@@ -225,18 +225,26 @@ async function handleCheckoutSessionCompleted(session: any) {
       }
     }
 
-    // Create notification
+    // Create notification — discloses the founding-offer renewal price when applicable
+    // so there's a clear, permanent in-app record of what was promised (in addition to
+    // the audit fields already stored on the Stripe Checkout Session's metadata).
+    const foundingOfferApplied = session.metadata?.foundingOfferApplied === "true";
+    const regularPriceDisplay = (tierInfo.price).toFixed(2);
+    const notificationMessage = foundingOfferApplied
+      ? `Your ${tierInfo.name} subscription is now active! First month billed at $0.99 (Founding Contractor Offer) — renews at $${regularPriceDisplay}/month starting next billing cycle. You can now select up to ${categoryCount} categories to receive leads from.`
+      : `Your ${tierInfo.name} subscription is now active! You can now select up to ${categoryCount} categories to receive leads from.`;
+
     await prisma.notification.create({
       data: {
         userId: contractorId,
         type: 'SUBSCRIPTION_CREATED',
         title: 'Subscription Activated! 🎉',
-        message: `Your ${tierInfo.name} subscription is now active! You can now select up to ${categoryCount} categories to receive leads from.`,
+        message: notificationMessage,
         read: false
       }
     });
 
-    console.log(`[STRIPE WEBHOOK] Successfully activated ${tierInfo.normalizedTier} subscription for contractor ${contractorId}`);
+    console.log(`[STRIPE WEBHOOK] Successfully activated ${tierInfo.normalizedTier} subscription for contractor ${contractorId}${foundingOfferApplied ? ' (founding offer: first month $0.99)' : ''}`);
 
     // Send subscription confirmation email
     const contractorEmailUser = await prisma.user.findUnique({
