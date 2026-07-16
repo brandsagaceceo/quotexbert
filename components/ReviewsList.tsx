@@ -8,9 +8,21 @@ interface Review {
   rating: number;
   text: string | null;
   createdAt: string;
+  isVerified: boolean;
   homeowner: {
     name: string | null;
   };
+  lead?: {
+    category: string | null;
+  } | null;
+}
+
+/** Privacy-safe display name: first name only, never full name/email. */
+function firstNameOnly(name: string | null | undefined): string {
+  if (!name) return "Anonymous";
+  const trimmed = name.trim();
+  if (!trimmed) return "Anonymous";
+  return trimmed.split(/\s+/)[0] ?? "Anonymous";
 }
 
 interface ReviewsListProps {
@@ -119,6 +131,16 @@ export function ReviewsList({ contractorId, limit }: ReviewsListProps) {
                   addSuffix: true,
                 })}
               </span>
+              {review.isVerified && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Verified QuoteXbert Job
+                </span>
+              )}
+              {review.lead?.category && (
+                <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full capitalize">
+                  {review.lead.category}
+                </span>
+              )}
             </div>
 
             {/* Comment */}
@@ -128,9 +150,9 @@ export function ReviewsList({ contractorId, limit }: ReviewsListProps) {
               </p>
             )}
 
-            {/* Reviewer */}
+            {/* Reviewer - first name only, never full identity */}
             <p className="text-sm text-slate-600">
-              — {review.homeowner?.name || "Anonymous"}
+              - {firstNameOnly(review.homeowner?.name)}
             </p>
           </div>
         ))}

@@ -76,6 +76,12 @@ model User {
   contractorContracts Contract[]        @relation("ContractorContracts")
   reviewsGiven        Review[]          @relation("HomeownerReviews")
   reviewsReceived     Review[]          @relation("ContractorReviews")
+
+  // Private contractor -> homeowner experience ratings (never public)
+  homeownerRatingsGiven    HomeownerRating[] @relation("ContractorGivenHomeownerRatings")
+  homeownerRatingsReceived HomeownerRating[] @relation("HomeownerReceivedRatings")
+  avgHomeownerRating      Float             @default(0) // Private aggregate — never exposed publicly
+  homeownerRatingCount    Int               @default(0) // Private aggregate — never exposed publicly
   
   // New conversation relations
   homeownerConversations Conversation[] @relation("HomeownerConversations")
@@ -149,7 +155,7 @@ model Lead {
   budget           String           // Changed from Float to String to store budget ranges
   zipCode          String
   category         String
-  status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "completed" | "closed"
+  status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "pending_completion" | "completed" | "closed"
   claimed          Boolean          @default(false)
   claimedBy        String?          // Contractor ID who claimed first
   claimedAt        DateTime?        // When lead was first claimed
@@ -171,7 +177,9 @@ model Lead {
   contractorId     String?
   contractor       User?            @relation("ContractorLeads", fields: [contractorId], references: [id])
   
-  completedAt      DateTime?        // When the job was completed
+  completedAt      DateTime?        // When the job was completed (homeowner confirmed)
+  contractorCompletedAt DateTime?   // When the contractor marked the work as complete
+  homeownerConfirmedAt  DateTime?   // When the homeowner confirmed completion (unlocks reviews/ratings)
   acceptedById     String?          // Final selected contractor
   acceptedBy       User?            @relation("AcceptedLeads", fields: [acceptedById], references: [id])
   
@@ -182,6 +190,7 @@ model Lead {
   charges          Charge[]
   contract         Contract?
   reviews          Review[]
+  homeownerRatings HomeownerRating[] // Private contractor ratings of the homeowner for this job
   conversations    Conversation[]
   quotes           Quote[]
   aiEstimate       AIEstimate?      // Link back to the original AI estimate
@@ -1070,6 +1079,43 @@ model EmailEvent {
   @@index([type])
   @@index([createdAt])
   @@map("email_events")
+}
+
+// Private contractor -> homeowner "job experience" rating. Never shown publicly,
+// to homeowners, on public profiles/APIs, or in emails to unrelated users.
+// Visible only to: the rating contractor, other eligible contractors considering/
+// involved in a job with this homeowner, and admins.
+model HomeownerRating {
+  id           String   @id @default(cuid())
+
+  leadId       String
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  contractorId String
+  contractor   User     @relation("ContractorGivenHomeownerRatings", fields: [contractorId], references: [id], onDelete: Cascade)
+
+  homeownerId  String
+  homeowner    User     @relation("HomeownerReceivedRatings", fields: [homeownerId], references: [id], onDelete: Cascade)
+
+  overallRating Int     // Required, 1-5. Overall job/experience rating.
+
+  // Optional structured category ratings (1-5) — professional, job-experience focused only
+  communicationRating   Int?
+  clarityRating         Int? // Clarity of scope
+  responsivenessRating  Int?
+  paymentRating         Int? // Payment experience
+  accessReadinessRating Int? // Site access / readiness
+  professionalismRating Int?
+
+  privateNote  String?  @db.Text // Sanitized, length-limited. Visible only to eligible contractors/admin.
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([leadId, contractorId]) // One rating per contractor per completed job
+  @@index([homeownerId])
+  @@index([contractorId])
+  @@map("homeowner_ratings")
 }
 
 // Stores affiliate lead submissions

@@ -45,7 +45,7 @@ export function ReviewModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contractorId,
-          jobId,
+          leadId: jobId,
           rating,
           text: comment,
         }),

@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { reviewSchema } from "@/lib/validation/schemas";
-import { auth } from "@clerk/nextjs/server";
+import { resolveAuthUser } from "@/lib/server-auth";
 import { sendReviewReceivedEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
+
+/** Strips HTML tags/scripts and enforces a sane length. Reviews are plain text only. */
+function sanitizeReviewText(input: string | undefined | null): string | null {
+  if (!input) return null;
+  const stripped = input.replace(/<[^>]*>/g, "").trim();
+  if (!stripped) return null;
+  return stripped.slice(0, 1000);
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,15 +65,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await auth();
-    const userId = authResult.userId;
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const { dbUserId: userId } = authResult.user;
 
     const body = await request.json();
     const validatedData = reviewSchema.parse(body);
@@ -89,7 +93,8 @@ export async function POST(request: NextRequest) {
       select: { 
         status: true, 
         homeownerId: true, 
-        contractorId: true 
+        contractorId: true,
+        isSeeded: true,
       },
     });
 
@@ -104,6 +109,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "You can only review your own jobs" },
         { status: 403 }
+      );
+    }
+
+    if (lead.contractorId === lead.homeownerId) {
+      // Defensive guard — a contractor can never review "themselves"
+      return NextResponse.json(
+        { error: "Invalid review target" },
+        { status: 400 }
       );
     }
 
@@ -138,14 +151,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create review
+    const sanitizedText = sanitizeReviewText(validatedData.text);
+
+    // Create review — isVerified is true only for real (non-seeded) completed jobs
     const review = await prisma.review.create({
       data: {
         leadId: validatedData.leadId,
         contractorId: validatedData.contractorId,
         homeownerId: userId,
         rating: validatedData.rating,
-        text: validatedData.text || null,
+        text: sanitizedText,
+        isVerified: !lead.isSeeded,
+        status: lead.isSeeded ? "hidden" : "published", // never auto-publish reviews from seeded/demo jobs
       },
       include: {
         homeowner: {
@@ -157,14 +174,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update contractor's average rating
+    // Update contractor's average rating — only counts published (non-seeded, non-hidden) reviews
     const [avgRating, reviewCount] = await Promise.all([
       prisma.review.aggregate({
-        where: { contractorId: validatedData.contractorId },
+        where: { contractorId: validatedData.contractorId, status: "published" },
         _avg: { rating: true },
       }),
       prisma.review.count({
-        where: { contractorId: validatedData.contractorId },
+        where: { contractorId: validatedData.contractorId, status: "published" },
       }),
     ]);
 
@@ -176,6 +193,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Only notify the contractor for real (non-seeded) reviews
+    if (review.status === "published") {
     // Send email notification to contractor about new review
     try {
       const contractor = await prisma.user.findUnique({
@@ -220,6 +239,7 @@ export async function POST(request: NextRequest) {
     } catch (emailError) {
       console.error('Failed to send review notification:', emailError);
       // Don't fail the request if email fails
+    }
     }
 
     return NextResponse.json({ review });

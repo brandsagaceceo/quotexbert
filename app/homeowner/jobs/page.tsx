@@ -105,6 +105,7 @@ export default function HomeownerJobsPage() {
       open: { label: 'Open for Applications', variant: 'default' as const },
       reviewing: { label: 'Reviewing Applications', variant: 'outline' as const },
       assigned: { label: 'Assigned', variant: 'success' as const },
+      pending_completion: { label: 'Awaiting Your Confirmation', variant: 'outline' as const },
       completed: { label: 'Completed', variant: 'success' as const },
     };
     

@@ -66,7 +66,8 @@ export default function PortfolioLikeButton({ itemId, readOnly = false }: Portfo
       onClick={handleToggle}
       disabled={loading}
       aria-label={liked ? "Unlike" : "Like"}
-      className={`flex items-center gap-1.5 text-xs font-medium transition-colors px-2 py-1 rounded-full ${
+      aria-pressed={liked}
+      className={`flex items-center gap-1.5 text-xs font-medium transition-colors px-3 py-1 rounded-full min-h-[44px] min-w-[44px] justify-center sm:min-h-0 sm:min-w-0 sm:justify-start sm:px-2 sm:py-1 ${
         liked
           ? "text-rose-600 bg-rose-50 hover:bg-rose-100"
           : "text-gray-400 hover:text-rose-500 hover:bg-rose-50"

@@ -28,6 +28,11 @@ export async function GET(
             name: true,
           },
         },
+        lead: {
+          select: {
+            category: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",

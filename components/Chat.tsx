@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useMessageNotifications } from "@/lib/hooks/useMessageNotifications";
 import { getAutoDraftQuoteState, type AutoDraftState } from "@/lib/quote-context";
+import { ReviewModal } from "@/components/ReviewModal";
+import { HomeownerRatingModal } from "@/components/HomeownerRatingModal";
 
 interface UserProfile {
   id: string;
@@ -69,13 +71,14 @@ function getProfilePhoto(user: UserProfile | null | undefined): string | null {
 }
 
 // Presentation-only label map for the existing `thread.lead.status` field
-// (values already supported by the schema: draft | open | reviewing | assigned | completed | closed).
-// Purely visual — does not affect any business logic.
+// (values already supported by the schema: draft | open | reviewing | assigned |
+// pending_completion | completed | closed). Purely visual — does not affect any business logic.
 const LEAD_STATUS_META: Record<string, { label: string; className: string }> = {
   draft: { label: "Draft", className: "bg-slate-100 text-slate-600" },
   open: { label: "Open", className: "bg-blue-50 text-blue-700" },
   reviewing: { label: "Reviewing", className: "bg-amber-50 text-amber-700" },
   assigned: { label: "Contractor Accepted", className: "bg-emerald-50 text-emerald-700" },
+  pending_completion: { label: "Awaiting Confirmation", className: "bg-amber-50 text-amber-700" },
   completed: { label: "Completed", className: "bg-slate-100 text-slate-600" },
   closed: { label: "Closed", className: "bg-slate-100 text-slate-500" },
 };
@@ -109,6 +112,16 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [hiringContractor, setHiringContractor] = useState(false);
   const [contractorHired, setContractorHired] = useState(false);
+  // Job completion lifecycle — local overrides so the UI updates immediately
+  // without needing the parent to re-fetch the whole thread list.
+  const [localLeadStatus, setLocalLeadStatus] = useState<string | null>(null);
+  const [markingComplete, setMarkingComplete] = useState(false);
+  const [confirmingComplete, setConfirmingComplete] = useState(false);
+  const [completionActionError, setCompletionActionError] = useState<string | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showHomeownerRatingModal, setShowHomeownerRatingModal] = useState(false);
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [hasSubmittedHomeownerRating, setHasSubmittedHomeownerRating] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -165,6 +178,16 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
     isHomeowner && thread.lead.contractor && thread.lead.status !== "assigned" && !contractorHired;
   // Self-user profile — used for optimistic message rendering (mirrors otherUser logic)
   const selfUser = isHomeowner ? thread.lead.homeowner : (thread.lead.contractor ?? thread.lead.homeowner);
+
+  // Job completion lifecycle — derive the effective status from local overrides first
+  // so the UI reflects mark-complete/confirm-complete actions immediately.
+  const effectiveLeadStatus = localLeadStatus ?? thread.lead.status;
+  const isHiredContractor =
+    !isHomeowner && !!currentUserId && thread.lead.contractor?.id === currentUserId;
+  const canMarkJobComplete = isHiredContractor && effectiveLeadStatus === "assigned";
+  const canConfirmCompletion = isHomeowner && effectiveLeadStatus === "pending_completion";
+  const canLeaveReview = isHomeowner && effectiveLeadStatus === "completed" && !hasSubmittedReview;
+  const canRateHomeowner = isHiredContractor && effectiveLeadStatus === "completed" && !hasSubmittedHomeownerRating;
 
   const fetchMessages = useCallback(async () => {
     if (isSendingRef.current) return; // skip during optimistic send window
@@ -431,6 +454,46 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
     finally { setHiringContractor(false); }
   };
 
+  const markJobComplete = async () => {
+    setMarkingComplete(true);
+    setCompletionActionError(null);
+    try {
+      const response = await fetch(`/api/leads/${thread.lead.id}/mark-complete`, {
+        method: "POST",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setLocalLeadStatus("pending_completion");
+      } else {
+        setCompletionActionError(data.error || "Failed to mark job complete. Please try again.");
+      }
+    } catch {
+      setCompletionActionError("Network error — please try again.");
+    } finally {
+      setMarkingComplete(false);
+    }
+  };
+
+  const confirmJobCompletion = async () => {
+    setConfirmingComplete(true);
+    setCompletionActionError(null);
+    try {
+      const response = await fetch(`/api/leads/${thread.lead.id}/confirm-complete`, {
+        method: "POST",
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setLocalLeadStatus("completed");
+      } else {
+        setCompletionActionError(data.error || "Failed to confirm completion. Please try again.");
+      }
+    } catch {
+      setCompletionActionError("Network error — please try again.");
+    } finally {
+      setConfirmingComplete(false);
+    }
+  };
+
   // Phase 1: AI Reply Assistant handler
   const handleAiEnhance = async () => {
     if (!newMessage.trim() || aiEnhancing || !userRole) return;
@@ -618,6 +681,78 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
           )}
         </div>
       </div>
+
+      {/* Job completion lifecycle banner — separate row so it never overlaps header actions on mobile */}
+      {(canMarkJobComplete || canConfirmCompletion || canLeaveReview || canRateHomeowner || completionActionError) && (
+        <div className="flex-shrink-0 px-3 sm:px-5 py-2.5 border-b border-slate-100 bg-amber-50/60 flex flex-wrap items-center gap-2">
+          {canMarkJobComplete && (
+            <button
+              onClick={markJobComplete}
+              disabled={markingComplete}
+              className="min-h-[40px] px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg disabled:opacity-60 flex items-center gap-1.5 transition-colors shadow-sm"
+            >
+              {markingComplete ? "Marking..." : "Mark Job Complete"}
+            </button>
+          )}
+          {canConfirmCompletion && (
+            <button
+              onClick={confirmJobCompletion}
+              disabled={confirmingComplete}
+              className="min-h-[40px] px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg disabled:opacity-60 flex items-center gap-1.5 transition-colors shadow-sm"
+            >
+              {confirmingComplete ? "Confirming..." : "Confirm Completion"}
+            </button>
+          )}
+          {effectiveLeadStatus === "pending_completion" && isHiredContractor && (
+            <span className="text-xs text-amber-700 font-medium">Waiting for homeowner to confirm completion…</span>
+          )}
+          {canLeaveReview && (
+            <button
+              onClick={() => setShowReviewModal(true)}
+              className="min-h-[40px] px-3 py-2 bg-[#800020] hover:shadow-md text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-all"
+            >
+              Leave a Review
+            </button>
+          )}
+          {canRateHomeowner && (
+            <button
+              onClick={() => setShowHomeownerRatingModal(true)}
+              className="min-h-[40px] px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors"
+            >
+              Rate This Homeowner
+            </button>
+          )}
+          {hasSubmittedReview && (
+            <span className="text-xs text-emerald-700 font-medium">✓ Review submitted — thank you!</span>
+          )}
+          {hasSubmittedHomeownerRating && (
+            <span className="text-xs text-emerald-700 font-medium">✓ Rating submitted — thank you!</span>
+          )}
+          {completionActionError && (
+            <span className="text-xs text-red-600 font-medium">{completionActionError}</span>
+          )}
+        </div>
+      )}
+
+      {isHomeowner && otherUser && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          contractorName={getDisplayName(otherUser)}
+          contractorId={otherUser.id}
+          jobId={thread.lead.id}
+          onSubmitSuccess={() => setHasSubmittedReview(true)}
+        />
+      )}
+      {isHiredContractor && otherUser && (
+        <HomeownerRatingModal
+          isOpen={showHomeownerRatingModal}
+          onClose={() => setShowHomeownerRatingModal(false)}
+          homeownerName={getDisplayName(otherUser)}
+          leadId={thread.lead.id}
+          onSubmitSuccess={() => setHasSubmittedHomeownerRating(true)}
+        />
+      )}
 
       {/* Messages — single primary scroll container */}
       <div

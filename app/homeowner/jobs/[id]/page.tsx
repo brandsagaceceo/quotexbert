@@ -67,6 +67,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     color: 'bg-rose-100 text-rose-800 border-rose-200',
     icon: <CheckCircle2 className="w-4 h-4" />,
   },
+  pending_completion: {
+    label: 'Awaiting Your Confirmation',
+    color: 'bg-amber-100 text-amber-800 border-amber-200',
+    icon: <Clock className="w-4 h-4" />,
+  },
   completed: {
     label: 'Completed',
     color: 'bg-blue-100 text-blue-800 border-blue-200',

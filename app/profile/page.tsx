@@ -107,6 +107,23 @@ interface SavedEstimate {
   createdAt: string;
 }
 
+interface RecentlyUsedContractor {
+  contractorId: string;
+  name: string;
+  companyName: string | null;
+  trade: string | null;
+  city: string | null;
+  verified: boolean;
+  avgRating: number;
+  reviewCount: number;
+  profilePhoto: string | null;
+  completedJobsWithHomeowner: number;
+  mostRecentJobTitle: string;
+  mostRecentJobDate: string;
+  mostRecentJobCategory: string;
+  mostRecentLeadId: string;
+}
+
 export default function UnifiedProfilePage() {
   const { isSignedIn, authUser, authLoading } = useAuth();
   const router = useRouter();
@@ -117,6 +134,7 @@ export default function UnifiedProfilePage() {
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [jobs, setJobs] = useState<JobData[]>([]);
   const [savedEstimates, setSavedEstimates] = useState<SavedEstimate[]>([]);
+  const [recentlyUsedContractors, setRecentlyUsedContractors] = useState<RecentlyUsedContractor[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     // Check for tab query parameter
@@ -333,6 +351,17 @@ export default function UnifiedProfilePage() {
             }
           } catch (error) {
             console.error("[ProfilePage] Error fetching posted jobs:", error);
+          }
+
+          // Fetch Recently Used Contractors — derived from real hired/completed jobs only
+          try {
+            const rucResponse = await fetch(`/api/homeowner/recently-used-contractors`);
+            if (rucResponse.ok) {
+              const rucData = await rucResponse.json();
+              setRecentlyUsedContractors(rucData.contractors || []);
+            }
+          } catch (error) {
+            console.log("[ProfilePage] Recently used contractors not available yet");
           }
         }
         
@@ -877,7 +906,7 @@ export default function UnifiedProfilePage() {
           <nav data-tour="profile-tabs" className="md:hidden flex gap-3 px-4 py-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
+              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'recently-used', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
@@ -894,6 +923,7 @@ export default function UnifiedProfilePage() {
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
                  tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
+                 tab === 'recently-used' ? 'Recently Used' :
                  tab}
               </button>
             ))}
@@ -903,7 +933,7 @@ export default function UnifiedProfilePage() {
           <nav data-tour="profile-tabs" className="hidden md:flex space-x-4 md:space-x-8 px-2 md:px-4 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
-              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'favorites', 'contact']
+              : ['overview', 'projects', 'estimates', 'quotes', 'jobs', 'recently-used', 'contact']
             ).map((tab) => (
               <button
                 key={tab}
@@ -920,6 +950,7 @@ export default function UnifiedProfilePage() {
                  tab === 'accepted-jobs' ? 'Accepted Jobs' : 
                  tab === 'work' ? 'Recent Work' :
                  tab === 'jobs' && !isContractor ? 'My Posted Jobs' :
+                 tab === 'recently-used' ? 'Recently Used Contractors' :
                  tab}
               </button>
             ))}
@@ -1527,17 +1558,83 @@ export default function UnifiedProfilePage() {
               </div>
             )}
 
-            {activeTab === 'favorites' && !isContractor && (
+            {activeTab === 'recently-used' && !isContractor && (
               <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-slate-200">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Favorite Contractors</h2>
-                <div className="text-center py-12 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl">
-                  <div className="text-6xl mb-4">⭐</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Save Your Favorite Contractors</h3>
-                  <p className="text-slate-600 mb-4">Keep track of contractors you want to work with</p>
-                  <a href="/contractors" className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
-                    Browse Contractors
-                  </a>
-                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Recently Used Contractors</h2>
+                <p className="text-sm text-slate-500 mb-6">
+                  Contractors you've formally hired or completed a job with through QuoteXbert.
+                </p>
+
+                {recentlyUsedContractors.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentlyUsedContractors.map((c) => (
+                      <div
+                        key={c.contractorId}
+                        className="border-2 border-slate-200 rounded-2xl p-5 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50"
+                      >
+                        <div className="flex items-start gap-4">
+                          {c.profilePhoto ? (
+                            <img
+                              src={c.profilePhoto}
+                              alt={c.companyName || c.name}
+                              className="w-14 h-14 rounded-full object-cover flex-shrink-0 ring-2 ring-white shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-14 h-14 rounded-full bg-[#800020] text-white flex items-center justify-center font-bold text-lg flex-shrink-0 ring-2 ring-white shadow-sm">
+                              {(c.companyName || c.name).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-bold text-slate-900 truncate">{c.companyName || c.name}</h3>
+                              {c.verified && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                  ✓ Verified
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                              {c.trade && <span className="capitalize">{c.trade}</span>}
+                              {c.city && <span>📍 {c.city}</span>}
+                              {c.reviewCount > 0 && (
+                                <span>⭐ {c.avgRating.toFixed(1)} ({c.reviewCount})</span>
+                              )}
+                              <span>{c.completedJobsWithHomeowner} completed job{c.completedJobsWithHomeowner !== 1 ? 's' : ''} with you</span>
+                            </div>
+                            <p className="text-xs text-slate-400 mt-2">
+                              Most recent: <span className="font-medium text-slate-600">{c.mostRecentJobTitle}</span>
+                              {' · '}
+                              {new Date(c.mostRecentJobDate).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          <a
+                            href={`/contractors/profile/${c.contractorId}`}
+                            className="inline-block text-sm bg-slate-100 text-slate-800 py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors min-h-[40px] flex items-center"
+                          >
+                            View Profile
+                          </a>
+                          <a
+                            href={`/messages?leadId=${c.mostRecentLeadId}`}
+                            className="inline-block text-sm bg-rose-700 text-white py-2 px-4 rounded-lg hover:bg-rose-800 transition-colors min-h-[40px] flex items-center"
+                          >
+                            Message Again
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl">
+                    <div className="text-6xl mb-4">🛠️</div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">No contractors used yet</h3>
+                    <p className="text-slate-600 mb-4">Contractors you hire through QuoteXbert will appear here.</p>
+                    <a href="/contractors" className="inline-block bg-[#800020] text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition-all">
+                      Browse Contractors
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 
