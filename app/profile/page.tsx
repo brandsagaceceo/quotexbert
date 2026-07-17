@@ -759,14 +759,14 @@ export default function UnifiedProfilePage() {
       </div>
 
       {/* Profile Identity Section */}
-      <div className="relative bg-[#800020] pb-3 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 10px)' }}>
+      <div className="relative bg-[#800020] pb-2 md:pb-8" style={{ marginTop: 'calc(-1 * var(--header-height, 64px))', paddingTop: 'calc(var(--header-height, 64px) + 4px)' }}>
         <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-row items-center gap-3 md:gap-6">
+          <div className="flex flex-row items-stretch md:items-center gap-3 md:gap-6">
             {/* Profile Picture + Business Logo stacked */}
-            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+            <div className="flex flex-col items-center gap-1.5 flex-shrink-0 self-stretch md:self-auto">
               {/* Profile Picture */}
-              <div className="relative group">
-                <div className="relative w-24 h-24 md:w-36 md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-[#800020]/10">
+              <div className="relative group flex-1 min-h-0 md:flex-none">
+                <div className="relative w-20 md:w-36 h-full md:h-36 rounded-xl md:rounded-2xl overflow-hidden border-2 md:border-4 border-white shadow-xl md:shadow-2xl bg-[#800020]/10">
                   {profile?.profilePhoto ? (
                     <img 
                       src={profile.profilePhoto} 
@@ -823,15 +823,15 @@ export default function UnifiedProfilePage() {
 
             {/* Profile Info Card */}
             <div className="flex-1">
-              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-4 md:p-6 border border-slate-200">
+              <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-2xl p-3 md:p-6 border border-slate-200">
                   {/* Mobile Edit/Save Buttons - Inline (shown only on mobile) */}
-                  <div className="md:hidden flex justify-end gap-2 mb-2">
+                  <div className="md:hidden flex justify-end gap-1.5 mb-1.5">
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="bg-[#800020] hover:bg-[#600018] text-white px-3 py-1.5 rounded-lg font-semibold transition-colors flex items-center gap-1.5 shadow-sm text-xs"
+                        className="bg-[#800020] hover:bg-[#600018] text-white px-2.5 py-1 rounded-lg font-semibold transition-colors flex items-center gap-1 shadow-sm text-xs"
                       >
-                        <Edit3 className="h-3.5 w-3.5" />
+                        <Edit3 className="h-3 w-3" />
                         Edit
                       </button>
                     ) : (
@@ -860,8 +860,8 @@ export default function UnifiedProfilePage() {
                   </div>
 
                   <div>
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-slate-900 mb-1.5 break-words">{displayName}</h1>
-                    <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-900 border border-rose-200 text-xs md:text-sm font-semibold capitalize px-2.5 py-1 rounded-full mb-2">
+                    <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-slate-900 mb-0.5 break-words">{displayName}</h1>
+                    <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-900 border border-rose-200 text-xs md:text-sm font-semibold capitalize px-2 py-0.5 rounded-full mb-1">
                       {isContractor ? (profile?.trade || 'Contractor') : 'Homeowner'}
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5 text-slate-500 text-xs md:text-sm">
@@ -903,7 +903,7 @@ export default function UnifiedProfilePage() {
       <div className="bg-white sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
         <div className="container mx-auto">
           {/* Mobile: Scrollable pill tabs */}
-          <nav data-tour="profile-tabs" className="md:hidden flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide">
+          <nav data-tour="profile-tabs" className="md:hidden flex gap-2 px-3 py-2 overflow-x-auto scrollbar-hide">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'jobs', 'recently-used', 'contact']
@@ -911,7 +911,7 @@ export default function UnifiedProfilePage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-shrink-0 px-4 py-1.5 rounded-full font-semibold text-xs capitalize whitespace-nowrap min-h-[40px] transition-all ${
+                className={`flex-shrink-0 px-3 py-1 rounded-full font-semibold text-xs capitalize whitespace-nowrap min-h-[32px] transition-all ${
                   activeTab === tab
                     ? 'bg-rose-700 text-white shadow-md'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'

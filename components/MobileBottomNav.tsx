@@ -90,9 +90,9 @@ export default function MobileBottomNav() {
     return (
       <div
         className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-[0_-1px_6px_rgba(0,0,0,0.06)]"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)", "--bottom-nav-height": "56px" } as React.CSSProperties}
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)", "--bottom-nav-height": "44px" } as React.CSSProperties}
       >
-        <div className="grid grid-cols-5 h-14">
+        <div className="grid grid-cols-5 h-11">
           {contractorItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -104,14 +104,14 @@ export default function MobileBottomNav() {
                 }`}
               >
                 <span className="relative">
-                  <Icon className="h-5 w-5 shrink-0" />
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
                   {"badge" in item && item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-600 text-white text-[10px] font-bold rounded-full leading-none">
+                    <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 flex items-center justify-center bg-rose-600 text-white text-[9px] font-bold rounded-full leading-none">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
                 </span>
-                <span className="text-[10px] mt-0.5 font-medium leading-tight">{item.label}</span>
+                <span className="text-[9px] mt-0.5 font-medium leading-tight">{item.label}</span>
               </Link>
             );
           })}
@@ -133,9 +133,9 @@ export default function MobileBottomNav() {
   return (
     <div
       className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-[0_-1px_6px_rgba(0,0,0,0.06)]"
-      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)", "--bottom-nav-height": "56px" } as React.CSSProperties}
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)", "--bottom-nav-height": "44px" } as React.CSSProperties}
     >
-      <div className="grid grid-cols-5 h-14 items-stretch">
+      <div className="grid grid-cols-5 h-11 items-stretch">
         {/* Left two items */}
         {leftItems.map((item) => {
           const Icon = item.icon;
@@ -148,14 +148,14 @@ export default function MobileBottomNav() {
               }`}
             >
               <span className="relative">
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className="h-[18px] w-[18px] shrink-0" />
                 {"badge" in item && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-600 text-white text-[10px] font-bold rounded-full leading-none">
+                  <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 flex items-center justify-center bg-rose-600 text-white text-[9px] font-bold rounded-full leading-none">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}
               </span>
-              <span className="text-[10px] mt-0.5 font-medium leading-tight">{item.label}</span>
+              <span className="text-[9px] mt-0.5 font-medium leading-tight">{item.label}</span>
             </Link>
           );
         })}
@@ -171,8 +171,8 @@ export default function MobileBottomNav() {
             pathname === "/create-lead" ? "text-[#800020]" : "text-gray-500 hover:text-[#800020]"
           }`}
         >
-          <Plus className="h-5 w-5 shrink-0" />
-          <span className="text-[10px] mt-0.5 font-medium leading-tight">Post Job</span>
+          <Plus className="h-[18px] w-[18px] shrink-0" />
+          <span className="text-[9px] mt-0.5 font-medium leading-tight">Post Job</span>
         </button>
 
         {/* Right two items */}
@@ -187,14 +187,14 @@ export default function MobileBottomNav() {
               }`}
             >
               <span className="relative">
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className="h-[18px] w-[18px] shrink-0" />
                 {"badge" in item && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center bg-rose-600 text-white text-[10px] font-bold rounded-full leading-none">
+                  <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 flex items-center justify-center bg-rose-600 text-white text-[9px] font-bold rounded-full leading-none">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}
               </span>
-              <span className="text-[10px] mt-0.5 font-medium leading-tight">{item.label}</span>
+              <span className="text-[9px] mt-0.5 font-medium leading-tight">{item.label}</span>
             </Link>
           );
         })}

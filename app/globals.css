@@ -17,7 +17,7 @@
 
   /* ── Layout heights — used in calc() across all pages ── */
   --header-height: 64px;
-  --bottom-nav-height: 56px;
+  --bottom-nav-height: 44px;
 
   /* ── Mobile Design System ── */
   --section-py-mobile: 2rem;      /* 32px section padding on mobile */

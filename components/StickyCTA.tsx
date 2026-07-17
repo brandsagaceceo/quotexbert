@@ -38,15 +38,15 @@ export function StickyCTA() {
   return (
     <>
       {/* Mobile Only - Sticky Bottom Bar */}
-      <div className="sticky-cta-bar md:hidden fixed bottom-0 left-0 right-0 z-40 safe-area-bottom">
-        <div className="bg-[#800020] shadow-lg flex items-stretch">
+      <div className="sticky-cta-bar md:hidden fixed bottom-0 left-0 right-0 z-40">
+        <div className="bg-[#800020] rounded-t-2xl shadow-lg flex items-stretch" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
           <Link
             href="/#estimator-tool"
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-white font-bold text-sm active:opacity-90 transition-opacity min-w-0"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-white font-bold text-sm active:opacity-90 transition-opacity min-w-0"
           >
             <Camera className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">Upload Photos — Free Estimate</span>
-            <span className="flex-shrink-0 bg-amber-400 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded-full">
+            <span className="flex-shrink-0 bg-amber-400 text-amber-900 text-[9px] font-black px-1.5 py-0.5 rounded-full">
               FREE
             </span>
           </Link>
@@ -68,7 +68,7 @@ export function StickyCTA() {
       <style jsx global>{`
         @media (max-width: 768px) {
           body {
-            padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
           }
         }
         
