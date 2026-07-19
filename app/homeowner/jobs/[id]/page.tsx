@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoadingState from '@/components/ui/LoadingState';
+import JobPhotoGallery from '@/components/JobPhotoGallery';
 import {
   ArrowLeft,
   MapPin,
@@ -49,6 +50,9 @@ interface Job {
   createdAt: string;
   assignedContractorId: string | null;
   applications: Application[];
+  photos?: string[];
+  canEdit?: boolean;
+  readOnly?: boolean;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -223,6 +227,12 @@ export default function HomeownerJobDetailPage() {
           <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{job.description}</p>
         </div>
 
+        {/* Photos */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Project Photos</h3>
+          <JobPhotoGallery photos={job.photos} title={job.title} />
+        </div>
+
         {/* Applications summary */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
@@ -281,13 +291,20 @@ export default function HomeownerJobDetailPage() {
               </span>
             )}
           </Link>
-          <Link
-            href={`/homeowner/jobs/${job.id}/edit`}
-            className="flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-slate-700 px-5 py-3.5 rounded-2xl font-semibold hover:border-rose-400 hover:text-rose-700 transition-all"
-          >
-            <Edit className="w-5 h-5" />
-            Edit Job
-          </Link>
+          {job.canEdit && !job.readOnly ? (
+            <Link
+              href={`/homeowner/jobs/${job.id}/edit`}
+              className="flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-slate-700 px-5 py-3.5 rounded-2xl font-semibold hover:border-rose-400 hover:text-rose-700 transition-all"
+            >
+              <Edit className="w-5 h-5" />
+              Edit Job
+            </Link>
+          ) : (
+            <div className="flex items-center justify-center gap-2 bg-slate-100 border-2 border-slate-200 text-slate-400 px-5 py-3.5 rounded-2xl font-semibold">
+              <Edit className="w-5 h-5" />
+              Read Only
+            </div>
+          )}
           <Link
             href={`/messages?leadId=${job.id}`}
             className="flex items-center justify-center gap-2 bg-white border-2 border-slate-200 text-slate-700 px-5 py-3.5 rounded-2xl font-semibold hover:border-rose-400 hover:text-rose-700 transition-all"

@@ -1,4 +1,7 @@
 import Stripe from "stripe";
+import { isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
+
+export { isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is not set in environment variables. Please configure it in your production environment.");
@@ -84,15 +87,6 @@ export type SubscriptionPlan = keyof typeof SUBSCRIPTION_PLANS;
 
 /** Cents charged for the discounted first month. */
 export const FOUNDING_OFFER_FIRST_MONTH_CENTS = 99; // $0.99
-
-/**
- * Master on/off switch for the founding offer, controlled via env var so it can
- * be disabled the moment the promotion ends without a code deploy.
- * Set FOUNDING_OFFER_ENABLED=false in the environment to turn it off.
- */
-export function isFoundingOfferEnabled(): boolean {
-  return process.env.FOUNDING_OFFER_ENABLED !== "false";
-}
 
 /**
  * Returns (creating if necessary) a Stripe Coupon ID that discounts exactly one

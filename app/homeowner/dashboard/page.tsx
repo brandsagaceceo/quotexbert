@@ -133,21 +133,21 @@ export default function HomeownerDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+2rem)]" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
+    <div className="min-h-screen bg-gray-50 -mt-[var(--header-height,64px)] pt-[calc(var(--header-height,64px)+1.25rem)] sm:pt-[calc(var(--header-height,64px)+1.75rem)]" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-gray-900 mb-2">
+        <div className="mb-5 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-1 tracking-tight">
             Welcome back, {authUser?.name || 'Homeowner'}!
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Manage your renovation projects and estimates
           </p>
         </div>
 
         {/* First-time onboarding banner */}
         {statsLoaded && stats.postedJobs === 0 && (
-          <div className="mb-8 bg-[#800020] rounded-2xl p-6 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mb-6 bg-[#800020] rounded-xl p-4 sm:p-5 text-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xl">🏠</span>
@@ -167,20 +167,20 @@ export default function HomeownerDashboard() {
         )}
 
         {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {dashboardCards.map((card) => (
             <Link
               key={card.href}
               href={card.href}
-              className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-rose-200 overflow-hidden"
+              className="group relative bg-white rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 hover:border-rose-200 overflow-hidden"
             >
               {/* Gradient background on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
               
               <div className="relative">
                 {/* Icon */}
-                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${card.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <card.icon className="w-6 h-6 text-white" />
+                <div className={`inline-flex p-2.5 rounded-lg bg-gradient-to-br ${card.color} mb-3 group-hover:-translate-y-0.5 transition-transform duration-200`}>
+                  <card.icon className="w-5 h-5 text-white" />
                 </div>
 
                 {/* Badge */}
@@ -191,7 +191,7 @@ export default function HomeownerDashboard() {
                 )}
 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-1.5">
                   {card.title}
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -208,27 +208,27 @@ export default function HomeownerDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div className="mt-8 bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
               href="/"
-              className="flex items-center gap-4 p-4 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+              className="flex items-center gap-3 p-3.5 bg-gradient-to-r from-rose-600 to-orange-600 text-white rounded-lg hover:shadow-md transition-all duration-200"
             >
-              <FileText className="w-8 h-8" />
+              <FileText className="w-6 h-6" />
               <div>
-                <div className="font-bold text-lg">Get AI Estimate</div>
+                <div className="font-bold text-base">Get AI Estimate</div>
                 <div className="text-sm text-white/80">Instant quote, then post to job board</div>
               </div>
             </Link>
 
             <Link
               href="/create-lead"
-              className="flex items-center gap-4 p-4 bg-[#800020] text-white rounded-xl hover:bg-[#600018] transition-colors"
+              className="flex items-center gap-3 p-3.5 bg-[#800020] text-white rounded-lg hover:bg-[#600018] transition-colors"
             >
-              <Briefcase className="w-8 h-8" />
+              <Briefcase className="w-6 h-6" />
               <div>
-                <div className="font-bold text-lg">Post a Job Manually</div>
+                <div className="font-bold text-base">Post a Job Manually</div>
                 <div className="text-sm text-white/80">Skip the AI and fill out the form yourself</div>
               </div>
             </Link>

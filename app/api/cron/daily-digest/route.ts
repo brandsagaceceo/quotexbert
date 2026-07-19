@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isGodUser } from "@/lib/god-access";
 import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 import { sendContractorDigestEmail, sendHomeownerDigestEmail } from "@/lib/email";
+import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,6 @@ async function runContractorDigests() {
           published: true,
           isSeeded: false,
           createdAt: { gte: since },
-          ...(isGod || categories.length === 0 ? {} : { category: { in: categories } }),
         },
         orderBy: { createdAt: "desc" },
         take: 25,
@@ -73,6 +73,7 @@ async function runContractorDigests() {
       // NotificationService.notifyAllContractors (lib/notifications.ts) —
       // no location data on either side means "don't filter it out".
       const matchedJobs = candidateJobs
+        .filter((job) => isGod || categories.some((category) => categoryMatchesEntitlement(job.category, category)))
         .filter((job) => {
           if (!contractorCity) return true;
           const jobCity = (job.zipCode || "").toLowerCase().trim();

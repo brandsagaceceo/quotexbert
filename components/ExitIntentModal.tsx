@@ -13,6 +13,18 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
   const [email, setEmail] = useState('');
 
   useEffect(() => {
+    if (!isVisible) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'contain';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    };
+  }, [isVisible]);
+
+  useEffect(() => {
     // Don't show if already shown in this session
     if (hasShown) return;
 
@@ -55,7 +67,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 z-50 overflow-hidden animate-fade-in">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/70 backdrop-blur-sm"
@@ -63,19 +75,20 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
       />
       
       {/* Modal - mobile-optimized */}
-      <div className="min-h-full flex items-center justify-center p-3 sm:p-4 py-6 sm:py-8">
-        <div className="relative bg-gradient-to-br from-white to-orange-50 rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-8 md:p-10 transform animate-scale-in max-h-[min(90vh,85vh-env(safe-area-inset-top)-env(safe-area-inset-bottom))] overflow-y-auto will-change-transform">
+      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center p-3 sm:p-4" style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))', paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+        <div className="relative flex max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-1.5rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-white to-orange-50 shadow-2xl sm:rounded-3xl animate-scale-in">
           {/* Close button - larger tap target for mobile */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+            className="absolute top-3 right-3 z-20 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg bg-white/80 backdrop-blur-sm"
             aria-label="Close"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Content */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="overflow-y-auto overscroll-contain px-5 pb-5 pt-5 sm:px-8 sm:pb-8 sm:pt-8 md:px-10 md:pb-10 md:pt-9">
+          <div className="space-y-4 sm:space-y-5">
             {/* Icon */}
             <div className="flex justify-center pt-2">
             <div className="relative">
@@ -119,7 +132,7 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
 
               <button
                 type="submit"
-                className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-4 sm:py-5 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-base sm:text-lg"
+                className="w-full bg-[#800020] hover:bg-[#600018] text-white font-bold py-4 sm:py-5 px-4 sm:px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-base sm:text-lg"
               >
                 📸 Upload Photos → Get Free Estimate
               </button>
@@ -141,12 +154,13 @@ export function ExitIntentModal({ onCaptureEmail }: ExitIntentModalProps) {
                 ))}
               </div>
               <p className="text-xs sm:text-sm text-gray-700 font-medium">
-                Join 2,500+ happy Toronto homeowners
+                Built for Toronto homeowners comparing renovation quotes
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 "Got my bathroom estimate in under 3 minutes!" - Sarah, Midtown Toronto
               </p>
             </div>
+          </div>
           </div>
         </div>
       </div>

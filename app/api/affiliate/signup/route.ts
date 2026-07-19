@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+import { buildEmail, sendSharedEmail } from "@/lib/email";
 
 /** Generate a short referral code like "alice7X2QP" */
 function generateReferralCode(email: string): string {
@@ -10,9 +10,14 @@ function generateReferralCode(email: string): string {
   return `${prefix}${suffix}`;
 }
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+function escHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,60 +102,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email notification to quotexbert@gmail.com
-    if (resend) {
+    {
       try {
-        await resend.emails.send({
-          from: 'QuoteXbert <no-reply@quotexbert.com>',
+        const submittedAt = new Date().toLocaleString();
+        await sendSharedEmail({
           to: 'quotexbert@gmail.com',
           subject: '🎉 New Affiliate Lead Submitted',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9fafb;">
-              <div style="background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0;">🎉 New Affiliate Lead!</h1>
-              </div>
-              <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
-                <h2 style="color: #9f1239; margin-top: 0;">Lead Details</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>Email:</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${email}</td>
-                  </tr>
-                  ${refCode ? `
-                  <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>Referral Code:</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${refCode}</td>
-                  </tr>
-                  ` : ''}
-                  ${landingUrl ? `
-                  <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>Landing URL:</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; word-break: break-all;">${landingUrl}</td>
-                  </tr>
-                  ` : ''}
-                  <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>IP Address:</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${ip}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>Submitted:</strong></td>
-                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${new Date().toLocaleString()}</td>
-                  </tr>
-                </table>
-                <div style="margin-top: 30px; padding: 20px; background: #fef2f2; border-left: 4px solid #9f1239; border-radius: 4px;">
-                  <p style="margin: 0; color: #666; font-size: 14px;">
-                    <strong>Next Steps:</strong> Contact this lead to convert them into an affiliate partner.
-                  </p>
-                </div>
-              </div>
-            </div>
-          `
+          html: buildEmail('New Affiliate Lead', [
+            { type: 'tag', content: 'Affiliate' },
+            { type: 'heading', content: 'New Affiliate Lead Submitted' },
+            { type: 'card', label: 'Lead Details', rawHtml: true, content: `<strong>Email:</strong> ${escHtml(email)}${refCode ? `<br><strong>Referral Code:</strong> ${escHtml(refCode)}` : ''}${landingUrl ? `<br><strong>Landing URL:</strong> <span style="word-break:break-all;">${escHtml(landingUrl)}</span>` : ''}<br><strong>IP Address:</strong> ${escHtml(ip)}<br><strong>Submitted:</strong> ${escHtml(submittedAt)}` },
+            { type: 'text', content: 'Contact this lead to convert them into an affiliate partner.' },
+          ]),
         });
         console.log('[AFFILIATE LEAD] Email sent to quotexbert@gmail.com');
       } catch (emailError) {
         console.error('[AFFILIATE LEAD] Failed to send email:', emailError);
       }
-    } else {
-      console.warn('[AFFILIATE LEAD] RESEND_API_KEY not configured, email not sent');
     }
 
     return NextResponse.json({

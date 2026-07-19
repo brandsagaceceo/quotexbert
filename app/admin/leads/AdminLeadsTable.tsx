@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatBudgetDisplay } from "@/lib/currency";
+import JobPhotoGallery from "@/components/JobPhotoGallery";
 
 interface Lead {
   id: string;
@@ -17,6 +18,7 @@ interface Lead {
   homeownerId: string;
   contractorId: string | null;
   acceptedById: string | null;
+  photos: string;
 }
 
 interface AdminLeadsTableProps {
@@ -74,6 +76,9 @@ export default function AdminLeadsTable({ leads }: AdminLeadsTableProps) {
                   Budget
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Photos
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Published
                 </th>
               </tr>
@@ -100,6 +105,9 @@ export default function AdminLeadsTable({ leads }: AdminLeadsTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatBudgetDisplay(lead.budget)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900 min-w-40">
+                    <JobPhotoGallery photos={lead.photos} title={lead.title} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span

@@ -52,6 +52,16 @@ html, body {
   border-radius: 8px;
 }
 
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+}
+
 /* Mobile-friendly card layouts */
 .card-mobile {
   margin: 8px;

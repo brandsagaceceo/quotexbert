@@ -2,12 +2,8 @@ import { headers } from 'next/headers';
 import { Webhook } from 'svix';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { prisma } from '@/lib/prisma';
-
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+import { buildEmail, sendSharedEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -82,45 +78,24 @@ export async function POST(req: Request) {
     }
 
     // Send email notification to quotexbert@gmail.com
-    if (resend && email) {
+    if (email) {
       try {
-        await resend.emails.send({
-          from: 'QuoteXbert <no-reply@quotexbert.com>',
+        await sendSharedEmail({
           to: 'quotexbert@gmail.com',
           subject: '🎉 New User Signup - QuoteXbert',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #dc2626;">New User Signed Up!</h2>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${name}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${email}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Clerk ID:</strong></td>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${id}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Signed up:</strong></td>
-                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date(created_at).toLocaleString()}</td>
-                </tr>
-              </table>
-              <p style="margin-top: 20px; color: #666; font-size: 14px;">
-                User will be prompted to select their role (Homeowner or Contractor) during onboarding.
-              </p>
-            </div>
-          `
+          html: buildEmail('New User Signup', [
+            { type: 'tag', content: 'Admin Notification' },
+            { type: 'heading', content: 'New User Signed Up' },
+            { type: 'card', label: 'User Details', rawHtml: true, content: `<strong>Name:</strong> ${name}<br><strong>Email:</strong> ${email}<br><strong>Clerk ID:</strong> ${id}<br><strong>Signed up:</strong> ${new Date(created_at).toLocaleString()}` },
+            { type: 'text', content: 'User will be prompted to select their role during onboarding.' },
+          ]),
         });
         console.log('[CLERK WEBHOOK] Notification email sent to quotexbert@gmail.com');
       } catch (emailError) {
         console.error('[CLERK WEBHOOK] Failed to send email:', emailError);
       }
     } else {
-      console.warn('[CLERK WEBHOOK] RESEND_API_KEY not configured or no email found');
+      console.warn('[CLERK WEBHOOK] No email found for signup notification');
     }
 
     // Optionally create user record in database

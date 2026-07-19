@@ -142,11 +142,11 @@ quotexbert/
 - Read receipts and notifications
 - Mobile-optimized chat interface
 
-### 4. Payment Processing
-- Stripe integration for secure payments
-- Milestone payment system
-- Escrow-style fund holding
-- Payment history and tracking
+### 4. Subscription Billing
+- Stripe integration for contractor subscription billing
+- Plan management for contractor access
+- Billing status and renewal tracking
+- Subscription lifecycle webhooks
 
 ### 5. Portfolio Management
 - Contractor portfolio uploads

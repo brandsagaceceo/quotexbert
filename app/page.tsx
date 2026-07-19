@@ -410,7 +410,7 @@ export default function Home() {
                       <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
                       <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
                     </div>
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">500+ homeowners</span>
+                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA homeowners</span>
                   </div>
                   <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
                     <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
@@ -647,8 +647,8 @@ export default function Home() {
                 {/* Stat cards — compact on mobile */}
                 <div className="flex flex-wrap gap-2 md:gap-4">
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">500+</div>
-                    <div className="text-slate-400 text-xs">GTA Homeowners</div>
+                    <div className="text-lg md:text-2xl font-black text-white">AI</div>
+                    <div className="text-slate-400 text-xs">GTA Estimates</div>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
                     <div className="text-lg md:text-2xl font-black text-white">$16k</div>

@@ -306,7 +306,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             placeholder="E.g., Kitchen needs new cabinets and countertops, appliances are staying"
             rows={3}
             className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base"
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
           />
         </div>
 
@@ -321,7 +321,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             onChange={(e) => setProjectType(e.target.value)}
             required
             className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
                      bg-white cursor-pointer"
           >
             <option value="">Select project type...</option>
@@ -344,7 +344,7 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
             placeholder="M1A 1A1"
             maxLength={7}
             className="w-full px-3 md:px-4 py-2.5 md:py-3 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base"
+                     focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base"
           />
           <p className="text-xs text-slate-500 mt-1">For accurate GTA pricing</p>
         </div>

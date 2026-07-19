@@ -222,7 +222,7 @@ export default function TorontoPage() {
             Ready to Start Your Toronto Renovation?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join 2,500+ happy Toronto homeowners who got instant, accurate renovation estimates with QuoteXbert
+            Get an instant, accurate renovation estimate built for Toronto homeowners
           </p>
           <Link
             href="/create-lead"

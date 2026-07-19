@@ -167,20 +167,20 @@ export default function ContractorDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
+    <div className="min-h-screen bg-gray-50 pt-5 sm:pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="mb-5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             Welcome back, {contractorProfile?.companyName || authUser?.name || "Contractor"}! 👋
           </h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-1 text-sm sm:text-base text-gray-600">
             Here's your performance overview and quick actions
           </p>
         </div>
 
         {/* Trust / Motivation Banner */}
-        <div className="mb-6 bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100 rounded-xl px-4 py-3 text-center select-none">
+          <div className="mb-5 bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100 rounded-xl px-4 py-2.5 text-center select-none">
           <p className="text-sm font-medium text-rose-800">
             {TRUST_MESSAGES[bannerIndex]}
           </p>
@@ -212,14 +212,14 @@ export default function ContractorDashboard() {
 
         {/* Performance Metrics */}
         {authUser?.id && (
-          <div className="mb-8">
+          <div className="mb-6">
             <ContractorMetricsCard contractorId={authUser.id} />
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {quickActions.map((action, index) => {
               const Icon = action.icon;
@@ -227,14 +227,14 @@ export default function ContractorDashboard() {
                 <Link
                   key={index}
                   href={action.href}
-                  className={`${action.color} text-white rounded-lg p-6 shadow-md transition-all duration-200 hover:shadow-lg hover:scale-105 relative overflow-hidden`}
+                  className={`${action.color} text-white rounded-lg p-4 sm:p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-1">{action.label}</h3>
+                      <h3 className="text-base font-semibold mb-1">{action.label}</h3>
                       <p className="text-sm opacity-90">{action.description}</p>
                     </div>
-                    <Icon className="h-8 w-8 opacity-80" />
+                    <Icon className="h-6 w-6 opacity-80" />
                   </div>
                   {action.badge !== undefined && action.badge > 0 && (
                     <span className="absolute top-3 right-3 bg-white text-gray-900 rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
@@ -249,7 +249,7 @@ export default function ContractorDashboard() {
 
         {/* Recent Jobs */}
         {recentJobs.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900">Recent Jobs</h2>
               <Link 
@@ -297,7 +297,7 @@ export default function ContractorDashboard() {
 
         {/* Empty State */}
         {recentJobs.length === 0 && (
-          <div className="bg-white rounded-lg shadow-md p-10 text-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 text-center">
             <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Briefcase className="h-8 w-8 text-rose-400" />
             </div>

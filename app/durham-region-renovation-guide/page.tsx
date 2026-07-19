@@ -117,7 +117,7 @@ const renovationTimeline = [
   {
     phase: 'Construction',
     duration: 'Varies by project',
-    tasks: ['Regular progress walkthroughs', 'Approve changes in writing', 'Make milestone payments', 'Address issues immediately'],
+    tasks: ['Regular progress walkthroughs', 'Approve changes in writing', 'Track contractor invoices directly', 'Address issues immediately'],
   },
   {
     phase: 'Completion',

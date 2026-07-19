@@ -167,7 +167,7 @@ export default function NotificationBell() {
         return "🎉";
       case "NEW_MESSAGE":
         return "💬";
-      case "PAYMENT_RECEIVED":
+      case "SUBSCRIPTION_PAYMENT_RECEIPT":
         return "💰";
       case "PAYMENT_FAILED":
         return "❌";
@@ -201,8 +201,8 @@ export default function NotificationBell() {
         return `Job Claimed: ${payload?.title || "Your Project"}`;
       case "NEW_MESSAGE":
         return `New Message from ${payload?.senderName || "User"}`;
-      case "PAYMENT_RECEIVED":
-        return `Payment Received: $${payload?.amount}`;
+      case "SUBSCRIPTION_PAYMENT_RECEIPT":
+        return "Subscription payment confirmed";
       case "PAYMENT_FAILED":
         return "Payment Failed";
       case "LEAD_MATCHED":
@@ -227,8 +227,8 @@ export default function NotificationBell() {
         return `${payload?.contractorName || "A contractor"} has claimed your job.`;
       case "NEW_MESSAGE":
         return payload?.message || "You have a new message.";
-      case "PAYMENT_RECEIVED":
-        return "Your payment has been processed successfully.";
+      case "SUBSCRIPTION_PAYMENT_RECEIPT":
+        return "Your QuoteXbert contractor subscription billing was confirmed.";
       case "PAYMENT_FAILED":
         return "There was an issue processing your payment.";
       case "LEAD_MATCHED": {

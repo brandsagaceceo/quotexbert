@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// This endpoint has been deprecated in favor of the subscription model
-// Payments are now handled through monthly subscriptions rather than per-job payments
+// This endpoint has been deprecated in favor of the subscription model.
+// QuoteXbert only bills contractor subscriptions through Stripe.
 
 export async function POST(request: NextRequest) {
   return NextResponse.json(

@@ -748,7 +748,7 @@ model ContractorSubscription {
   currency          String   @default("usd")
   
   // Stripe integration
-  stripeSubscriptionId String? @unique
+  stripeSubscriptionId String?
   stripeCustomerId     String?
   stripePriceId        String? // Stripe price ID for this category
   

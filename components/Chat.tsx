@@ -757,11 +757,11 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
       {/* Messages — single primary scroll container */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 pt-4 min-h-0 overscroll-contain"
+        className="flex-1 overflow-y-auto px-3 sm:px-4 pt-3 min-h-0 overscroll-contain"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "#e11d48 #f9fafb",
-          paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom, 12px))',
           WebkitOverflowScrolling: 'touch',
         }}
         onScroll={(e) => {
@@ -786,7 +786,7 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
           items.map((item, idx) => {
             if (item.type === "sep") {
               return (
-                <div key={item.key} className="flex items-center justify-center my-4">
+                <div key={item.key} className="flex items-center justify-center my-3">
                   <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full">{formatDateSeparator(item.date)}</span>
                 </div>
               );
@@ -804,12 +804,12 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
             // existing nodes never re-animate during polling.
             const isLastMessage = idx === items.length - 1;
             return (
-              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group ${isFirstInGroup ? "mt-3" : "mt-0.5"} ${isLastMessage ? "animate-message-in" : ""}`}>
+              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? "flex-row-reverse" : "flex-row"} group ${isFirstInGroup ? "mt-2.5" : "mt-0.5"} ${isLastMessage ? "animate-message-in" : ""}`}>
                 <div className={`w-8 flex-shrink-0 ${showAvatar ? "" : "invisible"}`}>
                   <Avatar user={msg.fromUser} size="sm" />
                 </div>
                   <div className={`flex flex-col ${isMine ? "items-end" : "items-start"} max-w-[85%] sm:max-w-[70%] lg:max-w-[520px]`}>
-                  <div className={`px-3 sm:px-4 py-2.5 rounded-xl text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 w-full ${
+                  <div className={`px-3 sm:px-3.5 py-2 rounded-xl text-sm leading-relaxed break-words whitespace-pre-wrap min-w-0 w-full ${
                     isMine
                       ? "bg-[#800020] text-white rounded-br-md"
                       : "bg-white border border-slate-200 text-slate-800 rounded-bl-md shadow-sm"
@@ -837,9 +837,9 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
 
         {/* Typing indicator */}
         {otherUserTyping && (
-          <div className="flex items-end gap-2 mt-3">
+          <div className="flex items-end gap-2 mt-2.5">
             <Avatar user={otherUser} size="sm" />
-            <div className="bg-white border border-slate-200 rounded-xl rounded-bl-md px-4 py-3 flex items-center gap-1 shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-xl rounded-bl-md px-3 py-2.5 flex items-center gap-1 shadow-sm">
               {[0, 150, 300].map((delay) => (
                 <div key={delay} className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
                   style={{ animationDelay: `${delay}ms` }} />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
+import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 const {
   spotsRemaining,
@@ -30,10 +30,12 @@ interface FoundingContractorSectionProps {
 export default function FoundingContractorSection({
   compact = false,
 }: FoundingContractorSectionProps) {
+  if (!FOUNDING_OFFER_ENABLED) return null;
+
   return (
     <section
       className={`relative overflow-hidden ${
-        compact ? "py-10 px-4" : "py-16 px-4"
+        compact ? "py-8 px-4" : "py-12 md:py-14 px-4"
       } bg-gradient-to-br from-[#800020] via-[#6a001a] to-[#400010]`}
       aria-label={programName}
     >
@@ -43,8 +45,8 @@ export default function FoundingContractorSection({
 
       <div className="relative max-w-5xl mx-auto">
         {/* Eyebrow badge */}
-        <div className="flex justify-center mb-5">
-          <span className="inline-flex items-center gap-2 bg-yellow-400/20 border border-yellow-400/40 text-yellow-300 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full animate-pulse-slow">
+        <div className="flex justify-center mb-4">
+          <span className="inline-flex items-center gap-2 bg-yellow-400/20 border border-yellow-400/40 text-yellow-300 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full animate-pulse-slow">
             🚨 Limited Time Offer
           </span>
         </div>
@@ -52,16 +54,15 @@ export default function FoundingContractorSection({
         {/* Heading */}
         <h2
           className={`text-center font-black text-white mb-3 ${
-            compact ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl lg:text-5xl"
+            compact ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
           }`}
         >
           Become a{" "}
           <span className="text-yellow-300">Founding Contractor</span>
         </h2>
-        <p className="text-center text-white/70 text-base md:text-lg max-w-2xl mx-auto mb-8">
-          Join today and lock in your pricing for life. Only{" "}
-          <span className="text-yellow-300 font-bold">{spotsRemaining}</span> of{" "}
-          {spotsTotal} founding spots remain.
+        <p className="text-center text-white/75 text-sm md:text-base max-w-2xl mx-auto mb-7">
+          First month <span className="text-yellow-300 font-bold">$0.99</span>, then renews at your selected monthly plan price. Only{" "}
+          <span className="text-yellow-300 font-bold">{spotsRemaining}</span> founding contractor spots remain. Cancel anytime.
         </p>
 
         <div
@@ -70,11 +71,11 @@ export default function FoundingContractorSection({
           } items-start`}
         >
           {/* Benefits list */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 md:p-8">
-            <h3 className="text-white font-bold text-lg mb-5">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-5 md:p-6">
+            <h3 className="text-white font-bold text-base mb-4">
               Founding Member Benefits
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {BENEFITS.map((b) => (
                 <li key={b.text} className="flex items-center gap-3">
                   <span className="text-lg flex-shrink-0">{b.icon}</span>
@@ -87,10 +88,10 @@ export default function FoundingContractorSection({
           </div>
 
           {/* Progress bar + CTAs */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             {/* Progress card */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 md:p-8">
-              <h3 className="text-white font-bold text-lg mb-1">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-5 md:p-6">
+              <h3 className="text-white font-bold text-base mb-1">
                 Founding Contractor Spots Remaining
               </h3>
               <p className="text-white/60 text-xs mb-4">
@@ -98,7 +99,7 @@ export default function FoundingContractorSection({
               </p>
 
               {/* Progress bar */}
-              <div className="h-4 bg-white/20 rounded-full overflow-hidden mb-3">
+              <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
                 <div
                   className="h-full bg-gradient-to-r from-yellow-400 to-yellow-300 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
                   style={{ width: `${fillPercent}%` }}
@@ -127,7 +128,7 @@ export default function FoundingContractorSection({
                 className="
                   group flex items-center justify-center gap-2
                   bg-white text-[#800020] font-black text-base
-                  py-4 px-6 rounded-xl
+                  py-3 px-5 rounded-lg
                   hover:bg-yellow-50 active:scale-[0.98]
                   transition-all shadow-2xl
                   ring-2 ring-white/20 hover:ring-yellow-300/50
@@ -144,7 +145,7 @@ export default function FoundingContractorSection({
                 className="
                   flex items-center justify-center gap-2
                   bg-yellow-400 text-[#600018] font-black text-base
-                  py-4 px-6 rounded-xl
+                  py-3 px-5 rounded-lg
                   hover:bg-yellow-300 active:scale-[0.98]
                   transition-all shadow-xl
                 "
@@ -157,7 +158,7 @@ export default function FoundingContractorSection({
                 className="
                   flex items-center justify-center gap-2
                   border-2 border-white/30 text-white font-bold text-sm
-                  py-3 px-6 rounded-xl
+                  py-2.5 px-5 rounded-lg
                   hover:bg-white/10 active:scale-[0.98]
                   transition-all
                 "

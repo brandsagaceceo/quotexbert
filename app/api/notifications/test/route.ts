@@ -18,11 +18,12 @@ export async function POST(request: NextRequest) {
         result = await notifications.welcome(userId, { firstName: "Test User" });
         break;
       
-      case "payment_received":
-        result = await notifications.paymentReceived(userId, {
-          amount: 15.00,
-          leadId: "test-lead-id",
-          title: "Kitchen Renovation"
+      case "subscription_payment_receipt":
+        result = await notifications.subscriptionPaymentReceipt(userId, {
+          amount: 99.00,
+          planName: "Renovation Plan",
+          billingDate: new Date().toISOString(),
+          renewalDate: new Date(Date.now() + 30 * 86400000).toISOString()
         });
         break;
       

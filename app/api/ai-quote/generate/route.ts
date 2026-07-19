@@ -383,17 +383,16 @@ function generateFallbackQuote(params: {
     </p>
   </div>
 
-  <!-- PAYMENT TERMS -->
+  <!-- CONTRACT TERMS -->
   <div style="margin-bottom: 30px;">
     <h2 style="color: #991B1B; font-size: 24px; margin: 0 0 15px 0; border-bottom: 2px solid #F97316; padding-bottom: 10px;">
-      4. PAYMENT TERMS
+      4. CONTRACT TERMS
     </h2>
     <ul style="margin: 0; padding-left: 20px;">
-      <li style="margin-bottom: 8px;"><strong>Deposit:</strong> ${Math.round(estimateHigh * 0.30).toLocaleString()} (30%) due upon contract signing</li>
-      <li style="margin-bottom: 8px;"><strong>Milestone Payment:</strong> ${Math.round(estimateHigh * 0.40).toLocaleString()} (40%) due at project midpoint</li>
-      <li style="margin-bottom: 8px;"><strong>Final Payment:</strong> ${Math.round(estimateHigh * 0.30).toLocaleString()} (30%) due upon completion</li>
-      <li style="margin-bottom: 8px;">All payments due within 5 business days of invoice</li>
-      <li style="margin-bottom: 8px;">Accepted payment methods: Check, Bank Transfer, Credit Card</li>
+      <li style="margin-bottom: 8px;">Confirm scope, timeline, and written contract terms directly with your selected contractor</li>
+      <li style="margin-bottom: 8px;">Review contractor licensing, insurance, warranty terms, and references before work begins</li>
+      <li style="margin-bottom: 8px;">QuoteXbert does not collect renovation project charges or hold project funds</li>
+      <li style="margin-bottom: 8px;">Any homeowner-contractor billing terms are arranged directly between both parties</li>
     </ul>
   </div>
 
@@ -403,7 +402,7 @@ function generateFallbackQuote(params: {
       5. PROJECT TIMELINE
     </h2>
     <p style="margin: 0 0 10px 0;"><strong>Estimated Duration:</strong> ${timeline}</p>
-    <p style="margin: 0 0 10px 0;"><strong>Start Date:</strong> To be confirmed upon deposit receipt</p>
+    <p style="margin: 0 0 10px 0;"><strong>Start Date:</strong> To be confirmed with your selected contractor</p>
     <p style="margin: 0;">Timeline is subject to weather conditions, material availability, and permit approval times.</p>
   </div>
 

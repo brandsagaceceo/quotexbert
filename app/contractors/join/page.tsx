@@ -6,6 +6,7 @@ import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import EarningsCalculator from "./EarningsCalculator";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 export const metadata: Metadata = {
   title: "Join as a Renovation Contractor | QuoteXbert GTA",
@@ -35,7 +36,6 @@ const PLANS = [
     name: "Handyman",
     price: "$49",
     period: "per month",
-    firstMonth: "First month $0.99",
     features: [
       "3 Trade Categories",
       "Unlimited job applications",
@@ -52,7 +52,6 @@ const PLANS = [
     name: "Renovation Xbert",
     price: "$99",
     period: "per month",
-    firstMonth: "First month $0.99",
     features: [
       "6 Trade Categories",
       "Everything in Handyman",
@@ -69,7 +68,6 @@ const PLANS = [
     name: "General Contractor",
     price: "$149",
     period: "per month",
-    firstMonth: "First month $0.99",
     features: [
       "ALL 10+ Categories",
       "Everything in Renovation Xbert",
@@ -275,7 +273,7 @@ export default function ContractorsJoinPage() {
             </Link>
           </div>
           <p className="text-slate-400 text-sm mt-4">
-            500+ verified contractors already on the platform
+            {FOUNDING_CONTRACTOR_CONFIG.foundingJoinLine}
           </p>
         </div>
       </section>
@@ -347,13 +345,13 @@ export default function ContractorsJoinPage() {
           <p className="text-slate-600 mb-8">
             No per-lead fees. No locked-in annual contracts. Cancel anytime.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 max-w-5xl mx-auto">
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`relative rounded-2xl border p-6 ${
+                className={`relative rounded-xl border p-5 ${
                   plan.highlighted
-                    ? "bg-rose-50 border-rose-300 shadow-lg shadow-rose-100 scale-105 z-10"
+                    ? "bg-rose-50 border-rose-300 shadow-md shadow-rose-100 z-10"
                     : "bg-white border-slate-200"
                 }`}
               >
@@ -367,9 +365,11 @@ export default function ContractorsJoinPage() {
                   <span className="text-3xl font-bold text-[#800020]">{plan.price}</span>
                   <span className="text-slate-500 text-sm mb-1">/ {plan.period}</span>
                 </div>
-                <p className="inline-block text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-full px-3 py-1 mb-3">
-                  🎉 {plan.firstMonth} — then {plan.price}/mo
-                </p>
+                {FOUNDING_OFFER_ENABLED && (
+                  <p className="inline-block text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-full px-3 py-1 mb-3">
+                    🎉 First month $0.99 — then {plan.price}/mo · {FOUNDING_CONTRACTOR_CONFIG.spotsRemaining} spots remain · Cancel anytime
+                  </p>
+                )}
                 <ul className="space-y-2 my-5">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-slate-700">

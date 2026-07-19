@@ -2,6 +2,7 @@
 // Uses Resend (configured via RESEND_API_KEY env var) for actual delivery.
 // sendNotificationEmail() below routes job/message types to lib/email.ts → Resend.
 // Other notification types log and return true until implemented.
+import { buildEmail, type EmailBlock } from '@/lib/email';
 
 // Email templates and notification types
 export type NotificationType = 
@@ -9,7 +10,7 @@ export type NotificationType =
   | 'job_posted'
   | 'quote_received'
   | 'quote_accepted'
-  | 'payment_received'
+  | 'subscription_payment_receipt'
   | 'message_received'
   | 'job_completed'
   | 'review_received'
@@ -28,268 +29,96 @@ interface EmailTemplate {
   text: string;
 }
 
-// (Dead code below — real email delivery is handled by sendNotificationEmail() via lib/email.ts + Resend)
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com';
+const SITE_URL = process.env.NEXT_PUBLIC_URL || BASE_URL;
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '- ')
+    .replace(/<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function template(subject: string, blocks: EmailBlock[]): EmailTemplate {
+  const html = buildEmail(subject, blocks);
+  return { subject, html, text: stripHtml(html) };
+}
 
 // Email templates
 export const getEmailTemplate = (type: NotificationType, data: Record<string, any>): EmailTemplate => {
-  const baseStyle = `
-    <style>
-      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
-      .header { background: linear-gradient(135deg, #9f1239 0%, #ea580c 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
-      .content { padding: 20px; }
-      .button { display: inline-block; background: #9f1239; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
-      .footer { background: #f8f8f8; border-top: 2px solid #9f1239; padding: 20px; text-align: center; font-size: 13px; color: #555; border-radius: 0 0 10px 10px; }
-      .highlight { background: #fef3c7; padding: 10px; border-left: 4px solid #f59e0b; margin: 10px 0; }
-    </style>
-  `;
-
   switch (type) {
     case 'welcome':
-      return {
-        subject: 'Welcome to QuoteXbert!',
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>Welcome to QuoteXbert!</h1>
-          </div>
-          <div class="content">
-            <h2>Hi ${data.name}!</h2>
-            <p>Thank you for joining QuoteXbert, the leading platform for connecting homeowners with trusted contractors.</p>
-            
-            ${data.role === 'homeowner' ? `
-              <div class="highlight">
-                <h3>🏠 As a Homeowner, you can:</h3>
-                <ul>
-                  <li>Post your home improvement projects</li>
-                  <li>Get quotes from verified contractors</li>
-                  <li>Message contractors directly</li>
-                  <li>Pay securely through our platform</li>
-                </ul>
-              </div>
-              <a href="${BASE_URL}/create-lead" class="button">Post Your First Project</a>
-            ` : `
-              <div class="highlight">
-                <h3>🔨 As a Contractor, you can:</h3>
-                <ul>
-                  <li>Browse available jobs in your area</li>
-                  <li>Submit competitive quotes</li>
-                  <li>Build your portfolio</li>
-                  <li>Get paid through our secure system</li>
-                </ul>
-              </div>
-              <a href="${BASE_URL}/contractor/jobs" class="button">Browse Available Jobs</a>
-            `}
-            
-            <p>If you have any questions, feel free to reach out to our support team.</p>
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-            <p style="margin: 6px 0 0 0;"><a href="${BASE_URL}" style="color: #9f1239;">Visit QuoteXbert</a></p>
-          </div>
-        `,
-        text: `Welcome to QuoteXbert! Thank you for joining our platform. Visit ${BASE_URL} to get started.`
-      };
+      return template('Welcome to QuoteXbert!', [
+        { type: 'heading', content: `Hi ${data.name || 'there'}!` },
+        { type: 'text', content: 'Thank you for joining QuoteXbert, the platform for planning renovation projects and connecting with trusted contractors.' },
+        data.role === 'homeowner'
+          ? { type: 'card', label: 'As a homeowner', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li>Post your home improvement projects</li><li>Get quotes from verified contractors</li><li>Message contractors directly</li><li>Track your project in one place</li></ul>' }
+          : { type: 'card', label: 'As a contractor', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li>Browse available jobs in your area</li><li>Submit quotes directly</li><li>Build your portfolio</li><li>Manage homeowner conversations</li></ul>' },
+        { type: 'cta', content: data.role === 'homeowner' ? 'Post Your First Project' : 'Browse Available Jobs', href: data.role === 'homeowner' ? `${BASE_URL}/create-lead` : `${BASE_URL}/contractor/jobs` },
+      ]);
 
     case 'job_posted':
-      return {
-        subject: `New Job Posted: ${data.jobTitle}`,
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>New Job Available!</h1>
-          </div>
-          <div class="content">
-            <h2>📋 ${data.jobTitle}</h2>
-            <p><strong>Location:</strong> ${data.location}</p>
-            <p><strong>Budget:</strong> $${data.budget}</p>
-            <p><strong>Category:</strong> ${data.category}</p>
-            
-            <div class="highlight">
-              <h3>Job Description:</h3>
-              <p>${data.description}</p>
-            </div>
-            
-            <p>This job matches your profile and service area. Submit a quote to get started!</p>
-            
-            <a href="${BASE_URL}/contractor/jobs/${data.jobId}" class="button">View Job &amp; Submit Quote</a>
-            
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: `New job available: ${data.jobTitle} in ${data.location}. Budget: $${data.budget}. Visit ${BASE_URL}/contractor/jobs/${data.jobId} to view and quote.`
-      };
+      const estimatedValue = String(data.budget || 'Estimate available in lead details');
+      return template(`New Job Posted: ${data.jobTitle}`, [
+        { type: 'tag', content: 'New Lead' },
+        { type: 'heading', content: data.jobTitle || 'New Job Available' },
+        { type: 'card', label: 'Lead Summary', rawHtml: true, content: `<strong>Service Required:</strong> ${data.category || 'General'}<br><strong>Location:</strong> ${data.location || 'Location shared in lead details'}<br><strong>Estimated Project Value:</strong> ${estimatedValue.startsWith('$') ? estimatedValue : `$${estimatedValue}`}<br><strong>Submitted Date:</strong> ${new Date().toLocaleDateString('en-CA')}` },
+        { type: 'card', label: 'Homeowner Description', content: data.description || 'No description provided.' },
+        { type: 'cta', content: 'View Lead & Submit a Quote', href: `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(data.jobId || '')}` },
+        { type: 'text', content: 'You’re receiving this because this project matches your selected service categories and service area on QuoteXbert.' },
+      ]);
 
     case 'quote_received':
-      return {
-        subject: `New Quote Received for ${data.jobTitle}`,
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>You've Received a New Quote!</h1>
-          </div>
-          <div class="content">
-            <h2>💰 Quote for: ${data.jobTitle}</h2>
-            <p><strong>Contractor:</strong> ${data.contractorName}</p>
-            <p><strong>Quote Amount:</strong> $${data.quoteAmount}</p>
-            <p><strong>Estimated Timeline:</strong> ${data.timeline}</p>
-            
-            <div class="highlight">
-              <h3>Quote Details:</h3>
-              <p>${data.quoteDetails}</p>
-            </div>
-            
-            <p>Review the quote and contractor profile to make your decision.</p>
-            
-            <a href="${BASE_URL}/homeowner/quotes/${data.quoteId}" class="button">Review Quote</a>
-            
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: `New quote received for ${data.jobTitle} from ${data.contractorName}. Amount: $${data.quoteAmount}. View at ${BASE_URL}/homeowner/quotes/${data.quoteId}`
-      };
+      return template(`New Quote Received for ${data.jobTitle}`, [
+        { type: 'tag', content: 'Quote Received' },
+        { type: 'heading', content: `Quote for ${data.jobTitle || 'your project'}` },
+        { type: 'card', label: 'Quote Summary', rawHtml: true, content: `<strong>Contractor:</strong> ${data.contractorName || 'Contractor'}<br><strong>Quote Amount:</strong> $${data.quoteAmount || 'TBD'}<br><strong>Estimated Timeline:</strong> ${data.timeline || 'Shared in quote details'}` },
+        { type: 'card', label: 'Quote Details', content: data.quoteDetails || 'Open QuoteXbert to review the full quote.' },
+        { type: 'cta', content: 'Review Quote', href: `${BASE_URL}/homeowner/quotes/${data.quoteId || ''}` },
+      ]);
 
     case 'quote_accepted':
-      return {
-        subject: `Your Quote Was Accepted! 🎉`,
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>Congratulations! Your Quote Was Accepted!</h1>
-          </div>
-          <div class="content">
-            <h2>🎉 Job: ${data.jobTitle}</h2>
-            <p><strong>Homeowner:</strong> ${data.homeownerName}</p>
-            <p><strong>Quote Amount:</strong> $${data.quoteAmount}</p>
-            <p><strong>Project Start:</strong> ${data.startDate}</p>
-            
-            <div class="highlight">
-              <h3>Next Steps:</h3>
-              <ul>
-                <li>Contact the homeowner to confirm details</li>
-                <li>Begin work as scheduled</li>
-                <li>Submit progress updates</li>
-                <li>Request milestone payments</li>
-              </ul>
-            </div>
-            
-            <a href="${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}" class="button">Message Homeowner</a>
-            
-            <p>Good luck with your project!</p>
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: `Congratulations! Your quote for ${data.jobTitle} was accepted by ${data.homeownerName}. Amount: $${data.quoteAmount}. Contact them at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
-      };
+      return template('Your Quote Was Accepted!', [
+        { type: 'tag', content: 'Quote Accepted' },
+        { type: 'heading', content: `Your quote for ${data.jobTitle || 'the project'} was accepted` },
+        { type: 'card', label: 'Project Summary', rawHtml: true, content: `<strong>Homeowner:</strong> ${data.homeownerName || 'Homeowner'}<br><strong>Quote Amount:</strong> $${data.quoteAmount || 'TBD'}<br><strong>Project Start:</strong> ${data.startDate || 'To be confirmed'}` },
+        { type: 'cta', content: 'Message Homeowner', href: `${SITE_URL}/messages?threadId=${data.conversationId || ''}` },
+      ]);
 
     case 'message_received':
-      return {
-        subject: `New Message from ${data.senderName}`,
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>New Message</h1>
-          </div>
-          <div class="content">
-            <h2>💬 Message from ${data.senderName}</h2>
-            <p><strong>Project:</strong> ${data.jobTitle}</p>
-            
-            <div class="highlight">
-              <p>"${data.messagePreview}"</p>
-            </div>
-            
-            <p>Reply to continue the conversation.</p>
-            
-            <a href="${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}" class="button">View & Reply</a>
-            
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: `New message from ${data.senderName} about ${data.jobTitle}: "${data.messagePreview}". Reply at ${process.env.NEXT_PUBLIC_URL}/messages?threadId=${data.conversationId}`
-      };
+      return template(`New Message from ${data.senderName || 'QuoteXbert'}`, [
+        { type: 'tag', content: 'New Message' },
+        { type: 'heading', content: `Message from ${data.senderName || 'a QuoteXbert user'}` },
+        { type: 'text', rawHtml: true, content: data.jobTitle ? `Project: <strong>${data.jobTitle}</strong>` : 'Reply to continue the conversation.' },
+        { type: 'card', label: 'Message Preview', content: data.messagePreview || 'You have a new message.' },
+        { type: 'cta', content: 'View & Reply', href: `${SITE_URL}/messages?threadId=${data.conversationId || ''}` },
+      ]);
 
-    case 'payment_received':
-      return {
-        subject: `Payment Received - $${data.amount}`,
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>Payment Received! 💰</h1>
-          </div>
-          <div class="content">
-            <h2>$${data.amount} Payment Confirmed</h2>
-            <p><strong>Job:</strong> ${data.jobTitle}</p>
-            <p><strong>Payment Type:</strong> ${data.paymentType}</p>
-            <p><strong>Date:</strong> ${data.paymentDate}</p>
-            
-            <div class="highlight">
-              <p>This payment has been securely processed and will be available in your account within 1-2 business days.</p>
-            </div>
-            
-            <a href="${process.env.NEXT_PUBLIC_URL}/contractor/payments" class="button">View Payment Details</a>
-            
-            <p>Thank you for using QuoteXbert!</p>
-            <p>Best regards,<br>The QuoteXbert Team</p>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: `Payment received: $${data.amount} for ${data.jobTitle}. Payment type: ${data.paymentType}. View details at ${process.env.NEXT_PUBLIC_URL}/contractor/payments`
-      };
+    case 'subscription_payment_receipt':
+      return template('QuoteXbert subscription payment confirmed', [
+        { type: 'tag', content: 'Subscription Billing' },
+        { type: 'heading', content: 'QuoteXbert subscription payment confirmed' },
+        { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${data.planName || data.plan || 'Contractor Plan'}<br><strong>Amount Charged:</strong> ${data.amountCharged || data.amount || '$0.00 CAD'}<br><strong>Billing Date:</strong> ${data.billingDate || new Date().toLocaleDateString('en-CA')}<br><strong>Renewal Date:</strong> ${data.renewalDate || data.nextBillingDate || 'Available in billing settings'}` },
+        { type: 'text', content: 'This receipt is for your QuoteXbert contractor subscription billed through Stripe.' },
+        { type: 'cta', content: 'Manage Subscription', href: `${SITE_URL}/contractor/subscriptions` },
+      ]);
 
     default:
-      return {
-        subject: 'QuoteXbert Notification',
-        html: `
-          ${baseStyle}
-          <div class="header">
-            <h1>QuoteXbert Notification</h1>
-          </div>
-          <div class="content">
-            <p>You have a new notification from QuoteXbert.</p>
-            <a href="${process.env.NEXT_PUBLIC_URL}" class="button">Visit QuoteXbert</a>
-          </div>
-          <div class="footer">
-            <p style="font-weight: bold; color: #9f1239; margin: 0 0 6px 0;">QuoteXbert Support</p>
-            <p style="margin: 0 0 4px 0;">📧 <a href="mailto:quotexbert@gmail.com" style="color: #9f1239;">quotexbert@gmail.com</a></p>
-            <p style="margin: 0 0 10px 0;">📞 905-242-9460</p>
-            <p style="margin: 0; font-size: 11px; color: #999;">© 2025 QuoteXbert. All rights reserved.</p>
-          </div>
-        `,
-        text: 'You have a new notification from QuoteXbert.'
-      };
+      return template('QuoteXbert Notification', [
+        { type: 'heading', content: 'You have a new notification from QuoteXbert' },
+        { type: 'cta', content: 'Visit QuoteXbert', href: SITE_URL },
+      ]);
   }
 };
 
@@ -350,7 +179,7 @@ export const sendNotificationEmail = async ({ to, type, data }: EmailParams): Pr
       case 'welcome':
       case 'quote_received':
       case 'quote_accepted':
-      case 'payment_received':
+      case 'subscription_payment_receipt':
       case 'job_completed':
       case 'review_received':
       case 'subscription_reminder':

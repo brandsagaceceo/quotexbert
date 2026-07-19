@@ -25,6 +25,8 @@ export default function EditJobPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const [readOnly, setReadOnly] = useState(false);
 
   // Load job data
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function EditJobPage() {
 
   const fetchJob = async () => {
     try {
-      const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${user?.id}`);
+      const response = await fetch(`/api/homeowner/jobs/${jobId}`);
       if (response.ok) {
         const job = await response.json();
         setFormData({
@@ -46,6 +48,8 @@ export default function EditJobPage() {
           zipCode: job.zipCode
         });
         setPhotos(job.photos || []);
+        setStatus(job.status || "");
+        setReadOnly(Boolean(job.readOnly));
       } else {
         setError("Failed to load job");
       }
@@ -66,6 +70,11 @@ export default function EditJobPage() {
     }
 
     // Validate required fields
+    if (readOnly) {
+      setError("This job is read only.");
+      return;
+    }
+
     if (!formData.title || !formData.category || !formData.description || !formData.zipCode) {
       setError("Please fill in all required fields");
       return;
@@ -75,7 +84,7 @@ export default function EditJobPage() {
     setError("");
 
     try {
-      const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${user.id}`, {
+      const response = await fetch(`/api/homeowner/jobs/${jobId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -84,14 +93,15 @@ export default function EditJobPage() {
           title: formData.title,
           description: formData.description,
           category: formData.category,
-          budget: parseFloat(formData.budget.replace(/[$,]/g, '')) || 0,
+          budget: formData.budget,
           zipCode: formData.zipCode,
           photos: photos
         }),
       });
 
       if (response.ok) {
-        router.push('/homeowner/jobs');
+        router.refresh();
+        router.push(`/homeowner/jobs/${jobId}`);
       } else {
         const data = await response.json();
         setError(data.error || "Failed to update job");
@@ -132,6 +142,11 @@ export default function EditJobPage() {
           <p className="text-gray-600">Update your job details</p>
         </CardHeader>
         <CardContent>
+          {status === 'assigned' && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+              A contractor has been selected for this job. To protect the agreement, only photos can be updated.
+            </div>
+          )}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
               {error}
@@ -151,6 +166,7 @@ export default function EditJobPage() {
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., Kitchen Renovation"
+                disabled={readOnly || status === 'assigned'}
                 required
               />
             </div>
@@ -165,6 +181,7 @@ export default function EditJobPage() {
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={readOnly || status === 'assigned'}
                 required
               >
                 <option value="">Select a category</option>
@@ -192,6 +209,7 @@ export default function EditJobPage() {
                 rows={6}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Describe your project in detail..."
+                disabled={readOnly || status === 'assigned'}
                 required
               />
             </div>
@@ -208,6 +226,7 @@ export default function EditJobPage() {
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., $5,000 - $10,000"
+                disabled={readOnly || status === 'assigned'}
               />
             </div>
 
@@ -223,6 +242,7 @@ export default function EditJobPage() {
                 onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., M5H 2N2"
+                disabled={readOnly || status === 'assigned'}
                 required
               />
             </div>
@@ -236,6 +256,7 @@ export default function EditJobPage() {
                 photos={photos}
                 onPhotosChange={setPhotos}
                 maxPhotos={5}
+                disabled={readOnly}
               />
             </div>
 
@@ -243,7 +264,7 @@ export default function EditJobPage() {
             <div className="flex gap-4">
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || readOnly}
                 className="flex-1"
               >
                 {isSubmitting ? 'Saving...' : 'Save Changes'}

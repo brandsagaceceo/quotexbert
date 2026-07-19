@@ -1,4 +1,7 @@
 import { ContractorLeadData } from "@/lib/seo/contractor-lead-data";
+import { FOUNDING_CONTRACTOR_SPOTS_REMAINING } from "@/lib/founding-contractor-config";
+
+const FOUNDING_SPOTS_LABEL = `${FOUNDING_CONTRACTOR_SPOTS_REMAINING} remain`;
 
 // ─── New city-specific contractor lead pages ───────────────────────────────────
 // These extend the existing contractor SEO footprint to Mississauga, Brampton,
@@ -523,9 +526,9 @@ export const contractorCityPages: ContractorLeadData[] = [
       { title: "Deck + Fence Project", budget: "$22,000–$35,000", location: "Scarborough, Toronto" },
     ],
     stats: [
-      { label: "Toronto Renovation Leads/Month", value: "150+" },
+      { label: "Photo-First Leads", value: "Included" },
       { label: "Average Job Value", value: "$42,000" },
-      { label: "Contractors on Platform", value: "200+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Free to Start", value: "Always" },
     ],
     faqs: [
@@ -566,7 +569,7 @@ export const contractorCityPages: ContractorLeadData[] = [
       { title: "Exterior Renovation Client", budget: "$18,000–$32,000", location: "Scarborough, Toronto" },
     ],
     stats: [
-      { label: "Verified Homeowner Leads", value: "500+/mo" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "GTA Municipalities", value: "50+" },
       { label: "Average Client Job Value", value: "$38,000" },
       { label: "Client Acquisition Cost", value: "Free to start" },
@@ -608,7 +611,7 @@ export const contractorCityPages: ContractorLeadData[] = [
       { title: "Second Storey Addition", budget: "$180,000–$280,000", location: "Oakville, Ontario" },
     ],
     stats: [
-      { label: "Ontario Leads/Month", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Ontario Municipalities", value: "100+" },
       { label: "Average Job Value", value: "$38,000" },
       { label: "Free for Contractors", value: "Always" },
@@ -1355,7 +1358,7 @@ export const contractorCityPages: ContractorLeadData[] = [
       { title: "Deck + Fence Project", budget: "$20,000–$34,000", location: "Kingston, Ontario" },
     ],
     stats: [
-      { label: "Ontario Leads/Month", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Ontario Cities Covered", value: "100+" },
       { label: "Average Job Value", value: "$38,000" },
       { label: "Cost to Join", value: "Free" },
@@ -2039,7 +2042,7 @@ export const contractorCityPages: ContractorLeadData[] = [
       { title: "Full Home Renovation Lead", budget: "$140,000–$220,000", location: "Kingston, Ontario" },
     ],
     stats: [
-      { label: "Ontario Leads/Month", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Ontario Cities Covered", value: "100+" },
       { label: "Average Lead Value", value: "$38,000" },
       { label: "Free to Join", value: "Yes" },

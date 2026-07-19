@@ -1,22 +1,67 @@
 import { prisma } from "@/lib/prisma";
-import { getCategoryById } from "@/lib/categories";
+import { ALL_CATEGORIES, getCategoryById, normalizeCategory } from "@/lib/categories";
 import { canAccessLead as canAccessLeadGod, isGodUser } from "@/lib/god-access";
+
+const ACCESS_STATUSES = new Set(["active", "trialing"]);
+
+export function uniqueNormalizedCategories(categories: Array<string | null | undefined>): string[] {
+  return Array.from(
+    new Set(
+      categories
+        .filter((category): category is string => typeof category === "string" && category.trim().length > 0)
+        .map((category) => normalizeCategory(category))
+    )
+  );
+}
+
+export function categoryMatchesEntitlement(leadCategory: string, entitlementCategory: string): boolean {
+  return normalizeCategory(leadCategory) === normalizeCategory(entitlementCategory);
+}
+
+function getCategoryQueryValues(activeCategories: string[]): string[] {
+  return Array.from(
+    new Set([
+      ...activeCategories,
+      ...ALL_CATEGORIES
+        .filter((category) => activeCategories.includes(normalizeCategory(category.id)))
+        .map((category) => category.id),
+    ])
+  );
+}
+
+function hasCurrentAccessWindow(currentPeriodEnd: Date | null): boolean {
+  return !currentPeriodEnd || currentPeriodEnd.getTime() >= Date.now();
+}
+
+function isClaimableSubscription(subscription: { status: string; canClaimLeads: boolean; currentPeriodEnd: Date | null }): boolean {
+  return subscription.canClaimLeads && ACCESS_STATUSES.has(subscription.status) && hasCurrentAccessWindow(subscription.currentPeriodEnd);
+}
+
+export async function resolveContractorDbId(contractorId: string): Promise<string | null> {
+  const user = await prisma.user.findFirst({
+    where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+    select: { id: true }
+  });
+
+  return user?.id ?? null;
+}
 
 /**
  * Check if a contractor has an active subscription for a specific category
  */
 export async function hasActiveSubscription(contractorId: string, category: string): Promise<boolean> {
   try {
-    const subscription = await prisma.contractorSubscription.findUnique({
-      where: {
-        contractorId_category: {
-          contractorId,
-          category
-        }
-      }
+    const dbContractorId = await resolveContractorDbId(contractorId);
+    if (!dbContractorId) return false;
+
+    const subscriptions = await prisma.contractorSubscription.findMany({
+      where: { contractorId: dbContractorId },
+      select: { category: true, status: true, canClaimLeads: true, currentPeriodEnd: true }
     });
 
-    return subscription ? subscription.canClaimLeads : false;
+    return subscriptions.some(
+      (subscription) => isClaimableSubscription(subscription) && categoryMatchesEntitlement(category, subscription.category)
+    );
   } catch (error) {
     console.error('Error checking subscription:', error);
     return false;
@@ -28,17 +73,24 @@ export async function hasActiveSubscription(contractorId: string, category: stri
  */
 export async function getActiveSubscriptionCategories(contractorId: string): Promise<string[]> {
   try {
+    const dbContractorId = await resolveContractorDbId(contractorId);
+    if (!dbContractorId) return [];
+
     const subscriptions = await prisma.contractorSubscription.findMany({
-      where: {
-        contractorId,
-        canClaimLeads: true
-      },
+      where: { contractorId: dbContractorId },
       select: {
-        category: true
+        category: true,
+        status: true,
+        canClaimLeads: true,
+        currentPeriodEnd: true
       }
     });
 
-    return subscriptions.map(sub => sub.category);
+    return uniqueNormalizedCategories(
+      subscriptions
+        .filter((subscription) => isClaimableSubscription(subscription))
+        .map(sub => sub.category)
+    );
   } catch (error) {
     console.error('Error fetching active subscriptions:', error);
     return [];
@@ -77,17 +129,20 @@ export async function canAccessLead(contractorId: string, leadCategory: string):
  */
 export async function getAccessibleLeads(contractorId: string) {
   try {
-    const activeCategories = await getActiveSubscriptionCategories(contractorId);
+    const dbContractorId = await resolveContractorDbId(contractorId);
+    if (!dbContractorId) return [];
+
+    const activeCategories = await getActiveSubscriptionCategories(dbContractorId);
     
     if (activeCategories.length === 0) {
       return [];
     }
 
-    const leads = await prisma.lead.findMany({
+    const categoryQueryValues = getCategoryQueryValues(activeCategories);
+
+    const candidateLeads = await prisma.lead.findMany({
       where: {
-        category: {
-          in: activeCategories
-        },
+        category: { in: categoryQueryValues },
         status: 'open',     // Only show open leads
         published: true,    // Only show published leads
         isSeeded: false,    // Never show demo/seed data
@@ -99,11 +154,19 @@ export async function getAccessibleLeads(contractorId: string) {
             name: true,
             email: true
           }
+        },
+        _count: {
+          select: {
+            applications: true
+          }
         }
       }
     });
 
-    return leads;
+    return candidateLeads.filter((lead) => {
+      const acceptedContractors = JSON.parse(lead.acceptedContractors || '[]');
+      return acceptedContractors.length < 3 && activeCategories.includes(normalizeCategory(lead.category));
+    });
   } catch (error) {
     console.error('Error fetching accessible leads:', error);
     return [];

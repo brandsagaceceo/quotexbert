@@ -104,11 +104,11 @@ export async function GET(request: NextRequest) {
     const sampleData = {
       name: 'John Doe',
       role: 'homeowner',
-      jobTitle: 'Kitchen Renovation',
-      location: 'Toronto, ON',
-      budget: '15000',
-      category: 'Kitchen',
-      description: 'Complete kitchen renovation including cabinets, countertops, and appliances.',
+      jobTitle: url.searchParams.get('jobTitle') || url.searchParams.get('projectType') || 'Kitchen Renovation',
+      location: url.searchParams.get('location') || url.searchParams.get('postalCode') || 'Toronto, ON',
+      budget: url.searchParams.get('budget') || url.searchParams.get('estimatedValue') || '15000',
+      category: url.searchParams.get('category') || url.searchParams.get('projectType') || 'Kitchen',
+      description: url.searchParams.get('description') || 'Complete kitchen renovation including cabinets, countertops, and appliances.',
       contractorName: 'Elite Kitchen Design',
       quoteAmount: '14500',
       timeline: '3-4 weeks',
@@ -118,10 +118,11 @@ export async function GET(request: NextRequest) {
       conversationId: 'conv-123',
       senderName: 'Mike Wilson',
       messagePreview: 'I have a question about the timeline for the project...',
-      amount: '7250',
-      paymentType: 'Milestone Payment',
-      paymentDate: 'March 10, 2024',
-      jobId: 'job-123',
+      planName: 'Renovation Plan',
+      amountCharged: '$99.00 CAD',
+      billingDate: 'March 10, 2024',
+      renewalDate: 'April 10, 2024',
+      jobId: url.searchParams.get('jobId') || 'job-123',
       quoteId: 'quote-456'
     };
 

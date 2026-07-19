@@ -73,11 +73,11 @@ export default function ScarboroughPage() {
       <div className="bg-white border-b-2 border-rose-100 py-6">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <div className="text-3xl font-bold text-rose-600">500+</div>
-            <div className="text-sm text-gray-600">Scarborough Projects</div>
+            <div className="text-3xl font-bold text-rose-600">AI</div>
+            <div className="text-sm text-gray-600">Scarborough Estimates</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-rose-600">50+</div>
+            <div className="text-3xl font-bold text-rose-600">GTA</div>
             <div className="text-sm text-gray-600">Local Contractors</div>
           </div>
           <div>

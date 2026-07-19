@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { parseSubscriptionMetadataCategories } from "@/lib/subscription-categories";
 import {
   sendSubscriptionCreatedEmail,
   sendSubscriptionCancelledEmail,
@@ -173,9 +174,9 @@ async function handleCheckoutSessionCompleted(session: any) {
 
     // Activate selected categories from metadata
     const selectedCategoriesRaw = session.metadata?.selectedCategories;
-    if (selectedCategoriesRaw) {
+    const selectedCategories = parseSubscriptionMetadataCategories(selectedCategoriesRaw);
+    if (selectedCategories.length > 0) {
       try {
-        const selectedCategories: string[] = JSON.parse(selectedCategoriesRaw);
         const now = new Date();
         const periodEnd = currentPeriodEnd || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
@@ -219,10 +220,18 @@ async function handleCheckoutSessionCompleted(session: any) {
           data: { selectedCategories: JSON.stringify(merged) },
         });
 
-        console.log(`[STRIPE WEBHOOK] Activated ${selectedCategories.length} categories for contractor ${contractorId}`);
+        console.log(
+          `[STRIPE WEBHOOK] Activated categories for contractor ${contractorId}: ` +
+          `subscription=${session.subscription || 'none'}, count=${selectedCategories.length}, categories=${selectedCategories.join(',')}`
+        );
       } catch (catError) {
         console.error("[STRIPE WEBHOOK] Error activating categories:", catError);
       }
+    } else if (selectedCategoriesRaw) {
+      console.warn(
+        `[STRIPE WEBHOOK] No valid categories parsed for contractor ${contractorId}: ` +
+        `subscription=${session.subscription || 'none'}`
+      );
     }
 
     // Create notification — discloses the founding-offer renewal price when applicable
@@ -434,6 +443,10 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
       const subscription = await prisma.contractorSubscription.findFirst({
         where: { stripeSubscriptionId: invoice.subscription }
       });
+      const entitlementRows = await prisma.contractorSubscription.findMany({
+        where: { stripeSubscriptionId: invoice.subscription },
+        select: { id: true }
+      });
 
       if (subscription) {
         await prisma.transaction.create({
@@ -453,10 +466,19 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
         });
 
         // Reset monthly lead count for the new billing period
-        await prisma.contractorSubscription.update({
-          where: { id: subscription.id },
-          data: { leadsThisMonth: 0 }
+        await prisma.contractorSubscription.updateMany({
+          where: { stripeSubscriptionId: invoice.subscription },
+          data: {
+            leadsThisMonth: 0,
+            status: 'active',
+            canClaimLeads: true,
+            canViewLeads: true,
+            currentPeriodStart: new Date(invoice.period_start * 1000),
+            currentPeriodEnd: new Date(invoice.period_end * 1000),
+            nextBillingDate: new Date(invoice.period_end * 1000)
+          }
         });
+        console.log(`[STRIPE WEBHOOK] Renewed ${entitlementRows.length} entitlement rows for subscription ${invoice.subscription}`);
 
         // AFFILIATE COMMISSION: 20% recurring
         // Find the contractor user via Stripe subscription ID and check for affiliate attribution
@@ -538,6 +560,10 @@ async function handleInvoicePaymentFailed(invoice: any) {
       const subscription = await prisma.contractorSubscription.findFirst({
         where: { stripeSubscriptionId: invoice.subscription }
       });
+      const entitlementRows = await prisma.contractorSubscription.findMany({
+        where: { stripeSubscriptionId: invoice.subscription },
+        select: { id: true }
+      });
 
       if (subscription) {
         await prisma.transaction.create({
@@ -554,13 +580,14 @@ async function handleInvoicePaymentFailed(invoice: any) {
         });
 
         // Update subscription status to past_due
-        await prisma.contractorSubscription.update({
-          where: { id: subscription.id },
+        await prisma.contractorSubscription.updateMany({
+          where: { stripeSubscriptionId: invoice.subscription },
           data: { 
             status: 'past_due',
             canClaimLeads: false // Restrict access until payment is resolved
           }
         });
+        console.log(`[STRIPE WEBHOOK] Marked ${entitlementRows.length} entitlement rows past_due for subscription ${invoice.subscription}`);
 
         // Send payment-failed email to contractor
         const contractorUser = await prisma.user.findUnique({

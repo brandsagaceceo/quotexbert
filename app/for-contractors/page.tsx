@@ -8,6 +8,7 @@ import { trackContractorJoinClicked } from "@/lib/tracking";
 import { CheckCircle, Shield, TrendingUp, Clock } from "lucide-react";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 
 const pricingTiers = [
   {
@@ -667,7 +668,7 @@ export default function ForContractorsPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-slate-600 text-sm font-semibold">
               <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-green-600" /><span>Stripe Secured</span></div>
-              <div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-rose-600" /><span>500+ Active Contractors</span></div>
+              <div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-rose-600" /><span>{FOUNDING_CONTRACTOR_CONFIG.spotsRemaining} Founding Spots Remain</span></div>
               <div className="flex items-center gap-2"><Clock className="w-5 h-5 text-orange-600" /><span>Cancel Anytime</span></div>
             </div>
           </div>

@@ -7,17 +7,17 @@ const locations = [
   {
     name: "Toronto",
     description: "Find verified contractors and get instant home repair estimates across Toronto",
-    stats: "500+ contractors available"
+    stats: "Verified local contractor profiles"
   },
   {
     name: "Whitby",
     description: "Quality home repair contractors serving Whitby and surrounding areas",
-    stats: "100+ contractors available"
+    stats: "Verified local contractor profiles"
   },
   {
     name: "Greater Toronto Area (GTA)",
     description: "Connecting homeowners with skilled contractors across the entire GTA region",
-    stats: "1000+ contractors available"
+    stats: "Verified GTA contractor profiles"
   }
 ];
 

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
+import JobPhotoGallery from '@/components/JobPhotoGallery';
 import { ArrowLeft, Star, CheckCircle, X, DollarSign, Clock, TrendingUp, Award, MapPin, MessageCircle } from 'lucide-react';
 
 interface JobApplication {
@@ -42,6 +43,7 @@ interface Job {
   status: string;
   maxContractors: number;
   applications: JobApplication[];
+  photos?: string[];
 }
 
 type SortKey = 'price' | 'rating' | 'speed';
@@ -181,6 +183,11 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
           <p className="text-gray-500 mt-1">
             {accepted ? 'You selected a contractor for this job.' : `${pending.length} contractor${pending.length !== 1 ? 's' : ''} applied â€” compare bids below`}
           </p>
+        </div>
+
+        <div className="mb-8 bg-white rounded-2xl border border-gray-200 p-5">
+          <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Project Photos</h2>
+          <JobPhotoGallery photos={job.photos} title={job.title} />
         </div>
 
         {/* Accepted contractor */}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendNewRenovationLeadEmail } from '@/lib/email';
+import { categoryMatchesEntitlement } from '@/lib/subscription-access';
 
 export const dynamic = "force-dynamic";
 
@@ -85,13 +86,6 @@ export async function POST(request: NextRequest) {
         where: {
           role: 'contractor',
           isActive: true,
-          subscriptions: {
-            some: {
-              category: category,
-              status: 'active',
-              canClaimLeads: true
-            }
-          }
         },
         select: {
           id: true,
@@ -103,11 +97,19 @@ export async function POST(request: NextRequest) {
             select: {
               companyName: true
             }
+          },
+          subscriptions: {
+            where: { status: 'active', canClaimLeads: true },
+            select: { category: true }
           }
         }
       });
 
-      console.log(`[JOB ALERT] Job ${job.id} posted — ${contractors.length} matching contractors found for category "${category}"`);
+      const matchingContractors = contractors.filter((contractor) =>
+        contractor.subscriptions.some((subscription) => categoryMatchesEntitlement(category, subscription.category))
+      );
+
+      console.log(`[JOB ALERT] Job ${job.id} posted — ${matchingContractors.length} matching contractors found for category "${category}"`);
 
       let inAppCount = 0;
       let emailCount = 0;
@@ -118,14 +120,14 @@ export async function POST(request: NextRequest) {
         where: {
           relatedId: job.id,
           relatedType: 'job',
-          userId: { in: contractors.map(c => c.id) }
+          userId: { in: matchingContractors.map(c => c.id) }
         },
         select: { userId: true }
       });
       const alreadyNotified = new Set(existingNotifications.map(n => n.userId));
 
       // ── Batch create: all missing in-app notifications in one createMany ─────────
-      const needInApp = contractors.filter(
+      const needInApp = matchingContractors.filter(
         c => c.notifyJobInApp !== false && !alreadyNotified.has(c.id)
       );
       if (needInApp.length > 0) {
@@ -152,7 +154,7 @@ export async function POST(request: NextRequest) {
       const inAppRecipientIds = new Set(needInApp.map(c => c.id));
 
       // ── Email: check return value — sendNewRenovationLeadEmail doesn't throw on rate limit ──
-      const emailPromises = contractors
+      const emailPromises = matchingContractors
         .filter(c => c.notifyJobEmail !== false)
         .map(async (contractor) => {
           try {

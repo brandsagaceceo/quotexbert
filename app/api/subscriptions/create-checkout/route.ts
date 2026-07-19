@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { stripe, getOrCreateFoundingOfferCoupon, isFoundingOfferEnabled, FOUNDING_OFFER_FIRST_MONTH_CENTS } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { isGodUser } from "@/lib/god-access";
-import { ALL_CATEGORIES } from "@/lib/categories";
+import { ALL_CATEGORIES, SIMPLE_CATEGORIES } from "@/lib/categories";
+import { normalizeSubscriptionCategoryList } from "@/lib/subscription-categories";
 
 // Subscription tier pricing
 const TIER_PRICING = {
@@ -21,7 +22,7 @@ const TIER_PRICING = {
   general: {
     name: "General Contractor",
     price: 14900, // $149 in cents
-    categories: 10,
+    categories: SIMPLE_CATEGORIES.length,
     description: "Access to ALL categories with premium features"
   }
 };
@@ -53,6 +54,21 @@ export async function POST(req: Request) {
     }
 
     const tierConfig = TIER_PRICING[tier as keyof typeof TIER_PRICING];
+    const normalizedSelectedCategories = normalizeSubscriptionCategoryList(selectedCategories);
+
+    if (selectedCategories && normalizedSelectedCategories.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Select at least one valid category" },
+        { status: 400 }
+      );
+    }
+
+    if (normalizedSelectedCategories.length > tierConfig.categories) {
+      return NextResponse.json(
+        { success: false, error: `Your selected plan includes up to ${tierConfig.categories} categories` },
+        { status: 400 }
+      );
+    }
 
     // Get or create Stripe customer (try DB id first, fallback to clerkUserId)
     let contractor = await prisma.user.findUnique({
@@ -132,8 +148,8 @@ export async function POST(req: Request) {
     // Admin/testing accounts skip Stripe entirely — activate subscription directly
     if (isGodUser(contractor.email)) {
       console.log('[API] God user detected — activating subscription without Stripe');
-      const categoriesToActivate = selectedCategories && selectedCategories.length > 0
-        ? selectedCategories
+      const categoriesToActivate = normalizedSelectedCategories.length > 0
+        ? normalizedSelectedCategories
         : ALL_CATEGORIES.map((c: { id: string }) => c.id);
 
       const now = new Date();
@@ -237,8 +253,8 @@ export async function POST(req: Request) {
     // selectedCategories is embedded in metadata so the webhook can activate
     // categories even if the client-side localStorage flow fails (tab closed, etc.).
     // Stripe metadata values are capped at 500 chars; JSON of ≤10 short IDs is well within that.
-    const selectedCategoriesJson = selectedCategories && selectedCategories.length > 0
-      ? JSON.stringify(selectedCategories)
+    const selectedCategoriesJson = normalizedSelectedCategories.length > 0
+      ? JSON.stringify(normalizedSelectedCategories)
       : '';
 
     const promotionStart = new Date().toISOString();

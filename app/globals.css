@@ -56,17 +56,20 @@ html {
   scroll-behavior: smooth;
   width: 100%;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--ink-900);
   font-family: system-ui, Inter, Manrope, sans-serif;
-  line-height: 1.75;
+  line-height: 1.6;
   cursor: default;
   width: 100%;
   overflow-x: hidden;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* Ensure all elements use border-box sizing */
@@ -78,8 +81,17 @@ body {
    under 16px, and can fail to zoom back out once the keyboard closes. Force a 16px
    minimum on every input/textarea/select on mobile widths (overriding any smaller
    Tailwind text-* utility) so focusing a field never triggers unwanted zoom. */
-@media (max-width: 767px) {
-  input, textarea, select {
+@media (max-width: 1024px) {
+  input,
+  textarea,
+  select,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
     font-size: 16px !important;
   }
 }
@@ -87,6 +99,30 @@ body {
 /* Interactive cursor */
 a, button, [role="button"], input[type="submit"], input[type="button"] {
   cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  body {
+    line-height: 1.55;
+  }
 }
 
 /* Modern Animations */

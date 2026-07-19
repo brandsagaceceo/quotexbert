@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { normalizeSubscriptionCategoryList } from "@/lib/subscription-categories";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,14 @@ export async function POST(request: NextRequest) {
     if (!sessionId || !contractorId || !Array.isArray(selectedCategories) || selectedCategories.length === 0) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const categoriesToActivate = normalizeSubscriptionCategoryList(selectedCategories);
+    if (categoriesToActivate.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "No valid categories selected" },
         { status: 400 }
       );
     }
@@ -75,7 +84,7 @@ export async function POST(request: NextRequest) {
     const created: string[] = [];
     const skipped: string[] = [];
 
-    for (const category of selectedCategories) {
+    for (const category of categoriesToActivate) {
       try {
         await prisma.contractorSubscription.upsert({
           where: {
@@ -116,7 +125,7 @@ export async function POST(request: NextRequest) {
     const existing: string[] = (() => {
       try { return JSON.parse(user.selectedCategories || "[]"); } catch { return []; }
     })();
-    const merged = Array.from(new Set([...existing, ...selectedCategories]));
+    const merged = Array.from(new Set([...existing, ...categoriesToActivate]));
     await prisma.user.update({
       where: { id: dbUserId },
       data: { selectedCategories: JSON.stringify(merged) },

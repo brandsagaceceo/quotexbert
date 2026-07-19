@@ -1,4 +1,7 @@
 import { FAQItem } from "@/components/seo/FAQSection";
+import { FOUNDING_CONTRACTOR_SPOTS_REMAINING } from "@/lib/founding-contractor-config";
+
+const FOUNDING_SPOTS_LABEL = `${FOUNDING_CONTRACTOR_SPOTS_REMAINING} remain`;
 
 export interface ContractorLeadData {
   slug: string;
@@ -46,10 +49,10 @@ export const contractorLeadPages: ContractorLeadData[] = [
       { title: "Roof Replacement", budget: "$12,000–$18,000", location: "Scarborough, Toronto" },
     ],
     stats: [
-      { label: "Active Homeowner Leads", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Toronto & GTA Coverage", value: "50+ cities" },
       { label: "Average Job Value", value: "$28,000" },
-      { label: "Contractors on Platform", value: "200+" },
+      { label: "Founding Pricing", value: "$0.99 first month" },
     ],
     faqs: [
       { question: "Is QuoteXbert free for contractors?", answer: "Yes, creating a contractor profile and receiving lead notifications is free. QuoteXbert offers optional subscription plans that unlock unlimited lead access, priority placement, and featured contractor status." },
@@ -200,7 +203,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
       { title: "Deck Board Replacement", budget: "$600–$1,500", location: "Whitby, Ontario" },
     ],
     stats: [
-      { label: "Handyman Leads Monthly", value: "200+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "Average Job Duration", value: "Half day" },
       { label: "Most Active Areas", value: "Downtown, Midtown" },
       { label: "Average Job Value", value: "$650" },
@@ -310,9 +313,9 @@ export const contractorLeadPages: ContractorLeadData[] = [
       { title: "Condo Suite Renovation", budget: "$45,000–$80,000", location: "Liberty Village, Toronto" },
     ],
     stats: [
-      { label: "Renovation Leads Monthly", value: "150+" },
+      { label: "Photo-First Leads", value: "Included" },
       { label: "Average Renovation Job", value: "$42,000" },
-      { label: "Active Homeowners", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "GTA Municipalities", value: "30+" },
     ],
     faqs: [
@@ -349,7 +352,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
     ],
     stats: [
       { label: "Trade Categories", value: "15+" },
-      { label: "Monthly Job Postings", value: "500+" },
+      { label: "Photo-First Leads", value: "Included" },
       { label: "GTA Service Area", value: "Complete" },
       { label: "Free to Join", value: "Always" },
     ],
@@ -386,7 +389,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
     ],
     stats: [
       { label: "GTA Municipalities Covered", value: "50+" },
-      { label: "Monthly GTA Leads", value: "500+" },
+      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
       { label: "GTA Population Served", value: "7M+" },
       { label: "Average GTA Job Value", value: "$38,000" },
     ],

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getCategoryById, ALL_CATEGORIES } from "@/lib/categories";
+import { resolveContractorDbId } from "@/lib/subscription-access";
 
 export const dynamic = "force-dynamic";
 
@@ -78,8 +79,7 @@ export async function POST(request: NextRequest) {
 
     // Demo mode: Check if we have a valid Stripe key, if not use demo flow
     const isValidStripeKey = process.env.STRIPE_SECRET_KEY && 
-                            process.env.STRIPE_SECRET_KEY.startsWith('sk_') && 
-                            process.env.STRIPE_SECRET_KEY !== 'sk_test_4eC39HqLyjWDarjtT1zdp7dc';
+                            process.env.STRIPE_SECRET_KEY.startsWith('sk_');
 
     if (!isValidStripeKey) {
       console.log('Using demo mode - no valid Stripe key found');
@@ -168,9 +168,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const dbContractorId = await resolveContractorDbId(contractorId);
+    if (!dbContractorId) {
+      return NextResponse.json(
+        { error: "Contractor not found" },
+        { status: 404 }
+      );
+    }
+
     // Get contractor's subscriptions
     const subscriptions = await prisma.contractorSubscription.findMany({
-      where: { contractorId },
+      where: { contractorId: dbContractorId },
       include: {
         transactions: {
           orderBy: { createdAt: 'desc' },

@@ -45,7 +45,7 @@ function EstimateGate({ onClose }: EstimateGateProps) {
           {[
             "♾️  Unlimited AI renovation estimates",
             "💾  Save & share your estimate",
-            "📬  Post your job to 500+ verified contractors",
+            "📬  Post your job for verified GTA contractors",
             "💬  Message contractors directly",
           ].map((b) => <li key={b}>{b}</li>)}
         </ul>
@@ -176,7 +176,7 @@ export default function LandingEstimatePage() {
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  <span className="ml-1 font-semibold text-gray-600">500+ GTA homeowners helped</span>
+                  <span className="ml-1 font-semibold text-gray-600">Built for GTA homeowners</span>
                 </div>
                 <span>·</span>
                 <span className="font-semibold text-gray-600">100% Free to Use</span>
@@ -253,7 +253,7 @@ export default function LandingEstimatePage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-xs font-semibold text-brand">
             {[
-              "✓ 500+ GTA homeowners",
+              "✓ Built for GTA homeowners",
               "✓ Verified contractors only",
               "✓ Free to post your project",
               "✓ No obligation",

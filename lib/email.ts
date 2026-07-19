@@ -1,8 +1,10 @@
 ﻿import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { buildUnsubscribeUrl } from "@/lib/unsubscribe";
+import { FOUNDING_CONTRACTOR_SPOTS_REMAINING, isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
+import { isUnlimitedTestContractor } from "@/lib/god-access";
 
-const resend = process.env.RESEND_API_KEY
+const resendClient = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
@@ -11,6 +13,77 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE
 /** @deprecated use BASE_URL */
 const baseUrl = BASE_URL;
 const REPLY_TO = 'quotexbert@gmail.com';
+const CONTRACTOR_ONBOARDING_CAMPAIGN = 'contractor_onboarding_offer';
+const CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN = 'contractor_onboarding_offer_reminder';
+const LOGO_URL = `${BASE_URL}/logo.svg`;
+
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/h[1-6]>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '- ')
+    .replace(/<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+}
+
+const resend = resendClient
+  ? {
+      emails: {
+        send: (payload: any) =>
+          resendClient.emails.send({
+            ...payload,
+            text: payload.text || htmlToPlainText(payload.html || ''),
+          }),
+      },
+    }
+  : null;
+
+export async function sendSharedEmail({
+  to,
+  subject,
+  html,
+  text,
+  replyTo = REPLY_TO,
+}: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
+}) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping email:', subject);
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo,
+      to,
+      subject,
+      html,
+      text,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('[EMAIL] Failed to send shared email:', error);
+    return { success: false, error };
+  }
+}
 
 // Email event logging (NO SECRETS)
 async function logEmailEvent(
@@ -122,7 +195,7 @@ async function getUserEmail(userId: string): Promise<string | null> {
 // Shared email layout builder
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-interface EmailBlock {
+export interface EmailBlock {
   type: 'heading' | 'text' | 'card' | 'cta' | 'tag';
   content: string;
   href?: string;    // for 'cta'
@@ -135,7 +208,7 @@ function escHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function buildEmail(
+export function buildEmail(
   subject: string,
   blocks: EmailBlock[],
   footer?: { unsubscribeUrl?: string; unsubscribeLabel?: string }
@@ -145,25 +218,25 @@ function buildEmail(
     // templates that compose their own inner HTML). Otherwise, escape by default.
     const c = b.rawHtml ? b.content : escHtml(b.content);
     if (b.type === 'heading') {
-      return `<h2 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#1e293b;line-height:1.3;">${c}</h2>`;
+      return `<h1 class="qx-heading" style="margin:0 0 14px;font-size:24px;font-weight:800;color:#111827;line-height:1.2;letter-spacing:-0.02em;">${c}</h1>`;
     }
     if (b.type === 'text') {
-      return `<p style="margin:0 0 14px;font-size:14px;color:#475569;line-height:1.6;">${c}</p>`;
+      return `<p class="qx-text" style="margin:0 0 16px;font-size:15px;color:#475569;line-height:1.65;">${c}</p>`;
     }
     if (b.type === 'tag') {
-      return `<span style="display:inline-block;background:#fef2f2;color:#9f1239;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">${c}</span>`;
+      return `<span class="qx-tag" style="display:inline-block;background:#fff1f2;color:#9f1239;font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 16px;border:1px solid #fecdd3;">${c}</span>`;
     }
     if (b.type === 'card') {
       return `
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:0 0 20px;">
-          ${b.label ? `<p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">${escHtml(b.label)}</p>` : ''}
-          <div style="font-size:14px;color:#334155;line-height:1.6;">${b.rawHtml ? b.content : c}</div>
+        <div class="qx-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:20px 22px;margin:0 0 20px;box-shadow:0 1px 2px rgba(15,23,42,0.04);">
+          ${b.label ? `<p style="margin:0 0 10px;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;">${escHtml(b.label)}</p>` : ''}
+          <div style="font-size:15px;color:#334155;line-height:1.65;">${b.rawHtml ? b.content : c}</div>
         </div>`;
     }
     if (b.type === 'cta') {
       return `
-        <div style="text-align:center;margin:24px 0 8px;">
-          <a href="${b.href ? escHtml(b.href) : '#'}" style="display:inline-block;background:linear-gradient(135deg,#9f1239,#ea580c);color:#fff;font-size:15px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;letter-spacing:.2px;">${c}</a>
+        <div style="text-align:center;margin:26px 0 10px;">
+          <a class="qx-button" href="${b.href ? escHtml(b.href) : '#'}" style="display:inline-block;background:#800020;color:#ffffff;font-size:16px;font-weight:800;padding:15px 28px;border-radius:12px;text-decoration:none;letter-spacing:-0.01em;box-shadow:0 10px 20px rgba(128,0,32,0.18);">${c}</a>
         </div>`;
     }
     return '';
@@ -174,33 +247,60 @@ function buildEmail(
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${subject}</title>
+<title>${escHtml(subject)}</title>
+<style>
+  @media (max-width: 640px) {
+    .qx-shell { padding: 16px 10px !important; }
+    .qx-container { width: 100% !important; max-width: 100% !important; }
+    .qx-header { padding: 22px 18px !important; }
+    .qx-body { padding: 24px 18px 20px !important; }
+    .qx-footer { padding: 18px !important; }
+    .qx-heading { font-size: 22px !important; }
+    .qx-button { display: block !important; width: auto !important; }
+    .qx-card { padding: 18px !important; }
+  }
+  @media (prefers-color-scheme: dark) {
+    body, .qx-shell { background: #0f172a !important; }
+    .qx-body { background: #111827 !important; }
+    .qx-card { background: #1f2937 !important; border-color: #334155 !important; }
+    .qx-heading { color: #f8fafc !important; }
+    .qx-text, .qx-card div { color: #cbd5e1 !important; }
+    .qx-footer { background: #0f172a !important; border-color: #334155 !important; }
+  }
+</style>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:32px 0;">
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+<div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0;">${escHtml(subject)} - QuoteXbert</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qx-shell" style="background:#f1f5f9;padding:32px 12px;">
   <tr><td align="center">
-    <table width="100%" style="max-width:560px;" cellpadding="0" cellspacing="0">
+    <table role="presentation" width="100%" class="qx-container" style="max-width:600px;border-collapse:separate;border-spacing:0;" cellpadding="0" cellspacing="0">
 
       <!-- Header -->
-      <tr><td style="background:linear-gradient(135deg,#9f1239 0%,#ea580c 100%);border-radius:12px 12px 0 0;padding:24px 32px;text-align:center;">
-        <span style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;">QuoteXbert</span>
+      <tr><td class="qx-header" style="background:#800020;border-radius:18px 18px 0 0;padding:24px 32px;text-align:left;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:middle;">
+            <img src="${LOGO_URL}" width="42" height="50" alt="QuoteXbert" style="display:inline-block;vertical-align:middle;border:0;outline:none;text-decoration:none;margin-right:12px;">
+            <span style="display:inline-block;vertical-align:middle;font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.03em;">QuoteXbert</span>
+          </td>
+          <td align="right" style="vertical-align:middle;color:#fecdd3;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Renovation intelligence</td>
+        </tr></table>
       </td></tr>
 
       <!-- Body -->
-      <tr><td style="background:#fff;padding:28px 32px 24px;">
+      <tr><td class="qx-body" style="background:#ffffff;padding:32px 34px 26px;">
         ${renderedBlocks}
       </td></tr>
 
       <!-- Footer -->
-      <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;padding:18px 32px;text-align:center;">
-        <p style="margin:0 0 6px;font-size:13px;color:#64748b;">Need help? Reach us at
+      <tr><td class="qx-footer" style="background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 18px 18px;padding:20px 32px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:13px;color:#64748b;line-height:1.55;">Need help? Reach us at
           <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
           or call <a href="tel:9052429460" style="color:#9f1239;text-decoration:none;font-weight:600;">905-242-9460</a>
         </p>
         <p style="margin:0 0 6px;font-size:12px;">
           <a href="${BASE_URL}/notifications" style="color:#9f1239;text-decoration:none;font-weight:600;">Manage email preferences</a>${footer?.unsubscribeUrl ? ` &middot; <a href="${footer.unsubscribeUrl}" style="color:#94a3b8;text-decoration:none;">${footer.unsubscribeLabel || 'Unsubscribe'}</a>` : ''}
         </p>
-        <p style="margin:0;font-size:11px;color:#94a3b8;">Â© ${new Date().getFullYear()} QuoteXbert Â· All rights reserved</p>
+        <p style="margin:0;font-size:11px;color:#94a3b8;line-height:1.5;">© ${new Date().getFullYear()} QuoteXbert · Toronto, Durham Region & the GTA</p>
       </td></tr>
 
     </table>
@@ -295,6 +395,166 @@ export async function sendWelcomeEmail(user: { id: string; email: string; name?:
   }
 }
 
+async function contractorHasPaidSubscription(contractorId: string): Promise<boolean> {
+  const contractor = await prisma.user.findUnique({
+    where: { id: contractorId },
+    select: { subscriptionStatus: true },
+  });
+
+  if (contractor?.subscriptionStatus && ['active', 'trialing'].includes(contractor.subscriptionStatus)) {
+    return true;
+  }
+
+  const paidSubscription = await prisma.contractorSubscription.findFirst({
+    where: {
+      contractorId,
+      status: { in: ['active', 'trialing'] },
+      monthlyPrice: { gt: 0 },
+      OR: [{ currentPeriodEnd: null }, { currentPeriodEnd: { gte: new Date() } }],
+    },
+    select: { id: true },
+  });
+
+  return Boolean(paidSubscription);
+}
+
+async function hasCampaignEmail(contractorId: string, email: string, campaignType: string): Promise<boolean> {
+  const existing = await prisma.emailEvent.findFirst({
+    where: {
+      type: campaignType,
+      status: 'sent',
+      OR: [{ userId: contractorId }, { to: email }],
+    },
+    select: { id: true },
+  });
+
+  return Boolean(existing);
+}
+
+function buildContractorOfferBlocks(isReminder = false): EmailBlock[] {
+  const heading = isReminder
+    ? 'Your QuoteXbert contractor offer is still available'
+    : 'Welcome to QuoteXbert.';
+
+  return [
+    { type: 'heading', content: heading },
+    { type: 'text', content: 'Your contractor profile has been created.' },
+    {
+      type: 'card',
+      label: 'Limited time founding offer',
+      rawHtml: true,
+      content: `
+        <p style="margin:0 0 10px;color:#334155;line-height:1.6;">For a limited time:</p>
+        <p style="margin:0 0 6px;font-size:13px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.4px;">First Month</p>
+        <p style="margin:0 0 10px;font-size:32px;line-height:1;font-weight:900;color:#9f1239;">$0.99</p>
+        <p style="margin:0;color:#475569;line-height:1.6;">Then renews at the normal monthly plan price.</p>
+      `,
+    },
+    { type: 'text', content: `Only ${FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding contractor spots remain.` },
+    { type: 'text', content: 'Choose the categories you want.' },
+    { type: 'text', content: 'Start receiving homeowner leads immediately.' },
+    { type: 'cta', content: 'Choose Your Plan', href: `${BASE_URL}/contractor/subscriptions` },
+    {
+      type: 'text',
+      rawHtml: true,
+      content: `<a href="${BASE_URL}/profile" style="color:#9f1239;text-decoration:none;font-weight:700;">Complete Your Profile</a>`,
+    },
+    { type: 'text', content: 'Cancel anytime.' },
+  ];
+}
+
+export async function sendContractorOnboardingOfferEmail(contractor: { id: string; email: string; name?: string | null }) {
+  if (!isFoundingOfferEnabled()) {
+    return { success: false, skipped: true, reason: 'founding_offer_disabled' };
+  }
+
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor onboarding offer');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  if (isUnlimitedTestContractor(contractor.email)) {
+    return { success: false, skipped: true, reason: 'internal_bypass_account' };
+  }
+
+  if (await contractorHasPaidSubscription(contractor.id)) {
+    return { success: false, skipped: true, reason: 'already_subscribed' };
+  }
+
+  if (await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_ONBOARDING_CAMPAIGN)) {
+    return { success: false, skipped: true, reason: 'already_sent' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: 'Start getting QuoteXbert jobs for just $0.99',
+      html: buildEmail('Start getting QuoteXbert jobs for just $0.99', buildContractorOfferBlocks(false), {
+        unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'marketing'),
+        unsubscribeLabel: 'Turn off marketing emails',
+      }),
+    });
+
+    await logEmailEvent(CONTRACTOR_ONBOARDING_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'sent');
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent(CONTRACTOR_ONBOARDING_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor onboarding offer:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendContractorOnboardingReminderEmail(contractor: { id: string; email: string; name?: string | null }) {
+  if (!isFoundingOfferEnabled()) {
+    return { success: false, skipped: true, reason: 'founding_offer_disabled' };
+  }
+
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor onboarding reminder');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  if (isUnlimitedTestContractor(contractor.email)) {
+    return { success: false, skipped: true, reason: 'internal_bypass_account' };
+  }
+
+  if (await contractorHasPaidSubscription(contractor.id)) {
+    return { success: false, skipped: true, reason: 'already_subscribed' };
+  }
+
+  if (!(await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_ONBOARDING_CAMPAIGN))) {
+    return { success: false, skipped: true, reason: 'welcome_offer_not_sent' };
+  }
+
+  if (await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN)) {
+    return { success: false, skipped: true, reason: 'already_sent' };
+  }
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: 'Reminder: Start getting QuoteXbert jobs for just $0.99',
+      html: buildEmail('Reminder: Start getting QuoteXbert jobs for just $0.99', buildContractorOfferBlocks(true), {
+        unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'marketing'),
+        unsubscribeLabel: 'Turn off marketing emails',
+      }),
+    });
+
+    await logEmailEvent(CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'sent');
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent(CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor onboarding reminder:', error);
+    return { success: false, error };
+  }
+}
+
 // New Job Email (for matching contractors)
 /** Format urgency label + emoji for email based on job creation time */
 function getJobUrgencyForEmail(createdAt?: string): { emoji: string; label: string } {
@@ -340,16 +600,20 @@ export async function sendNewJobEmail(
 
   const urgency = getJobUrgencyForEmail(job.createdAt ?? undefined);
   const displayLocation = job.city || job.location || null;
+  const submittedDate = job.createdAt
+    ? new Date(job.createdAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
+    : new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const estimatedProjectValue = job.budget || 'Estimate available in lead details';
   // Deep link highlights the specific job card when the contractor opens the page
   const jobDeepLink = `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(job.id)}`;
 
   try {
-    const cardRows: string[] = [
-      `<strong>Category:</strong> ${escHtml(job.category)}`,
-      displayLocation ? `<strong>Location:</strong> ${escHtml(displayLocation)}` : '',
-      job.budget ? `<strong>Budget:</strong> ${escHtml(job.budget)}` : '',
-      `<strong>Urgency:</strong> ${urgency.emoji} ${escHtml(urgency.label)}`,
-    ].filter(Boolean);
+    const leadSummaryRows: string[] = [
+      `<strong>Service Required:</strong> ${escHtml(job.category)}`,
+      `<strong>Location:</strong> ${escHtml(displayLocation || 'Location shared in lead details')}`,
+      `<strong>Estimated Project Value:</strong> ${escHtml(estimatedProjectValue)}`,
+      `<strong>Submitted Date:</strong> ${escHtml(submittedDate)}`,
+    ];
 
     await resend.emails.send({
       from: fromEmail,
@@ -359,17 +623,23 @@ export async function sendNewJobEmail(
       html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
         { type: 'tag', content: `${urgency.emoji} ${urgency.label}` },
         { type: 'heading', content: job.title },
-        { type: 'text', content: job.description.substring(0, 180) + (job.description.length > 180 ? '...' : '') },
         {
           type: 'card',
           rawHtml: true,
-          content: cardRows.join('<br>'),
-          label: 'Job Details',
+          label: 'Estimated Project Value',
+          content: `<div style="font-size:30px;line-height:1.1;font-weight:900;color:#800020;letter-spacing:-0.03em;">${escHtml(estimatedProjectValue)}</div><p style="margin:8px 0 0;color:#64748b;font-size:13px;line-height:1.5;">Review the full scope before submitting your quote.</p>`,
         },
-        { type: 'cta', content: '👉 View Job Now', href: jobDeepLink },
+        {
+          type: 'card',
+          rawHtml: true,
+          content: leadSummaryRows.join('<br>'),
+          label: 'Lead Summary',
+        },
+        { type: 'card', label: 'Homeowner Description', content: job.description.substring(0, 600) + (job.description.length > 600 ? '...' : '') },
+        { type: 'cta', content: 'View Lead & Submit a Quote', href: jobDeepLink },
         {
           type: 'text',
-          content: `<span style="font-size:12px;color:#94a3b8;">You're receiving this because you're subscribed to ${escHtml(job.category)} jobs on QuoteXbert. <a href="${BASE_URL}/contractor/settings" style="color:#9f1239;">Manage alerts</a></span>`,
+          content: `<span style="font-size:12px;color:#64748b;">You're receiving this because this project matches your selected service categories and service area on QuoteXbert. <a href="${BASE_URL}/contractor/settings" style="color:#9f1239;font-weight:700;text-decoration:none;">Manage alerts</a></span>`,
           rawHtml: true,
         },
       ]),
@@ -461,40 +731,19 @@ export async function sendQuoteChangeRequestEmail(
 export async function sendLeadEmail(payload: LeadEmailPayload) {
   const fromEmail = process.env.FROM_EMAIL || "leads@quotexbert.com";
   const toEmail = "quotexbert@gmail.com"; // Always send to quotexbert@gmail.com
+  const submittedAt = new Date().toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
 
   const emailContent = {
     from: fromEmail,
     to: toEmail,
     subject: `New QuoteXbert Lead - ${payload.projectType}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #dc2626;">New Lead Submitted</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Project Type:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.projectType}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Postal Code:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.postalCode}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Description:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.description}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Estimated Value:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.estimate}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Source:</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.source || "web"}</td>
-          </tr>
-          ${payload.affiliateId ? `<tr><td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Affiliate ID:</strong></td><td style="padding: 8px; border-bottom: 1px solid #ddd;">${payload.affiliateId}</td></tr>` : ""}
-        </table>
-        <p style="margin-top: 20px; color: #666; font-size: 14px;">Submitted via quotexbert.com on ${new Date().toLocaleString()}</p>
-      </div>
-    `,
+    html: buildEmail('New QuoteXbert Lead Submitted', [
+      { type: 'tag', content: 'New Lead' },
+      { type: 'heading', content: `New ${payload.projectType} lead` },
+      { type: 'card', label: 'Estimated Project Value', rawHtml: true, content: `<div style="font-size:28px;line-height:1.1;font-weight:900;color:#800020;">${escHtml(payload.estimate)}</div>` },
+      { type: 'card', label: 'Lead Details', rawHtml: true, content: `<strong>Service Required:</strong> ${escHtml(payload.projectType)}<br><strong>Location:</strong> ${escHtml(payload.postalCode)}<br><strong>Submitted Date:</strong> ${escHtml(submittedAt)}<br><strong>Source:</strong> ${escHtml(payload.source || 'web')}${payload.affiliateId ? `<br><strong>Affiliate ID:</strong> ${escHtml(payload.affiliateId)}` : ''}` },
+      { type: 'card', label: 'Homeowner Description', content: payload.description },
+    ]),
   };
 
   if (!resend) {
@@ -718,6 +967,9 @@ export async function sendNewRenovationLeadEmail(
   }
 
   try {
+    const submittedDate = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+    const estimatedProjectValue = job.estimatedPrice || 'Estimate available in lead details';
+
     await resend.emails.send({
       from: fromEmail,
       to: contractor.email,
@@ -725,9 +977,11 @@ export async function sendNewRenovationLeadEmail(
       html: buildEmail(`New ${escHtml(job.category)} Lead â€” QuoteXbert`, [
         { type: 'tag', content: job.category },
         { type: 'heading', content: job.title || job.category },
-        { type: 'card', label: 'Lead Details', rawHtml: true, content: `${job.city ? `<strong>Location:</strong> ${escHtml(job.city)}<br>` : ''}${job.estimatedPrice ? `<strong>Est. Value:</strong> ${escHtml(job.estimatedPrice)}<br>` : ''}${job.description ? `<span style="color:#64748b;">${escHtml(job.description.substring(0, 200))}${job.description.length > 200 ? 'â€¦' : ''}</span>` : ''}` },
-        { type: 'cta', content: 'View Lead', href: `${baseUrl}/contractor/jobs` },
-        { type: 'text', content: '<span style="font-size:12px;color:#94a3b8;">You\'re receiving this because this project matches your selected service categories.</span>', rawHtml: true },
+        { type: 'card', label: 'Estimated Project Value', rawHtml: true, content: `<div style="font-size:30px;line-height:1.1;font-weight:900;color:#800020;letter-spacing:-0.03em;">${escHtml(estimatedProjectValue)}</div><p style="margin:8px 0 0;color:#64748b;font-size:13px;line-height:1.5;">Review the full scope before submitting your quote.</p>` },
+        { type: 'card', label: 'Lead Summary', rawHtml: true, content: `<strong>Service Required:</strong> ${escHtml(job.category)}<br><strong>Location:</strong> ${escHtml(job.city || 'Location shared in lead details')}<br><strong>Estimated Project Value:</strong> ${escHtml(estimatedProjectValue)}<br><strong>Submitted Date:</strong> ${escHtml(submittedDate)}` },
+        ...(job.description ? [{ type: 'card' as const, label: 'Homeowner Description', content: job.description.substring(0, 600) + (job.description.length > 600 ? '...' : '') }] : []),
+        { type: 'cta', content: 'View Lead & Submit a Quote', href: `${baseUrl}/contractor/jobs?highlight=${encodeURIComponent(job.id)}` },
+        { type: 'text', content: `<span style="font-size:12px;color:#64748b;">You're receiving this because this project matches your selected service categories and service area on QuoteXbert. <a href="${BASE_URL}/contractor/settings" style="color:#9f1239;font-weight:700;text-decoration:none;">Manage alerts</a></span>`, rawHtml: true },
       ])
     });
 
@@ -979,26 +1233,30 @@ export async function sendSubscriptionRenewalEmail(params: {
   }
   const { contractor, tier, amountPaid, nextBillingDate } = params;
   const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+  const billingDate = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const renewalDate = nextBillingDate
+    ? new Date(nextBillingDate).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Available in billing settings';
   try {
     await resend.emails.send({
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: `✅ Payment received — QuoteXbert ${tierLabel} Plan renewed`,
-      html: buildEmail(`${tierLabel} Plan Renewed — QuoteXbert`, [
-        { type: 'tag', content: 'Payment Received' },
-        { type: 'heading', content: 'Your subscription has been renewed' },
-        { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${escHtml(tierLabel)}<br><strong>Amount Paid:</strong> $${amountPaid.toFixed(2)} CAD${nextBillingDate ? `<br><strong>Next Billing Date:</strong> ${new Date(nextBillingDate).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}` : ''}` },
-        { type: 'cta', content: 'View Jobs', href: `${BASE_URL}/contractor/jobs` },
+      subject: 'QuoteXbert subscription payment confirmed',
+      html: buildEmail('QuoteXbert subscription payment confirmed', [
+        { type: 'tag', content: 'Subscription Billing' },
+        { type: 'heading', content: 'QuoteXbert subscription payment confirmed' },
+        { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${escHtml(tierLabel)} Plan<br><strong>Amount Charged:</strong> $${amountPaid.toFixed(2)} CAD<br><strong>Billing Date:</strong> ${escHtml(billingDate)}<br><strong>Renewal Date:</strong> ${escHtml(renewalDate)}` },
+        { type: 'cta', content: 'Manage Subscription', href: `${BASE_URL}/contractor/subscriptions` },
         { type: 'text', content: 'Questions? Call <a href="tel:9052429460" style="color:#9f1239;">905-242-9460</a>', rawHtml: true },
       ]),
     });
-    await logEmailEvent('subscription_renewed', contractor.email, contractor.id, undefined, undefined, 'sent');
+    await logEmailEvent('subscription_payment_receipt', contractor.email, contractor.id, undefined, undefined, 'sent');
     console.log(`[EMAIL] Renewal receipt sent to ${contractor.email}`);
     return { success: true };
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    await logEmailEvent('subscription_renewed', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    await logEmailEvent('subscription_payment_receipt', contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
     console.error('[EMAIL] Failed to send renewal email:', error);
     return { success: false, error };
   }

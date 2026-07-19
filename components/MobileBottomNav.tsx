@@ -167,6 +167,7 @@ export default function MobileBottomNav() {
         <button
           type="button"
           onClick={() => setShowPostChoice(true)}
+          aria-label="Post a job"
           className={`flex flex-col items-center justify-center h-full transition-colors ${
             pathname === "/create-lead" ? "text-[#800020]" : "text-gray-500 hover:text-[#800020]"
           }`}
@@ -207,11 +208,11 @@ export default function MobileBottomNav() {
           onClick={(e) => { if (e.target === e.currentTarget) setShowPostChoice(false); }}
         >
           <div
-            className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-5 pb-6"
-            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)" }}
+            className="w-full max-w-md bg-white rounded-t-2xl shadow-xl p-4 pb-5"
+            style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1.25rem)" }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-900">Post a Job</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-bold text-slate-900">Post a Job</h3>
               <button
                 type="button"
                 onClick={() => setShowPostChoice(false)}
@@ -226,7 +227,7 @@ export default function MobileBottomNav() {
             <button
               type="button"
               onClick={() => { setShowPostChoice(false); router.push("/"); }}
-              className="w-full flex items-start gap-3 text-left bg-gradient-to-br from-rose-50 to-orange-50 border-2 border-rose-200 rounded-2xl p-4 mb-3 active:scale-[0.98] transition-transform"
+              className="w-full flex items-start gap-3 text-left bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-200 rounded-xl p-3.5 mb-3 active:scale-[0.98] transition-transform"
             >
               <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#800020] flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-white" />
@@ -243,7 +244,7 @@ export default function MobileBottomNav() {
             <button
               type="button"
               onClick={() => { setShowPostChoice(false); router.push("/create-lead"); }}
-              className="w-full flex items-center gap-3 text-left border border-slate-200 rounded-2xl p-4 active:scale-[0.98] transition-transform hover:bg-slate-50"
+              className="w-full flex items-center gap-3 text-left border border-slate-200 rounded-xl p-3.5 active:scale-[0.98] transition-transform hover:bg-slate-50"
             >
               <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
                 <FileEdit className="h-5 w-5 text-slate-600" />

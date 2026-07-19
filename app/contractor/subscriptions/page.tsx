@@ -11,6 +11,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { CATEGORY_GROUPS, getCategoryById, normalizeCategory, SIMPLE_CATEGORIES } from "@/lib/categories";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import { FOUNDING_CONTRACTOR_SPOTS_REMAINING, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -59,6 +60,8 @@ export default function SubscriptionsPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showCancelMessage, setShowCancelMessage] = useState(false);
+  const [activatingCategories, setActivatingCategories] = useState(false);
+  const [activationTimedOut, setActivationTimedOut] = useState(false);
   const [successFoundingOffer, setSuccessFoundingOffer] = useState(false);
   const [successTier, setSuccessTier] = useState<'handyman' | 'renovation' | 'general' | null>(null);
   
@@ -87,6 +90,7 @@ export default function SubscriptionsPage() {
 
     if (success === 'true') {
       setShowSuccessMessage(true);
+      setActivationTimedOut(false);
       setSuccessFoundingOffer(founding === '1');
       setSuccessTier(tier === 'handyman' || tier === 'renovation' || tier === 'general' ? tier : null);
       setTimeout(() => setShowSuccessMessage(false), 10000);
@@ -98,8 +102,9 @@ export default function SubscriptionsPage() {
       })();
 
       if (sessionId && pendingCategories.length > 0) {
+        setActivatingCategories(true);
         // Wait for authUser to be available
-        const activate = (userId: string) => {
+        const activate = async (userId: string) => {
           fetch('/api/subscriptions/activate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -110,9 +115,17 @@ export default function SubscriptionsPage() {
               if (data.success) {
                 localStorage.removeItem(pendingKey);
                 fetchSubscriptions();
+                setActivatingCategories(false);
+              } else {
+                setActivationTimedOut(true);
+                setActivatingCategories(false);
               }
             })
-            .catch((err) => console.error('[Activate] Error:', err));
+            .catch((err) => {
+              console.error('[Activate] Error:', err);
+              setActivationTimedOut(true);
+              setActivatingCategories(false);
+            });
         };
 
         // authUser may not be loaded yet — poll briefly.
@@ -129,7 +142,11 @@ export default function SubscriptionsPage() {
               if (u) { clearInterval(poll); activate(u.id); }
             }());
           }, 300);
-          setTimeout(() => clearInterval(poll), 5000);
+          setTimeout(() => {
+            clearInterval(poll);
+            setActivationTimedOut(true);
+            setActivatingCategories(false);
+          }, 5000);
         }
       }
 
@@ -360,6 +377,10 @@ export default function SubscriptionsPage() {
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
   const totalMonthlyFees = activeSubscriptions.reduce((sum, sub) => sum + sub.monthlyPrice, 0);
   const subscribedCategories = new Set(subscriptions.map(sub => sub.category));
+  const activeCategoryLabels = activeSubscriptions.map((subscription) => {
+    const categoryConfig = getCategoryById(subscription.category);
+    return categoryConfig?.name || normalizeCategory(subscription.category);
+  });
 
   // Filter function for categories
   const getFilteredCategoryGroups = () => {
@@ -398,7 +419,7 @@ export default function SubscriptionsPage() {
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
         {/* Founding Contractor urgency section */}
-        {subscriptions.length === 0 && !loading && (
+        {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && !loading && (
           <FoundingContractorSection compact />
         )}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12">
@@ -410,16 +431,26 @@ export default function SubscriptionsPage() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <div className="flex-1">
-                <h3 className="text-green-800 font-medium">Subscription Activated!</h3>
+                <h3 className="text-green-800 font-medium">
+                  {activatingCategories ? 'Activating your categories...' : 'Subscription Activated!'}
+                </h3>
                 {successFoundingOffer && successTier ? (
                   <p className="text-green-700 mt-1">
                     🎉 Founding Contractor Offer applied — you were charged <strong>$0.99</strong> for your first month.
                     Your subscription renews at the regular <strong>{TIER_REGULAR_PRICE_LABEL[successTier]}/month</strong> starting
-                    next billing cycle. Cancel anytime. You can now select your categories below to start receiving leads.
+                    next billing cycle. Cancel anytime. Your paid categories are being activated now.
                   </p>
                 ) : (
                   <p className="text-green-700 mt-1">
-                    Your subscription payment was successful. You can now select your categories below to start receiving leads.
+                    Your subscription payment was successful. Your paid categories are being activated now.
+                  </p>
+                )}
+                {activatingCategories && (
+                  <p className="text-green-700 text-sm mt-2">Activating your categories...</p>
+                )}
+                {activationTimedOut && (
+                  <p className="text-amber-700 text-sm mt-2">
+                    Payment succeeded, but category activation is still syncing. Refresh this page in a moment if your categories do not appear.
                   </p>
                 )}
                 <button
@@ -520,10 +551,10 @@ export default function SubscriptionsPage() {
                           <span className="text-5xl font-black bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">$49</span>
                           <span className="text-gray-600 font-bold text-lg">/month</span>
                         </div>
-                        {subscriptions.length === 0 && (
+                        {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                           <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
-                            <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
-                            <p className="text-[11px] text-amber-700">Then $49.00/month · Cancel anytime</p>
+                            <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
+                            <p className="text-[11px] text-amber-700">Then $49.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
                           </div>
                         )}
                         <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-200">
@@ -566,10 +597,10 @@ export default function SubscriptionsPage() {
                         <span className="text-5xl font-black text-[#800020]">$99</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
-                      {subscriptions.length === 0 && (
+                      {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
-                          <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $99.00/month · Cancel anytime</p>
+                          <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
+                          <p className="text-[11px] text-amber-700">Then $99.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
@@ -610,14 +641,14 @@ export default function SubscriptionsPage() {
                         <span className="text-5xl font-black text-[#800020]">$149</span>
                         <span className="text-gray-600 font-bold text-lg">/month</span>
                       </div>
-                      {subscriptions.length === 0 && (
+                      {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
-                          <p className="text-xs font-black text-amber-800">🎉 Founding Offer: First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $149.00/month · Cancel anytime</p>
+                          <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
+                          <p className="text-[11px] text-amber-700">Then $149.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
-                        <p className="text-sm font-black text-rose-900">ALL 10+ Categories — Full-service contractors</p>
+                        <p className="text-sm font-black text-rose-900">ALL Categories — Full-service contractors</p>
                       </div>
                       <ul className="text-left space-y-2 mb-6">
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> ALL job categories included</li>
@@ -696,28 +727,49 @@ export default function SubscriptionsPage() {
           {subscriptions.length > 0 && (
             <div className="bg-white rounded-lg shadow mb-6">
               <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-rose-50 to-orange-50">
-                <h2 className="text-xl font-bold text-gray-900">Your Active Categories</h2>
-                <p className="text-sm text-gray-700 mt-1">Categories you can currently accept jobs from</p>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Your Subscription</h2>
+                    <p className="text-sm text-gray-700 mt-1">
+                      {activeSubscriptions.length} active {activeSubscriptions.length === 1 ? 'category' : 'categories'} included
+                      {activeSubscriptions[0]?.currentPeriodEnd ? ` • renews ${new Date(activeSubscriptions[0].currentPeriodEnd).toLocaleDateString()}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setActiveTab('billing')} className="px-3 py-2 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-white">
+                      Manage Billing
+                    </button>
+                    <button onClick={() => setActiveTab('subscriptions')} className="px-3 py-2 text-sm font-semibold rounded-lg bg-[#800020] text-white hover:bg-[#6b001b]">
+                      Upgrade Plan
+                    </button>
+                    <button onClick={() => setActiveTab('subscriptions')} className="px-3 py-2 text-sm font-semibold rounded-lg border border-[#800020] text-[#800020] hover:bg-rose-50">
+                      Add Categories
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {subscriptions.map((subscription) => {
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 text-sm">
+                  <div>
+                    <p className="text-gray-500">Billing status</p>
+                    <p className="font-semibold text-gray-900">{activeSubscriptions[0]?.status || subscriptions[0]?.status || 'inactive'}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Monthly price</p>
+                    <p className="font-semibold text-gray-900">${totalMonthlyFees.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Active categories</p>
+                    <p className="font-semibold text-gray-900">{activeCategoryLabels.length}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {activeSubscriptions.map((subscription) => {
                     const categoryConfig = getCategoryById(subscription.category);
                     return (
-                      <div key={subscription.id} className="group relative">
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl blur opacity-30 group-hover:opacity-60 transition"></div>
-                        <div className="relative bg-white rounded-xl shadow p-4 border-2 border-green-200 text-center transform hover:scale-105 transition-all">
-                          <div className="text-3xl mb-2">✓</div>
-                          <p className="text-sm font-bold text-gray-900">{categoryConfig?.name || subscription.category}</p>
-                          <span className={`inline-block mt-2 px-2 py-1 text-xs font-bold rounded-full ${
-                            subscription.status === 'active' 
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {subscription.status}
-                          </span>
-                        </div>
-                      </div>
+                      <span key={subscription.id} className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-800">
+                        {categoryConfig?.name || normalizeCategory(subscription.category)}
+                      </span>
                     );
                   })}
                 </div>
@@ -1074,9 +1126,9 @@ export default function SubscriptionsPage() {
                     Select {maxAllowed - pickedCategories.length} more to continue
                   </p>
                 )}
-                {subscriptions.length === 0 && pendingTier && (
+                {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && pendingTier && (
                   <p className="text-center text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 mb-3">
-                    🎉 Founding Offer: first month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. Cancel anytime.
+                    🎉 First month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain. Cancel anytime.
                   </p>
                 )}
                 <div className="flex items-center gap-3">

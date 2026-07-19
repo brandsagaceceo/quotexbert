@@ -129,7 +129,7 @@ export default function HomeownerJobsPage() {
           <h1 className="text-3xl font-bold text-gray-900">My Jobs</h1>
           <p className="text-gray-600 mt-2">Manage your posted jobs and contractor applications</p>
         </div>
-        <Link href="/homeowner/jobs/create">
+        <Link href="/create-lead">
           <Button>
             <Plus className="w-4 h-4 mr-2" />
             Post New Job
@@ -180,7 +180,7 @@ export default function HomeownerJobsPage() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No jobs posted yet</h3>
             <p className="text-gray-600 mb-4">Start by posting your first job to find qualified contractors.</p>
-            <Link href="/homeowner/jobs/create">
+            <Link href="/create-lead">
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
                 Post Your First Job
@@ -267,12 +267,12 @@ export default function HomeownerJobsPage() {
                       </Link>
                     )}
 
-                    {/* Edit button - available for draft and open jobs */}
-                    {(job.status === 'draft' || job.status === 'open') && (
+                    {/* Edit button - available until a contractor is selected or job is completed */}
+                    {['draft', 'open', 'reviewing'].includes(job.status) && (
                       <Link href={`/homeowner/jobs/${job.id}/edit`}>
                         <Button variant="secondary" size="sm">
                           <Edit className="w-4 h-4 mr-2" />
-                          Edit
+                          Edit Job
                         </Button>
                       </Link>
                     )}

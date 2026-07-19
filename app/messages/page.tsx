@@ -515,15 +515,15 @@ export default function MessagesPage() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
-      <div className="max-w-7xl mx-auto p-2 sm:p-6 lg:p-8 flex-1 flex flex-col w-full overflow-hidden min-h-0">
+      <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-5 flex-1 flex flex-col w-full overflow-hidden min-h-0">
         {/* Modern Header — hidden on mobile when viewing a thread */}
-        <div className={`mb-2 sm:mb-6 flex-shrink-0 ${selectedThread ? 'hidden lg:block' : ''}`}>
+        <div className={`mb-2 sm:mb-4 flex-shrink-0 ${selectedThread ? 'hidden lg:block' : ''}`}>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-700 bg-clip-text text-transparent tracking-tight">
                 Messages
               </h1>
-              <p className="text-slate-500 mt-1 text-sm sm:text-lg hidden sm:block">Stay connected with your project partners</p>
+              <p className="text-slate-500 mt-1 text-sm hidden sm:block">Stay connected with your project partners</p>
             </div>
             <div className="hidden sm:flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -534,11 +534,11 @@ export default function MessagesPage() {
 
           <div className="flex flex-col lg:flex-row gap-2 lg:gap-6 flex-1 min-h-0 overflow-hidden">
           {/* Conversations List - Modern Sidebar */}
-          <div className={`lg:w-[340px] xl:w-[380px] lg:flex-shrink-0 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
+          <div className={`lg:w-[320px] xl:w-[360px] lg:flex-shrink-0 flex-col min-h-0 h-full max-h-full ${selectedThread ? 'hidden lg:flex' : 'flex'}`}>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden backdrop-blur-none relative z-10 h-full w-full max-w-full">
               {/* Header with Search */}
-              <div className="p-3 sm:p-5 border-b border-slate-200 flex-shrink-0">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-3 sm:p-4 border-b border-slate-200 flex-shrink-0">
+                <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-slate-900">Conversations</h2>
                   <div className="w-8 h-8 rounded-full bg-rose-700 flex items-center justify-center">
                     <ChatBubbleLeftRightIcon className="w-4 h-4 text-white" />
@@ -664,7 +664,7 @@ export default function MessagesPage() {
                         <div
                           key={thread.id}
                           onClick={() => selectThread(thread)}
-                          className={`group relative p-3.5 cursor-pointer rounded-xl border-b border-slate-100 last:border-b-0 transition-all duration-150 active:scale-[0.99] ${
+                          className={`group relative p-3 cursor-pointer rounded-lg border-b border-slate-100 last:border-b-0 transition-all duration-150 active:scale-[0.99] ${
                             isSelected
                               ? 'bg-rose-50 border-l-4 border-l-rose-700 shadow-sm'
                               : (thread.unreadCount ?? 0) > 0

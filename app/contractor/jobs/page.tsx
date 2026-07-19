@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ALL_CATEGORIES, SIMPLE_CATEGORIES, normalizeCategory } from "@/lib/categories";
 import { ContractorOnboardingPopup } from "@/components/ContractorOnboardingPopup";
+import JobPhotoGallery from "@/components/JobPhotoGallery";
 import { canAcceptJob, isUnlimitedTestContractor } from "@/lib/god-access";
 import { useJobNotifications, type Job } from "@/lib/hooks/useJobNotifications";
 import { useToast } from "@/components/ToastProvider";
@@ -421,12 +422,12 @@ function ContractorJobsContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-[#800020] mb-4">
+      <div className="max-w-6xl mx-auto px-4 pt-5 sm:pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
+        <div className="mb-5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#800020] mb-2 tracking-tight">
             Available Jobs
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Welcome {user.name}! Browse home improvement projects in your area
           </p>
 
@@ -455,7 +456,7 @@ function ContractorJobsContent() {
 
         {/* Performance Metrics */}
         {user?.id && (
-          <div className="mb-6">
+          <div className="mb-5">
             <ContractorMetricsCard contractorId={user.id} />
           </div>
         )}
@@ -490,14 +491,14 @@ function ContractorJobsContent() {
 
         {/* New Job Alert Banner */}
         {newJobAlert && (
-          <div className="mb-6 bg-[#800020] text-white rounded-2xl p-6 shadow-md">
+          <div className="mb-5 bg-[#800020] text-white rounded-xl p-4 sm:p-5 shadow-sm">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl">🔥</span>
-                  <h3 className="text-2xl font-black">New Renovation Lead Near You!</h3>
+                  <span className="text-2xl">🔥</span>
+                  <h3 className="text-xl font-black">New Renovation Lead Near You!</h3>
                 </div>
-                <div className="space-y-1 text-lg">
+                <div className="space-y-1 text-sm sm:text-base">
                   <p className="font-semibold">{newJobAlert.location} – {newJobAlert.category} – {newJobAlert.budget}</p>
                   <p className="opacity-90">{newJobAlert.title}</p>
                 </div>
@@ -523,8 +524,8 @@ function ContractorJobsContent() {
         )}
 
         {/* Quick Hot Leads Filters */}
-        <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-wrap gap-3">
+        <div className="mb-5 bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+          <div className="flex flex-wrap gap-2.5">
             <button
               onClick={() => {
                 const newFilters = { ...filters };
@@ -532,7 +533,7 @@ function ContractorJobsContent() {
                 delete newFilters.sortBy;
                 setFilters(newFilters);
               }}
-              className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${
+              className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 !filters.urgency && !filters.sortBy
                   ? 'bg-[#800020] text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -547,7 +548,7 @@ function ContractorJobsContent() {
                 delete newFilters.sortBy;
                 setFilters(newFilters);
               }}
-              className={`px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${
                 filters.urgency === 'hot'
                   ? 'bg-[#800020] text-white shadow-lg'
                   : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border-2 border-orange-200'
@@ -881,30 +882,10 @@ function ContractorJobsContent() {
                         <span className="font-medium">Status:</span> {job.status}
                       </div>
                     </div>
-                    {job.photos && (() => {
-                      try {
-                        const photos = JSON.parse(job.photos);
-                        return photos.length > 0 && (
-                          <div className="mt-3">
-                            <span className="font-medium">Photos:</span>
-                            <div className="flex gap-2 mt-1 flex-wrap">
-                              {photos.map((photo: string, index: number) => (
-                                <img 
-                                  key={index} 
-                                  src={photo} 
-                                  alt={`Project photo ${index + 1}`}
-                                  className="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
-                                  onClick={() => window.open(photo, '_blank')}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      } catch (error) {
-                        console.error('Error parsing photos:', error);
-                        return null;
-                      }
-                    })()}
+                    <div className="mt-3">
+                      <span className="font-medium">Photos:</span>
+                      <JobPhotoGallery photos={job.photos} title={job.title} className="mt-2" />
+                    </div>
                   </div>
                 )}
 

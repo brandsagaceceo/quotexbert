@@ -502,7 +502,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
 • Install 6 potlights in living room"
                 rows={4}
                 className="w-full px-3 py-2 md:py-3 border-2 border-slate-300 rounded-lg md:rounded-xl focus:border-orange-500 
-                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm md:text-base
+                         focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
                          placeholder:text-slate-400 resize-none"
               />
             </div>
@@ -533,7 +533,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               onChange={(e) => setProjectType(e.target.value)}
               required
               className="w-full px-3 py-2 md:py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
+                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
                        bg-white cursor-pointer"
             >
               <option value="">Select project type...</option>
@@ -556,7 +556,7 @@ export function EstimatorMain({ onEstimateComplete, userId, isBlocked, onBlocked
               placeholder="M5H 2N2"
               maxLength={7}
               className="w-full px-3 py-2 md:py-2.5 border-2 border-slate-300 rounded-lg focus:border-orange-500 
-                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-sm
+                       focus:ring-2 focus:ring-orange-200 outline-none transition-all text-slate-900 text-base
                        placeholder:text-slate-400"
             />
           </div>

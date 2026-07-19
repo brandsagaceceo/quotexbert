@@ -4,6 +4,7 @@ import { GTA_CITIES, RENOVATION_TYPES, CITY_MAP } from "@/lib/seo/gta-cities";
 import RenovationCTA from "@/components/seo/RenovationCTA";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import FAQSection from "@/components/seo/FAQSection";
+import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 
 export async function generateStaticParams() {
   return GTA_CITIES.map((city) => ({ city: city.slug }));
@@ -191,7 +192,7 @@ export default function ContractorsCityPage({
       <section className="bg-amber-50 border-y border-amber-100 py-6 px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[
-            { label: "Verified Contractors", value: "500+" },
+            { label: "Founding Spots Remain", value: String(FOUNDING_CONTRACTOR_CONFIG.spotsRemaining) },
             { label: `Serving ${city.name}`, value: "✓" },
             { label: "Avg Response Time", value: "< 4 hrs" },
             { label: "Renovation Types", value: "10+" },

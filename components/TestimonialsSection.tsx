@@ -133,8 +133,8 @@ export function TestimonialsSection() {
         <div className="bg-white rounded-2xl p-8 shadow-lg">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-4xl font-bold text-rose-600 mb-2">2,500+</div>
-              <div className="text-sm text-gray-600">Happy Homeowners</div>
+              <div className="text-4xl font-bold text-rose-600 mb-2">GTA</div>
+              <div className="text-sm text-gray-600">Homeowner Focus</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-orange-600 mb-2">5.0★</div>

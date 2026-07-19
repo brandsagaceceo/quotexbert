@@ -186,9 +186,13 @@ export async function POST(req: NextRequest) {
     const isFirstRoleSet = !existingUser || existingUser.role === null;
     if (isFirstRoleSet) {
       try {
-        const { sendWelcomeEmail } = await import('@/lib/email');
+        const { sendWelcomeEmail, sendContractorOnboardingOfferEmail } = await import('@/lib/email');
         await sendWelcomeEmail({ id: resolvedUserId, email, name: userName, role });
         console.log(`[USER/ROLE] Role-specific welcome email sent to ${email} (role=${role})`);
+        if (role === 'contractor') {
+          const offerResult = await sendContractorOnboardingOfferEmail({ id: resolvedUserId, email, name: userName });
+          console.log(`[USER/ROLE] Contractor onboarding offer result for ${email}:`, offerResult);
+        }
       } catch (welcomeErr) {
         console.error('[USER/ROLE] Failed to send welcome email (non-fatal):', welcomeErr);
       }

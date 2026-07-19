@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail } from "@/lib/email";
+import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail } from "@/lib/email";
 import { isGodUser } from "@/lib/god-access";
+import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
 // Email data interface
 interface EmailData {
@@ -11,27 +12,14 @@ interface EmailData {
 
 // Resend-based fallback email send (for types not covered by lib/email helpers)
 async function sendEmailViaResend({ to, subject, html }: EmailData) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('[EMAIL] RESEND_API_KEY not configured — skipping email to', to);
-    return;
-  }
-  try {
-    const { Resend } = await import('resend');
-    const resend = new Resend(apiKey);
-    const from = process.env.EMAIL_FROM || 'QuoteXbert <noreply@quotexbert.com>';
-    const result = await resend.emails.send({ from, to, subject, html });
-    console.log(`[EMAIL] Sent to ${to}: ${subject} → id=${JSON.stringify(result)}`);
-  } catch (err) {
-    console.error(`[EMAIL] Failed to send to ${to}: ${subject}`, err);
-  }
+  return sendSharedEmail({ to, subject, html });
 }
 
 export type NotificationType = 
   | "JOB_CLAIMED"
   | "NEW_MESSAGE" 
   | "LEAD_MATCHED"
-  | "PAYMENT_RECEIVED"
+  | "SUBSCRIPTION_PAYMENT_RECEIPT"
   | "PAYMENT_FAILED"
   | "LEAD_EXPIRED"
   | "CONTRACT_SIGNED"
@@ -179,11 +167,12 @@ export class NotificationService {
       });
 
       // Filter to only contractors who match the job's category (or god users who bypass)
-      const categoryMatched = jobDetails.category
+      const jobCategory = jobDetails.category;
+      const categoryMatched = jobCategory
         ? allContractors.filter((contractor) => {
             if (isGodUser(contractor.email)) return true;
             return contractor.subscriptions.some(
-              (sub) => sub.category === jobDetails.category && sub.canClaimLeads,
+              (sub) => categoryMatchesEntitlement(jobCategory, sub.category) && sub.canClaimLeads,
             );
           })
         : allContractors; // No category → notify all (legacy fallback)
@@ -348,75 +337,8 @@ export class NotificationService {
   /**
    * Get enhanced branded email template
    */
-  private static getBrandedEmailTemplate(content: string) {
-    return `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>QuoteXbert</title>
-      </head>
-      <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <table role="presentation" style="width: 100%; border-collapse: collapse;">
-          <tr>
-            <td style="padding: 40px 20px;">
-              <!-- Email Container -->
-              <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); overflow: hidden;">
-                <!-- Header -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #800020 0%, #2d5a5a 100%); padding: 30px; text-align: center;">
-                    <div style="background-color: #ffffff; display: inline-block; padding: 12px 24px; border-radius: 8px; margin-bottom: 20px;">
-                      <h1 style="margin: 0; color: #800020; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">
-                        Quote<span style="color: #2d5a5a;">Xpert</span>
-                      </h1>
-                    </div>
-                    <p style="margin: 0; color: #ffffff; font-size: 16px; opacity: 0.9;">
-                      Canada's Premier Home Improvement Platform
-                    </p>
-                  </td>
-                </tr>
-                
-                <!-- Content -->
-                <tr>
-                  <td style="padding: 40px 30px;">
-                    ${content}
-                  </td>
-                </tr>
-                
-                <!-- Footer -->
-                <tr>
-                  <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-                    <div style="margin-bottom: 20px;">
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}" style="color: #800020; text-decoration: none; font-weight: 600; font-size: 16px;">
-                        Visit QuoteXbert
-                      </a>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px;">
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/help" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Help Center</a>
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/contact" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Contact Us</a>
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/privacy" style="color: #64748b; text-decoration: none; margin: 0 15px; font-size: 14px;">Privacy Policy</a>
-                    </div>
-                    
-                    <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.4;">
-                      © 2025 QuoteXbert. All rights reserved.<br>
-                      Connecting homeowners with trusted contractors across Canada.
-                    </p>
-                    
-                    <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 11px;">
-                      You're receiving this email because you have an account with QuoteXbert.
-                      <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/unsubscribe" style="color: #64748b; text-decoration: underline;">Unsubscribe</a>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </body>
-      </html>
-    `;
+  private static getBrandedEmailTemplate(subject: string, content: string) {
+    return buildEmail(subject, [{ type: 'card', content, rawHtml: true }]);
   }
 
   /**
@@ -503,37 +425,23 @@ export class NotificationService {
         `;
         break;
 
-      case "PAYMENT_RECEIVED":
-        subject = "💰 Payment Received - QuoteXbert";
+      case "SUBSCRIPTION_PAYMENT_RECEIPT":
+        subject = "QuoteXbert subscription payment confirmed";
         content = `
-          <div style="text-align: center; margin-bottom: 30px;">
-            <div style="background: linear-gradient(135deg, #22c55e, #16a34a); width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 40px;">💰</span>
-            </div>
-            <h2 style="color: #1e293b; margin: 0; font-size: 28px; font-weight: 700;">Payment Confirmed</h2>
-          </div>
-          
           <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
             Hi <strong>${userName}</strong>,
           </p>
-          
-          <div style="background: #f0fdf4; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #22c55e; text-align: center;">
-            <p style="margin: 0 0 10px 0; color: #15803d; font-size: 18px; font-weight: 600;">
-              Payment Successfully Processed
-            </p>
-            <p style="margin: 0; color: #166534; font-size: 24px; font-weight: 700;">
-              $${payload.amount}
-            </p>
-          </div>
-          
           <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-            You can now view the full lead details and contact the homeowner directly.
+            Your QuoteXbert contractor subscription payment was confirmed through Stripe.
           </p>
-          
-          <div style="text-align: center; margin: 35px 0;">
-            <a href="${baseUrl}${payload.actionUrl}" style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);">
-              View Lead Details →
-            </a>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin:0 0 20px;">
+            <strong>Plan:</strong> ${payload.planName || 'Contractor Plan'}<br>
+            <strong>Amount Charged:</strong> $${payload.amount || '0.00'} CAD<br>
+            <strong>Billing Date:</strong> ${payload.billingDate ? new Date(payload.billingDate).toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA')}<br>
+            <strong>Renewal Date:</strong> ${payload.renewalDate ? new Date(payload.renewalDate).toLocaleDateString('en-CA') : 'Available in billing settings'}
+          </div>
+          <div style="text-align:center;margin:35px 0;">
+            <a href="${baseUrl}/contractor/subscriptions" style="background:#800020;color:white;padding:16px 32px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:600;font-size:16px;">Manage Subscription</a>
           </div>
         `;
         break;
@@ -650,7 +558,7 @@ export class NotificationService {
 
     return {
       subject,
-      html: this.getBrandedEmailTemplate(content)
+      html: this.getBrandedEmailTemplate(subject, content)
     };
   }
 
@@ -727,11 +635,11 @@ export const notifications = {
       sendEmail: true  // Ensure email is always sent for messages
     }),
 
-  paymentReceived: (userId: string, payload: { amount: number; leadId: string; title: string }) =>
+  subscriptionPaymentReceipt: (userId: string, payload: { amount: number; planName?: string; billingDate?: string; renewalDate?: string }) =>
     NotificationService.create({
       userId,
-      type: "PAYMENT_RECEIVED",
-      payload: { ...payload, actionUrl: `/contractor/jobs` }
+      type: "SUBSCRIPTION_PAYMENT_RECEIPT",
+      payload
     }),
 
   paymentFailed: (userId: string, payload: { amount: number; reason?: string }) =>

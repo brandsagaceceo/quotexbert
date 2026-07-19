@@ -1,5 +1,5 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
-import { getAllOpenLeads } from '@/lib/subscription-access';
+import { getAccessibleLeads } from '@/lib/subscription-access';
 import { formatBudgetDisplay } from '@/lib/currency';
 
 export const dynamic = "force-dynamic";
@@ -17,8 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get all open leads - contractors can view all but only apply to subscribed categories
-    const leads = await getAllOpenLeads();
+    const leads = await getAccessibleLeads(contractorId);
 
     const jobs = leads.map((lead: any) => ({
       id: lead.id,
@@ -40,8 +39,8 @@ export async function GET(request: NextRequest) {
       jobs,
       total: jobs.length,
       message: jobs.length === 0
-        ? 'No leads available at the moment.'
-        : 'Jobs available in your categories — subscribe to a category to apply.'
+        ? 'No leads available in your active categories at the moment.'
+        : 'Jobs available in your active categories.'
     });
   } catch (error) {
     console.error('Error:', error);

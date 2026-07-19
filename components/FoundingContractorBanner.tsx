@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
+import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 const { spotsRemaining, programName, ctaHref } = FOUNDING_CONTRACTOR_CONFIG;
 
@@ -18,7 +18,7 @@ export default function FoundingContractorBanner() {
     return () => clearTimeout(t);
   }, []);
 
-  if (!visible || dismissed) return null;
+  if (!FOUNDING_OFFER_ENABLED || !visible || dismissed) return null;
 
   return (
     <div
@@ -26,8 +26,8 @@ export default function FoundingContractorBanner() {
         fixed bottom-4 left-1/2 -translate-x-1/2 z-[9998]
         w-[calc(100%-2rem)] max-w-2xl
         bg-gradient-to-r from-[#800020] to-[#600018]
-        rounded-2xl shadow-2xl border border-white/20
-        px-5 py-4
+        rounded-xl shadow-xl border border-white/20
+        px-4 py-3
         animate-slide-up
       "
       role="banner"
@@ -53,11 +53,11 @@ export default function FoundingContractorBanner() {
             {programName}
           </p>
           <p className="text-white/80 text-xs leading-snug">
-            Only{" "}
-            <span className="font-bold text-white">{spotsRemaining} spots</span>{" "}
-            remain for discounted founding memberships.{" "}
+            First month <span className="font-bold text-white">$0.99</span>, then renews at your selected monthly plan price. Only{" "}
+            <span className="font-bold text-white">{spotsRemaining} founding contractor spots</span>{" "}
+            remain.{" "}
             <span className="text-yellow-300 font-semibold">
-              Lock in your pricing for life.
+              Cancel anytime.
             </span>
           </p>
 
@@ -88,7 +88,7 @@ export default function FoundingContractorBanner() {
           className="
             flex-shrink-0
             bg-white text-[#800020] font-black text-sm
-            px-5 py-2.5 rounded-xl
+            px-4 py-2.5 rounded-lg
             hover:bg-yellow-50 active:scale-95
             transition-all shadow-lg
             whitespace-nowrap
