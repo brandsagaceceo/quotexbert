@@ -24,7 +24,7 @@ const LOOKBACK_DAYS = 90;
 
 function percentile(sorted: number[], p: number): number {
   const idx = Math.floor(sorted.length * p);
-  return sorted[Math.max(0, Math.min(sorted.length - 1, idx))];
+  return sorted[Math.max(0, Math.min(sorted.length - 1, idx))] ?? 0;
 }
 
 export async function GET(request: NextRequest) {

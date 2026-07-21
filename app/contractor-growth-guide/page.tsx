@@ -281,7 +281,7 @@ export default function ContractorGrowthGuidePage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
             {growthStrategies.map((s) => (
               <a key={s.id} href={`#${s.id}`} className="text-rose-600 hover:text-rose-700 hover:underline font-medium">
-                → {s.title.split(':')[0].split('(')[0].trim()}
+                → {s.title.split(':')[0]?.split('(')[0]?.trim() ?? s.title}
               </a>
             ))}
           </div>

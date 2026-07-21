@@ -283,7 +283,7 @@ export default function ContractorSettingsPage() {
                   icon={soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                   label="Sound notifications"
                   description="A short chime plays when you receive a new job or message"
-                  helperText={soundEnabled ? "Toggling ON plays a test chime to confirm sound works." : undefined}
+                  {...(soundEnabled ? { helperText: "Toggling ON plays a test chime to confirm sound works." } : {})}
                   checked={soundEnabled}
                   onChange={handleSoundToggle}
                 />

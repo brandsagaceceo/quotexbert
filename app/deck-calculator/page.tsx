@@ -24,9 +24,12 @@ export default function DeckCalculatorPage() {
   const [pergola, setPergola] = useState(false);
   const [stairs, setStairs] = useState(true);
 
-  const sqft = DECK_SIZES[sizeIdx].sqft;
-  const base = sqft * MATERIALS[matIdx].perSqft * CITY_MULT[city];
-  const extras = (pergola ? 4500 * CITY_MULT[city] : 0) + (stairs ? 1200 : 0);
+  const selectedSize = DECK_SIZES[sizeIdx] ?? DECK_SIZES[1]!;
+  const selectedMaterial = MATERIALS[matIdx] ?? MATERIALS[0]!;
+  const cityMultiplier = CITY_MULT[city] ?? 1;
+  const sqft = selectedSize.sqft;
+  const base = sqft * selectedMaterial.perSqft * cityMultiplier;
+  const extras = (pergola ? 4500 * cityMultiplier : 0) + (stairs ? 1200 : 0);
   const low = Math.round((base + extras) * 0.85 / 500) * 500;
   const high = Math.round((base + extras) * 1.2 / 500) * 500;
   const mid = Math.round((low + high) / 2 / 500) * 500;

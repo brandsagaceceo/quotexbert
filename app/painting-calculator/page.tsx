@@ -20,10 +20,12 @@ export default function PaintingCalculatorPage() {
   const [exterior, setExterior] = useState(false);
   const [cabinets, setCabinets] = useState(false);
 
-  const sqft = SCOPE[scopeIdx].sqft;
-  const base = sqft * BASE_PER_SQFT_INT * CITY_MULT[city];
-  const extCost = exterior ? sqft * 2.5 * CITY_MULT[city] : 0;
-  const cabCost = cabinets ? 2200 * CITY_MULT[city] : 0;
+  const selectedScope = SCOPE[scopeIdx] ?? SCOPE[2]!;
+  const cityMultiplier = CITY_MULT[city] ?? 1;
+  const sqft = selectedScope.sqft;
+  const base = sqft * BASE_PER_SQFT_INT * cityMultiplier;
+  const extCost = exterior ? sqft * 2.5 * cityMultiplier : 0;
+  const cabCost = cabinets ? 2200 * cityMultiplier : 0;
   const low = Math.round((base + extCost + cabCost) * 0.82 / 200) * 200;
   const high = Math.round((base + extCost + cabCost) * 1.25 / 200) * 200;
   const mid = Math.round((low + high) / 2 / 200) * 200;

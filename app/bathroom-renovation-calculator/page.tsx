@@ -27,7 +27,10 @@ export default function BathroomRenovationCalculatorPage() {
   const [heatedFloors, setHeatedFloors] = useState(false);
   const [customGlass, setCustomGlass] = useState(false);
 
-  const base = BATH_TYPES[bathTypeIdx].base * FINISH_LEVELS[finishIdx].multiplier * CITY_MULT[cityKey];
+  const selectedBathType = BATH_TYPES[bathTypeIdx] ?? BATH_TYPES[1]!;
+  const selectedFinish = FINISH_LEVELS[finishIdx] ?? FINISH_LEVELS[1]!;
+  const cityMultiplier = CITY_MULT[cityKey] ?? 1;
+  const base = selectedBathType.base * selectedFinish.multiplier * cityMultiplier;
   const extras = (heatedFloors ? 1800 : 0) + (customGlass ? 2500 : 0);
   const low = Math.round((base + extras) * 0.82 / 250) * 250;
   const high = Math.round((base + extras) * 1.22 / 250) * 250;

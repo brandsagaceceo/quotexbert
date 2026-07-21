@@ -27,9 +27,12 @@ export default function BasementRenovationCalculatorPage() {
   const [cityKey, setCityKey] = useState('Durham Region (Oshawa/Whitby)');
   const [separateEntrance, setSeparateEntrance] = useState(false);
 
-  const sqft = BASEMENT_SIZES[sizeIdx].sqft;
-  const base = sqft * BASE_PER_SQFT * CITY_MULT[cityKey];
-  const extras = SCOPE[scopeIdx].extra + (separateEntrance ? 9000 : 0);
+  const selectedSize = BASEMENT_SIZES[sizeIdx] ?? BASEMENT_SIZES[1]!;
+  const selectedScope = SCOPE[scopeIdx] ?? SCOPE[1]!;
+  const cityMultiplier = CITY_MULT[cityKey] ?? 1;
+  const sqft = selectedSize.sqft;
+  const base = sqft * BASE_PER_SQFT * cityMultiplier;
+  const extras = selectedScope.extra + (separateEntrance ? 9000 : 0);
   const low = Math.round((base + extras) * 0.85 / 500) * 500;
   const high = Math.round((base + extras) * 1.25 / 500) * 500;
   const mid = Math.round((low + high) / 2 / 500) * 500;

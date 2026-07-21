@@ -348,7 +348,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
             cityName={city.name}
             citySlug={citySlug}
             renoName={reno.name}
-            tradeSlug={RENO_TO_TRADE[typeSlug]}
+            {...(RENO_TO_TRADE[typeSlug] ? { tradeSlug: RENO_TO_TRADE[typeSlug] } : {})}
           />
 
           {/* FAQs */}

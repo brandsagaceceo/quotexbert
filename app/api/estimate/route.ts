@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
     void emitQuoteSignal({
       event: 'ai_estimate_shown',
       category: projectType,
-      city: postalCode || undefined,
+      ...(postalCode ? { city: postalCode } : {}),
       aiEstimateLow: estimate.totals?.total_low,
       aiEstimateHigh: estimate.totals?.total_high,
       createdByRole: 'system',

@@ -340,7 +340,10 @@ export function normalizeCategory(category: string): string {
 
   // Lowercase-normalized ID map lookup (handles mixed-case IDs)
   const lowerKey = Object.keys(CATEGORY_TO_SIMPLE).find(k => k.toLowerCase() === lower);
-  if (lowerKey) return CATEGORY_TO_SIMPLE[lowerKey];
+  if (lowerKey) {
+    const normalized = CATEGORY_TO_SIMPLE[lowerKey];
+    if (normalized) return normalized;
+  }
 
   // Keyword detection for partial / freeform text
   if (lower.includes("paint")) return "Painting";

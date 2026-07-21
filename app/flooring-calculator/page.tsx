@@ -20,7 +20,9 @@ export default function FlooringCalculatorPage() {
   const [city, setCity] = useState('Durham Region');
   const [removal, setRemoval] = useState(true);
 
-  const base = sqft * MATERIALS[matIdx].perSqft * CITY_MULT[city];
+  const selectedMaterial = MATERIALS[matIdx] ?? MATERIALS[1]!;
+  const cityMultiplier = CITY_MULT[city] ?? 1;
+  const base = sqft * selectedMaterial.perSqft * cityMultiplier;
   const removalCost = removal ? sqft * 1.2 : 0;
   const low = Math.round((base + removalCost) * 0.88 / 100) * 100;
   const high = Math.round((base + removalCost) * 1.18 / 100) * 100;
@@ -86,7 +88,7 @@ export default function FlooringCalculatorPage() {
                   </div>
                   <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-4">
                     <p className="text-xs font-bold text-blue-800 mb-1">📊 Per Square Foot Breakdown</p>
-                    <p className="text-xs text-blue-700">Material: ${MATERIALS[matIdx].perSqft.toFixed(2)}/sq ft · Labour: ~$2.50–$4.00/sq ft · Total: ~${(MATERIALS[matIdx].perSqft + 3.25).toFixed(2)}/sq ft installed</p>
+                    <p className="text-xs text-blue-700">Material: ${selectedMaterial.perSqft.toFixed(2)}/sq ft · Labour: ~$2.50–$4.00/sq ft · Total: ~${(selectedMaterial.perSqft + 3.25).toFixed(2)}/sq ft installed</p>
                   </div>
                 </div>
                 <div className="space-y-3">

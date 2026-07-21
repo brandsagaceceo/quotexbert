@@ -377,9 +377,9 @@ export default function OntarioRenovationCostGuidePage() {
               {renovationTypes.map((rt, i) => (
                 <tr key={rt.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                   <td className="px-4 py-3 font-medium text-gray-900">{rt.name}</td>
-                  <td className="px-4 py-3 text-center text-green-700 font-semibold">{rt.tiers[0].range}</td>
-                  <td className="px-4 py-3 text-center text-rose-700 font-bold">{rt.tiers[1].range}</td>
-                  <td className="px-4 py-3 text-center text-gray-600">{rt.tiers[2].range}</td>
+                  <td className="px-4 py-3 text-center text-green-700 font-semibold">{rt.tiers[0]?.range ?? 'Contact for quote'}</td>
+                  <td className="px-4 py-3 text-center text-rose-700 font-bold">{rt.tiers[1]?.range ?? 'Contact for quote'}</td>
+                  <td className="px-4 py-3 text-center text-gray-600">{rt.tiers[2]?.range ?? 'Contact for quote'}</td>
                   <td className="px-4 py-3 text-center">
                     <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">{rt.roi}</span>
                   </td>

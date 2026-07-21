@@ -23,10 +23,13 @@ export default function RoofReplacementCalculatorPage() {
   const [city, setCity] = useState('Durham Region');
   const [gutters, setGutters] = useState(false);
 
-  const sqft = HOME_SIZES[sizeIdx].sqft;
+  const selectedSize = HOME_SIZES[sizeIdx] ?? HOME_SIZES[1]!;
+  const selectedShingle = SHINGLE_TYPES[shingleIdx] ?? SHINGLE_TYPES[1]!;
+  const cityMultiplier = CITY_MULT[city] ?? 1;
+  const sqft = selectedSize.sqft;
   const roofSqft = sqft * 1.2;
-  const base = roofSqft * SHINGLE_TYPES[shingleIdx].perSqft * CITY_MULT[city];
-  const gutterCost = gutters ? 2000 * CITY_MULT[city] : 0;
+  const base = roofSqft * selectedShingle.perSqft * cityMultiplier;
+  const gutterCost = gutters ? 2000 * cityMultiplier : 0;
   const low = Math.round((base + gutterCost) * 0.88 / 500) * 500;
   const high = Math.round((base + gutterCost) * 1.18 / 500) * 500;
   const mid = Math.round((low + high) / 2 / 500) * 500;

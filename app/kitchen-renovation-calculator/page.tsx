@@ -40,7 +40,9 @@ export default function KitchenRenovationCalculatorPage() {
   const [layoutChange, setLayoutChange] = useState(false);
   const [applianceUpgrade, setApplianceUpgrade] = useState(false);
 
-  const base = BASE_COST_PER_SQFT * sqft * FINISH_LEVELS[finishIdx].multiplier * CITY_MULTIPLIERS[cityKey];
+  const selectedFinish = FINISH_LEVELS[finishIdx] ?? FINISH_LEVELS[1]!;
+  const cityMultiplier = CITY_MULTIPLIERS[cityKey] ?? 1;
+  const base = BASE_COST_PER_SQFT * sqft * selectedFinish.multiplier * cityMultiplier;
   const extras = (layoutChange ? 8000 : 0) + (applianceUpgrade ? 5000 : 0);
   const low = Math.round((base + extras) * 0.85 / 500) * 500;
   const high = Math.round((base + extras) * 1.2 / 500) * 500;

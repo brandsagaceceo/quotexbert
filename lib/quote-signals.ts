@@ -87,19 +87,28 @@ async function enrich(input: QuoteSignalInput): Promise<QuoteSignalInput> {
 
     if (!q) return input;
 
-    return {
-      ...input,
-      conversationId: input.conversationId ?? q.conversationId,
-      leadId: input.leadId ?? q.job?.id ?? undefined,
-      category: input.category ?? q.job?.category ?? undefined,
-      // Prefer contractor profile city; fall back to job zipCode as a proxy
-      city: input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode ?? undefined,
-      aiEstimateLow: input.aiEstimateLow ?? q.job?.aiEstimate?.minCost ?? undefined,
-      aiEstimateHigh: input.aiEstimateHigh ?? q.job?.aiEstimate?.maxCost ?? undefined,
-      quoteTotalCost: input.quoteTotalCost ?? q.totalCost,
-      version: input.version ?? q.version ?? 1,
-      isRevision: input.isRevision ?? (q.parentQuoteId != null),
-    };
+    const enriched: QuoteSignalInput = { event: input.event };
+
+    if (input.quoteId) enriched.quoteId = input.quoteId;
+    if (input.conversationId ?? q.conversationId) enriched.conversationId = input.conversationId ?? q.conversationId;
+    if (input.leadId ?? q.job?.id) enriched.leadId = input.leadId ?? q.job?.id;
+    if (input.category ?? q.job?.category) enriched.category = input.category ?? q.job?.category;
+    // Prefer contractor profile city; fall back to job zipCode as a proxy
+    if (input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode) {
+      enriched.city = input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode;
+    }
+    const aiEstimateLow = input.aiEstimateLow ?? q.job?.aiEstimate?.minCost;
+    if (aiEstimateLow != null) enriched.aiEstimateLow = aiEstimateLow;
+    const aiEstimateHigh = input.aiEstimateHigh ?? q.job?.aiEstimate?.maxCost;
+    if (aiEstimateHigh != null) enriched.aiEstimateHigh = aiEstimateHigh;
+    if (input.quoteTotalCost ?? q.totalCost != null) enriched.quoteTotalCost = input.quoteTotalCost ?? q.totalCost;
+    enriched.version = input.version ?? q.version ?? 1;
+    enriched.isRevision = input.isRevision ?? (q.parentQuoteId != null);
+    if (input.outcome) enriched.outcome = input.outcome;
+    if (input.createdByRole) enriched.createdByRole = input.createdByRole;
+    if (input.isAcceptedVersion != null) enriched.isAcceptedVersion = input.isAcceptedVersion;
+
+    return enriched;
   } catch {
     // Enrichment failed — return original input so signal still fires
     return input;

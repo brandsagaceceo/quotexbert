@@ -296,8 +296,13 @@ export async function GET(request: Request) {
           continue;
         }
 
-        const location = torontoLocations[Math.floor(Math.random() * torontoLocations.length)];
-        const homeowner = homeowners[Math.floor(Math.random() * homeowners.length)];
+        const location = torontoLocations[Math.floor(Math.random() * torontoLocations.length)] ?? torontoLocations[0];
+        const homeowner = homeowners[Math.floor(Math.random() * homeowners.length)] ?? homeowners[0];
+
+        if (!location || !homeowner) {
+          errors.push({ job: jobTemplate.title, error: 'missing seed location or homeowner' });
+          continue;
+        }
 
         const lead = await prisma.lead.create({
           data: {

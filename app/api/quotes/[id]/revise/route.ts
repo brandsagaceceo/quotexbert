@@ -105,7 +105,7 @@ export async function POST(
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPrice: item.totalPrice,
-          notes: item.notes ?? undefined,
+          notes: item.notes ?? null,
         })),
       });
     }

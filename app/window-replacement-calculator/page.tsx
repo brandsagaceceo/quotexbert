@@ -23,7 +23,10 @@ export default function WindowReplacementCalculatorPage() {
   const [frameIdx, setFrameIdx] = useState(0);
   const [city, setCity] = useState('Durham Region');
 
-  const base = count * WIN_TYPES[winTypeIdx].perUnit * FRAME_TYPES[frameIdx].multiplier * CITY_MULT[city];
+  const selectedWindowType = WIN_TYPES[winTypeIdx] ?? WIN_TYPES[0]!;
+  const selectedFrameType = FRAME_TYPES[frameIdx] ?? FRAME_TYPES[0]!;
+  const cityMultiplier = CITY_MULT[city] ?? 1;
+  const base = count * selectedWindowType.perUnit * selectedFrameType.multiplier * cityMultiplier;
   const low = Math.round(base * 0.85 / 200) * 200;
   const high = Math.round(base * 1.22 / 200) * 200;
   const mid = Math.round((low + high) / 2 / 200) * 200;

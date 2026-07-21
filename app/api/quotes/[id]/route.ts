@@ -175,7 +175,7 @@ export async function PUT(
       void emitQuoteSignal({
         event: status === 'sent' ? 'quote_sent' : 'quote_rejected',
         quoteId,
-        outcome: status === 'rejected' ? 'rejected' : undefined,
+        ...(status === 'rejected' ? { outcome: 'rejected' } : {}),
         createdByRole: status === 'sent' ? 'contractor' : 'homeowner',
       }).catch(() => {});
     }

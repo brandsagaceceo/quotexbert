@@ -4,8 +4,9 @@ import { normalizeSubscriptionCategoryList, parseSubscriptionMetadataCategories 
 
 const oneCategory = parseSubscriptionMetadataCategories(JSON.stringify(["painting-interior-exterior"]));
 assert.deepEqual(oneCategory, ["painting-interior-exterior"], "stores one selected category");
-assert.equal(categoryMatchesEntitlement("Painting", oneCategory[0]), true, "painting jobs match painting entitlement");
-assert.equal(categoryMatchesEntitlement("Flooring", oneCategory[0]), false, "flooring jobs do not match painting entitlement");
+const paintingEntitlement = oneCategory[0]!;
+assert.equal(categoryMatchesEntitlement("Painting", paintingEntitlement), true, "painting jobs match painting entitlement");
+assert.equal(categoryMatchesEntitlement("Flooring", paintingEntitlement), false, "flooring jobs do not match painting entitlement");
 
 const threeCategories = parseSubscriptionMetadataCategories(
   JSON.stringify(["painting-interior-exterior", "drywall-plastering", "flooring-installation-repair"])
