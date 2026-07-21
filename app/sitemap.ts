@@ -73,6 +73,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/deck-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
     { url: `${baseUrl}/roof-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
     { url: `${baseUrl}/window-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    // Phase 4 — Bathroom Renovation Cluster
+    { url: `${baseUrl}/can-i-renovate-my-bathroom-for-10000-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.90 },
+    { url: `${baseUrl}/bathroom-renovation-financing-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.89 },
+    { url: `${baseUrl}/bathroom-renovation-permits-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.89 },
+    { url: `${baseUrl}/how-to-compare-contractor-quotes-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
+    // Phase 4 — Schluter Cluster
+    { url: `${baseUrl}/schluter-kerdi-cost-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
+    { url: `${baseUrl}/who-installs-schluter-shower-systems-near-me`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.88 },
   ]
   
   // Toronto-specific SEO landing pages (existing)

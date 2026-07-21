@@ -87,6 +87,29 @@ const guideCategories = [
     ],
   },
   {
+    id: 'bathroom-cluster',
+    name: 'Bathroom Renovation Cluster',
+    icon: '🚿',
+    color: 'blue',
+    guides: [
+      { title: 'Can I Renovate My Bathroom for $10,000?', desc: 'Honest 2026 reality check — what fits in a $10k bathroom budget in Ontario by city, what to skip, and how to stretch it.', href: '/can-i-renovate-my-bathroom-for-10000-ontario', badge: 'Budget Guide', readTime: '10 min' },
+      { title: 'Bathroom Renovation Financing Ontario', desc: 'HELOC vs. renovation loans vs. contractor payment plans — 2026 rates compared for Ontario homeowners.', href: '/bathroom-renovation-financing-ontario', badge: 'Financing', readTime: '8 min' },
+      { title: 'Do I Need a Permit for My Bathroom Renovation?', desc: 'Task-by-task Ontario permit guide — exactly which bathroom work requires a permit and what happens if you skip one.', href: '/bathroom-renovation-permits-ontario', badge: 'Permit Guide', readTime: '8 min' },
+      { title: 'How to Compare Contractor Quotes in Ontario', desc: 'Line-by-line comparison template, 7 red flags, and what every legitimate quote must include.', href: '/how-to-compare-contractor-quotes-ontario', badge: 'Homeowner Protection', readTime: '9 min' },
+      { title: 'Free Bathroom Renovation Calculator', desc: 'Instant estimate by bathroom type, city, and finish level.', href: '/bathroom-renovation-calculator', badge: 'Calculator', readTime: 'Calculator' },
+    ],
+  },
+  {
+    id: 'schluter-cluster',
+    name: 'Schluter Waterproofing Guides',
+    icon: '🛡️',
+    color: 'slate',
+    guides: [
+      { title: 'Who Installs Schluter Shower Systems Near Me?', desc: 'Find certified Schluter installers in Ontario. Costs, plywood rules, and waterproofing standards.', href: '/who-installs-schluter-shower-systems-near-me', badge: 'Installer Guide', readTime: '15 min' },
+      { title: 'Schluter KERDI Cost Ontario 2026', desc: 'Exact material prices for KERDI, KERDI-BOARD, and DITRA-HEAT in Ontario. Full system installation costs.', href: '/schluter-kerdi-cost-ontario', badge: 'Pricing', readTime: '10 min' },
+    ],
+  },
+  {
     id: 'cost-guides',
     name: 'Cost & Pricing Guides',
     icon: '💰',
@@ -104,6 +127,7 @@ const guideCategories = [
     icon: '📋',
     color: 'amber',
     guides: [
+      { title: 'Do I Need a Permit for My Bathroom Renovation?', desc: 'Ontario-wide permit guide — which bathroom tasks require a permit, permit costs by city, and consequences.', href: '/bathroom-renovation-permits-ontario', badge: 'New', readTime: '8 min' },
       { title: 'Durham Region Renovation Permit Guide', desc: 'When you need permits, how to get them, permit costs, and all municipal contacts for Durham Region.', href: '/renovation-permit-guide-durham-region', badge: 'Permit Guide', readTime: '10 min' },
       { title: 'Renovation Permits in Durham Region (Blog)', desc: 'Detailed breakdown of permit requirements by project type for Durham Region homeowners.', href: '/blog/renovation-permits-durham-region', badge: 'Blog', readTime: '8 min' },
       { title: 'Home Renovation Checklist Ontario', desc: 'Phase-by-phase renovation planning checklist from first ideas to final walkthrough.', href: '/blog/home-renovation-checklist-ontario', badge: 'Checklist', readTime: '10 min' },
