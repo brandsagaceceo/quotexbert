@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
+    "deploy": "git add -A && git diff --cached --quiet || git commit -m \"deploy: publish latest changes\" && git push origin main && powershell -Command \"Invoke-WebRequest -Method POST -Uri 'https://api.vercel.com/v1/integrations/deploy/prj_VmE4r9OklojtuAzXWl0f13um9ekj/9gCFlpypVu' -UseBasicParsing | Out-Null\" && echo \"Vercel build triggered successfully\"",
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "echo 'Linting disabled'",
