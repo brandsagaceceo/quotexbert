@@ -41,6 +41,13 @@ const guideCategories = [
         readTime: '20 min read',
       },
       {
+        title: 'Who Installs Schluter Shower Systems Near Me?',
+        desc: 'In-depth 2026 Ontario cost guide on Schluter waterproofing systems, plywood guidelines, and hiring certified installers.',
+        href: '/who-installs-schluter-shower-systems-near-me',
+        badge: 'Specialist Guide',
+        readTime: '15 min read',
+      },
+      {
         title: 'The Complete Durham Region Renovation Guide',
         desc: 'Everything you need before renovating in Durham Region — all 12 municipalities, permits, costs, timelines, and contractor advice.',
         href: '/durham-region-renovation-guide',
