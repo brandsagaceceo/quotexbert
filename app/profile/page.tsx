@@ -151,6 +151,11 @@ export default function UnifiedProfilePage() {
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [maxCategories, setMaxCategories] = useState<number>(0);
+  // Saved project drafts for homeowner overview
+  const [savedProjectsList, setSavedProjectsList] = useState<Array<{
+    id: string; title: string; status: string; city?: string | null; province?: string | null;
+    budget?: string | null; createdAt: string; postedAsLeadId?: string | null; category: string;
+  }>>([]);
   const [editData, setEditData] = useState({
     companyName: '',
     trade: '',
@@ -322,6 +327,17 @@ export default function UnifiedProfilePage() {
             console.log("[ProfilePage] Jobs not available yet");
           }
         } else if (userRole === 'homeowner') {
+          // Fetch saved project drafts for homeowner overview
+          try {
+            const spRes = await fetch('/api/saved-projects');
+            if (spRes.ok) {
+              const spData = await spRes.json();
+              setSavedProjectsList(spData.savedProjects || []);
+            }
+          } catch {
+            // non-fatal
+          }
+
           // Fetch saved estimates for homeowners
           try {
             const estimatesResponse = await fetch(`/api/estimates?homeownerId=${authUser.id}`);
@@ -903,7 +919,7 @@ export default function UnifiedProfilePage() {
       <div className="bg-white sticky z-30" style={{ top: 'var(--header-height, 64px)' }}>
         <div className="container mx-auto">
           {/* Mobile: Scrollable pill tabs */}
-          <nav data-tour="profile-tabs" className="md:hidden flex gap-2 px-3 py-2 overflow-x-auto scrollbar-hide">
+          <nav data-tour="profile-tabs" className="md:hidden flex gap-2 px-3 py-2 overflow-x-auto scrollbar-hide scroll-smooth">
             {(isContractor 
               ? ['overview', 'work', 'accepted-jobs', 'messages', 'categories', 'jobs', 'contact'] 
               : ['overview', 'projects', 'estimates', 'jobs', 'recently-used', 'contact']
@@ -926,6 +942,8 @@ export default function UnifiedProfilePage() {
                  tab}
               </button>
             ))}
+            {/* Trailing spacer ensures the last tab clears the screen edge when scrolled fully right */}
+            <span className="flex-shrink-0 w-3 block" aria-hidden="true" />
           </nav>
 
           {/* Desktop: Full tab bar */}
@@ -1072,28 +1090,118 @@ export default function UnifiedProfilePage() {
                 )}
 
                 {!isContractor && (
-                  <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
-                    <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-3">Your Project Hub</h2>
-                    <p className="text-slate-600 text-sm md:text-base mb-5">
-                      Start with an instant AI estimate, then post to the job board to get contractor applications.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Link
-                        data-tour="ai-estimate-link"
-                        href="/"
-                        className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white px-5 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
-                      >
-                        Get a Free AI Estimate
-                      </Link>
-                      <Link
-                        data-tour="post-job-link"
-                        href="/create-lead"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold border border-rose-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition-colors"
-                      >
-                        Post a Job Manually
-                      </Link>
+                  <>
+                    {/* Your Projects — merged view of drafts + posted jobs */}
+                    {(savedProjectsList.length > 0 || jobs.length > 0) && (() => {
+                      // Build merged list: drafts that haven't been published as jobs yet,
+                      // plus posted jobs. A saved project that is 'posted' should appear
+                      // only once, as the posted job entry.
+                      const publishedLeadIds = new Set(
+                        savedProjectsList.filter(sp => sp.postedAsLeadId).map(sp => sp.postedAsLeadId)
+                      );
+                      const draftItems = savedProjectsList
+                        .filter(sp => sp.status !== 'posted')
+                        .map(sp => ({
+                          id: sp.id,
+                          title: sp.title,
+                          status: 'draft' as const,
+                          category: sp.category,
+                          locationDisplay: [sp.city, sp.province].filter(Boolean).join(', ') || '',
+                          budget: sp.budget || null,
+                          date: sp.createdAt,
+                          href: `/homeowner/saved-projects`,
+                          actionLabel: 'Edit Draft',
+                          secondaryHref: `/homeowner/saved-projects`,
+                          secondaryLabel: 'Post to Board',
+                        }));
+                      const postedItems = jobs.map((j: any) => ({
+                        id: j.id,
+                        title: j.title,
+                        status: 'posted' as const,
+                        category: j.category || '',
+                        locationDisplay: [j.city, j.province].filter(Boolean).join(', ') || j.location || '',
+                        budget: j.budget || null,
+                        date: j.createdAt,
+                        href: `/homeowner/jobs/${j.id}`,
+                        actionLabel: 'View Job',
+                        secondaryHref: null,
+                        secondaryLabel: null,
+                      }));
+                      const merged = [...draftItems, ...postedItems]
+                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                        .slice(0, 4);
+                      if (merged.length === 0) return null;
+                      return (
+                        <div className="bg-white rounded-lg md:rounded-xl shadow-md border border-slate-200 p-4 md:p-5">
+                          <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-base md:text-lg font-bold text-slate-900">Your Projects</h2>
+                            <Link
+                              href="/homeowner/saved-projects"
+                              className="text-xs font-semibold text-rose-700 hover:underline whitespace-nowrap"
+                            >
+                              View All →
+                            </Link>
+                          </div>
+                          <div className="space-y-3">
+                            {merged.map(item => (
+                              <div key={item.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                                      item.status === 'posted'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-orange-100 text-orange-700'
+                                    }`}>
+                                      {item.status === 'posted' ? 'Posted' : 'Draft'}
+                                    </span>
+                                    {item.category && (
+                                      <span className="text-xs text-slate-500">{item.category}</span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm font-semibold text-slate-900 truncate">{item.title}</p>
+                                  <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400 flex-wrap">
+                                    {item.locationDisplay && <span>📍 {item.locationDisplay}</span>}
+                                    {item.budget && <span>💰 {item.budget}</span>}
+                                    <span>{new Date(item.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}</span>
+                                  </div>
+                                </div>
+                                <Link
+                                  href={item.href}
+                                  className="flex-shrink-0 text-xs bg-[#800020] text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-[#600018] transition-colors whitespace-nowrap"
+                                >
+                                  {item.actionLabel}
+                                </Link>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Project Hub CTA */}
+                    <div className="bg-white rounded-lg md:rounded-xl shadow-md md:shadow-lg p-5 md:p-6 lg:p-8 border border-slate-200">
+                      <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-slate-900 mb-3">Your Project Hub</h2>
+                      <p className="text-slate-600 text-sm md:text-base mb-5">
+                        Start with an instant AI estimate, then post to the job board to get contractor applications.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Link
+                          data-tour="ai-estimate-link"
+                          href="/"
+                          className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white px-5 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                        >
+                          Get a Free AI Estimate
+                        </Link>
+                        <Link
+                          data-tour="post-job-link"
+                          href="/create-lead"
+                          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold border border-rose-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition-colors"
+                        >
+                          Post a Job Manually
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </>
             )}

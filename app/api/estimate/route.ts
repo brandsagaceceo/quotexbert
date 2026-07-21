@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
@@ -115,42 +116,73 @@ export async function POST(req: NextRequest) {
       throw err;
     });
 
-    // If a user is signed in, save the estimate to their profile automatically
-    if (userId) {
-      try {
-        const createdEstimate = await prisma.aIEstimate.create({
-          data: {
-            homeownerId: userId,
-            description: description || "AI-generated estimate",
-            minCost: estimate.totals.total_low,
-            maxCost: estimate.totals.total_high,
-            confidence: estimate.confidence,
-            aiPowered: true,
-            enhancedDescription: estimate.summary,
-            factors: JSON.stringify(estimate.assumptions),
-            reasoning: JSON.stringify(estimate.questions_to_confirm),
-            status: "saved",
-            isPublic: false,
-            imageCount: photos?.length || 0,
-            hasVoice: false, // This would need to be passed from the client
-            items: {
-              create: estimate.line_items.map((item) => ({
-                category: item.name,
-                description: item.notes || "",
-                minCost: item.material_cost,
-                maxCost: item.material_cost + item.labor_cost,
-                quantity: item.qty,
-                unit: item.unit,
-                selected: true, // Default to selected
-              })),
-            },
-          },
+    // Save the estimate to the homeowner's profile.
+    // IMPORTANT: resolve the DB user server-side via Clerk auth — never trust a userId from the client
+    // body, as the client may send a Clerk ID (user_xxx) instead of the database User.id (cuid).
+    let estimateProfileWarning: string | undefined;
+    try {
+      const { userId: clerkUserId } = await auth();
+      if (clerkUserId) {
+        // Look up the DB user by clerkUserId (the canonical mapping)
+        const dbUser = await prisma.user.findFirst({
+          where: { OR: [{ clerkUserId }, { id: clerkUserId }] },
+          select: { id: true },
         });
-        console.log("✅ Estimate automatically saved for user:", userId, "Estimate ID:", createdEstimate.id);
-      } catch (dbError) {
-        console.error("❌ Failed to auto-save estimate to DB:", dbError);
-        // Non-fatal: The user still gets their estimate, but it's not saved.
+
+        if (dbUser) {
+          // Dedup: skip if an identical estimate was saved in the last 60 s (prevents double-save on retry)
+          const recentDuplicate = await prisma.aIEstimate.findFirst({
+            where: {
+              homeownerId: dbUser.id,
+              minCost: estimate.totals.total_low,
+              maxCost: estimate.totals.total_high,
+              createdAt: { gte: new Date(Date.now() - 60_000) },
+            },
+            select: { id: true },
+          });
+
+          if (recentDuplicate) {
+            console.log("⚠️ Skipping duplicate estimate save for user:", dbUser.id);
+          } else {
+            const createdEstimate = await prisma.aIEstimate.create({
+              data: {
+                homeownerId: dbUser.id,
+                description: description || "AI-generated estimate",
+                minCost: estimate.totals.total_low,
+                maxCost: estimate.totals.total_high,
+                confidence: estimate.confidence,
+                aiPowered: true,
+                enhancedDescription: estimate.summary,
+                factors: JSON.stringify(estimate.assumptions),
+                reasoning: JSON.stringify(estimate.questions_to_confirm),
+                status: "saved",
+                isPublic: false,
+                imageCount: photos?.length || 0,
+                hasVoice: false,
+                items: {
+                  create: estimate.line_items.map((item) => ({
+                    category: item.name,
+                    description: item.notes || "",
+                    minCost: item.material_cost,
+                    maxCost: item.material_cost + item.labor_cost,
+                    quantity: item.qty,
+                    unit: item.unit,
+                    selected: true,
+                  })),
+                },
+              },
+            });
+            console.log("✅ Estimate saved for user:", dbUser.id, "Estimate ID:", createdEstimate.id);
+          }
+        } else {
+          console.warn("⚠️ Clerk user found but no DB user record — estimate not saved. clerkUserId:", clerkUserId);
+          estimateProfileWarning = "Your estimate was created, but we couldn't save it to your profile. Please try again.";
+        }
       }
+    } catch (dbError) {
+      // Log the real error server-side only — never expose raw DB errors to the client
+      console.error("❌ Failed to auto-save estimate to DB:", dbError instanceof Error ? dbError.message : String(dbError));
+      estimateProfileWarning = "Your estimate was created, but we couldn't save it to your profile. Please try again.";
     }
 
     // Log analytics event
@@ -182,7 +214,11 @@ export async function POST(req: NextRequest) {
       console.error("Service failed: quote signal emission", err);
     });
 
-    return NextResponse.json({ success: true, ...estimate });
+    return NextResponse.json({
+      success: true,
+      ...estimate,
+      ...(estimateProfileWarning ? { profileSaveWarning: estimateProfileWarning } : {}),
+    });
   } catch (error: any) {
     console.error("❌ ESTIMATE ERROR:", error);
     console.error("[ESTIMATE][request-body]", requestBody);
