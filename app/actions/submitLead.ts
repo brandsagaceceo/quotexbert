@@ -7,6 +7,7 @@ import { sendLeadEmail, sendJobPostedEmail } from "@/lib/email";
 import { NotificationService } from "@/lib/notifications";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
+import { postalCodeToCity } from "@/lib/postal-to-city";
 
 const leadSchema = z.object({
   postalCode: z
@@ -461,13 +462,21 @@ export async function submitLead(formData: FormData) {
     }
 
     // Send admin notification email (goes to quotexbert@gmail.com — intentional admin inbox)
+    // IMPORTANT: use finalBudget (the canonical saved lead budget), NOT the local hash-based
+    // `estimate` variable, which was generating a random divergent value.
+    const resolvedCity = postalCodeToCity(data.postalCode);
     try {
       await sendLeadEmail({
         postalCode: data.postalCode,
         projectType: data.projectType,
         description: data.description,
-        estimate,
+        estimate: finalBudget,   // FIX: was `estimate` (hash-based random), now `finalBudget`
         source: rawData.affiliateCode ? "affiliate" : "web",
+        city: resolvedCity,
+        title: data.title,
+        homeownerName: user.name ?? null,
+        homeownerEmail: user.email ?? null,
+        leadId: lead.id,
       });
       console.log(`[submitLead:${requestId}] Admin notification email sent to quotexbert@gmail.com`);
     } catch (emailError) {
@@ -475,14 +484,14 @@ export async function submitLead(formData: FormData) {
       // Don't fail the request if email fails
     }
 
-    // Notify matching contractors about the new job (filtered by category)
+    // Notify all active contractors about the new job
     try {
       await NotificationService.notifyAllContractors({
         leadId: lead.id,
         title: data.title,
         description: data.description,
         budget: finalBudget,
-        city: data.postalCode,
+        city: resolvedCity || data.postalCode,   // FIX: was raw postalCode, now resolved city name
         category: data.projectType,
         createdAt: lead.createdAt.toISOString(),
         isSeeded: lead.isSeeded,

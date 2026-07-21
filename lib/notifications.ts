@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail } from "@/lib/email";
-import { isGodUser } from "@/lib/god-access";
-import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
 // Email data interface
 interface EmailData {
@@ -140,8 +138,11 @@ export class NotificationService {
   }
 
   /**
-   * Notify MATCHING contractors about a new job post immediately.
-   * Only contractors subscribed to the job's category (or god users) are notified.
+   * Notify ALL active contractors about a new public job post.
+   * Every registered active contractor receives the alert regardless of their
+   * subscription category, tier, or city — maximum awareness at this stage of growth.
+   * Explicit opt-outs (notifyJobEmail: false) are respected.
+   * Duplicate notifications within 24 h for the same lead are suppressed inside create().
    */
   static async notifyAllContractors(jobDetails: {
     leadId: string;
@@ -155,59 +156,63 @@ export class NotificationService {
     /** true = demo/seed lead — must never generate visible in-app or email alerts */
     isSeeded?: boolean;
   }): Promise<void> {
+    const logTag = `[NOTIFY][${jobDetails.leadId}]`;
+
     if (jobDetails.isSeeded) {
-      console.log(`[LEADS] Skipping notifications for seeded/demo lead ${jobDetails.leadId}`);
+      console.log(`${logTag} Skipping — seeded/demo lead`);
       return;
     }
+
     try {
-      // Fetch all active contractors with their subscriptions for category filtering
+      // Fetch ALL active contractors who haven't explicitly opted out of job-alert emails.
+      // No category or subscription filter — every contractor should see every new job.
       const allContractors = await prisma.user.findMany({
-        where: { role: 'contractor', isActive: true },
-        include: { contractorProfile: true, subscriptions: true },
+        where: {
+          role: 'contractor',
+          isActive: true,
+          notifyJobEmail: true,   // respect explicit opt-out only
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          contractorProfile: { select: { companyName: true } },
+        },
       });
 
-      // Filter to only contractors who match the job's category (or god users who bypass)
-      const jobCategory = jobDetails.category;
-      const categoryMatched = jobCategory
-        ? allContractors.filter((contractor) => {
-            if (isGodUser(contractor.email)) return true;
-            return contractor.subscriptions.some(
-              (sub) => categoryMatchesEntitlement(jobCategory, sub.category) && sub.canClaimLeads,
-            );
-          })
-        : allContractors; // No category → notify all (legacy fallback)
-
-      // Soft location filter: if a contractor has a city set, only notify them when the
-      // job city overlaps (case-insensitive). Contractors without a city set always qualify.
-      const jobCity = (jobDetails.city || '').toLowerCase().trim();
-      const matchingContractors = categoryMatched.filter((contractor) => {
-        const contractorCity = (contractor.contractorProfile?.city || '').toLowerCase().trim();
-        if (!contractorCity || !jobCity) return true; // no city data — notify
-        // Partial match in either direction covers "Toronto" vs "North York, Toronto"
-        return contractorCity.includes(jobCity) || jobCity.includes(contractorCity);
+      // Deduplicate by lowercase email — prevents double delivery if the same address
+      // appears on multiple contractor rows.
+      const seen = new Set<string>();
+      const uniqueContractors = allContractors.filter(c => {
+        if (!c.email) return false;
+        const lower = c.email.toLowerCase();
+        if (seen.has(lower)) return false;
+        seen.add(lower);
+        return true;
       });
 
       console.log(
-        `[LEADS] New lead "${jobDetails.title}" (category=${jobDetails.category || 'unknown'}): ` +
-        `${allContractors.length} total contractors, ${matchingContractors.length} matching`,
+        `${logTag} New job "${jobDetails.title}" | category=${jobDetails.category || 'none'} | ` +
+        `city=${jobDetails.city || 'none'} | Active contractors: ${allContractors.length} | ` +
+        `After dedup: ${uniqueContractors.length}`,
       );
-      matchingContractors.forEach((c) => {
-        console.log(`[LEADS] Notifying contractor: ${c.email} (dbId=${c.id})`);
-      });
 
-      if (matchingContractors.length === 0) {
-        console.log(`[LEADS] No matching contractors found for category=${jobDetails.category}. Lead ID=${jobDetails.leadId}`);
+      if (uniqueContractors.length === 0) {
+        console.warn(`${logTag} No eligible contractors found — no emails sent`);
+        return;
       }
 
-      // Create notifications for matching contractors in parallel
-      const notificationPromises = matchingContractors.map(contractor =>
+      let successCount = 0;
+      let failCount = 0;
+
+      const notificationPromises = uniqueContractors.map(contractor =>
         this.create({
           userId: contractor.id,
           type: 'LEAD_MATCHED',
           payload: {
             leadId: jobDetails.leadId,
             title: jobDetails.title,
-            description: jobDetails.description.substring(0, 200) + '...',
+            description: jobDetails.description.substring(0, 200) + (jobDetails.description.length > 200 ? '...' : ''),
             budget: jobDetails.budget,
             city: jobDetails.city || 'Not specified',
             category: jobDetails.category || 'Home Improvement',
@@ -215,16 +220,22 @@ export class NotificationService {
           },
           sendEmail: true,
           sendSms: false,
-        }).catch(err => {
-          console.error(`[LEADS] Failed to notify contractor ${contractor.id} (${contractor.email}):`, err);
-          return null; // Continue even if one fails
         })
+          .then(() => { successCount++; })
+          .catch(err => {
+            failCount++;
+            // Log the failure without exposing personal contractor data in shared logs
+            console.error(`${logTag} Failed to notify contractor ${contractor.id}: ${err instanceof Error ? err.message : String(err)}`);
+            return null;
+          })
       );
 
       await Promise.all(notificationPromises);
-      console.log(`[LEADS] Notified ${matchingContractors.length} matching contractors for lead ${jobDetails.leadId}`);
+      console.log(
+        `${logTag} Complete | Sent: ${successCount} | Failed: ${failCount} | Total attempted: ${uniqueContractors.length}`,
+      );
     } catch (error) {
-      console.error('[LEADS] Error notifying matching contractors:', error);
+      console.error(`${logTag} Critical error in notifyAllContractors:`, error);
       throw error;
     }
   }

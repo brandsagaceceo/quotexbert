@@ -351,9 +351,16 @@ interface LeadEmailPayload {
   postalCode: string;
   projectType: string;
   description: string;
+  /** The FINAL canonical budget/estimate stored on the lead — must match the job board. */
   estimate: string;
   source?: string;
   affiliateId?: string;
+  // Optional enriched fields for the admin email
+  city?: string | null;
+  title?: string | null;
+  homeownerName?: string | null;
+  homeownerEmail?: string | null;
+  leadId?: string | null;
 }
 
 // Welcome Email
@@ -619,7 +626,9 @@ export async function sendNewJobEmail(
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`,
+      subject: (job.city && job.city !== 'Not specified')
+        ? `${urgency.emoji} New ${job.category} job in ${job.city} — QuoteXbert`
+        : `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`,
       html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
         { type: 'tag', content: `${urgency.emoji} ${urgency.label}` },
         { type: 'heading', content: job.title },
@@ -733,16 +742,27 @@ export async function sendLeadEmail(payload: LeadEmailPayload) {
   const toEmail = "quotexbert@gmail.com"; // Always send to quotexbert@gmail.com
   const submittedAt = new Date().toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
 
+  // Build a human-readable location string — city is preferred over raw postal code
+  const locationDisplay = payload.city
+    ? `${payload.city}, ON${payload.postalCode ? ` (${payload.postalCode})` : ''}`
+    : payload.postalCode;
+
+  const adminJobLink = payload.leadId
+    ? `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(payload.leadId)}`
+    : `${BASE_URL}/contractor/jobs`;
+
   const emailContent = {
     from: fromEmail,
     to: toEmail,
-    subject: `New QuoteXbert Lead - ${payload.projectType}`,
+    subject: `New QuoteXbert Lead - ${payload.projectType}${payload.city ? ` in ${payload.city}` : ''}`,
     html: buildEmail('New QuoteXbert Lead Submitted', [
       { type: 'tag', content: 'New Lead' },
-      { type: 'heading', content: `New ${payload.projectType} lead` },
-      { type: 'card', label: 'Estimated Project Value', rawHtml: true, content: `<div style="font-size:28px;line-height:1.1;font-weight:900;color:#800020;">${escHtml(payload.estimate)}</div>` },
-      { type: 'card', label: 'Lead Details', rawHtml: true, content: `<strong>Service Required:</strong> ${escHtml(payload.projectType)}<br><strong>Location:</strong> ${escHtml(payload.postalCode)}<br><strong>Submitted Date:</strong> ${escHtml(submittedAt)}<br><strong>Source:</strong> ${escHtml(payload.source || 'web')}${payload.affiliateId ? `<br><strong>Affiliate ID:</strong> ${escHtml(payload.affiliateId)}` : ''}` },
+      { type: 'heading', content: payload.title ? `New Lead: ${payload.title}` : `New ${payload.projectType} lead` },
+      { type: 'card', label: 'Final Saved Estimate (matches job board)', rawHtml: true, content: `<div style="font-size:28px;line-height:1.1;font-weight:900;color:#800020;">${escHtml(payload.estimate)}</div>` },
+      { type: 'card', label: 'Lead Details', rawHtml: true, content: `<strong>Service Required:</strong> ${escHtml(payload.projectType)}<br><strong>Location:</strong> ${escHtml(locationDisplay)}<br><strong>Submitted Date:</strong> ${escHtml(submittedAt)}<br><strong>Source:</strong> ${escHtml(payload.source || 'web')}${payload.affiliateId ? `<br><strong>Affiliate ID:</strong> ${escHtml(payload.affiliateId)}` : ''}${payload.leadId ? `<br><strong>Lead ID:</strong> ${escHtml(payload.leadId)}` : ''}` },
+      { type: 'card', label: 'Homeowner', rawHtml: true, content: `<strong>Name:</strong> ${escHtml(payload.homeownerName || 'Not provided')}<br><strong>Email:</strong> ${escHtml(payload.homeownerEmail || 'Not provided')}` },
       { type: 'card', label: 'Homeowner Description', content: payload.description },
+      { type: 'cta', content: 'View Job on Job Board', href: adminJobLink },
     ]),
   };
 

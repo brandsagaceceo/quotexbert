@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
 import { NotificationService } from '@/lib/notifications';
 import { normalizeEstimatePricing } from '@/lib/estimate-pricing';
+import { postalCodeToCity } from '@/lib/postal-to-city';
 
 const prisma = new PrismaClient();
 
@@ -194,23 +195,25 @@ export async function POST(
       },
     });
 
-    // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
+      // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
     try {
-      // Get homeowner profile for city info
+      // Resolve city: prefer homeowner profile city, then derive from postal code
       const homeownerWithProfile = await prisma.user.findUnique({
         where: { id: estimate.homeownerId },
         include: { homeownerProfile: true },
       });
 
-      const city = homeownerWithProfile?.homeownerProfile?.city || undefined;
+      const resolvedCity =
+        homeownerWithProfile?.homeownerProfile?.city ||
+        postalCodeToCity(lead.zipCode) ||
+        undefined;
 
       await NotificationService.notifyAllContractors({
         leadId: lead.id,
         title: lead.title,
         description: lead.description,
         budget: lead.budget,
-        // Only include city when we have a concrete string value
-        ...(city ? { city } : {}),
+        ...(resolvedCity ? { city: resolvedCity } : {}),
         createdAt: lead.createdAt.toISOString(),
         isSeeded: lead.isSeeded,
       });
