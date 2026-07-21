@@ -87,6 +87,18 @@ const guideCategories = [
     ],
   },
   {
+    id: 'basement-cluster',
+    name: 'Basement Renovation Cluster',
+    icon: '🏗️',
+    color: 'stone',
+    guides: [
+      { title: 'How Much Does It Cost to Finish a Basement in Ontario?', desc: 'Real 2026 per-square-foot pricing for open-concept, with bathroom, and legal suite — all major Ontario cities.', href: '/how-much-does-it-cost-to-finish-a-basement-in-ontario', badge: 'Cost Guide', readTime: '12 min' },
+      { title: 'Do I Need Permits to Finish My Basement in Ontario?', desc: 'Task-by-task permit guide — framing, bathroom, bedroom, legal suite, and egress window rules.', href: '/do-i-need-permits-to-finish-my-basement-ontario', badge: 'Permit Guide', readTime: '9 min' },
+      { title: 'Legal Suite vs. Open Concept — Which Adds More Value?', desc: '8-factor ROI comparison with 2026 Ontario rental market data. Who should choose each option.', href: '/basement-suite-vs-open-concept-ontario', badge: 'Decision Guide', readTime: '10 min' },
+      { title: 'Free Basement Renovation Calculator', desc: 'Instant estimate by scope, city, and size.', href: '/basement-renovation-calculator', badge: 'Calculator', readTime: 'Calculator' },
+    ],
+  },
+  {
     id: 'bathroom-cluster',
     name: 'Bathroom Renovation Cluster',
     icon: '🚿',

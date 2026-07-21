@@ -73,6 +73,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/deck-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
     { url: `${baseUrl}/roof-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
     { url: `${baseUrl}/window-replacement-calculator`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    // Phase 4 — Basement Renovation Cluster
+    { url: `${baseUrl}/how-much-does-it-cost-to-finish-a-basement-in-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.92 },
+    { url: `${baseUrl}/do-i-need-permits-to-finish-my-basement-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.90 },
+    { url: `${baseUrl}/basement-suite-vs-open-concept-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.89 },
     // Phase 4 — Bathroom Renovation Cluster
     { url: `${baseUrl}/can-i-renovate-my-bathroom-for-10000-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.90 },
     { url: `${baseUrl}/bathroom-renovation-financing-ontario`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.89 },
