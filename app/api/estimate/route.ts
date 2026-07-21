@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
+import { prisma } from "@/lib/prisma";
 
 // Tell Vercel this function can run for up to 60 seconds (GPT-4o + vision is slow)
 export const maxDuration = 60;
@@ -113,6 +114,44 @@ export async function POST(req: NextRequest) {
       console.error("Service failed: OpenAI estimate generation", err);
       throw err;
     });
+
+    // If a user is signed in, save the estimate to their profile automatically
+    if (userId) {
+      try {
+        const createdEstimate = await prisma.aIEstimate.create({
+          data: {
+            homeownerId: userId,
+            description: description || "AI-generated estimate",
+            minCost: estimate.totals.total_low,
+            maxCost: estimate.totals.total_high,
+            confidence: estimate.confidence,
+            aiPowered: true,
+            enhancedDescription: estimate.summary,
+            factors: JSON.stringify(estimate.assumptions),
+            reasoning: JSON.stringify(estimate.questions_to_confirm),
+            status: "saved",
+            isPublic: false,
+            imageCount: photos?.length || 0,
+            hasVoice: false, // This would need to be passed from the client
+            items: {
+              create: estimate.line_items.map((item) => ({
+                category: item.name,
+                description: item.notes || "",
+                minCost: item.material_cost,
+                maxCost: item.material_cost + item.labor_cost,
+                quantity: item.qty,
+                unit: item.unit,
+                selected: true, // Default to selected
+              })),
+            },
+          },
+        });
+        console.log("✅ Estimate automatically saved for user:", userId, "Estimate ID:", createdEstimate.id);
+      } catch (dbError) {
+        console.error("❌ Failed to auto-save estimate to DB:", dbError);
+        // Non-fatal: The user still gets their estimate, but it's not saved.
+      }
+    }
 
     // Log analytics event
     await logEventServer(

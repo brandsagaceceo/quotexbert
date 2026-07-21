@@ -152,8 +152,10 @@ model Lead {
   id               String           @id @default(cuid())
   title            String
   description      String
-  budget           String           // Changed from Float to String to store budget ranges
-  zipCode          String
+  budget           String?
+  city             String?
+  province         String?
+  zipCode          String?
   category         String
   status           String           @default("draft") // "draft" | "open" | "reviewing" | "assigned" | "pending_completion" | "completed" | "closed"
   claimed          Boolean          @default(false)
@@ -970,7 +972,10 @@ model SavedProject {
   title               String           // User-friendly project name
   description         String           // Project description
   category            String           // Job category
-  location            String?          // City/address
+  city                String?          // City or location
+  province            String?          // Province code (e.g. ON)
+  zipCode             String?          // Postal code (optional)
+  location            String?          // Legacy free-text location field
   budget              String?          // Budget range or estimate
   
   // Media

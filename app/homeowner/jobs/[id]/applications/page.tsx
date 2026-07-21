@@ -12,7 +12,7 @@ import { ArrowLeft, Star, CheckCircle, X, DollarSign, Clock, TrendingUp, Award, 
 interface JobApplication {
   id: string;
   message: string;
-  proposedPrice: string;
+  proposedPrice: number;
   estimatedDays: number;
   status: string;
   createdAt: string;
@@ -37,9 +37,11 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  budget: string;
+  budget: number | null;
   category: string;
-  zipCode: string;
+  city?: string;
+  province?: string;
+  zipCode?: string;
   status: string;
   maxContractors: number;
   applications: JobApplication[];

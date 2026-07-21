@@ -11,7 +11,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { CATEGORY_GROUPS, getCategoryById, normalizeCategory, SIMPLE_CATEGORIES } from "@/lib/categories";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
-import { FOUNDING_CONTRACTOR_SPOTS_REMAINING, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
+import { FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -554,7 +554,7 @@ export default function SubscriptionsPage() {
                         {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                           <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                             <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                            <p className="text-[11px] text-amber-700">Then $49.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
+                            <p className="text-[11px] text-amber-700">Then $49.00/month · Founding offer · Cancel anytime</p>
                           </div>
                         )}
                         <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-200">
@@ -600,7 +600,7 @@ export default function SubscriptionsPage() {
                       {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                           <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $99.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
+                          <p className="text-[11px] text-amber-700">Then $99.00/month · Founding offer · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
@@ -644,7 +644,7 @@ export default function SubscriptionsPage() {
                       {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                           <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $149.00/month · {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain · Cancel anytime</p>
+                          <p className="text-[11px] text-amber-700">Then $149.00/month · Founding offer · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
@@ -1128,7 +1128,7 @@ export default function SubscriptionsPage() {
                 )}
                 {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && pendingTier && (
                   <p className="text-center text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 mb-3">
-                    🎉 First month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. {FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding spots remain. Cancel anytime.
+                    🎉 First month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. Founding offer · Cancel anytime.
                   </p>
                 )}
                 <div className="flex items-center gap-3">

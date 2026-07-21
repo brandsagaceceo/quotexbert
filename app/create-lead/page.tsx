@@ -9,8 +9,9 @@ import Link from "next/link";
 import PhotoUploadFixed from "@/components/PhotoUploadFixed";
 import { submitLead } from "@/app/actions/submitLead";
 import { SIMPLE_CATEGORIES } from "@/lib/categories";
-import { Sparkles, CheckCircle, AlertCircle } from "lucide-react";
+import { Sparkles, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
+import { HOMEOWNER_TRUST_SIGNAL } from "@/lib/founding-contractor-config";
 
 export default function CreateLeadPage() {
   const { authUser: user } = useAuth();
@@ -20,10 +21,13 @@ export default function CreateLeadPage() {
     description: "",
     category: "",
     budget: "",
+    city: "",
+    province: "ON",
     zipCode: ""
   });
   const [photos, setPhotos] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -201,6 +205,8 @@ export default function CreateLeadPage() {
     if (!formData.title.trim()) errors.title = "Project title is required";
     if (!formData.category) errors.category = "Please select a category";
     if (!formData.description.trim()) errors.description = "Project description is required";
+    if (!formData.city.trim()) errors.city = "City or location is required";
+    if (!formData.province) errors.province = "Province is required";
     const normalizedZipCode = formData.zipCode.trim().toUpperCase();
     if (normalizedZipCode && !CANADIAN_POSTAL_CODE_REGEX.test(normalizedZipCode)) {
       errors.zipCode = "Please enter a valid postal code like L1B 1E4.";
@@ -221,6 +227,8 @@ export default function CreateLeadPage() {
       submitFormData.append("projectType", formData.category);
       submitFormData.append("description", formData.description);
       submitFormData.append("budget", formData.budget);
+      submitFormData.append("city", formData.city.trim());
+      submitFormData.append("province", formData.province);
       submitFormData.append("postalCode", normalizedZipCode);
       submitFormData.append("photos", JSON.stringify(photos));
       // Pass the user ID to ensure server action has it
@@ -247,6 +255,8 @@ export default function CreateLeadPage() {
           description: "",
           category: "",
           budget: "",
+          city: "",
+          province: "ON",
           zipCode: ""
         });
         setPhotos([]);
@@ -342,11 +352,70 @@ export default function CreateLeadPage() {
         description: "",
         category: "",
         budget: "",
+        city: "",
+        province: "ON",
         zipCode: ""
       });
       setPhotos([]);
       setSuccessMessage("Draft cleared! Starting fresh.");
       setTimeout(() => setSuccessMessage(""), 3000);
+    }
+  };
+
+  // Save project privately to the homeowner's profile (no job board posting, no notifications)
+  const handleSaveToProfile = async () => {
+    if (!user) {
+      setError("You must be signed in to save a project.");
+      return;
+    }
+
+    setError("");
+    setFieldErrors({});
+
+    const errors: Record<string, string> = {};
+    if (!formData.title.trim()) errors.title = "Project title is required";
+    if (!formData.description.trim()) errors.description = "Project description is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setError("Please add a title and description before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/saved-projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          category: formData.category || "general",
+          city: formData.city.trim() || null,
+          province: formData.province || null,
+          zipCode: formData.zipCode.trim().toUpperCase() || null,
+          budget: formData.budget || null,
+          photos,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Clear draft
+        localStorage.removeItem("create_lead_draft");
+        localStorage.removeItem("create_lead_draft_photos");
+        setSuccessMessage("Project saved to your profile! Redirecting...");
+        setTimeout(() => {
+          router.push("/homeowner/saved-projects");
+        }, 1200);
+      } else {
+        setError(data.error || "Failed to save project. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -547,7 +616,7 @@ export default function CreateLeadPage() {
               </p>
             </div>
 
-            {/* Budget and Postal Code Row */}
+            {/* Budget and Location Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Budget */}
               <div>
@@ -563,6 +632,81 @@ export default function CreateLeadPage() {
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all"
                   disabled={isSubmitting}
                 />
+              </div>
+
+              {/* City */}
+              <div>
+                <label htmlFor="city" className="block text-sm font-semibold text-gray-800 mb-2">
+                  City or Location <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => {
+                    setFormData({ ...formData, city: e.target.value });
+                    if (fieldErrors.city) setFieldErrors(prev => ({ ...prev, city: "" }));
+                  }}
+                  placeholder="e.g., Toronto"
+                  className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                    fieldErrors.city
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                  }`}
+                  required
+                  disabled={isSubmitting}
+                />
+                {fieldErrors.city && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {fieldErrors.city}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Province and Postal Code Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Province */}
+              <div>
+                <label htmlFor="province" className="block text-sm font-semibold text-gray-800 mb-2">
+                  Province <span className="text-rose-500">*</span>
+                </label>
+                <select
+                  id="province"
+                  value={formData.province}
+                  onChange={(e) => {
+                    setFormData({ ...formData, province: e.target.value });
+                    if (fieldErrors.province) setFieldErrors(prev => ({ ...prev, province: "" }));
+                  }}
+                  className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 focus:outline-none focus:ring-2 transition-all ${
+                    fieldErrors.province
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
+                  }`}
+                  required
+                  disabled={isSubmitting}
+                >
+                  <option value="ON">Ontario</option>
+                  <option value="QC">Quebec</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NT">Northwest Territories</option>
+                  <option value="YT">Yukon</option>
+                  <option value="NU">Nunavut</option>
+                </select>
+                {fieldErrors.province && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {fieldErrors.province}
+                  </p>
+                )}
               </div>
 
               {/* Postal Code */}
@@ -584,8 +728,8 @@ export default function CreateLeadPage() {
                   maxLength={7}
                   autoComplete="postal-code"
                   className={`w-full bg-gray-50 border rounded-xl p-3 sm:p-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
-                    fieldErrors.zipCode 
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
+                    fieldErrors.zipCode
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                       : "border-gray-200 focus:border-rose-500 focus:ring-rose-200"
                   }`}
                   disabled={isSubmitting}
@@ -660,19 +804,36 @@ export default function CreateLeadPage() {
               </div>
             )}
 
-            {/* Submit Button */}
+            {/* Submit Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <button
                 type="button"
                 onClick={() => router.back()}
                 className="flex-1 bg-gray-100 text-gray-700 py-3 sm:py-4 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all border border-gray-200"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSaving}
               >
                 Cancel
               </button>
               <button
+                type="button"
+                onClick={handleSaveToProfile}
+                disabled={isSaving || isSubmitting || successMessage !== ""}
+                className="flex-1 bg-white text-[#800020] border-2 border-[#800020] py-3 sm:py-4 px-6 rounded-xl font-bold hover:bg-rose-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#800020]"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Save to Profile</span>
+                  </>
+                )}
+              </button>
+              <button
                 type="submit"
-                disabled={isSubmitting || successMessage !== ""}
+                disabled={isSubmitting || isSaving || successMessage !== ""}
                 className="flex-1 bg-[#800020] text-white py-3 sm:py-4 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-[#600018] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
@@ -683,10 +844,16 @@ export default function CreateLeadPage() {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    <span>Post Project</span>
+                    <span>Post to Job Board</span>
                   </>
                 )}
               </button>
+            </div>
+
+            {/* Homeowner trust signal — contractor availability */}
+            <div className="flex items-center justify-center gap-2 text-xs text-gray-500 pt-1">
+              <Users className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
+              <span>{HOMEOWNER_TRUST_SIGNAL}</span>
             </div>
           </form>
         </div>

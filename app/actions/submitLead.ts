@@ -10,6 +10,16 @@ import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 import { postalCodeToCity } from "@/lib/postal-to-city";
 
 const leadSchema = z.object({
+  city: z
+    .string()
+    .min(1, "City or location is required")
+    .max(100, "City must be 100 characters or less")
+    .transform((val) => val.trim()),
+  province: z
+    .string()
+    .min(1, "Province is required")
+    .max(50, "Province must be 50 characters or less")
+    .transform((val) => val.trim()),
   postalCode: z
     .string()
     .optional()
@@ -93,6 +103,8 @@ export async function submitLead(formData: FormData) {
 
     // Parse and validate input
     const rawData = {
+      city: (formData.get("city") as string) || "",
+      province: (formData.get("province") as string) || "",
       postalCode: formData.get("postalCode") as string,
       projectType: formData.get("projectType") as string,
       title: formData.get("title") as string,
@@ -340,7 +352,9 @@ export async function submitLead(formData: FormData) {
       lead = await prisma.lead.create({
         data: {
           title: data.title,
-          zipCode: data.postalCode,
+          city: data.city,
+          province: data.province,
+          zipCode: data.postalCode || null,
           category: data.projectType,
           description: data.description,
           budget: finalBudget,
@@ -464,13 +478,13 @@ export async function submitLead(formData: FormData) {
     // Send admin notification email (goes to quotexbert@gmail.com — intentional admin inbox)
     // IMPORTANT: use finalBudget (the canonical saved lead budget), NOT the local hash-based
     // `estimate` variable, which was generating a random divergent value.
-    const resolvedCity = postalCodeToCity(data.postalCode);
+    const resolvedCity = data.city || postalCodeToCity(data.postalCode);
     try {
       await sendLeadEmail({
         postalCode: data.postalCode,
         projectType: data.projectType,
         description: data.description,
-        estimate: finalBudget,   // FIX: was `estimate` (hash-based random), now `finalBudget`
+        estimate: finalBudget,
         source: rawData.affiliateCode ? "affiliate" : "web",
         city: resolvedCity,
         title: data.title,
@@ -490,8 +504,9 @@ export async function submitLead(formData: FormData) {
         leadId: lead.id,
         title: data.title,
         description: data.description,
-        budget: finalBudget,
-        city: resolvedCity || data.postalCode,   // FIX: was raw postalCode, now resolved city name
+        budget: null, // budget is a string range; pass null to avoid type mismatch
+        city: resolvedCity || undefined,
+        province: data.province || undefined,
         category: data.projectType,
         createdAt: lead.createdAt.toISOString(),
         isSeeded: lead.isSeeded,
@@ -507,7 +522,14 @@ export async function submitLead(formData: FormData) {
       try {
         await sendJobPostedEmail({
           homeowner: { id: user.id, email: user.email, name: user.name },
-          job: { id: lead.id, title: data.title, category: data.projectType },
+          job: {
+            id: lead.id,
+            title: data.title,
+            category: data.projectType,
+            city: data.city || resolvedCity || undefined,
+            province: data.province || undefined,
+            zipCode: data.postalCode || undefined,
+          },
         });
         console.log(`[submitLead:${requestId}] Job-posted confirmation email sent to ${user.email}`);
       } catch (jobEmailError) {

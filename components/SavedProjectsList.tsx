@@ -42,7 +42,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(`/api/saved-projects?homeownerId=${homeownerId}`);
+      const response = await fetch(`/api/saved-projects`);
       if (response.ok) {
         const data = await response.json();
         setProjects(data.savedProjects || []);
@@ -79,16 +79,14 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
 
     setIsPosting(true);
     try {
-      const response = await fetch('/api/saved-projects/post-to-board', {
+      const response = await fetch(`/api/saved-projects/${project.id}/publish`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ savedProjectId: project.id })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert('✅ Project posted to job board successfully!');
+        alert('✅ Project posted to job board successfully! Contractors are being notified.');
         fetchProjects(); // Refresh to show updated status
       } else {
         alert(data.error || 'Failed to post project to job board');

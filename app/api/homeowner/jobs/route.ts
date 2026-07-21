@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendNewRenovationLeadEmail } from '@/lib/email';
-import { categoryMatchesEntitlement } from '@/lib/subscription-access';
+import { sendNewRenovationLeadEmail, sendJobPostedEmail } from '@/lib/email';
 
 export const dynamic = "force-dynamic";
 
@@ -61,9 +60,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, budget, category, zipCode, maxContractors = 3, homeownerId } = body;
+    const { title, description, budget, category, city, zipCode, maxContractors = 3, homeownerId } = body;
 
-    if (!title || !description || !budget || !category || !zipCode || !homeownerId) {
+    if (!title || !description || !category || !homeownerId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -71,16 +70,17 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description,
-        budget: budget.toString(), // Ensure budget is stored as string
+        budget: budget ? budget.toString() : null,
         category,
-        zipCode,
+        city: city || null,
+        zipCode: zipCode || null,
         status: 'open',
         maxContractors,
-        homeownerId: homeownerId
-      }
+        homeownerId: homeownerId,
+      },
     });
 
-    // Find contractors subscribed to this category and send notifications
+    // Notify all active contractors — no category or subscription filter
     try {
       const contractors = await prisma.user.findMany({
         where: {
@@ -95,124 +95,138 @@ export async function POST(request: NextRequest) {
           notifyJobInApp: true,
           contractorProfile: {
             select: {
-              companyName: true
-            }
+              companyName: true,
+            },
           },
-          subscriptions: {
-            where: { status: 'active', canClaimLeads: true },
-            select: { category: true }
-          }
-        }
+        },
       });
 
-      const matchingContractors = contractors.filter((contractor) =>
-        contractor.subscriptions.some((subscription) => categoryMatchesEntitlement(category, subscription.category))
-      );
-
-      console.log(`[JOB ALERT] Job ${job.id} posted — ${matchingContractors.length} matching contractors found for category "${category}"`);
+      console.log(`[JOB ALERT] Job ${job.id} posted — ${contractors.length} contractors to notify`);
 
       let inAppCount = 0;
       let emailCount = 0;
       let emailFails = 0;
 
-      // ── Batch prefetch: get all existing LEAD_MATCHED for this job in one query ──
+      // Batch prefetch existing LEAD_MATCHED notifications to prevent duplicates
       const existingNotifications = await prisma.notification.findMany({
         where: {
           relatedId: job.id,
           relatedType: 'job',
-          userId: { in: matchingContractors.map(c => c.id) }
+          userId: { in: contractors.map((c) => c.id) },
         },
-        select: { userId: true }
+        select: { userId: true },
       });
-      const alreadyNotified = new Set(existingNotifications.map(n => n.userId));
+      const alreadyNotified = new Set(existingNotifications.map((n) => n.userId));
 
-      // ── Batch create: all missing in-app notifications in one createMany ─────────
-      const needInApp = matchingContractors.filter(
-        c => c.notifyJobInApp !== false && !alreadyNotified.has(c.id)
+      // Batch-create in-app notifications for all contractors not yet notified
+      const needInApp = contractors.filter(
+        (c) => c.notifyJobInApp !== false && !alreadyNotified.has(c.id)
       );
       if (needInApp.length > 0) {
         await prisma.notification.createMany({
-          data: needInApp.map(contractor => ({
+          data: needInApp.map((contractor) => ({
             userId: contractor.id,
             type: 'LEAD_MATCHED',
             title: `New ${category} job available`,
-            message: `${title} - ${budget} in ${zipCode}`,
+            message: `${title} in ${zipCode || city || 'your area'}`,
             relatedId: job.id,
             relatedType: 'job',
             payload: {
               jobId: job.id,
               jobTitle: title,
-              location: zipCode,
+              location: zipCode || city || '',
               budget: budget,
-              category: category
+              category: category,
             },
-            read: false
-          }))
+            read: false,
+          })),
         });
         inAppCount = needInApp.length;
       }
-      const inAppRecipientIds = new Set(needInApp.map(c => c.id));
 
-      // ── Email: check return value — sendNewRenovationLeadEmail doesn't throw on rate limit ──
-      const emailPromises = matchingContractors
-        .filter(c => c.notifyJobEmail !== false)
+      // Send emails to all contractors who have not opted out
+      const emailPromises = contractors
+        .filter((c) => c.notifyJobEmail !== false)
         .map(async (contractor) => {
           try {
             const emailResult = await sendNewRenovationLeadEmail(
               {
                 id: contractor.id,
                 email: contractor.email,
-                companyName: contractor.contractorProfile?.companyName || contractor.name || 'Contractor',
+                companyName:
+                  contractor.contractorProfile?.companyName ||
+                  contractor.name ||
+                  'Contractor',
               },
               {
                 id: job.id,
                 title,
                 category,
-                city: zipCode,
+                city: zipCode || city || '',
                 description,
               }
             );
 
-            // Explicit check: function returns { success: false } on rate limit instead of throwing
             if (emailResult && (emailResult as any).success === false) {
               emailFails++;
-              console.warn(`[JOB ALERT] Email capped (rate limit) for contractor ${contractor.id}`);
-              // Fallback in-app notification if they have no in-app alert at all
-              if (!alreadyNotified.has(contractor.id) && !inAppRecipientIds.has(contractor.id)) {
-                await prisma.notification.create({
-                  data: {
-                    userId: contractor.id,
-                    type: 'LEAD_MATCHED',
-                    title: `New ${category} job available`,
-                    message: `${title} — email alert capped, check the job board`,
-                    relatedId: job.id,
-                    relatedType: 'job',
-                    payload: {
-                      jobId: job.id,
-                      jobTitle: title,
-                      location: zipCode,
-                      budget: budget,
-                      category: category,
-                      emailFallback: true
-                    },
-                    read: false
-                  }
-                }).catch(() => {});
-              }
+              console.warn(
+                `[JOB ALERT] Email not sent for contractor ${contractor.id}: ${(emailResult as any).error}`
+              );
             } else {
               emailCount++;
             }
           } catch (emailError) {
             emailFails++;
-            console.error(`[JOB ALERT] Email failed for contractor ${contractor.id}:`, emailError);
+            console.error(
+              `[JOB ALERT] Email exception for contractor ${contractor.id}:`,
+              emailError
+            );
           }
         });
 
       await Promise.allSettled(emailPromises);
-      console.log(`[JOB ALERT] Pipeline complete — ${inAppCount} in-app, ${emailCount} emails sent, ${emailFails} email failures for job: ${title}`);
-    } catch (emailError) {
-      console.error('Error sending job notifications:', emailError);
-      // Don't fail job creation if notifications fail
+      console.log(
+        `[JOB ALERT] Complete — in-app: ${inAppCount}, emails sent: ${emailCount}, email failures: ${emailFails}`
+      );
+
+      // Send homeowner confirmation email
+      try {
+        const homeownerUser = await prisma.user.findFirst({
+          where: { OR: [{ id: homeownerId }, { clerkUserId: homeownerId }] },
+          select: { id: true, email: true, name: true },
+        });
+        if (homeownerUser) {
+          const confirmResult = await sendJobPostedEmail({
+            homeowner: {
+              id: homeownerUser.id,
+              email: homeownerUser.email,
+              name: homeownerUser.name,
+            },
+            job: {
+              id: job.id,
+              title,
+              category,
+              city: city || '',
+              zipCode: zipCode || '',
+            },
+          });
+          console.log(
+            `[JOB ALERT] Homeowner confirmation email attempted — success: ${confirmResult.success}`
+          );
+        } else {
+          console.warn(
+            `[JOB ALERT] Homeowner user not found for homeownerId ${homeownerId}, skipping confirmation email`
+          );
+        }
+      } catch (homeownerEmailError) {
+        console.error(
+          '[JOB ALERT] Homeowner confirmation email failed:',
+          homeownerEmailError
+        );
+      }
+    } catch (notifyError) {
+      console.error('[JOB ALERT] Notification pipeline error:', notifyError);
+      // Never fail job creation because of notification errors
     }
 
     return NextResponse.json(job);

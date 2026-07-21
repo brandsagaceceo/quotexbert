@@ -34,9 +34,11 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  budget: number;
+  budget: number | string | null;
   category: string;
-  zipCode: string;
+  city: string | null;
+  province: string | null;
+  zipCode: string | null;
   status: string;
   maxContractors: number;
   createdAt: string;
@@ -225,7 +227,9 @@ export default function HomeownerJobsPage() {
                       <span className="truncate capitalize">{job.category}</span>
                     </span>
                     <span className="flex items-center gap-1 min-w-0">
-                      <span className="truncate">ZIP {job.zipCode}</span>
+                      <span className="truncate">
+                        {[job.city, job.province].filter(Boolean).join(", ") || (job.zipCode ? `ZIP ${job.zipCode}` : "Location TBD")}
+                      </span>
                     </span>
                     <span className="flex items-center gap-1 min-w-0">
                       <Users className="w-4 h-4 flex-shrink-0" />

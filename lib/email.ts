@@ -588,6 +588,7 @@ export async function sendNewJobEmail(
     description: string;
     budget?: string | null;
     city?: string | null;
+    province?: string | null;
     location?: string | null;
     createdAt?: string | null;
   }
@@ -606,7 +607,11 @@ export async function sendNewJobEmail(
   }
 
   const urgency = getJobUrgencyForEmail(job.createdAt ?? undefined);
-  const displayLocation = job.city || job.location || null;
+  // Build "City, Province" display — fall back to legacy location field or generic text
+  const cityProvince = [job.city, job.province].filter(
+    (v): v is string => typeof v === 'string' && v.trim() !== '' && v !== 'Not specified'
+  ).join(', ');
+  const displayLocation = cityProvince || job.location || null;
   const submittedDate = job.createdAt
     ? new Date(job.createdAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
     : new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -626,8 +631,8 @@ export async function sendNewJobEmail(
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: (job.city && job.city !== 'Not specified')
-        ? `${urgency.emoji} New ${job.category} job in ${job.city} — QuoteXbert`
+      subject: (cityProvince)
+        ? `${urgency.emoji} New ${job.category} job in ${cityProvince} — QuoteXbert`
         : `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`,
       html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, [
         { type: 'tag', content: `${urgency.emoji} ${urgency.label}` },
@@ -1055,29 +1060,32 @@ export async function sendReviewReceivedEmail(
 // â”€â”€â”€ Job Posted Confirmation (homeowner) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function sendJobPostedEmail(params: {
   homeowner: { id: string; email: string; name?: string | null };
-  job: { id: string; title: string; category: string };
+  job: { id: string; title: string; category: string; city?: string; province?: string; zipCode?: string };
 }): Promise<{ success: boolean; error?: any }> {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping job-posted email');
     return { success: false, error: 'Email service not configured' };
   }
   const { homeowner, job } = params;
+  const location = [job.city, job.province].filter(Boolean).join(', ') || job.zipCode || 'Your area';
+  const datePosted = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
   try {
     await resend.emails.send({
       from: fromEmail,
       replyTo: REPLY_TO,
       to: homeowner.email,
       subject: 'Your project is now live on QuoteXbert',
-      html: buildEmail('Your Project is Live â€” QuoteXbert', [
+      html: buildEmail('Your Project is Live \u2014 QuoteXbert', [
         { type: 'tag', content: job.category },
         { type: 'heading', content: `"${escHtml(job.title)}" is now live!`, rawHtml: true },
-        { type: 'text', content: 'Your project has been posted and matching contractors have been notified.' },
+        { type: 'text', content: 'Your project has been posted and contractors have been notified.' },
+        { type: 'card', label: 'Project Details', rawHtml: true, content: `<strong>Title:</strong> ${escHtml(job.title)}<br><strong>Location:</strong> ${escHtml(location)}<br><strong>Date Posted:</strong> ${escHtml(datePosted)}` },
         { type: 'card', label: 'What happens next', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Contractors will review your project</li><li style="margin-bottom:6px;">You\'ll receive quotes directly in your messages</li><li>Accept the quote that best fits your budget and schedule</li></ul>' },
-        { type: 'cta', content: 'View My Messages', href: `${baseUrl}/messages` },
+        { type: 'cta', content: 'View & Manage Your Job', href: `${baseUrl}/homeowner/jobs/${encodeURIComponent(job.id)}` },
       ]),
     });
     await logEmailEvent('job_posted', homeowner.email, homeowner.id, job.id, undefined, 'sent');
-    console.log(`[EMAIL] Job-posted confirmation sent to ${homeowner.email}`);
+    console.log(`[EMAIL] Job-posted confirmation sent to homeowner ${homeowner.id}`);
     return { success: true };
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
@@ -1086,8 +1094,6 @@ export async function sendJobPostedEmail(params: {
     return { success: false, error };
   }
 }
-
-// â”€â”€â”€ Quote Received Notification (homeowner) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export async function sendQuoteReceivedEmail(params: {
   homeowner: { id: string; email: string; name?: string | null };
   contractorName: string;

@@ -42,10 +42,12 @@ interface Job {
   id: string;
   title: string;
   description: string;
-  budget: number | string;
+  budget: number | string | null;
   category: string;
+  city?: string | null;
+  province?: string | null;
   location?: string;
-  zipCode?: string;
+  zipCode?: string | null;
   status: string;
   createdAt: string;
   assignedContractorId: string | null;
@@ -208,7 +210,7 @@ export default function HomeownerJobDetailPage() {
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Location</span>
               <div className="flex items-center gap-1.5 text-slate-800 font-semibold">
                 <MapPin className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                <span className="truncate">{job.location || job.zipCode || 'Not set'}</span>
+                <span className="truncate">{[job.city, job.province].filter(Boolean).join(", ") || job.location || job.zipCode || 'Not set'}</span>
               </div>
             </div>
             <div className="flex flex-col gap-1">

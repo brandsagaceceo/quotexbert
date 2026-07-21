@@ -61,7 +61,7 @@ export default function HomeownerDashboard() {
       ).length;
 
       setStats({
-        savedEstimates: estimatesData.projects?.length || 0,
+        savedEstimates: estimatesData.savedProjects?.length || 0,
         postedJobs: jobsData.jobs?.length || 0,
         activeProjects: jobsData.jobs?.filter((j: any) => j.status === 'open').length || 0,
         unreadMessages: unreadMsgCount

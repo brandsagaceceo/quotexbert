@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       description: lead.description || 'No description available',
       category: lead.category || 'General',
       budget: formatBudgetDisplay(lead.budget),
-      location: lead.zipCode || 'Location TBD',
+      location: [lead.city, lead.province].filter(Boolean).join(", ") || lead.zipCode || 'Location TBD',
       status: lead.status || 'open',
       homeowner: lead.homeowner?.name || 'Anonymous',
       photos: lead.photos || '[]', // Include photos from lead

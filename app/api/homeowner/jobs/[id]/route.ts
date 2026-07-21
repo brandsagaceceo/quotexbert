@@ -27,7 +27,7 @@ function parsePhotoList(value: unknown): string[] {
 }
 
 function importantFieldsChanged(previous: Record<string, unknown>, next: Record<string, unknown>): boolean {
-  return ['title', 'description', 'category', 'budget', 'zipCode'].some((field) =>
+  return ['title', 'description', 'category', 'budget', 'city', 'province', 'zipCode'].some((field) =>
     typeof next[field] !== 'undefined' && String(previous[field] ?? '') !== String(next[field] ?? '')
   );
 }
@@ -160,18 +160,22 @@ export async function PATCH(
       return NextResponse.json({ error: 'This job cannot be edited in its current state' }, { status: 409 });
     }
 
-    const updateData: Record<string, string> = {};
+    const updateData: Record<string, any> = {};
     const nextTitle = cleanText(body.title, 120);
     const nextDescription = cleanText(body.description, 3000);
     const nextCategory = cleanText(body.category, 120);
-    const nextBudget = cleanText(String(body.budget ?? ''), 80);
+    const nextBudget = cleanText(body.budget, 100); // Treat budget as a simple string
+    const nextCity = cleanText(body.city, 100);
+    const nextProvince = cleanText(body.province, 50);
     const nextZipCode = cleanText(body.zipCode, 20)?.toUpperCase();
 
-    if (typeof body.title !== 'undefined') updateData.title = nextTitle || job.title;
-    if (typeof body.description !== 'undefined') updateData.description = nextDescription || job.description;
-    if (typeof body.category !== 'undefined') updateData.category = nextCategory || job.category;
-    if (typeof body.budget !== 'undefined') updateData.budget = nextBudget || job.budget;
-    if (typeof body.zipCode !== 'undefined') updateData.zipCode = nextZipCode || job.zipCode;
+    if (typeof body.title !== 'undefined') updateData.title = nextTitle ?? job.title;
+    if (typeof body.description !== 'undefined') updateData.description = nextDescription ?? job.description;
+    if (typeof body.category !== 'undefined') updateData.category = nextCategory ?? job.category;
+    if (typeof body.budget !== 'undefined') updateData.budget = nextBudget ?? job.budget;
+    if (typeof body.city !== 'undefined') updateData.city = nextCity ?? job.city;
+    if (typeof body.province !== 'undefined') updateData.province = nextProvince ?? job.province;
+    if (typeof body.zipCode !== 'undefined') updateData.zipCode = nextZipCode ?? job.zipCode;
     if (typeof body.photos !== 'undefined') updateData.photos = JSON.stringify(parsePhotoList(body.photos));
 
     const shouldNotifyApplicants = importantFieldsChanged(job, updateData) && job.applications.length > 0;

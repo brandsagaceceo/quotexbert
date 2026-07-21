@@ -3,7 +3,7 @@
 // Edit this file to update numbers shown across the entire site
 // ============================================================
 
-const SPOTS_REMAINING = 42;
+const SPOTS_REMAINING = 37;
 
 export const FOUNDING_CONTRACTOR_CONFIG = {
   /** How many spots remain out of the total */
@@ -31,6 +31,10 @@ export const FOUNDING_CONTRACTOR_SPOTS_REMAINING = FOUNDING_CONTRACTOR_CONFIG.sp
 export const FOUNDING_OFFER_ENABLED =
   process.env.NEXT_PUBLIC_FOUNDING_OFFER_ENABLED !== "false" &&
   process.env.FOUNDING_OFFER_ENABLED !== "false";
+
+/** Homeowner-facing trust signal shown on the project-posting form only. */
+export const HOMEOWNER_TRUST_SIGNAL =
+  `${FOUNDING_CONTRACTOR_CONFIG.spotsRemaining} contractor spots are currently being filled across QuoteXbert. Post your project now to connect with available professionals.`;
 
 export function isFoundingOfferEnabled(): boolean {
   return FOUNDING_OFFER_ENABLED;

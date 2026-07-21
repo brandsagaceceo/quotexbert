@@ -148,8 +148,9 @@ export class NotificationService {
     leadId: string;
     title: string;
     description: string;
-    budget: string;
+    budget: number | null;
     city?: string;
+    province?: string;
     category?: string;
     /** ISO timestamp — used for urgency labelling in email */
     createdAt?: string;
@@ -166,11 +167,13 @@ export class NotificationService {
     try {
       // Fetch ALL active contractors who haven't explicitly opted out of job-alert emails.
       // No category or subscription filter — every contractor should see every new job.
+      // Use `not: false` instead of `true` to include contractors whose notifyJobEmail is NULL
+      // (accounts created before that column existed, or via direct DB insert).
       const allContractors = await prisma.user.findMany({
         where: {
           role: 'contractor',
           isActive: true,
-          notifyJobEmail: true,   // respect explicit opt-out only
+          notifyJobEmail: { not: false },
         },
         select: {
           id: true,
@@ -193,8 +196,8 @@ export class NotificationService {
 
       console.log(
         `${logTag} New job "${jobDetails.title}" | category=${jobDetails.category || 'none'} | ` +
-        `city=${jobDetails.city || 'none'} | Active contractors: ${allContractors.length} | ` +
-        `After dedup: ${uniqueContractors.length}`,
+        `city=${jobDetails.city || 'none'} | province=${jobDetails.province || 'none'} | ` +
+        `Active contractors: ${allContractors.length} | After dedup: ${uniqueContractors.length}`,
       );
 
       if (uniqueContractors.length === 0) {
@@ -215,6 +218,7 @@ export class NotificationService {
             description: jobDetails.description.substring(0, 200) + (jobDetails.description.length > 200 ? '...' : ''),
             budget: jobDetails.budget,
             city: jobDetails.city || 'Not specified',
+            province: jobDetails.province || '',
             category: jobDetails.category || 'Home Improvement',
             createdAt: jobDetails.createdAt || new Date().toISOString(),
           },
@@ -293,8 +297,9 @@ export class NotificationService {
             title: payload.title || 'New Job',
             category: payload.category || 'Home Improvement',
             description: typeof payload.description === 'string' ? payload.description : 'A new job matching your services is available.',
-            budget: typeof payload.budget === 'string' ? payload.budget : null,
+            budget: typeof payload.budget === 'number' ? payload.budget : null,
             city: typeof payload.city === 'string' && payload.city !== 'Not specified' ? payload.city : null,
+            province: typeof payload.province === 'string' && payload.province !== '' ? payload.province : null,
             createdAt: typeof payload.createdAt === 'string' ? payload.createdAt : null,
           }
         );

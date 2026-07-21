@@ -19,6 +19,8 @@ export default function EditJobPage() {
     description: "",
     category: "",
     budget: "",
+    city: "",
+    province: "ON",
     zipCode: ""
   });
   const [photos, setPhotos] = useState<string[]>([]);
@@ -44,8 +46,10 @@ export default function EditJobPage() {
           title: job.title,
           description: job.description,
           category: job.category,
-          budget: job.budget.toString(),
-          zipCode: job.zipCode
+          budget: job.budget ? job.budget.toString() : "",
+          city: job.city || "",
+          province: job.province || "ON",
+          zipCode: job.zipCode || ""
         });
         setPhotos(job.photos || []);
         setStatus(job.status || "");
@@ -75,8 +79,8 @@ export default function EditJobPage() {
       return;
     }
 
-    if (!formData.title || !formData.category || !formData.description || !formData.zipCode) {
-      setError("Please fill in all required fields");
+    if (!formData.title || !formData.category || !formData.description || !formData.city || !formData.province) {
+      setError("Please fill in all required fields: Title, Category, Description, City, and Province.");
       return;
     }
 
@@ -94,6 +98,8 @@ export default function EditJobPage() {
           description: formData.description,
           category: formData.category,
           budget: formData.budget,
+          city: formData.city,
+          province: formData.province,
           zipCode: formData.zipCode,
           photos: photos
         }),
@@ -230,10 +236,58 @@ export default function EditJobPage() {
               />
             </div>
 
+            {/* City */}
+            <div>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                City / Location *
+              </label>
+              <input
+                type="text"
+                id="city"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Toronto"
+                disabled={readOnly || status === 'assigned'}
+                required
+              />
+            </div>
+
+            {/* Province */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-2">
+                  Province *
+                </label>
+                <select
+                  id="province"
+                  value={formData.province}
+                  onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={readOnly || status === 'assigned'}
+                  required
+                >
+                  <option value="ON">Ontario</option>
+                  <option value="QC">Quebec</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="AB">Alberta</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="NT">Northwest Territories</option>
+                  <option value="YT">Yukon</option>
+                  <option value="NU">Nunavut</option>
+                </select>
+              </div>
+            </div>
+
             {/* Postal Code */}
             <div>
               <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
-                Postal Code *
+                Postal Code (Optional)
               </label>
               <input
                 type="text"
@@ -243,7 +297,6 @@ export default function EditJobPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g., M5H 2N2"
                 disabled={readOnly || status === 'assigned'}
-                required
               />
             </div>
 
