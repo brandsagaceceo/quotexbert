@@ -1,7 +1,7 @@
 ﻿import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { buildUnsubscribeUrl } from "@/lib/unsubscribe";
-import { FOUNDING_CONTRACTOR_SPOTS_REMAINING, isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
+import { isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
 import { isUnlimitedTestContractor } from "@/lib/god-access";
 
 const resendClient = process.env.RESEND_API_KEY
@@ -440,36 +440,145 @@ async function hasCampaignEmail(contractorId: string, email: string, campaignTyp
   return Boolean(existing);
 }
 
-function buildContractorOfferBlocks(isReminder = false): EmailBlock[] {
-  const heading = isReminder
-    ? 'Your QuoteXbert contractor offer is still available'
-    : 'Welcome to QuoteXbert.';
+function buildContractorOfferBlocks(isReminder = false, isPaid = false): EmailBlock[] {
+  // ── Hero ──────────────────────────────────────────────────────────────────
+  const heroBlock: EmailBlock = {
+    type: 'text',
+    rawHtml: true,
+    content: `
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+        <tr><td style="text-align:center;padding:8px 0 32px;">
+          <div style="font-size:44px;line-height:1;margin:0 0 18px;">🔥</div>
+          <h1 style="margin:0 0 14px;font-size:26px;font-weight:900;color:#111827;line-height:1.25;letter-spacing:-0.03em;">
+            New Homeowner Projects<br>Are Waiting
+          </h1>
+          <p style="margin:0 0 28px;font-size:15px;color:#475569;line-height:1.7;">
+            Real homeowners are posting renovation projects right now.<br>
+            Check the QuoteXbert Job Board before they're claimed.
+          </p>
+          <a href="${BASE_URL}/contractor/jobs"
+             style="display:inline-block;background:#800020;color:#ffffff;font-size:16px;font-weight:800;padding:16px 40px;border-radius:12px;text-decoration:none;letter-spacing:-0.01em;box-shadow:0 10px 24px rgba(128,0,32,0.22);">
+            View Available Jobs →
+          </a>
+        </td></tr>
+      </table>`,
+  };
 
-  return [
-    { type: 'heading', content: heading },
-    { type: 'text', content: 'Your contractor profile has been created.' },
-    {
-      type: 'card',
-      label: 'Limited time founding offer',
-      rawHtml: true,
-      content: `
-        <p style="margin:0 0 10px;color:#334155;line-height:1.6;">For a limited time:</p>
-        <p style="margin:0 0 6px;font-size:13px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.4px;">First Month</p>
-        <p style="margin:0 0 10px;font-size:32px;line-height:1;font-weight:900;color:#9f1239;">$0.99</p>
-        <p style="margin:0;color:#475569;line-height:1.6;">Then renews at the normal monthly plan price.</p>
-      `,
-    },
-    { type: 'text', content: `Only ${FOUNDING_CONTRACTOR_SPOTS_REMAINING} founding contractor spots remain.` },
-    { type: 'text', content: 'Choose the categories you want.' },
-    { type: 'text', content: 'Start receiving homeowner leads immediately.' },
-    { type: 'cta', content: 'Choose Your Plan', href: `${BASE_URL}/contractor/subscriptions` },
-    {
-      type: 'text',
-      rawHtml: true,
-      content: `<a href="${BASE_URL}/profile" style="color:#9f1239;text-decoration:none;font-weight:700;">Complete Your Profile</a>`,
-    },
-    { type: 'text', content: 'Cancel anytime.' },
-  ];
+  // ── Divider ───────────────────────────────────────────────────────────────
+  const divider: EmailBlock = {
+    type: 'text',
+    rawHtml: true,
+    content: `<div style="border-top:1px solid #e2e8f0;margin:4px 0 28px;"></div>`,
+  };
+
+  // ── Feature card: Why Check Today? ────────────────────────────────────────
+  const featureCard: EmailBlock = {
+    type: 'card',
+    rawHtml: true,
+    label: 'Why Check Today?',
+    content: `
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+        <tr><td style="padding:6px 0;">
+          <span style="font-size:15px;">✅</span>&nbsp;
+          <span style="font-size:15px;color:#1e293b;font-weight:600;">New homeowner renovation projects</span>
+        </td></tr>
+        <tr><td style="padding:6px 0;">
+          <span style="font-size:15px;">✅</span>&nbsp;
+          <span style="font-size:15px;color:#1e293b;font-weight:600;">Check jobs that match your business</span>
+        </td></tr>
+        <tr><td style="padding:6px 0;">
+          <span style="font-size:15px;">✅</span>&nbsp;
+          <span style="font-size:15px;color:#1e293b;font-weight:600;">Stay ahead of other contractors</span>
+        </td></tr>
+        <tr><td style="padding:6px 0;">
+          <span style="font-size:15px;">✅</span>&nbsp;
+          <span style="font-size:15px;color:#1e293b;font-weight:600;">Fill gaps in your schedule</span>
+        </td></tr>
+      </table>`,
+  };
+
+  // ── Project types card (two-column table) ─────────────────────────────────
+  const projectTypesCard: EmailBlock = {
+    type: 'card',
+    rawHtml: true,
+    label: 'Popular Projects Being Posted',
+    content: `
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td width="50%" style="padding:7px 10px 7px 0;font-size:14px;color:#334155;vertical-align:top;">🏠 Kitchen Renovations</td>
+          <td width="50%" style="padding:7px 0 7px 10px;font-size:14px;color:#334155;vertical-align:top;">🛁 Bathroom Renovations</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px 7px 0;font-size:14px;color:#334155;">🎨 Painting</td>
+          <td style="padding:7px 0 7px 10px;font-size:14px;color:#334155;">🔨 Handyman Services</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px 7px 0;font-size:14px;color:#334155;">⚡ Electrical</td>
+          <td style="padding:7px 0 7px 10px;font-size:14px;color:#334155;">🚿 Plumbing</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px 7px 0;font-size:14px;color:#334155;">🪟 Windows &amp; Doors</td>
+          <td style="padding:7px 0 7px 10px;font-size:14px;color:#334155;">🌿 Landscaping</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 10px 7px 0;font-size:14px;color:#334155;">🧱 Masonry</td>
+          <td style="padding:7px 0 7px 10px;font-size:14px;color:#334155;">🏗 General Renovations</td>
+        </tr>
+      </table>`,
+  };
+
+  // ── Urgency card (burgundy) ────────────────────────────────────────────────
+  const urgencyBlock: EmailBlock = {
+    type: 'text',
+    rawHtml: true,
+    content: `
+      <div style="background:#800020;border-radius:16px;padding:26px 28px;margin:0 0 28px;text-align:center;">
+        <p style="margin:0 0 12px;font-size:20px;font-weight:900;color:#ffffff;letter-spacing:-0.02em;line-height:1.2;">
+          ⏰ Don't Wait Too Long
+        </p>
+        <p style="margin:0;font-size:14px;color:#fecdd3;line-height:1.75;">
+          New projects are claimed quickly.<br>
+          Checking the Job Board regularly gives you the best opportunity<br>
+          to connect with homeowners looking for work today.
+        </p>
+      </div>`,
+  };
+
+  // ── Subscription section: paid vs free ────────────────────────────────────
+  const subscriptionBlock: EmailBlock = isPaid
+    ? {
+        type: 'text',
+        rawHtml: true,
+        content: `
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:14px;padding:22px 26px;margin:0 0 28px;text-align:center;">
+            <p style="margin:0 0 8px;font-size:18px;font-weight:800;color:#166534;line-height:1.3;">
+              ✅ Your contractor membership is active.
+            </p>
+            <p style="margin:0;font-size:14px;color:#475569;line-height:1.65;">
+              You're ready to start reviewing homeowner projects immediately.
+            </p>
+          </div>`,
+      }
+    : {
+        type: 'text',
+        rawHtml: true,
+        content: `
+          <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:14px;padding:26px 28px;margin:0 0 28px;text-align:center;">
+            <p style="margin:0 0 10px;font-size:20px;font-weight:900;color:#6b21a8;letter-spacing:-0.02em;line-height:1.25;">
+              Ready to Start Winning More Jobs?
+            </p>
+            <p style="margin:0 0 22px;font-size:14px;color:#475569;line-height:1.7;">
+              Upgrade your contractor account to unlock full access to homeowner projects,
+              messaging and future premium features.
+            </p>
+            <a href="${BASE_URL}/contractor/subscriptions"
+               style="display:inline-block;background:#6b21a8;color:#ffffff;font-size:15px;font-weight:800;padding:14px 32px;border-radius:12px;text-decoration:none;box-shadow:0 8px 18px rgba(107,33,168,0.22);">
+              View Contractor Plans →
+            </a>
+          </div>`,
+      };
+
+  return [heroBlock, divider, featureCard, projectTypesCard, urgencyBlock, subscriptionBlock];
 }
 
 export async function sendContractorOnboardingOfferEmail(contractor: { id: string; email: string; name?: string | null }) {
@@ -499,8 +608,8 @@ export async function sendContractorOnboardingOfferEmail(contractor: { id: strin
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: 'Start getting QuoteXbert jobs for just $0.99',
-      html: buildEmail('Start getting QuoteXbert jobs for just $0.99', buildContractorOfferBlocks(false), {
+      subject: '🔥 New Homeowner Projects Are Waiting on the QuoteXbert Job Board',
+      html: buildEmail('🔥 New Homeowner Projects Are Waiting on the QuoteXbert Job Board', buildContractorOfferBlocks(false), {
         unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'marketing'),
         unsubscribeLabel: 'Turn off marketing emails',
       }),
@@ -547,8 +656,8 @@ export async function sendContractorOnboardingReminderEmail(contractor: { id: st
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: 'Reminder: Start getting QuoteXbert jobs for just $0.99',
-      html: buildEmail('Reminder: Start getting QuoteXbert jobs for just $0.99', buildContractorOfferBlocks(true), {
+      subject: '⏰ Reminder: Homeowner Projects Are Still Waiting — QuoteXbert',
+      html: buildEmail('⏰ Reminder: Homeowner Projects Are Still Waiting — QuoteXbert', buildContractorOfferBlocks(true), {
         unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'marketing'),
         unsubscribeLabel: 'Turn off marketing emails',
       }),
