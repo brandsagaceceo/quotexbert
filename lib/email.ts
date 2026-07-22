@@ -581,6 +581,64 @@ function buildContractorOfferBlocks(isReminder = false, isPaid = false): EmailBl
   return [heroBlock, divider, featureCard, projectTypesCard, urgencyBlock, subscriptionBlock];
 }
 
+// Campaign type for the general contractor announcement blast (separate from founding offer dedup key)
+const CONTRACTOR_ANNOUNCEMENT_CAMPAIGN = 'contractor_announcement_v1';
+
+/**
+ * Send the general contractor announcement to a single contractor.
+ * Unlike sendContractorOnboardingOfferEmail, this:
+ *  - Is NOT gated by isFoundingOfferEnabled()
+ *  - Sends to paid AND unpaid contractors (passing isPaid to the template)
+ *  - Uses a separate campaign dedup key so old onboarding-offer recipients are not blocked
+ *
+ * Caller is responsible for filtering by isActive and notifyJobEmail before calling this.
+ */
+export async function sendContractorAnnouncementEmail(contractor: {
+  id: string;
+  email: string;
+  name?: string | null;
+  isPaid: boolean;
+}) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor announcement');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  if (isUnlimitedTestContractor(contractor.email)) {
+    return { success: false, skipped: true, reason: 'internal_bypass_account' };
+  }
+
+  if (await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_ANNOUNCEMENT_CAMPAIGN)) {
+    return { success: false, skipped: true, reason: 'already_sent' };
+  }
+
+  const subject = contractor.isPaid
+    ? '✅ Your QuoteXbert Contractor Account is Active — Homeowner Projects Are Waiting'
+    : '🔥 New Homeowner Projects Are Waiting on the QuoteXbert Job Board';
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject,
+      html: buildEmail(subject, buildContractorOfferBlocks(false, contractor.isPaid), {
+        unsubscribeUrl: buildUnsubscribeUrl(contractor.id, 'marketing'),
+        unsubscribeLabel: 'Turn off marketing emails',
+      }),
+    });
+
+    await logEmailEvent(CONTRACTOR_ANNOUNCEMENT_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'sent');
+    console.log(`[EMAIL] Contractor announcement sent to ${contractor.email} (isPaid=${contractor.isPaid})`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent(CONTRACTOR_ANNOUNCEMENT_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor announcement:', error);
+    return { success: false, error };
+  }
+}
+
 export async function sendContractorOnboardingOfferEmail(contractor: { id: string; email: string; name?: string | null }) {
   if (!isFoundingOfferEnabled()) {
     return { success: false, skipped: true, reason: 'founding_offer_disabled' };
