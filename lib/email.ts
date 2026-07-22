@@ -440,7 +440,7 @@ async function hasCampaignEmail(contractorId: string, email: string, campaignTyp
   return Boolean(existing);
 }
 
-function buildContractorOfferBlocks(isReminder = false, isPaid = false): EmailBlock[] {
+export function buildContractorOfferBlocks(isReminder = false, isPaid = false): EmailBlock[] {
   // ── Hero ──────────────────────────────────────────────────────────────────
   const heroBlock: EmailBlock = {
     type: 'text',
@@ -637,6 +637,38 @@ export async function sendContractorAnnouncementEmail(contractor: {
     console.error('[EMAIL] Failed to send contractor announcement:', error);
     return { success: false, error };
   }
+}
+
+/**
+ * Send a single test announcement email to an arbitrary address.
+ * - Subject is prefixed with [TEST]
+ * - Uses fake preview contractor data — no real contractor queried
+ * - Nothing is written to EmailEvent; campaign dedup is untouched
+ * - Both isPaid variants are supported
+ */
+export async function sendContractorAnnouncementTestEmail({
+  testEmail,
+  isPaid,
+}: {
+  testEmail: string;
+  isPaid: boolean;
+}) {
+  const baseSubject = isPaid
+    ? '✅ Your QuoteXbert Contractor Account is Active — Homeowner Projects Are Waiting'
+    : '🔥 New Homeowner Projects Are Waiting on the QuoteXbert Job Board';
+  const subject = `[TEST] ${baseSubject}`;
+
+  // Fake unsubscribe URL — not tied to any real user id
+  const fakeUnsubscribeUrl = 'https://www.quotexbert.com/unsubscribe?preview=1';
+
+  return sendSharedEmail({
+    to: testEmail,
+    subject,
+    html: buildEmail(subject, buildContractorOfferBlocks(false, isPaid), {
+      unsubscribeUrl: fakeUnsubscribeUrl,
+      unsubscribeLabel: 'Turn off marketing emails',
+    }),
+  });
 }
 
 export async function sendContractorOnboardingOfferEmail(contractor: { id: string; email: string; name?: string | null }) {

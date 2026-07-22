@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendContractorAnnouncementEmail } from "@/lib/email";
+import { sendContractorAnnouncementEmail, sendContractorAnnouncementTestEmail } from "@/lib/email";
 import { isUnlimitedTestContractor } from "@/lib/god-access";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +33,26 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const dryRun = Boolean(body?.dryRun);
+
+    // ── Test-send: deliver one email to a specified address, no DB touched ───
+    if (body?.testEmail) {
+      const testEmail = String(body.testEmail).trim();
+      const isPaid = Boolean(body?.isPaid);
+
+      const result = await sendContractorAnnouncementTestEmail({ testEmail, isPaid });
+      if (result.success) {
+        return NextResponse.json({
+          testSent: true,
+          to: testEmail,
+          isPaid,
+          message: "[TEST] email sent — no campaign state modified",
+        });
+      }
+      return NextResponse.json(
+        { error: "Test email failed", detail: String((result as any).error ?? "unknown") },
+        { status: 500 }
+      );
+    }
 
     // ── Query: all active contractors who have not explicitly opted out ───────
     const contractors = await prisma.user.findMany({
