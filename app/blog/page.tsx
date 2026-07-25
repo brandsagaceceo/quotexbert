@@ -32,7 +32,7 @@ export default function BlogPage() {
     {
       id: "1",
       title: "Complete Guide to Basement Finishing in Toronto 2026",
-      slug: "basement-finishing-toronto-guide-2026",
+      slug: "basement-finishing-toronto-guide-2025",
       excerpt: "Transform your Toronto basement into a beautiful living space. Learn about permits, costs, design ideas, and finding the right GTA contractor for your project.",
       author: "Michael Chen",
       publishedAt: "2026-02-20",
@@ -46,7 +46,7 @@ export default function BlogPage() {
     {
       id: "2",
       title: "Kitchen Renovation Costs in Toronto & GTA: 2026 Price Guide",
-      slug: "toronto-kitchen-renovation-costs-2026",
+      slug: "toronto-kitchen-renovation-costs-2025",
       excerpt: "Planning a kitchen reno in Toronto? Get accurate cost breakdowns for cabinets, countertops, appliances, and labor in the Greater Toronto Area.",
       author: "Sarah Thompson",
       publishedAt: "2026-02-18",
@@ -203,7 +203,7 @@ export default function BlogPage() {
     {
       id: "9",
       title: "Energy-Efficient Home Upgrades for Toronto's Climate",
-      slug: "energy-efficient-upgrades-toronto",
+      slug: "toronto-energy-efficient-upgrades",
       excerpt: "Save money and stay comfortable in Toronto's extreme weather. Top energy-efficient upgrades, rebates, and ROI for GTA homeowners.",
       author: "Tom Anderson",
       publishedAt: "2026-02-02",
@@ -303,7 +303,7 @@ export default function BlogPage() {
     {
       id: "16",
       title: "Toronto Condo Renovation Rules & Restrictions 2026",
-      slug: "toronto-condo-renovation-rules",
+      slug: "toronto-condo-renovation-rules-2025",
       excerpt: "Planning a condo reno in Toronto? Learn about building rules, noise bylaws, insurance requirements, and working with property management in the GTA.",
       author: "Jessica Taylor",
       publishedAt: "2026-01-15",
@@ -317,7 +317,7 @@ export default function BlogPage() {
     {
       id: "17",
       title: "Smart Home Technology for Toronto Homes: Worth the Investment?",
-      slug: "smart-home-toronto-guide",
+      slug: "smart-home-technology-toronto-2025",
       excerpt: "Upgrade your Toronto home with smart technology. Best devices for Canadian climate, costs, installation, and finding qualified GTA integrators.",
       author: "Alex Kumar",
       publishedAt: "2026-01-12",
@@ -332,7 +332,7 @@ export default function BlogPage() {
     {
       id: "18",
       title: "Garage Conversion Ideas for Toronto Homes",
-      slug: "toronto-garage-conversion-ideas",
+      slug: "garage-conversion-toronto-ideas-2025",
       excerpt: "Maximize your Toronto property with a garage conversion. Ideas, permits, costs, insulation for Ontario winters, and qualified GTA contractors.",
       author: "Ryan Murphy",
       publishedAt: "2026-01-10",
@@ -346,7 +346,7 @@ export default function BlogPage() {
     {
       id: "19",
       title: "Accessible Home Renovations in Toronto: Aging in Place",
-      slug: "toronto-accessible-home-renovations",
+      slug: "accessible-home-renovations-toronto-2025",
       excerpt: "Make your Toronto home accessible for all ages. Bathroom modifications, ramps, wider doorways, Ontario grants, and specialized GTA contractors.",
       author: "Linda Martinez",
       publishedAt: "2026-01-08",
@@ -360,7 +360,7 @@ export default function BlogPage() {
     {
       id: "20",
       title: "Foundation Repair in Toronto: Signs, Costs & Solutions",
-      slug: "toronto-foundation-repair-guide",
+      slug: "foundation-repair-toronto-2025",
       excerpt: "Protect your Toronto home's foundation. Warning signs, repair methods, costs, preventing damage in freeze-thaw cycles, and expert GTA contractors.",
       author: "Michael O'Brien",
       publishedAt: "2026-01-05",
@@ -374,7 +374,7 @@ export default function BlogPage() {
     {
       id: "21",
       title: "Outdoor Kitchen Design for Toronto Backyards",
-      slug: "toronto-outdoor-kitchen-design",
+      slug: "outdoor-kitchen-design-toronto-2025",
       excerpt: "Build the perfect outdoor kitchen for Toronto entertaining. Design ideas, weatherproofing for Ontario, costs, and finding skilled GTA contractors.",
       author: "Sophia Chen",
       publishedAt: "2026-01-02",
@@ -388,7 +388,7 @@ export default function BlogPage() {
     {
       id: "22",
       title: "Fire Safety Upgrades for Toronto Homes: Code Requirements",
-      slug: "toronto-fire-safety-upgrades",
+      slug: "fire-safety-upgrades-toronto-2025",
       excerpt: "Ensure your Toronto home meets fire code. Smoke alarms, sprinklers, escape routes, Ontario Building Code requirements, and qualified GTA contractors.",
       author: "David Wong",
       publishedAt: "2025-12-28",
@@ -402,7 +402,7 @@ export default function BlogPage() {
     {
       id: "23",
       title: "Toronto Home Office Renovation: Design & Tax Deductions",
-      slug: "toronto-home-office-renovation",
+      slug: "toronto-home-office-renovation-2025",
       excerpt: "Create the perfect Toronto home office. Design ideas, soundproofing, lighting, CRA tax deductions, and finding GTA renovation contractors.",
       author: "Caroline Lee",
       publishedAt: "2025-12-25",
@@ -416,7 +416,7 @@ export default function BlogPage() {
     {
       id: "24",
       title: "Pool Installation in Toronto: Types, Costs & Maintenance",
-      slug: "toronto-pool-installation-guide",
+      slug: "pool-installation-toronto-2025",
       excerpt: "Add a pool to your Toronto backyard. Compare pool types, installation costs, winterizing for Ontario, maintenance, and trusted GTA pool builders.",
       author: "James Mitchell",
       publishedAt: "2025-12-22",
@@ -430,7 +430,7 @@ export default function BlogPage() {
     {
       id: "25",
       title: "Historic Home Renovation in Toronto: Preserving Character",
-      slug: "toronto-historic-home-renovation",
+      slug: "historic-home-renovation-toronto-2025",
       excerpt: "Renovate your historic Toronto home with care. Heritage permits, preserving character, modern upgrades, costs, and specialized GTA contractors.",
       author: "Margaret Thompson",
       publishedAt: "2025-12-18",
