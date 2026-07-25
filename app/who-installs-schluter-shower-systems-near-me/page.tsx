@@ -141,6 +141,46 @@ const faqs = [
     q: 'Does QuoteXbert match me with Schluter-certified bathroom contractors?',
     a: "Absolutely. When you submit your project details through our primary system, our matching algorithms prioritize bathroom contractors who have extensive tile experience and are trained in Schluter waterproofing standards. You can specify 'Schluter system' in your project description to instantly alert qualified installers.",
   },
+  {
+    q: "Can I use Schluter-DITRA-HEAT as primary heating for a bathroom in Ontario?",
+    a: "Yes, in small to medium-sized en-suites with adequate insulation, Schluter-DITRA-HEAT can operate as the primary heating source. However, in larger bathrooms or poorly-insulated basements, it is best utilized as a comfort secondary heat system alongside your primary HVAC duct registers or baseboards.",
+  },
+  {
+    q: "Do Ontario building inspectors require a flood test on Schluter shower pans?",
+    a: "Yes, municipal building inspectors in Toronto, Whitby, Oshawa, and most of Southern Ontario routinely require a 24-hour water/flood test for shower pan approvals before authorizing tile setting. They will inspect the expansion plugs and verify that the water level has not dropped, ensuring compliance with the Ontario Building Code Part 7.",
+  },
+  {
+    q: "Can Schluter-KERDI-BOARD be used on bathroom ceilings?",
+    a: "Yes, you can install 1/2-inch thick Schluter-KERDI-BOARD on bathroom ceilings to prevent moisture and vapor transmission from steam showers into the attic insulation or joist framing. Space your fasteners/screws at a maximum of 12 inches on center on wood or metal framing.",
+  },
+  {
+    q: "Can I install mosaic floor tiles over Schluter-DITRA or DITRA-HEAT?",
+    a: "Yes, but there are size limitations. Tile size must be at least 2 inches by 2 inches (50 mm x 50 mm) to safely distribute weights and bypass point-load limits without crushing the uncoupling mat's cavities. For smaller mosaic tiles, a cementitious self-leveling underlayment must be poured over the DITRA-HEAT wires to create a flat, rigid solid bed.",
+  },
+  {
+    q: "How thick is a complete Schluter-DITRA-HEAT installation?",
+    a: "The DITRA-HEAT-E-HK cable integrated into the DITRA-HEAT membrane creates a total thickness of approximately 1/4-inch (5.5 mm) before thin-set and tile are laid. This thin profile is highly sought after as it helps match standard transitions into hardwood or engineered materials outside the washroom door."
+  },
+  {
+    q: "Why is water vapor permeability (perm rating) critical for steam showers?",
+    a: "A standard steam shower produces extreme heat and vapor pressure that easily bypasses traditional tiles and liquid sealants. The standard Schluter-KERDI membrane is vapor-impermeable with a very low perm rating of 0.90 perms, but for heavy-steam units, it is recommended to double-overlap joints with KERDI-BAND or use KERDI-DS (0.19 perms) to completely protect stud framing from dry rot."
+  },
+  {
+    q: "Can you install luxury vinyl plank (LVP) directly over Schluter-DITRA?",
+    a: "No, Schluter systems (like DITRA or any tile underlayment) are engineered specifically as a structural substrate for ceramic, porcelain, glass, or natural stone tile products. Floating flooring or glue-down luxury vinyl planks (LVP/LVT) cannot be installed directly over uncoupling membranes because LVP requires a continuous, solid, rigid flat subfloor and wood/vinyl adhesives do not bond to the fleece."
+  },
+  {
+    q: "Can a Schluter-KERDI drain hook up to a legacy cast iron floor pipe?",
+    a: "Yes, but a commercial mechanical coupling/coupling band (such as a Fernco transition coupl) must be utilized to adapt the old cast iron pipe to standard Schedule 40 ABS or PVC. Modern Schluter KERDI-DRAIN collars are solvent-welded using transition cement in standard 2-inch or 3-inch shower stack structures."
+  },
+  {
+    q: "What thin-set mortar should be used to bond Schluter-DITRA to an OSB subfloor?",
+    a: "To bond the underlayment fleece to unfinished OSB or plywood structural sheets, you must utilize an ANSI A118.11 modified thin-set mortar (such as Schluter ALL-SET or FAST-SET) mixed with clean water. Modified thin-sets contain polymers that form a secure, elastic chemical-physical lock to wood grain fibers."
+  },
+  {
+    q: "What is the warranty period for a complete Schluter shower system installation?",
+    a: "If a certified installer utilizes the integrated range of components—including shower tray, Kerdi-Board walls, Kerdi-Drain, and Kerdi-Band seams—and documents a passing 24-hour water/flood test, Schluter Systems offers a Lifetime Limited Warranty. Using mixed-and-matched cheap alternative waterproofing brands completely voids this protection."
+  }
 ];
 
 export default function SchluterInstallerGuide() {
