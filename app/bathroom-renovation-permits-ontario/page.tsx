@@ -146,6 +146,102 @@ const faqs = [
     q: 'Does my contractor pull the permit or do I?',
     a: 'Either party can pull the permit, but for plumbing and electrical work, the licensed tradesperson (plumber, electrician) typically pulls the permit as part of their service. For a general building permit (structural, additions), the homeowner or general contractor usually applies. Always confirm who is responsible before work begins.',
   },
+  {
+    q: 'Who qualifies as a competent plumber under the Ontario Building Code?',
+    a: "Under the Ontario Building Code (OBC) and the Ontario College of Trades, plumbing work must be performed by a registered apprentice or a certified Journeyperson plumber holding a legally recognized 306A plumbing ticket.",
+  },
+  {
+    q: 'When do I need to contact the Electrical Safety Authority (ESA)?',
+    a: "Any electrical installations, alterations, additions, or replacements of wiring and circuits in Ontario first require filing a notification of work with the Electrical Safety Authority (ESA) within 48 hours of starting the job.",
+  },
+  {
+    q: 'Are minor lighting fixture replacements exempt from ESA notifications?',
+    a: "Yes. Swapping an existing electrical lighting fixture or wall switch for a similar device of identical rating in the same box is exempt, provided no extensions or additions to structural branch circuit wiring are made.",
+  },
+  {
+    q: 'What are the consequences of failing an ESA inspection in Ontario?',
+    a: "An inspection failure results in a defect notice. If not corrected within the specified deadline (typically 15 to 30 days), the ESA can order your regional utility provider (like Hydro One or Toronto Hydro) to disconnect electrical service.",
+  },
+  {
+    q: 'Can a homeowner legally pull their own building permit in Ontario?',
+    a: "Yes. Homeowners in Ontario can legally pull municipal building permits themselves, provided they supply comprehensive, accurate architectural design drawings that comply perfectly with the Ontario Building Code (OBC).",
+  },
+  {
+    q: 'What are the ventilation requirements for bathrooms in the OBC?',
+    a: "Section 9.32 of the Ontario Building Code mandates mechanical ventilation (exhaust fan venting outside the building core) providing a minimum of 50 CFM intermittently, or 20 CFM continuously, if there is no operable outward window.",
+  },
+  {
+    q: 'Can I vent a bathroom exhaust fan directly into an attic space under Ontario code?',
+    a: "Absolutely not. Tying an exhaust duct to attic spaces results in massive winter condensation, causing severe mold, structural wood rot, and compromised attic thermal insulation. All bathroom exhaust fans must duct to the exterior atmosphere.",
+  },
+  {
+    q: 'Do structural bathroom wall adjustments require stamped engineer plans?',
+    a: "Yes. If you remove or alter any load-bearing wall, municipal building offices require structural designs stamped by an Ontario-licensed Professional Engineer (P.Eng) along with corresponding building permit forms.",
+  },
+  {
+    q: 'How many plumbing inspections occur during a permitted renovation?',
+    a: "Standard permitted bathroom renovations undergo two plumbing inspections: first, a \"rough-in\" inspection when structural lines are open and pressure-tested, and second, a \"final\" inspection when vanity finishes and toilets are connected.",
+  },
+  {
+    q: 'Do I need a building permit to add a glass partition wall in my bathroom?',
+    a: "No. Standard glass panel installations, glass tub doors, or basic partition panels do not alter the building's structure or plumbing systems, making them entirely exempt from building permit requirements in Ontario.",
+  },
+  {
+    q: 'What is a B.C.I.N. designer and when do I need one for a bathroom?',
+    a: "In Ontario, designers who produce drawings for permit applications must hold a Building Code Identification Number (BCIN) from the Ministry of Municipal Affairs and Housing, unless drawings are submitted directly by the homeowner or a P.Eng.",
+  },
+  {
+    q: 'Does installing a luxury freestanding bath tub require a structural review?',
+    a: "Yes. Large-format cast iron or stone freestanding tubs can weigh upwards of 800-1,000 lbs when filled with water and an occupant. This frequently requires structural joist sistering reinforcement under OBC Section 9.4 to prevent structural floor sag.",
+  },
+  {
+    q: 'How close to a bathtub can a standard wall outlet be placed in Ontario?',
+    a: "Under the Ontario Electrical Safety Code (OESC), electrical outlets must not be placed within 1 meter of a bathtub or shower stall, unless protected by a GFCI and structurally restricted by wall layouts (cannot be closer than 0.5 meters).",
+  },
+  {
+    q: 'Are there specific waterproofing expectations under the Ontario Building Code?',
+    a: "Yes. Section 9.29 of the OBC mandates that walls surrounding bathtubs and showers must be constructed of water-resistant backings (such as cement board, glassmat panels, or waterproofing membranes) rather than standard paper-faced drywall.",
+  },
+  {
+    q: 'How long are building permits valid in Toronto or Mississauga?',
+    a: "Under Section 8 of the Ontario Building Code Act, if construction is not commenced within six months of permit issuance, or if work is suspended/abandoned for more than six months, the municipality may revoke your building permit.",
+  },
+  {
+    q: 'Do I need an inspection if I install an electric floor heating mat?',
+    a: "Yes. Any floor heating system connected to your home’s electrical panel represents a new electrical circuit, which legally requires an ESA notification of work, rough-in inspection, and final safety certification.",
+  },
+  {
+    q: 'What is the required door size for an accessible bathroom under the OBC?',
+    a: "For barrier-free or accessible private bathrooms under OBC Section 3.8, entrance doors must have a clear opening width of at least 800 mm (32 inches) when the door is held in its fully open position.",
+  },
+  {
+    q: 'What plumbing drain line sizes are required for toilets in Ontario?',
+    a: "The Ontario Building Code dictates that standard water closets (toilets) must connect to a minimum drain pipe diameter of 3 inches (76 mm) to prevent blockages and maintain proper pneumatic pressure within DWV vent stacks.",
+  },
+  {
+    q: 'Is it legal to use flexible corrugated plastic drain lines in Ontario?',
+    a: "No. Flexible accordian/corrugated plastic trap connections (such as \"slip-joint stretch drains\") do not meet OBC plumbing standards, as they trap mold and debris. Solid PVC, ABS, or brass traps with smooth interiors are mandatory.",
+  },
+  {
+    q: 'What is a plumbing air test and when is it checked?',
+    a: "A plumbing air test involves sealing drainage lines and pumping air or water pressure to verify there are absolutely zero joints leaking sewer gas. This test is inspected by the municipal inspector during the mandatory rough-in visit.",
+  },
+  {
+    q: 'How do I know if my contractor actually pulled the building permit?',
+    a: "Always demand a physical or digital copy of the municipal Building Permit and the ESA Permit Authorization before letting work commence. Valid municipal permits must legally be posted in a street-visible window of your residential property.",
+  },
+  {
+    q: 'What happens to unpermitted bathroom work during a mortgage refinance?',
+    a: "If an appraiser flags a newly added or fully remodeled high-end bathroom, the bank may demand municipal permit verification. Lack of permit history can lead to a lower home valuation or loan denial until retroactive compliance is resolved.",
+  },
+  {
+    q: 'Are plumbing venting rules strictly enforced in Ontario?',
+    a: "Extremely strictly. Without proper air venting (e.g. wet vents or individual vents complying with OBC Section 9.7), the vacuum created by draining water will siphon water out of traps, allowing toxic sewer gas to enter your home.",
+  },
+  {
+    q: 'Can QuoteXbert help me resolve an active stop-work permit violation?',
+    a: "Yes. While QuoteXbert's main site forms AI estimates, our contractor lead directory matches you directly with certified, OBC-licensed general contractors and master trades who specialize in code remediation and permit resolution.",
+  },
 ];
 
 const jsonLd = {

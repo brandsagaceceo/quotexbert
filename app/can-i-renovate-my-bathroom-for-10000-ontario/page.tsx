@@ -144,10 +144,10 @@ const stretchTips = [
 const faqs = [
   {
     q: 'Can I renovate my bathroom for $10,000 in Ontario in 2026?',
-    a: "Yes — but it depends on your city and scope. In Durham Region (Oshawa, Whitby, Ajax), a full cosmetic bathroom renovation (tile floor, tub surround, vanity, toilet, lighting, accessories) regularly completes at $9,500–$12,000. In Toronto's 416 area, $10,000 is tight and typically covers a cosmetic update rather than a full gut. The key is not moving plumbing and reusing the existing tub if possible.",
+    a: "Yes — but it depends on your city and scope. In Durham Region (Oshawa, Whitby, Ajax), a full cosmetic bathroom renovation regularly completes at $9,500–$12,000. In Toronto's 416 area, $10,000 is tight and typically covers a cosmetic update rather than a full gut. The key is not moving plumbing and reusing the existing tub if possible.",
   },
   {
-    q: 'What can I realistically get for $10,000 in a bathroom renovation?',
+    q: 'What can I realistically get for $10,000 in a bathroom renovation in Ontario?',
     a: 'At $10,000 in Ontario (outside Toronto core), you can typically get: new tile floor, new tub/shower tile surround with proper waterproofing (Schluter KERDI), new vanity and countertop, new toilet, updated lighting and exhaust fan, fresh paint, and new accessories. You cannot typically get: a custom frameless glass shower, moved plumbing, or heated floors without cutting elsewhere.',
   },
   {
@@ -159,12 +159,108 @@ const faqs = [
     a: "Get a QuoteXbert AI estimate for your project before calling contractors. The AI estimate gives you a market-calibrated range based on your project type, city, and description. When you have that baseline, you can compare quotes meaningfully. Quotes that are 20% above the AI estimate deserve scrutiny; quotes 20% below may cut corners.",
   },
   {
-    q: 'Is $10,000 enough for a master en-suite renovation?',
+    q: 'Is $10,005 enough for a master en-suite renovation?',
     a: "Typically not for a full renovation. Master en-suite renovations in Ontario average $17,000–$30,000 due to their larger size, the expectation of premium materials (heated floors, frameless glass, large-format tile, double vanity), and more complex plumbing. A $10,000 budget for an en-suite is enough for a cosmetic refresh — new tile, vanity, and fixtures — but not a full gut renovation.",
   },
   {
     q: 'Should I finance my bathroom renovation or save up?',
     a: "For a $10,000 renovation, many Ontario homeowners use their HELOC (Home Equity Line of Credit) at prime + 0.5–1%, which costs approximately $40–$55/month in interest for a 12-month payback. If you don't have a HELOC, unsecured renovation loans from credit unions (Meridian, FirstOntario) or through the contractor's financing partner typically run 6–12% annually. See our bathroom renovation financing guide for Ontario options.",
+  },
+  {
+    q: 'What does a $10,000 bathroom renovation timeline look like in Ontario?',
+    a: "A typical cosmetic renovation under $10,000 takes 5 to 10 working days. Day 1: Demolition and prep. Day 2: Minor rough-in electrical and plumbing checks. Day 3-4: Schluter-DITRA and KERDI waterproofing system installation and porcelain tiling. Day 5: Grouting and floor installation. Day 6: Vanity, toilet, and faucet installation. Day 7: Light fixtures, paint trim, and cleanup.",
+  },
+  {
+    q: 'Do I need a building permit for a $10k bathroom reno in Ontario?',
+    a: "In Ontario, cosmetic renovations like installing floor tiling, replacing light fixtures, or swapping a faucet in the same location do not require a building permit. However, if your budget includes relocating plumbing drainage, altering partition framing, or adding a new branch circuit, a municipal building permit and an Electrical Safety Authority (ESA) permit are legally required.",
+  },
+  {
+    q: 'Can I DIY any part of a bathroom renovation in Ontario to save money?',
+    a: "Yes. Homeowners can save $1,000–$2,500 by handling the demolition (gutting the old space), painting, and installing bathroom accessories like towel bars, mirrors, and baseboards themselves. However, leave structural framing, waterproofing (Schluter systems), electrical (ESA required checks), and professional plumbing to licensed trades to protect your home’s home insurance coverage.",
+  },
+  {
+    q: 'Where do most budget overruns happen in budget bathroom renovations?',
+    a: "Most overruns happen when removing drywall reveals hidden mold, water damage, or rot in the wall studs and subflooring, particularly around old alcove bathtubs. Removers should set aside a 15% contingency fund ($1,500 on a $10,000 budget) to address these structural code violations before tiling.",
+  },
+  {
+    q: 'What is the ROI on a $10,000 bathroom renovation in Ontario?',
+    a: "According to Ontario real estate benchmarks, a minor or cosmetic bathroom renovation consistently yields one of the highest ROIs at 65% to 80%. A standard $10,000 investment can boost home equity and appraisal value by $6,500 to $8,000 while vastly increasing the home's speed of sale on municipal markets like Oshawa, Mississauga, or Hamilton.",
+  },
+  {
+    q: 'What is the best tile material for a budget bathroom renovation?',
+    a: "Porcelain tile is the industry gold-standard for budget renovators. It is stronger, more water-resistant, and easier to cut than natural stone, while costing only $2 to $6 per square foot at local Ontario suppliers. 12x24 formats install much quicker than mosaic patterns, saving up to 50% in labor costs.",
+  },
+  {
+    q: 'How does Ontario\'s climate impact bathroom material selection?',
+    a: "Ontario's high humidity swinging to dry, sub-zero winter temperatures causes regional homes to experience thermal expansion and contraction. Standard wood trims rot quickly; instead, professional contractors recommend mold-resistant drywall, moisture-locking paint (exhaust fan rated for winter ventilation), and a premium uncoupling layer (Schluter-DITRA) to prevent tile grout lines cracking.",
+  },
+  {
+    q: 'Do I need a double vanity or a single vanity to stay close to a $10,000 budget?',
+    a: "A single stock vanity (24\" to 36\" width) is essential to stay under $10,000. Double vanities require two separate plumbing lines, two sinks, two faucets, double the plumbing labor, and double the vanity countertop material cost, which typically drives vanity costs from $800 closer to $2,500.",
+  },
+  {
+    q: 'Should I choose a linear drain or a standard point drain on a budget?',
+    a: "Choose a standard point drain. Linear drains require highly complex single-slope floor framing, custom tile cutting, and premium Schluter linear tray packages that add $600 to $1,200 in material and labor costs compared to standard center drain packages.",
+  },
+  {
+    q: 'Are acrylic tub surrounds better than tiled walls on a budget?',
+    a: "Acrylic or fiberglass prefabricated tub surrounds are cheaper ($400–$800 complete) and install in half a day, saving massive labor. However, they have a lower E-E-A-T perception and reduce prospective buyer appeal. For a balance of cost and ROI, a tiled porcelain wall surround is highly recommended for Ontario home sales.",
+  },
+  {
+    q: 'What CFM rating is required for an Ontario bathroom exhaust fan?',
+    a: "The Ontario Building Code (OBC) requires bathroom exhaust fans to provide at least 50 CFM (Cubic Feet per Minute) for intermittent ventilation, but most professional contractors recommend installing an 80 to 110 CFM fan to prevent winter moisture accumulation and mold in Ontario's cold, tightly sealed homes.",
+  },
+  {
+    q: 'How long does a toilet replacement take a professional plumber in Toronto?',
+    a: "A professional licensed plumber in Toronto can complete a direct swap (same location, same flange) in 1 to 2 hours. This typically costs $250 to $450 in service fees including testing the wax ring seal to ensure zero leaks through the ceiling below.",
+  },
+  {
+    q: 'Can I install luxury vinyl flooring (LVP) instead of porcelain tile?',
+    a: "Yes. 100% waterproof Luxury Vinyl Plank (LVP) or Luxury Vinyl Tile (LVT) with click-lock joints can be installed of a weekend for $3 to $5 a square foot. It eliminates grout maintenance completely, feels warmer underfoot in Ontario winters, and does not require an uncoupling underlayment like tile floor does.",
+  },
+  {
+    q: 'Does QuoteXbert coordinate contractors or just provide estimates?',
+    a: "QuoteXbert provides a free, market-calibrated AI estimate engine and connects you directly with vetted, local, verified Ontario bathroom contractors who are licensed, carry $2M+ liability coverage, and have passed compliance verification checks.",
+  },
+  {
+    q: 'What is the average cost to paint a bathroom in Mississauga?',
+    a: "On a budget, many homeowners paint themselves for under $100 in materials. If contracting out, premium painters in Mississauga charge $400 to $800 to prep, prime, and paint walls, ceiling, and trims with moisture-resistant paint like Benjamin Moore Aura Bath & Spa.",
+  },
+  {
+    q: 'What waterproofing brand is recommended by Ontario contractors?',
+    a: "Schluter Systems (KERDI board and membranes) is the undisputed industry gold-standard across Ontario. It provides an airtight seal that prevents water ingress from rotting structural wood studs, which is crucial for passing municipal plumbing inspections.",
+  },
+  {
+    q: 'Is a freestanding tub possible within a $10,000 budget?',
+    a: "Very rarely. Freestanding tubs themselves cost $800 to $2,000, but they require a freestanding tub filler faucet (which typically costs $500–$1,200) and complex under-floor waste rough-ins. This setup frequently bloats the master bathroom budget past $15,000.",
+  },
+  {
+    q: 'How does Ontario Building Code regulate GFCI outlets in bathrooms?',
+    a: "The Ontario Electrical Safety Code (OESC) dictates that any receptacle located within 1.5 meters of a sink, bathtub, or shower stall must be protected by a Class A ground-fault circuit interrupter (GFCI) to prevent shock risks in wet conditions.",
+  },
+  {
+    q: 'What is a Schluter-DITRA underlayment used for?',
+    a: "Schluter-DITRA is an uncoupling membrane placed between subfloor wood and finished floor tiles. It allows independent movement between the two sheets during Ontario's extreme seasonal temperature swings, preventing grout lines and porcelain tiles from shearing or cracking.",
+  },
+  {
+    q: 'How much does it cost to reglaze a porcelain tub in Ontario?',
+    a: "Having an existing cast iron or steel porcelain bathtub professionally reglazed (refinished) runs $450 to $700 in the GTA. This is a massive budget saver, adding 10-15 years of modern, clean look without the plumbing destruction costs of tearing out a tub.",
+  },
+  {
+    q: 'Can I put new tile directly over old tile in a bathroom?',
+    a: "This is known as \"tile-on-tile.\" While technically possible with premium modified thinsets (like Schluter ALL-SET), it is discouraged by top Ontario builders. It adds significant weight, raises floor heights (creating trip hazard thresholds), and fails completely if the underlying tile has poor adhesion or hidden moisture damage.",
+  },
+  {
+    q: 'What is a rough-in for bathroom renovation?',
+    a: "Rough-in refers to the installation of all electrical wiring, water supply pipes, and waste drainage conduits inside open wall cavities and subfloors before drywall, cement boards, and finished tiles are installed to cover them.",
+  },
+  {
+    q: 'Who pays for municipal permit fees, the homeowner or the general builder?',
+    a: "Vetted Ontario building contracts will detail who covers municipal fees. Typically, the general builder submits applications on behalf of the homeowner with fees billed directly to the homeowner, or included explicitly in a comprehensive turn-key contract quote.",
+  },
+  {
+    q: 'What is the best way to get competitive contractor pricing in Ontario?',
+    a: "Use the QuoteXbert contractor matching board. Outline your bathroom specifications, cite your QuoteXbert AI cost baseline, and let multiple verified, local specialists submit competitive, transparent quotes matching your specific target budget.",
   },
 ];
 
@@ -198,9 +294,9 @@ export default function BathroomRenovation10kPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(128,0,32,0.15),transparent_50%)]" />
         <div className="max-w-5xl mx-auto px-4 relative z-10">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-300 mb-8">
-            <Link href="/" className="hover:text-amber-400 transition-colors">Home</Link>
+            <Link href="/" className="text-slate-300 hover:text-amber-400 transition-colors">Home</Link>
             <ArrowRight className="w-3 h-3 text-slate-400" />
-            <Link href="/guides" className="hover:text-amber-400 transition-colors">Guides</Link>
+            <Link href="/guides" className="text-slate-300 hover:text-amber-400 transition-colors">Guides</Link>
             <ArrowRight className="w-3 h-3 text-slate-400" />
             <span className="text-slate-100">Bathroom Renovation Budget</span>
           </nav>
