@@ -105,6 +105,146 @@ export const renovationCostPages: RenovationCostData[] = [
         question: "What adds the most value in a bathroom renovation?",
         answer: "In Toronto's real estate market, walk-in showers, heated floors, and double vanities consistently return 60–80% of renovation cost in resale value. A clean, modern bathroom is a top buyer priority.",
       },
+      {
+        question: "What is the certified plumber standard under the Ontario Building Code?",
+        answer: "Under the Ontario Building Code (OBC), all professional plumbing work must be executed by a registered apprentice or a certified Journeyperson plumber holding a legally recognized 306A plumbing ticket.",
+      },
+      {
+        question: "When is an Electrical Safety Authority (ESA) notification mandatory in Toronto?",
+        answer: "Anytime you install, alter, or replace electrical wiring or branch circuits in your Toronto bathroom, you must file a notification of work with the Electrical Safety Authority (ESA) within 48 hours of starting.",
+      },
+      {
+        question: "Can I swap an existing light fixture without filing an ESA permit?",
+        answer: "Yes. Swapping a light fixture, wall outlet, or switch for an equivalent model of identical rating in the same structural electrical box is exempt, provided no new branch wiring is extended.",
+      },
+      {
+        question: "What exhaust fan CFM rating is required under Section 9.32 of the OBC?",
+        answer: "The Ontario Building Code (OBC) mandates bathroom exhaust fans provide at least 50 CFM for intermittent airflow, but professional GTA contractors recommend 80 to 110 CFM to prevent winter mold compilation.",
+      },
+      {
+        question: "Can a bathroom fan discharge directly into an attic space in Toronto?",
+        answer: "Absolutely not. Directing warm moisture-laden exhaust into your attic causes instant winter condensation, triggering severe timber rot and mold. All exhausts must duct to the outer atmosphere.",
+      },
+      {
+        question: "Why do Toronto tile setters recommend Schluter-DITRA underlayment?",
+        answer: "Schluter-DITRA is an uncoupling membrane placed below floor tiles. It allows independent structural movements between the wood subfloor and tiles during Toronto's extreme seasonal weather swings.",
+      },
+      {
+        question: "Is cast iron tub reglazing a viable money-saver in the GTA?",
+        answer: "Yes. Cast iron and steel bathtub reglazing costs between $450 and $700 in Toronto. This represents a massive savings compared to the $1,500–$3,500 cost of demoing, replacing, and replumbing a new tub.",
+      },
+      {
+        question: "What is the difference between a linear shower drain and a point drain on a budget?",
+        answer: "Point drains are located in the center and require standard sloped base packages ($250). Linear drains require highly complex single-slope floor preparation, adding $600 to $1,200 in material and labor costs.",
+      },
+      {
+        question: "Are there government cash rebates for seniors modifying bathrooms in Toronto?",
+        answer: "Yes. The Ontario Seniors Home Safety Tax Credit returns up to 25% of eligible safety adjustments (such as grab bars or curbless walk-in showers) up to a maximum credit of $2,500.",
+      },
+      {
+        question: "What is an uncoupling membrane and why does it prevent cracked tiles?",
+        answer: "An uncoupling membrane (like Schluter-DITRA) absorbs internal shear stresses between the subfloor and the tile layer, preventing seasonal expansion from cracking your porcelain grout lines.",
+      },
+      {
+        question: "Do structural wall modifications require stamped engineer drawings in Toronto?",
+        answer: "Yes. If you remove or alter any load-bearing wall, Toronto Building Services requires architectural files stamped by an Ontario-licensed Professional Engineer (P.Eng).",
+      },
+      {
+        question: "What is the safe distance for electrical outlets near a bathtub under the OESC?",
+        answer: "Under the Ontario Electrical Safety Code (OESC), electrical outlets must be located at least 1 meter away from a bathtub or shower stall, and must be protected by a Class A GFCI circuit.",
+      },
+      {
+        question: "What waterproofing panels are recommended over standard drywall in Toronto showers?",
+        answer: "Section 9.29 of the OBC mandates that walls surrounding showers and tubs must be constructed of water-resistant backings like cement boards or specialized Schluter-KERDI-BOARD.",
+      },
+      {
+        question: "How long is a municipal building permit valid in Toronto?",
+        answer: "A Toronto building permit may be revoked by inspectors under the Building Code Act if construction has not started within 6 months of issuance or if work is suspended for more than 6 months.",
+      },
+      {
+        question: "Is it legal to use corrugated, flexible plastic drain pipes on Toronto bathroom sinks?",
+        answer: "No. Flexible, accordian-style corrugated plastic p-traps are illegal under the Ontario Building Code, as their ridges accumulate grease and hair, violating health standards. Only smooth ABS, PVC, or brass is permitted.",
+      },
+      {
+        question: "What is a plumbing air test during a Toronto renovation?",
+        answer: "An air test involves pressurizing the entire DWV piping system to confirm there are zero joint leaks before sealing the wall cavities with concrete boards or drywall.",
+      },
+      {
+        question: "Does unpermitted bathroom work affect mortgage refinancing in Toronto?",
+        answer: "Yes. GTA bank appraisers who log unpermitted additions can result in mortgage refinance denials or severe home valuation drop deductions until a retroactive municipal permit is resolved.",
+      },
+      {
+        question: "Why are plumbing venting stacks strictly regulated in Toronto?",
+        answer: "Without proper venting, the vacuum caused by draining water will siphon water out of traps. Siphoned traps allow high concentrations of sewer gases to enter your living spaces.",
+      },
+      {
+        question: "Does QuoteXbert match users with licensed, insured general contractors?",
+        answer: "Yes. QuoteXbert works exclusively with background-checked local general contractors and certified trades who hold $2M+ liability coverage and verified business licences.",
+      },
+      {
+        question: "What is the average cost to paint a bathroom in Toronto?",
+        answer: "If painting yourself, materials run under $100. Hiring professional painters in the GTA ranges from $400 to $900 depending on drywall patching requirements and the use of moisture-resistant paints.",
+      },
+      {
+        question: "Can I use standard drywall behind a tiled tub surround in Ontario?",
+        answer: "No. Standard paper-faced drywall is moisture-absorbent and is forbidden by OBC Section 9.29 in shower stalls. Only cement board, glassmat panels, or waterproofing membranes are code-compliant.",
+      },
+      {
+        question: "What is a holdback under the Ontario Construction Act?",
+        answer: "Under Section 22 of the Construction Act, clients must legally hold back 10% of all contract payments for up to 60 days following project completion to protect against subcontractor liens.",
+      },
+      {
+        question: "Is it safe to pay a bathroom contractor cash in exchange for skipping Ontario HST?",
+        answer: "Never pay under-the-table cash. It strips you of warranty claims, voids home insurance liability protections, and leaves you with zero legal recourse under Ontario Consumer Protection laws.",
+      },
+      {
+        question: "What is a progress payment schedule for custom bathroom jobs?",
+        answer: "Progress payment plans divide your total quote into clear milestones: 10% deposit, 30% after demo/rough-in, 30% after drywall/tile prep, 20% after fixtures, and the final 10% after inspection.",
+      },
+      {
+        question: "How close to a vanity sink can an standard wall receptacle be placed in Ontario?",
+        answer: "Under OESC standards, standard wall receptacles placed within 1.5 meters of a vanity sink must be protected by a Class A ground-fault circuit interrupter (GFCI).",
+      },
+      {
+        question: "How heavy can a cast iron bathtub get when filled with water?",
+        answer: "A standard 5-foot cast iron tub weighs ~350 lbs empty. Filled with 40 gallons of water (~330 lbs) and an adult occupant (~180 lbs), the load exceeds 850 lbs, requiring structural joist review.",
+      },
+      {
+        question: "Do bathroom upgrades increase property tax in Toronto?",
+        answer: "Cosmetic updates or full guts within your home's existing footprint do not trigger property tax reassessments by MPAC. Only home extensions adding square footage increase MPAC valuations.",
+      },
+      {
+        question: "What is a wet vent under the Ontario Building Code?",
+        answer: "A wet vent is a single plumbing pipe that serves as both a drain line for one fixture (like a sink) and an air vent stack for an adjacent fixture (like a toilet) to save structural framing space.",
+      },
+      {
+        question: "Can I use PEX plumbing tubing for shower valves in Toronto?",
+        answer: "Yes. Flexible PEX (cross-linked polyethylene) is fully OBC-approved and is widely used for water supply manifolds, saving massive solder joint time compared to copper.",
+      },
+      {
+        question: "Who applies for the municipal plumbing permit, the client or the plumber?",
+        answer: "For permitted jobs, the licensed 306A plumber on record typically submits plumbing drawings and pulls the trade plumbing permit from Toronto Building Services.",
+      },
+      {
+        question: "Does QuoteXbert coordinate municipal inspections in Toronto?",
+        answer: "No. Your hired general builder or structural tradesperson coordinates directly with City of Toronto building inspectors to schedule mandatory rough-in and final checks.",
+      },
+      {
+        question: "What is the best way to handle uncoupling membrane seam joins?",
+        answer: "Tile setters seal uncoupling membrane joins using a 2-inch band of waterproofing strip (like Schluter-KERDI-BAND) laid in unmodified thin-set mortar.",
+      },
+      {
+        question: "Is a curbless walk-in shower possible in older Toronto semi-detached homes?",
+        answer: 'Yes, but it requires cutting and recessing the floor joists or raising the bathroom subfloor. This adds $2,500–$5,500 in custom structural carpentry.',
+      },
+      {
+        question: "Can a homeowner perform their own electrical work in Toronto?",
+        answer: "Yes, under ESA standards, primary homeowners who reside in a single-family dwelling can pull their own owner's electrical permit, but work must still pass standard ESA inspections.",
+      },
+      {
+        question: "What is the typical diameter of a bathroom vanity drain stack in Toronto?",
+        answer: "Under OBC Section 7.2, bathroom siphonic vanity wash basins must drain through a pipe with a minimum diameter of 1.25 inches (32 mm), though 1.5 inches is standard practice.",
+      },
     ],
   },
   {
