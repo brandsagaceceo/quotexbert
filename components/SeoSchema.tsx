@@ -79,14 +79,7 @@ export function SeoSchema({ pageType, title, description, breadcrumbs }: SeoSche
         'priceCurrency': 'CAD',
         'description': 'Free AI estimates for home renovations'
       },
-      'operatingSystem': 'Web',
-      'aggregateRating': {
-        '@type': 'AggregateRating',
-        'ratingValue': '4.8',
-        'ratingCount': '1250',
-        'bestRating': '5',
-        'worstRating': '1'
-      }
+      'operatingSystem': 'Web'
     };
 
     // Create and inject page-specific LocalService schema

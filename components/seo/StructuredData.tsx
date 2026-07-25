@@ -83,12 +83,6 @@ export default function StructuredData({
           closes: "23:59",
         },
       ],
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.8",
-        reviewCount: "247",
-        bestRating: "5",
-      },
     };
   }
 

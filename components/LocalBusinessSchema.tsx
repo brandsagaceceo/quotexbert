@@ -96,13 +96,6 @@ export function LocalBusinessSchema({ googleBusinessUrl }: LocalBusinessSchemaPr
       googleBusinessUrl,
       "https://www.quotexbert.com"
     ] : ["https://www.quotexbert.com"],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "5.0",
-      "ratingCount": "0",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://www.quotexbert.com/create-lead?query={search_term_string}",

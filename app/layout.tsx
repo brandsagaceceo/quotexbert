@@ -239,12 +239,7 @@ export default function RootLayout({
                     { "@type": "City", "name": "Oshawa" },
                     { "@type": "City", "name": "Whitby" },
                     { "@type": "City", "name": "Ajax" }
-                  ],
-                  "aggregateRating": {
-                    "@type": "AggregateRating",
-                    "ratingValue": "5.0",
-                    "reviewCount": "0"
-                  }
+                  ]
                 },
                 {
                   "@type": "WebSite",
@@ -267,8 +262,7 @@ export default function RootLayout({
                   "name": "QuoteXbert AI Renovation Estimator",
                   "applicationCategory": "HomeAndGardenApplication",
                   "operatingSystem": "Web",
-                  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
-                  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "5.0", "ratingCount": "1" }
+                  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" }
                 }
               ]
             })
