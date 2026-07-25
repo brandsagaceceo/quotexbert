@@ -33,25 +33,73 @@ export default function BathroomRenovationCostPage() {
           <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-8 border-2 border-blue-200">
             <h2 className="text-2xl font-black text-slate-900 mb-4 flex items-center gap-2">
               <TrendingUp className="w-7 h-7 text-blue-600" />
-              Average Bathroom Renovation Cost
+              Average Bathroom Renovation Cost (Toronto 2026)
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white rounded-xl p-6 shadow-md">
                 <p className="text-sm font-semibold text-slate-600 mb-2">Basic Refresh</p>
-                <p className="text-3xl font-black text-blue-600">$5K - $10K</p>
-                <p className="text-xs text-slate-500 mt-2">Paint, fixtures, minor updates</p>
+                <p className="text-3xl font-black text-[#800020]">$5,000 - $10,000</p>
+                <p className="text-xs text-slate-500 mt-2">Paint, modern fixtures, minor updates, stock vanities, vinyl/laminate flooring.</p>
               </div>
-              <div className="bg-white rounded-xl p-6 shadow-md border-2 border-rose-400">
+              <div className="bg-white rounded-xl p-6 shadow-md border-2 border-[#800020]">
                 <p className="text-sm font-semibold text-slate-600 mb-2">Mid-Range Remodel</p>
-                <p className="text-3xl font-black text-rose-600">$15K - $25K</p>
-                <p className="text-xs text-slate-500 mt-2">New tile, vanity, tub/shower</p>
+                <p className="text-3xl font-black text-[#800020]">$15,000 - $25,000</p>
+                <p className="text-xs text-slate-500 mt-2">New porcelain tile, quartz countertop vanity, upgraded tub/shower and plumbing fixtures.</p>
               </div>
               <div className="bg-white rounded-xl p-6 shadow-md">
-                <p className="text-sm font-semibold text-slate-600 mb-2">High-End Renovation</p>
-                <p className="text-3xl font-black text-orange-600">$30K - $50K+</p>
-                <p className="text-xs text-slate-500 mt-2">Luxury finishes, layout changes</p>
+                <p className="text-sm font-semibold text-slate-600 mb-2">High-End Ensuite</p>
+                <p className="text-3xl font-black text-[#800020]">$30,000 - $50,000+</p>
+                <p className="text-xs text-slate-500 mt-2">Custom layouts, heated floors, frameless glass rain showers, premium materials, high-end design.</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Local Pricing Comparison Table */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-black text-slate-900 mb-6">Ontario-Specific Cost Benchmarks (2026)</h2>
+          <div className="prose prose-lg max-w-none mb-6">
+            <p>
+              Bathroom renovation costs fluctuate significantly depending on the city, material availability, and regional labour rates. Homeowners in the Greater Toronto Area (GTA) can expect a premium on contracting trades due to demand, while areas outside the core, such as Durham Region, see lower average pricing. Here is a localized cost comparison:
+            </p>
+          </div>
+          <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-[#800020] text-white">
+                <tr>
+                  <th className="text-left p-4 font-bold">Region/City</th>
+                  <th className="text-center p-4 font-bold">Average Mid-Range Cost</th>
+                  <th className="text-right p-4 font-bold">Price Relative to Toronto</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                <tr className="hover:bg-slate-50">
+                  <td className="p-4 font-bold text-slate-900">Toronto (Core GTA)</td>
+                  <td className="p-4 text-center text-slate-800 font-semibold">$18,000 - $25,000</td>
+                  <td className="p-4 text-right text-slate-600 font-semibold">100% (Base City)</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="p-4 font-bold text-slate-900">Mississauga & Brampton</td>
+                  <td className="p-4 text-center text-slate-800 font-semibold">$17,000 - $24,000</td>
+                  <td className="p-4 text-right text-emerald-600 font-semibold">Save 3% - 5%</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="p-4 font-bold text-slate-900">Vaughan & Markham</td>
+                  <td className="p-4 text-center text-slate-800 font-semibold">$18,000 - $25,000</td>
+                  <td className="p-4 text-right text-slate-600 font-semibold">Par with Toronto</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="p-4 font-bold text-slate-900">Whitby, Ajax & Pickering</td>
+                  <td className="p-4 text-center text-slate-800 font-semibold">$16,500 - $22,500</td>
+                  <td className="p-4 text-right text-emerald-600 font-semibold">Save 8% - 10%</td>
+                </tr>
+                <tr className="hover:bg-slate-50">
+                  <td className="p-4 font-bold text-slate-900">Oshawa & Clarington</td>
+                  <td className="p-4 text-center text-slate-800 font-semibold">$15,000 - $21,000</td>
+                  <td className="p-4 text-right text-emerald-600 font-semibold">Save 15% - 20%</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -211,6 +259,36 @@ export default function BathroomRenovationCostPage() {
           </div>
         </section>
 
+        {/* Frequently Asked Questions (FAQ) with Structured Schema */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-black text-slate-900 mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {[
+              {
+                question: "Do I need a permit for a bathroom renovation in Ontario?",
+                answer: "Yes, you generally require a building permit in Ontario if your renovation alters structural walls, relocates plumbing fixtures (such as shifting your toilet or sink layout), or adds new electrical circuits. Purely cosmetic work—such as swapping a standard vanity in the exact same spot, retiling, painting, or modernizing faucets—does not require a permit.",
+              },
+              {
+                question: "What is the ROI on a standard bathroom renovation in the GTA?",
+                answer: "A bathroom renovation stands as one of the highest value-generating improvements a homeowner can perform, consistently recouping 60%–80% of its initial project costs upon immediate property resale. In dense markets like Toronto or Richmond Hill, adding a completely new bathroom to a single-bath home can yield an even higher ROI.",
+              },
+              {
+                question: "Can I remodel a bathroom for under $10,000 in Toronto?",
+                answer: "Yes, a budget under $10,000 allows for an excellent cosmetic refresh. You can repaint walls, reface or buy a builder-grade vanity, reglaze your existing tub rather than replacing it, update lighting, and swap hardware/faucets. However, a full gut trim with customized tile and structural movement will exceed this budget.",
+              },
+              {
+                question: "How long does a typical bathroom renovation take to complete?",
+                answer: "Most bathroom renovations require 2 to 4 weeks. Cosmetic updates can take as little as 5–7 days, whereas full gut remodels, layout changes, custom frameless glass showers, and heated flooring projects require the full 4 weeks of coordination across carpenters, tilers, plumbers, and electricians.",
+              },
+            ].map((faq, index) => (
+              <div key={index} className="bg-slate-50 border-l-4 border-[#800020] p-6 rounded-r-xl">
+                <h3 className="font-bold text-slate-900 text-lg mb-2">💡 {faq.question}</h3>
+                <p className="text-sm text-slate-700 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* CTA to Estimate Tool */}
         <section className="bg-[#800020] rounded-2xl p-10 text-white text-center shadow-2xl">
           <Sparkles className="w-16 h-16 mx-auto mb-4" />
@@ -232,15 +310,93 @@ export default function BathroomRenovationCostPage() {
           </p>
         </section>
 
-        {/* Related Guides */}
+        {/* Related Guides & Internal Clusters */}
+        <section className="mt-12 bg-slate-50 rounded-xl p-8 border border-slate-200">
+          <h3 className="text-2xl font-black text-slate-900 mb-6">Explore Bathroom Renovation Cluster Guides</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link
+              href="/bathroom-renovation-calculator"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                🛁 Bathroom Renovation Calculator →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Get an instant, itemized estimate based on bathroom type, fixtures, and finishes.
+              </p>
+            </Link>
+            
+            <Link
+              href="/bathroom-renovation-permits-ontario"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                📋 Ontario Bathroom Permits Guide →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Learn exactly when you need a municipal permit and how to apply in Ontario.
+              </p>
+            </Link>
+
+            <Link
+              href="/bathroom-renovation-financing-ontario"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                💰 Bathroom Renovation Financing & Grants →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Compare HELOC, renovation loans, and energy-efficiency grants in Ontario.
+              </p>
+            </Link>
+
+            <Link
+              href="/can-i-renovate-my-bathroom-for-10000-ontario"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                📉 Renovating Under $10,000 in Ontario →
+              </h4>
+              <p className="text-sm text-slate-600">
+                What finishes and layouts are realistically possible under a $10K budget.
+              </p>
+            </Link>
+
+            <Link
+              href="/blog/bathroom-renovation-cost-durham-region"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                🚗 Durham Region Bathroom Costs →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Save 15–20% on contracting overhead outside of the core Toronto relative index.
+              </p>
+            </Link>
+
+            <Link
+              href="/who-installs-schluter-shower-systems-near-me"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                💦 Schluter Waterproofing Shower Costs →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Deep dive on premium Schluter-Kerdi membranes and shower prep benchmarks.
+              </p>
+            </Link>
+          </div>
+        </section>
+
+        {/* More Renovation Cost Guides */}
         <section className="mt-12">
-          <h3 className="text-2xl font-black text-slate-900 mb-6">More Renovation Cost Guides</h3>
+          <h3 className="text-2xl font-black text-slate-900 mb-6">More General Renovation Cost Guides</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/renovation-cost/toronto/kitchen"
-              className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border-2 border-slate-200 hover:border-orange-400 transition group"
+              className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border-2 border-slate-200 hover:border-[#800020] transition group"
             >
-              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-orange-600 transition">
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
                 Kitchen Renovation Cost →
               </h4>
               <p className="text-sm text-slate-600">
@@ -249,9 +405,9 @@ export default function BathroomRenovationCostPage() {
             </Link>
             <Link
               href="/renovation-cost/toronto/basement"
-              className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border-2 border-slate-200 hover:border-orange-400 transition group"
+              className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border-2 border-slate-200 hover:border-[#800020] transition group"
             >
-              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-orange-600 transition">
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
                 Basement Renovation Cost →
               </h4>
               <p className="text-sm text-slate-600">
