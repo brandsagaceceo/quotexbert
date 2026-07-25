@@ -177,6 +177,130 @@ const faqs = [
     q: 'How long does it take to get approved for a renovation loan in Ontario?',
     a: 'Credit union and online lender unsecured renovation loans typically approve in 1–5 business days. A HELOC takes 2–6 weeks to set up (home appraisal required if you don\'t already have one). If your project is starting in 3+ weeks, explore a HELOC first. If you need funds in a few days, an unsecured loan from Meridian or EQ Bank is faster.',
   },
+  {
+    q: 'What is deep-seated equity refinancing and how does it apply in Ontario?',
+    a: 'Equity refinancing (refinancing your primary mortgage) allows you to break your existing mortgage term to access up to 80% of your home’s appraised value. This is highly popular for comprehensive $30k+ master ensuite renovations in high-value areas like Richmond Hill, Oakville, and Toronto core.',
+  },
+  {
+    q: "How does Bank of Canada's prime rate affect my monthly bathroom loan payments?",
+    a: "If you use a variable-rated HELOC or variable personal line of credit, your payments will rise or fall in tandem with Bank of Canada prime rate changes. Fixed unsecured renovation loans, however, lock in your exact interest rate for the entire term.",
+  },
+  {
+    q: 'Can a non-owner occupant finance a bathroom remodel in Ontario?',
+    a: "No, traditional bank lines of credit and HELOCs require structural and financial ownership on title. Landlords of rental properties can finance updates, but must utilize dedicated rental property commercial loans or unsecured lines.",
+  },
+  {
+    q: 'Does QuoteXbert offer payment installment schedules?',
+    a: "No, QuoteXbert provides market-calibrated estimates and contractor pairing services. Your physical contract and payment structures are finalized directly with your selected vetted local contractor.",
+  },
+  {
+    q: 'What is a typical payment deposit schedule for an Ontario contractor?',
+    a: "A standard, trusted contractor payment schedule is 10% deposit upon contract signature, 30% upon demolition and rough-in completion, 30% upon drywall and waterproofing approval, 20% upon fixture installation, and the final 10% only after final walkthrough approval.",
+  },
+  {
+    q: 'Are home renovation loans tax-deductible in Ontario?',
+    a: "No. If the bathroom is in your primary personal residence, renovation loan interest is not tax-deductible in Canada. However, if the bathroom is in a registered, active income-producing rental suite, you can claim corresponding interest expenses as rental business costs.",
+  },
+  {
+    q: 'How does the Ontario Clean Energy Improvement Program (CEIP) work?',
+    a: "CEIP is a property-assessed clean energy (PACE) program rolling out in specific Ontario municipalities that allows you to finance energy efficiency upgrades (like high-performance heat pumps and heat-recovery ventilation) via your low-interest municipal property tax bill.",
+  },
+  {
+    q: 'What credit score is required for a credit union reno loan in Ontario?',
+    a: "To qualify for competitive interest rates (5.99% – 9.99%) at local credit unions like Meridian or FirstOntario, you typically need a credit score of 680 or higher, along with a debt service ratio (GDS/TDS) under standard bank thresholds.",
+  },
+  {
+    q: 'Should I pay for my bathroom renovation with my retirement savings (RRSP)?',
+    a: "Generally, no. Withdrawing funds from your Registered Retirement Savings Plan (RRSP) triggers heavy immediate withholding tax penalties and counts as taxable income for that financial year, making a HELOC or credit union loan significantly cheaper.",
+  },
+  {
+    q: 'Is a Home Equity Loan the same thing as a HELOC?',
+    a: "No. A Home Equity Loan delivers a lump-sum check upfront with a fixed payment term and fixed interest rate. A HELOC operates like a credit card, allowing you to draw funds continuously up to a limit and pay interest only on what you actively use.",
+  },
+  {
+    q: 'How does a co-signer help with a bathroom renovation loan application?',
+    a: "If your debt-to-income ratio is high or your credit rating is under 640, adding an Ontario resident co-signer with strong credit credentials blocks risk parameters, helping you qualify for standard interest rate caps rather than subprime lenders.",
+  },
+  {
+    q: 'Are there financial rebates for installing low-flow toilets in Ontario?',
+    a: "Several municipalities across Ontario (such as Peel Region, Toronto, and Waterloo) offer $50 to $100 cash rebates or utility bill credits for replacing old, water-guzzling toilets with certified WaterSense high-efficiency models.",
+  },
+  {
+    q: 'What is the maximum limit on an unsecured line of credit in Canada?',
+    a: "Most major Canadian financial institutions cap unsecured personal lines of credit around $50,000. For master en-suite updates that exceed this amount, home equity-secured lending becomes structurally necessary.",
+  },
+  {
+    q: 'Can I use a second mortgage to pay for structural bathroom reno work?',
+    a: "Yes. Homeowners who cannot qualify for a standard HELOC or refinance due to strict bank underwriting sometimes use a second mortgage. These carry higher interest rates (8% to 15%) plus administrative broker fees, so use with caution.",
+  },
+  {
+    q: 'How does a licensed electrician protect my home insurance during a reno?',
+    a: "Filing an ESA notification of work verified by a licensed electrician guarantees that your electrical upgrades conform to the Ontario Electrical Safety Code. If an uncertified DIY installation causes a fire, insurance adjusters can void home damage policies.",
+  },
+  {
+    q: 'Is it safe to pay a bathroom general contractor in cash?',
+    a: "Never pay a contractor fully in cash without a detailed, printed contract and signed, timestamped receipts. Doing so strips away your legal recourse, nullifies liability protections, and voids any structural warranty coverage.",
+  },
+  {
+    q: 'What is a progress payment clause in a home renovation contract?',
+    a: "This clause protects both parties by tying financial payments directly to verified, inspected physical milestones on-site, ensuring the contractor is never overpaid ahead of work being physically completed.",
+  },
+  {
+    q: 'Are there any grants for senior citizens modifying bathrooms in Ontario?',
+    a: "Yes. The Ontario Seniors Home Safety Tax Credit provides up to a $2,500 tax credit (25% of up to $10,000 in eligible expenses) for Senior citizens to add safety features like grab bars, curbless walk-in showers, and wheelchair access to their bathrooms.",
+  },
+  {
+    q: 'How do peer-to-peer lending sites compare for reno loans in Canada?',
+    a: "Canadian peer-to-peer platforms (like GoPeer) offer fast digital underwriting but carry higher interest rates (8% to 30%) compared to personal lines of credit at your primary bank or member credit unions.",
+  },
+  {
+    q: 'Should I get pre-approved for my bathroom line of credit?',
+    a: "Yes. Securing credit pre-approval gives you a concrete, bulletproof budget boundary before you call contractors, preventing you from wasting time choosing premium materials you cannot afford to finance.",
+  },
+  {
+    q: 'Can a home buyer add a bathroom renovation cost to their new mortgage?',
+    a: "Yes, using a \"Purchase Plus Improvements\" mortgage. This program allows you to fold up to $40,000 of planned renovation costs directly into your primary mortgage loan when purchasing a home in Ontario.",
+  },
+  {
+    q: 'What fees are involved in setting up a HELOC in Ontario?',
+    a: "Typical HELOC setup fees run $500 to $1,000, which includes a professional home property appraisal ($300–$500), lawyers' legal registration fees ($300–$600), and minor administrative search charges.",
+  },
+  {
+    q: 'What happens if a contractor asks for a 50% deposit upfront?',
+    a: "This is a massive red flag. Under Ontario consumer protection standards, a deposit should rarely exceed 10% to 15% of the total contract value. Asking for 50% signifies poor contractor cash flow or high bankruptcy risk.",
+  },
+  {
+    q: 'Does a bathroom renovation require structural engineering review for financing?',
+    a: "Only if the project involves altering the primary floor framing (joists) or removing weight-bearing support studs, in which case banks require a stamped engineer drawing before authorizing a construction loan draw.",
+  },
+  {
+    q: 'How do credit cards with 0% promotional balance transfers work for renos?',
+    a: "Some cards offer 0% interest on balance transfers for 12 months with a 1% to 3% transfer fee. This works perfectly to pay down a mid-range $10,000 reno, but only if you have a guaranteed cash source to pay the full balance before the promo expires and triggers a jump to 19.99%+.",
+  },
+  {
+    q: 'Are there grants for disabled bathroom modifications in Ontario?',
+    a: "Yes. The Home Adaptations for Independence (HAFI) or similar regional housing programs offer forgivable grants of up to $10,000 to assist low-income homeowners with accessibility and lifestyle bathroom adjustments.",
+  },
+  {
+    q: 'What is a holdback under the Ontario Construction Act?',
+    a: "In Ontario, Section 22 of the Construction Act protects clients by legally holding back 10% of every contract payment until the 60-day deadline for subcontractors to file a construction lien on your property has passed.",
+  },
+  {
+    q: 'Does a bathroom gut increase the property tax assessment in Ontario?',
+    a: "A regular cosmetic or mid-range bathroom renovation inside your existing home footprint does not trigger property tax reassessments by MPAC (Municipal Property Assessment Corporation). Only structural extensions or adding brand-new bath space adds to tax valuations.",
+  },
+  {
+    q: 'How does personal loan interest compare to EQ Bank or digital bank loans?',
+    a: "Digital-first banks typically hold lower overhead costs and can offer personal loan rates up to 2% lower than traditional Big 5 branch rates, making them a premium secondary source below HELOCs.",
+  },
+  {
+    q: 'What is a lien and how does unpermitted work affect it?',
+    a: "A lien is a legal claim filed against a home's title by unpaid subcontractors. Unpermitted jobs are high-risk targets because standard builders cannot defend unpermitted work in construction courts.",
+  },
+  {
+    q: 'How do I submit an insurance claim for structural bathroom flood damage?',
+    a: "Notify your broker immediately. They will require photographic evidence, moisture read metrics from emergency remediation crews, and certified plumbing statements describing the root failure cause.",
+  },
 ];
 
 const jsonLd = {
