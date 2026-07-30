@@ -254,6 +254,15 @@ export function StreamlinedEstimateForm({ onEstimateComplete, userId }: Streamli
       result.projectImages = images;
       onEstimateComplete(result);
 
+      // Track Custom EstimateCompleted event for Meta Pixel (Requirement 2)
+      try {
+        const { trackEstimateCompleted } = await import("@/lib/metaPixel");
+        const estimateAmount = result?.totals?.total_high || result?.total || 0;
+        trackEstimateCompleted(estimateAmount, result?.id || `est_${Date.now()}`);
+      } catch (trackErr) {
+        console.error("Meta Pixel EstimateCompleted tracking failed inside StreamlinedEstimateForm:", trackErr);
+      }
+
     } catch (error) {
       console.error("Error generating estimate:", error);
       

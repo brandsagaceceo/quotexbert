@@ -223,6 +223,14 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
       const data = await response.json();
 
       if (data.success) {
+        // Track Lead event in Meta Pixel (Requirement 3)
+        try {
+          const { trackLead } = await import("@/lib/metaPixel");
+          trackLead(postingBudget.toString(), estimate.items[0]?.category || "General Contractor", data.lead?.id || estimate.id);
+        } catch (trackErr) {
+          console.error("Meta Pixel Lead tracking failed on publishing from estimate detail page:", trackErr);
+        }
+
         // Redirect to the job board or applications page
         router.push(`/homeowner/jobs/${data.lead.id}/applications`);
       } else {

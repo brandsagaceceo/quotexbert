@@ -239,6 +239,14 @@ export default function CreateLeadPage() {
       if (result.success) {
         setSuccessMessage("Your project has been posted successfully! Redirecting...");
         
+        // Track Lead event in Meta Pixel (Requirement 3)
+        try {
+          const { trackLead } = await import("@/lib/metaPixel");
+          trackLead(formData.budget || "$5,000", formData.category, result.leadId || `lead_${Date.now()}`);
+        } catch (trackErr) {
+          console.error("Meta Pixel Lead tracking failed:", trackErr);
+        }
+
         // Track Clarity event for successful lead creation
         if (typeof window !== 'undefined' && (window as any).clarity) {
           (window as any).clarity('event', 'lead_created_success', {

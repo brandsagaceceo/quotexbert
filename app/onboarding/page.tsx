@@ -74,6 +74,15 @@ export default function OnboardingPage() {
         throw new Error(data.error || "Failed to update role");
       }
 
+      // Track successful user registration (Meta CompleteRegistration)
+      try {
+        const { trackCompleteRegistration } = await import("@/lib/metaPixel");
+        // Using Clerk userId or roleId derived identifier
+        trackCompleteRegistration(roleId);
+      } catch (trackErr) {
+        console.error("Meta Pixel Registration tracking failed:", trackErr);
+      }
+
       // Mark first login so the profile page shows the onboarding tour
       // Only trigger tour if not already dismissed (versioned key)
       if (localStorage.getItem("quotexbert_onboarding_dismissed_v2") !== "1") {

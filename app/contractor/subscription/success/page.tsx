@@ -24,7 +24,33 @@ export default function SubscriptionSuccess() {
     try {
       const response = await fetch(`/api/contractor/verify-subscription?session_id=${sessionId}`);
       if (response.ok) {
-        await response.json();
+        const data = await response.json();
+        
+        // Track visualizer/standard contractor subscription Purchase event in Meta Pixel on client-side
+        try {
+          const { trackPurchase } = await import("@/lib/metaPixel");
+          // Default price or visualizer subscription price ($6.99) or regular tiered subscription.
+          // Let's inspect session/metadata or contract value. We default to 49 CAD for Handyman if not found.
+          const tierPricing: Record<string, number> = {
+            handyman: 49,
+            renovation: 99,
+            general: 149
+          };
+          
+          let amount = 49;
+          if (data?.tier) {
+            amount = tierPricing[data.tier.toLowerCase()] || 49;
+          } else if (sessionId) {
+            // Visualizer subscription or similar checks
+            if (window.location.search.includes("visualizer")) {
+              amount = 6.99;
+            }
+          }
+          
+          trackPurchase(amount, sessionId);
+        } catch (trackErr) {
+          console.error("Meta Pixel Purchase tracking failed in verification success screen:", trackErr);
+        }
       }
     } catch (error) {
       console.error("Error verifying subscription:", error);

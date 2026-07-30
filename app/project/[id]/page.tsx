@@ -147,6 +147,15 @@ export default function ProjectDetailPage() {
 
       if (response.ok) {
         toast.success("Project posted to job board!");
+        
+        // Track Lead event in Meta Pixel (Requirement 3)
+        try {
+          const { trackLead } = await import("@/lib/metaPixel");
+          trackLead(project.budget || "$5,000", project.category, project.id);
+        } catch (trackErr) {
+          console.error("Meta Pixel Lead tracking failed on publishing from project detail page:", trackErr);
+        }
+
         fetchProject(); // Refresh to get updated status
       } else {
         const data = await response.json();

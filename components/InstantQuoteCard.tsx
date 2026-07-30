@@ -183,6 +183,15 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
         // If the API still sent a usable estimate shape despite non-ok, use it
         if (data?.totals || data?.estimate) {
           onEstimateComplete(data);
+          
+          // Track Custom EstimateCompleted event for Meta Pixel (Requirement 2)
+          try {
+            const { trackEstimateCompleted } = await import("@/lib/metaPixel");
+            const estimateAmount = data?.totals?.total_high || data?.estimate?.totals?.total_high || 0;
+            trackEstimateCompleted(estimateAmount, data?.id || `est_${Date.now()}`);
+          } catch (trackErr) {
+            console.error("Meta Pixel EstimateCompleted tracking failed inside InstantQuoteCard:", trackErr);
+          }
         } else {
           setError(data?.error || "Something went wrong. Please try again.");
           return;
@@ -190,6 +199,15 @@ export function InstantQuoteCard({ onEstimateComplete, userId }: InstantQuoteCar
       }
 
       onEstimateComplete(data);
+
+      // Track Custom EstimateCompleted event for Meta Pixel (Requirement 2)
+      try {
+        const { trackEstimateCompleted } = await import("@/lib/metaPixel");
+        const estimateAmount = data?.totals?.total_high || data?.total || 0;
+        trackEstimateCompleted(estimateAmount, data?.id || `est_${Date.now()}`);
+      } catch (trackErr) {
+        console.error("Meta Pixel EstimateCompleted tracking failed inside InstantQuoteCard (success):", trackErr);
+      }
     } catch (err: any) {
       console.error("Frontend error:", err);
       if (err?.name === 'AbortError') {

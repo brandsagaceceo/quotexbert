@@ -105,6 +105,20 @@ export default function SubscriptionsPage() {
         setActivatingCategories(true);
         // Wait for authUser to be available
         const activate = async (userId: string) => {
+          // Track purchase in Meta Pixel if we have tier pricing
+          try {
+            const { trackPurchase } = await import("@/lib/metaPixel");
+            const tierPricing: Record<string, number> = {
+              handyman: 49,
+              renovation: 99,
+              general: 149
+            };
+            const price = tierPricing[tier || ""] || 49;
+            trackPurchase(price, sessionId);
+          } catch (trackErr) {
+            console.error("Meta Pixel Purchase tracking failed on subscriptions page:", trackErr);
+          }
+
           fetch('/api/subscriptions/activate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

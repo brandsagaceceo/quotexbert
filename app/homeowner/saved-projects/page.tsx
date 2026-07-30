@@ -86,6 +86,14 @@ export default function SavedProjectsPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        // Track Lead event in Meta Pixel (Requirement 3)
+        try {
+          const { trackLead } = await import("@/lib/metaPixel");
+          trackLead(project.budget || "$5,000", project.category, data.lead?.id || project.id);
+        } catch (trackErr) {
+          console.error("Meta Pixel Lead tracking failed on publishing from SavedProjects page handler:", trackErr);
+        }
+
         if (data.alreadyPublished) {
           setMessage(`"${project.title}" is already live on the job board.`);
         } else {

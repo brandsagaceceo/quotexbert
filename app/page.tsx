@@ -206,6 +206,15 @@ export default function Home() {
     setEstimateResult(result);
     trackEstimateComplete(result?.total);
 
+    // Track Custom EstimateCompleted event for Meta Pixel (Requirement 2)
+    try {
+      const { trackEstimateCompleted } = await import("@/lib/metaPixel");
+      const estimateAmount = result?.totals?.total_high || result?.total || 0;
+      trackEstimateCompleted(estimateAmount, result?.id || `est_${Date.now()}`);
+    } catch (trackErr) {
+      console.error("Meta Pixel EstimateCompleted tracking failed on homepage:", trackErr);
+    }
+
     // Mark free estimate as used for unauthenticated visitors
     if (!isSignedIn) {
       localStorage.setItem('estimateUsed', '1');

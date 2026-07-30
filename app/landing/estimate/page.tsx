@@ -96,6 +96,16 @@ export default function LandingEstimatePage() {
   const handleEstimateComplete = (result: any) => {
     setEstimateResult(result);
     trackEstimateCompleted(result?.totals?.total_high, "landing_estimate");
+
+    // Track Custom EstimateCompleted event for Meta Pixel (Requirement 2)
+    try {
+      const { trackEstimateCompleted: trackMetaEstimate } = await import("@/lib/metaPixel");
+      const estimateAmount = result?.totals?.total_high || 0;
+      trackMetaEstimate(estimateAmount, result?.id || `est_${Date.now()}`);
+    } catch (trackErr) {
+      console.error("Meta Pixel EstimateCompleted tracking failed on landing page:", trackErr);
+    }
+
     if (!isSignedIn) {
       localStorage.setItem("estimateUsed", "1");
       setHasUsedFree(true);

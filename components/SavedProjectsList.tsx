@@ -103,6 +103,14 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Track Lead event in Meta Pixel (Requirement 3)
+        try {
+          const { trackLead } = await import("@/lib/metaPixel");
+          trackLead(project.budget || "$5,000", project.category, data.lead?.id || project.id);
+        } catch (trackErr) {
+          console.error("Meta Pixel Lead tracking failed on publishing from SavedProjectsList component:", trackErr);
+        }
+
         await fetchProjects(); // Refresh status before showing modal
         const cityProvince = [data.lead?.city, data.lead?.province].filter(Boolean).join(', ')
           || project.city && [project.city, project.province].filter(Boolean).join(', ')
