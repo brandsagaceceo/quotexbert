@@ -202,7 +202,7 @@ export default function Home() {
     }
   };
 
-  const handleEstimateComplete = (result: any) => {
+  const handleEstimateComplete = async (result: any) => {
     setEstimateResult(result);
     trackEstimateComplete(result?.total);
 

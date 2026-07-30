@@ -93,7 +93,7 @@ export default function LandingEstimatePage() {
 
   const isBlocked = !isSignedIn && hasUsedFree;
 
-  const handleEstimateComplete = (result: any) => {
+  const handleEstimateComplete = async (result: any) => {
     setEstimateResult(result);
     trackEstimateCompleted(result?.totals?.total_high, "landing_estimate");
 
