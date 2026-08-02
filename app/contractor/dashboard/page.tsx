@@ -73,10 +73,10 @@ export default function ContractorDashboard() {
       }
 
       // Fetch recent jobs (last 5)
-      const jobsRes = await fetch("/api/jobs");
+      const jobsRes = await fetch(`/api/jobs?contractorId=${authUser?.id}`);
       const jobsData = await jobsRes.json();
       
-      if (jobsData.success) {
+      if (jobsRes.ok) {
         setRecentJobs(jobsData.jobs.slice(0, 5));
       }
 
@@ -263,8 +263,8 @@ export default function ContractorDashboard() {
               {recentJobs.map((job) => (
                 <Link
                   key={job.id}
-                  href={`/contractor/jobs?highlight=${job.id}`}
-                  className="block p-4 border border-gray-200 rounded-lg hover:border-rose-400 hover:bg-rose-50 transition-colors"
+                  href={job.hasAccess ? `/contractor/jobs?highlight=${job.id}` : "/contractor/subscriptions"}
+                  className={`block p-4 border rounded-lg transition-colors ${job.hasAccess ? 'border-gray-200 hover:border-rose-400 hover:bg-rose-50' : 'border-gray-200 bg-gray-50 hover:border-rose-300'}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -275,18 +275,26 @@ export default function ContractorDashboard() {
                           </span>
                         )}
                         <h3 className="font-semibold text-gray-900 truncate">{job.title}</h3>
+                        {!job.hasAccess && (
+                          <span className="bg-gray-900 text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                            LOCKED
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 flex-wrap">
                         <span>📍 {job.city || job.location || "Location not specified"}</span>
                         {job.budget && <span>💰 {job.budget}</span>}
-                        {job.category && <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-xs">{job.category}</span>}
+                        {job.simpleCategory && <span className="bg-rose-50 text-rose-700 px-2 py-0.5 rounded text-xs">{job.simpleCategory}</span>}
                       </div>
+                      {!job.hasAccess && (
+                        <p className="mt-2 text-xs text-gray-500">Upgrade this category to unlock full details and claim the lead.</p>
+                      )}
                     </div>
                     <div className="text-right flex-shrink-0">
                       <span className="text-xs text-gray-400 block">
                         {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
                       </span>
-                      <span className="text-xs text-rose-600 font-medium mt-1 block">View Job →</span>
+                      <span className="text-xs text-rose-600 font-medium mt-1 block">{job.hasAccess ? 'View Job →' : 'Upgrade →'}</span>
                     </div>
                   </div>
                 </Link>

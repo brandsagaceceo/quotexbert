@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendNewRenovationLeadEmail, sendJobPostedEmail } from '@/lib/email';
+import { sendJobPostedEmail } from '@/lib/email';
+import { NotificationService } from '@/lib/notifications';
 
 export const dynamic = "force-dynamic";
 
@@ -80,114 +81,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Notify all active contractors — no category or subscription filter
+    // Notify matching contractors based on active category entitlements
     try {
-      const contractors = await prisma.user.findMany({
-        where: {
-          role: 'contractor',
-          isActive: true,
-        },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          notifyJobEmail: true,
-          notifyJobInApp: true,
-          contractorProfile: {
-            select: {
-              companyName: true,
-            },
-          },
-        },
+      await NotificationService.notifyAllContractors({
+        leadId: job.id,
+        title,
+        description,
+        budget: typeof budget === 'number' ? budget : null,
+        city: city || undefined,
+        province: undefined,
+        category,
+        createdAt: job.createdAt.toISOString(),
+        isSeeded: job.isSeeded,
       });
-
-      console.log(`[JOB ALERT] Job ${job.id} posted — ${contractors.length} contractors to notify`);
-
-      let inAppCount = 0;
-      let emailCount = 0;
-      let emailFails = 0;
-
-      // Batch prefetch existing LEAD_MATCHED notifications to prevent duplicates
-      const existingNotifications = await prisma.notification.findMany({
-        where: {
-          relatedId: job.id,
-          relatedType: 'job',
-          userId: { in: contractors.map((c) => c.id) },
-        },
-        select: { userId: true },
-      });
-      const alreadyNotified = new Set(existingNotifications.map((n) => n.userId));
-
-      // Batch-create in-app notifications for all contractors not yet notified
-      const needInApp = contractors.filter(
-        (c) => c.notifyJobInApp !== false && !alreadyNotified.has(c.id)
-      );
-      if (needInApp.length > 0) {
-        await prisma.notification.createMany({
-          data: needInApp.map((contractor) => ({
-            userId: contractor.id,
-            type: 'LEAD_MATCHED',
-            title: `New ${category} job available`,
-            message: `${title} in ${zipCode || city || 'your area'}`,
-            relatedId: job.id,
-            relatedType: 'job',
-            payload: {
-              jobId: job.id,
-              jobTitle: title,
-              location: zipCode || city || '',
-              budget: budget,
-              category: category,
-            },
-            read: false,
-          })),
-        });
-        inAppCount = needInApp.length;
-      }
-
-      // Send emails to all contractors who have not opted out
-      const emailPromises = contractors
-        .filter((c) => c.notifyJobEmail !== false)
-        .map(async (contractor) => {
-          try {
-            const emailResult = await sendNewRenovationLeadEmail(
-              {
-                id: contractor.id,
-                email: contractor.email,
-                companyName:
-                  contractor.contractorProfile?.companyName ||
-                  contractor.name ||
-                  'Contractor',
-              },
-              {
-                id: job.id,
-                title,
-                category,
-                city: zipCode || city || '',
-                description,
-              }
-            );
-
-            if (emailResult && (emailResult as any).success === false) {
-              emailFails++;
-              console.warn(
-                `[JOB ALERT] Email not sent for contractor ${contractor.id}: ${(emailResult as any).error}`
-              );
-            } else {
-              emailCount++;
-            }
-          } catch (emailError) {
-            emailFails++;
-            console.error(
-              `[JOB ALERT] Email exception for contractor ${contractor.id}:`,
-              emailError
-            );
-          }
-        });
-
-      await Promise.allSettled(emailPromises);
-      console.log(
-        `[JOB ALERT] Complete — in-app: ${inAppCount}, emails sent: ${emailCount}, email failures: ${emailFails}`
-      );
+      console.log(`[JOB ALERT] NotificationService completed for job ${job.id}`);
 
       // Send homeowner confirmation email
       try {

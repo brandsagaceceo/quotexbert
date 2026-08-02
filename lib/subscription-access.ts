@@ -173,6 +173,32 @@ export async function getAccessibleLeads(contractorId: string) {
   }
 }
 
+export async function getVisibleLeads(contractorId: string) {
+  try {
+    const dbContractorId = await resolveContractorDbId(contractorId);
+    if (!dbContractorId) return [];
+
+    const [activeCategories, leads, user] = await Promise.all([
+      getActiveSubscriptionCategories(dbContractorId),
+      getAllOpenLeads(),
+      prisma.user.findUnique({
+        where: { id: dbContractorId },
+        select: { email: true },
+      }),
+    ]);
+
+    const hasGodAccess = canAccessLeadGod(user?.email);
+
+    return leads.map((lead) => ({
+      ...lead,
+      hasAccess: hasGodAccess || activeCategories.includes(normalizeCategory(lead.category)),
+    }));
+  } catch (error) {
+    console.error('Error fetching visible leads:', error);
+    return [];
+  }
+}
+
 /**
  * Get all open leads regardless of subscription status
  * Contractors can view all leads but only apply to subscribed categories

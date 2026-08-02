@@ -40,4 +40,11 @@ assert.deepEqual(uniqueNormalizedCategories(duplicates), ["Painting"], "duplicat
 const csvMetadata = parseSubscriptionMetadataCategories("painting-interior-exterior,drywall-plastering,flooring-installation-repair");
 assert.deepEqual(csvMetadata, threeCategories, "comma-separated metadata fallback parses all categories");
 
+assert.equal(categoryMatchesEntitlement("plumbing", "Plumbing"), true, "lowercase simple lead category matches legacy simple entitlement");
+assert.equal(categoryMatchesEntitlement("hvac", "HVAC"), true, "lowercase HVAC lead category matches legacy simple entitlement");
+assert.equal(categoryMatchesEntitlement("general-plumbing", "Plumbing"), true, "detailed plumbing category matches legacy simple entitlement");
+assert.equal(categoryMatchesEntitlement("bathroom-renovation", "Renovation"), true, "detailed renovation category matches legacy simple entitlement");
+assert.equal(categoryMatchesEntitlement("general-renovation", "Renovation"), true, "freeform renovation category matches legacy simple entitlement");
+assert.equal(categoryMatchesEntitlement("appliance-repair", "Other"), true, "detailed other category matches legacy simple entitlement");
+
 console.log("subscription-category-access tests passed");

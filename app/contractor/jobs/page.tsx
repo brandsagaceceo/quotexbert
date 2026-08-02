@@ -720,8 +720,8 @@ function ContractorJobsContent() {
                 </button>
                 <div className="text-sm text-gray-600 flex items-center sm:justify-end">
                   {filteredJobs.length === jobs.length
-                    ? `${filteredJobs.length} jobs in your categories`
-                    : `Showing ${filteredJobs.length} of ${jobs.length} matching jobs`}
+                    ? `${filteredJobs.length} visible jobs`
+                    : `Showing ${filteredJobs.length} of ${jobs.length} visible jobs`}
                 </div>
               </div>
             </div>
@@ -771,12 +771,12 @@ function ContractorJobsContent() {
         ) : (
           <div className="grid gap-6">
             {filteredJobs.map((job) => {
-              const _isSubscribed = subscriptions.some(sub =>
+              const _hasAccess = job.hasAccess ?? canAcceptJob(user?.email, subscriptions.some(sub =>
                 normalizeCategory(sub.category) === normalizeCategory(job.category) &&
                 sub.status === 'active' &&
                 sub.canClaimLeads
-              );
-              const _hasAccess = canAcceptJob(user?.email, _isSubscribed);
+              ));
+              const _displayCategory = job.simpleCategory || job.category;
               // For non-subscribers, only show city-level location
               const _displayLocation = _hasAccess
                 ? (job.location || job.zipCode)
@@ -793,7 +793,10 @@ function ContractorJobsContent() {
                     <div className="flex items-center space-x-4 text-sm text-gray-600 flex-wrap gap-2 mb-2">
                       <span className="whitespace-nowrap">📍 {_displayLocation}{!_hasAccess && ' (area only)'}</span>
                       <span className="whitespace-nowrap">💰 {job.budget}</span>
-                      <span className="bg-[#800020]/10 text-[#800020] px-2 py-1 rounded whitespace-nowrap">{job.category}</span>
+                      <span className="bg-[#800020]/10 text-[#800020] px-2 py-1 rounded whitespace-nowrap">{_displayCategory}</span>
+                      {!_hasAccess && (
+                        <span className="bg-gray-900 text-white px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">Locked</span>
+                      )}
                       {/* Match type badge */}
                       {job._matchType === 'exact' && (
                         <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap">⭐ Best Match</span>
@@ -858,14 +861,14 @@ function ContractorJobsContent() {
                     <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
                       <Link href="/contractor/subscriptions"
                         className="bg-[#800020] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all">
-                        Subscribe to {job.category} to unlock
+                        Subscribe to {_displayCategory} to unlock
                       </Link>
                     </div>
                   </div>
                 )}
 
                 {/* Expanded Details */}
-                {expandedJob === job.id && (
+                {_hasAccess && expandedJob === job.id && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                     <h4 className="font-semibold text-gray-800 mb-2">Project Details</h4>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
@@ -876,7 +879,7 @@ function ContractorJobsContent() {
                         <span className="font-medium">Location:</span> {_hasAccess ? (job.location || job.zipCode) : _displayLocation + ' (area only)'}
                       </div>
                       <div>
-                        <span className="font-medium">Category:</span> {job.category}
+                        <span className="font-medium">Category:</span> {_displayCategory}
                       </div>
                       <div>
                         <span className="font-medium">Status:</span> {job.status}
@@ -894,12 +897,21 @@ function ContractorJobsContent() {
                     Posted {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
                   </span>
                   <div className="flex gap-2 flex-wrap">
-                    <button 
-                      onClick={() => toggleJobDetails(job.id)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      {expandedJob === job.id ? 'Hide Details' : 'View Job'}
-                    </button>
+                    {_hasAccess ? (
+                      <button 
+                        onClick={() => toggleJobDetails(job.id)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        {expandedJob === job.id ? 'Hide Details' : 'View Job'}
+                      </button>
+                    ) : (
+                      <Link
+                        href="/contractor/subscriptions"
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Upgrade to Unlock
+                      </Link>
+                    )}
                     {job.status === 'open' && (() => {
                       // Access already computed per card above as _hasAccess
                       return _hasAccess ? (
@@ -922,7 +934,7 @@ function ContractorJobsContent() {
                             href="/contractor/subscriptions"
                             className="text-xs text-rose-600 hover:text-rose-800 underline"
                           >
-                            Subscribe to {job.category}
+                            Subscribe to {_displayCategory}
                           </Link>
                         </div>
                       );

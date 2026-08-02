@@ -1,5 +1,112 @@
 import { prisma } from "@/lib/prisma";
 import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail } from "@/lib/email";
+import { categoryMatchesEntitlement } from "@/lib/subscription-access";
+
+const CLAIMABLE_STATUSES = new Set(["active", "trialing"]);
+const LEAD_NOTIFICATION_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+export type LeadNotificationAccessLevel = "full" | "teaser" | "skip";
+
+export interface LeadNotificationSubscription {
+  category: string;
+  status: string;
+  canClaimLeads: boolean;
+  currentPeriodEnd: Date | null;
+}
+
+export interface LeadNotificationAudience {
+  isActive: boolean;
+  subscriptions: LeadNotificationSubscription[];
+}
+
+export interface LeadNotificationJobDetails {
+  leadId: string;
+  title: string;
+  description: string;
+  budget: number | string | null;
+  city?: string | undefined;
+  province?: string | undefined;
+  category?: string | undefined;
+  createdAt?: string | undefined;
+  isSeeded?: boolean | undefined;
+}
+
+interface LeadNotificationPayload {
+  leadId: string;
+  jobId: string;
+  jobTitle: string;
+  title: string;
+  description: string;
+  budget: number | string | null;
+  city: string;
+  province: string;
+  category: string;
+  createdAt: string;
+  fullAccess: boolean;
+}
+
+function hasCurrentAccessWindow(currentPeriodEnd: Date | null, now = Date.now()): boolean {
+  return !currentPeriodEnd || currentPeriodEnd.getTime() >= now;
+}
+
+export function getLeadNotificationAccess(
+  contractor: LeadNotificationAudience,
+  jobCategory?: string,
+  now = Date.now()
+): LeadNotificationAccessLevel {
+  if (!contractor.isActive) return "skip";
+
+  if (!jobCategory?.trim()) {
+    return "teaser";
+  }
+
+  const hasMatchingEntitlement = contractor.subscriptions.some((subscription) =>
+    subscription.canClaimLeads &&
+    CLAIMABLE_STATUSES.has(subscription.status) &&
+    hasCurrentAccessWindow(subscription.currentPeriodEnd, now) &&
+    categoryMatchesEntitlement(jobCategory, subscription.category)
+  );
+
+  return hasMatchingEntitlement ? "full" : "teaser";
+}
+
+export function buildLeadNotificationPayload(
+  jobDetails: LeadNotificationJobDetails,
+  accessLevel: Exclude<LeadNotificationAccessLevel, "skip">
+): LeadNotificationPayload {
+  const category = jobDetails.category?.trim() || "Home Improvement";
+  const createdAt = jobDetails.createdAt || new Date().toISOString();
+
+  if (accessLevel === "full") {
+    return {
+      leadId: jobDetails.leadId,
+      jobId: jobDetails.leadId,
+      jobTitle: jobDetails.title,
+      title: `New ${category} job available`,
+      description: jobDetails.description.substring(0, 200) + (jobDetails.description.length > 200 ? '...' : ''),
+      budget: jobDetails.budget,
+      city: jobDetails.city || 'Not specified',
+      province: jobDetails.province || '',
+      category,
+      createdAt,
+      fullAccess: true,
+    };
+  }
+
+  return {
+    leadId: jobDetails.leadId,
+    jobId: jobDetails.leadId,
+    jobTitle: jobDetails.title,
+    title: `New ${category} job available`,
+    description: `A new ${category} job was posted. Subscribe to unlock full details and claim this lead.`,
+    budget: null,
+    city: 'Your area',
+    province: '',
+    category,
+    createdAt,
+    fullAccess: false,
+  };
+}
 
 // Email data interface
 interface EmailData {
@@ -138,25 +245,11 @@ export class NotificationService {
   }
 
   /**
-   * Notify ALL active contractors about a new public job post.
-   * Every registered active contractor receives the alert regardless of their
-   * subscription category, tier, or city — maximum awareness at this stage of growth.
-   * Explicit opt-outs (notifyJobEmail: false) are respected.
-   * Duplicate notifications within 24 h for the same lead are suppressed inside create().
+   * Notify all active contractors that new work exists.
+   * Matching, claimable entitlements receive full details; everyone else receives
+   * a teaser alert so available work stays visible without unlocking claim access.
    */
-  static async notifyAllContractors(jobDetails: {
-    leadId: string;
-    title: string;
-    description: string;
-    budget: number | null;
-    city?: string;
-    province?: string;
-    category?: string;
-    /** ISO timestamp — used for urgency labelling in email */
-    createdAt?: string;
-    /** true = demo/seed lead — must never generate visible in-app or email alerts */
-    isSeeded?: boolean;
-  }): Promise<void> {
+  static async notifyAllContractors(jobDetails: LeadNotificationJobDetails): Promise<void> {
     const logTag = `[NOTIFY][${jobDetails.leadId}]`;
 
     if (jobDetails.isSeeded) {
@@ -165,78 +258,124 @@ export class NotificationService {
     }
 
     try {
-      // Fetch ALL active contractors who haven't explicitly opted out of job-alert emails.
-      // No category or subscription filter — every contractor should see every new job.
-      // Use `not: false` instead of `true` to include contractors whose notifyJobEmail is NULL
-      // (accounts created before that column existed, or via direct DB insert).
-      const allContractors = await prisma.user.findMany({
+      const contractors = await prisma.user.findMany({
         where: {
           role: 'contractor',
           isActive: true,
-          notifyJobEmail: { not: false },
         },
         select: {
           id: true,
           email: true,
           name: true,
+          notifyJobEmail: true,
+          notifyJobInApp: true,
+          isActive: true,
           contractorProfile: { select: { companyName: true } },
+          subscriptions: {
+            select: {
+              category: true,
+              status: true,
+              canClaimLeads: true,
+              currentPeriodEnd: true,
+            },
+          },
         },
       });
 
-      // Deduplicate by lowercase email — prevents double delivery if the same address
-      // appears on multiple contractor rows.
-      const seen = new Set<string>();
-      const uniqueContractors = allContractors.filter(c => {
-        if (!c.email) return false;
-        const lower = c.email.toLowerCase();
-        if (seen.has(lower)) return false;
-        seen.add(lower);
-        return true;
-      });
+      const recipients = contractors
+        .map((contractor) => ({
+          contractor,
+          accessLevel: getLeadNotificationAccess(contractor, jobDetails.category),
+        }))
+        .filter((recipient) => recipient.accessLevel !== 'skip');
+
+      const fullRecipients = recipients.filter((recipient) => recipient.accessLevel === 'full');
+      const teaserRecipients = recipients.filter((recipient) => recipient.accessLevel === 'teaser');
 
       console.log(
         `${logTag} New job "${jobDetails.title}" | category=${jobDetails.category || 'none'} | ` +
         `city=${jobDetails.city || 'none'} | province=${jobDetails.province || 'none'} | ` +
-        `Active contractors: ${allContractors.length} | After dedup: ${uniqueContractors.length}`,
+        `Full access: ${fullRecipients.length} | Teaser: ${teaserRecipients.length} | Total recipients: ${recipients.length}`,
       );
 
-      if (uniqueContractors.length === 0) {
-        console.warn(`${logTag} No eligible contractors found — no emails sent`);
+      if (recipients.length === 0) {
+        console.warn(`${logTag} No recipients found — no notifications sent`);
         return;
+      }
+
+      const fullPayload = buildLeadNotificationPayload(jobDetails, 'full');
+      const teaserPayload = buildLeadNotificationPayload(jobDetails, 'teaser');
+
+      const existingNotifications = await prisma.notification.findMany({
+        where: {
+          userId: { in: recipients.map((recipient) => recipient.contractor.id) },
+          type: 'LEAD_MATCHED',
+          createdAt: { gte: new Date(Date.now() - LEAD_NOTIFICATION_DEDUPE_WINDOW_MS) },
+          payload: { path: ['leadId'], equals: jobDetails.leadId },
+        },
+        select: { userId: true },
+      });
+      const alreadyNotified = new Set(existingNotifications.map((notification) => notification.userId));
+
+      const inAppRecipients = recipients.filter(
+        (recipient) => recipient.contractor.notifyJobInApp !== false && !alreadyNotified.has(recipient.contractor.id)
+      );
+
+      if (inAppRecipients.length > 0) {
+        await prisma.notification.createMany({
+          data: inAppRecipients.map((recipient) => {
+            const payload = recipient.accessLevel === 'full' ? fullPayload : teaserPayload;
+            return {
+            userId: recipient.contractor.id,
+            type: 'LEAD_MATCHED',
+            title: payload.title,
+            message: payload.description,
+            relatedId: jobDetails.leadId,
+            relatedType: 'job',
+            payload: payload as any,
+            read: false,
+          };}),
+        });
       }
 
       let successCount = 0;
       let failCount = 0;
 
-      const notificationPromises = uniqueContractors.map(contractor =>
-        this.create({
-          userId: contractor.id,
-          type: 'LEAD_MATCHED',
-          payload: {
-            leadId: jobDetails.leadId,
-            title: jobDetails.title,
-            description: jobDetails.description.substring(0, 200) + (jobDetails.description.length > 200 ? '...' : ''),
-            budget: jobDetails.budget,
-            city: jobDetails.city || 'Not specified',
-            province: jobDetails.province || '',
-            category: jobDetails.category || 'Home Improvement',
-            createdAt: jobDetails.createdAt || new Date().toISOString(),
-          },
-          sendEmail: true,
-          sendSms: false,
-        })
-          .then(() => { successCount++; })
-          .catch(err => {
-            failCount++;
-            // Log the failure without exposing personal contractor data in shared logs
-            console.error(`${logTag} Failed to notify contractor ${contractor.id}: ${err instanceof Error ? err.message : String(err)}`);
-            return null;
-          })
-      );
+      const emailRecipientMap = new Map<string, typeof recipients[number]>();
+      for (const recipient of recipients) {
+        const email = recipient.contractor.email?.toLowerCase();
+        if (!email || recipient.contractor.notifyJobEmail === false) continue;
 
-      await Promise.all(notificationPromises);
+        const existing = emailRecipientMap.get(email);
+        if (!existing || (existing.accessLevel === 'teaser' && recipient.accessLevel === 'full')) {
+          emailRecipientMap.set(email, recipient);
+        }
+      }
+
+      const emailRecipients = Array.from(emailRecipientMap.values());
+      const emailPromises = emailRecipients.map(async (recipient) => {
+        try {
+          await this.sendEmailNotification(
+            {
+              id: recipient.contractor.id,
+              email: recipient.contractor.email,
+              name: recipient.contractor.name,
+              contractorProfile: recipient.contractor.contractorProfile,
+              homeownerProfile: null,
+            },
+            'LEAD_MATCHED',
+            recipient.accessLevel === 'full' ? fullPayload : teaserPayload
+          );
+          successCount++;
+        } catch (err) {
+          failCount++;
+          console.error(`${logTag} Failed to notify contractor ${recipient.contractor.id}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      });
+
+      await Promise.all(emailPromises);
       console.log(
-        `${logTag} Complete | Sent: ${successCount} | Failed: ${failCount} | Total attempted: ${uniqueContractors.length}`,
+        `${logTag} Complete | In-app: ${inAppRecipients.length} | Emails sent: ${successCount} | Failed: ${failCount} | Total recipients: ${recipients.length}`,
       );
     } catch (error) {
       console.error(`${logTag} Critical error in notifyAllContractors:`, error);
@@ -290,6 +429,28 @@ export class NotificationService {
           console.log(`[EMAIL] Skipping job email for ${user.email} — preference disabled`);
           return;
         }
+
+        if (payload.fullAccess === false) {
+          await sendEmailViaResend({
+            to: user.email,
+            subject: `${payload.category || 'New'} job posted on QuoteXbert`,
+            html: buildEmail('New Job Posted on QuoteXbert', [
+              { type: 'tag', content: 'New Job Alert' },
+              { type: 'heading', content: `A new ${payload.category || 'home improvement'} job is live` },
+              { type: 'text', content: 'New homeowner work is available on QuoteXbert. Upgrade this category to unlock full details, submit quotes, and claim the lead.' },
+              {
+                type: 'card',
+                label: 'What you can see now',
+                rawHtml: true,
+                content: `<strong>Category:</strong> ${payload.category || 'Home Improvement'}<br><strong>Access:</strong> Locked until you subscribe to this category`,
+              },
+              { type: 'cta', content: 'View Plans & Unlock Jobs', href: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.quotexbert.com'}/contractor/subscriptions` },
+            ]),
+          });
+          console.log(`EMAIL SENT TO: ${user.email} | type=LEAD_MATCHED | mode=teaser | lead=${payload.leadId}`);
+          return;
+        }
+
         await sendNewJobEmail(
           { id: user.id, email: user.email, name: user.contractorProfile?.companyName || user.name || null },
           {
@@ -297,7 +458,7 @@ export class NotificationService {
             title: payload.title || 'New Job',
             category: payload.category || 'Home Improvement',
             description: typeof payload.description === 'string' ? payload.description : 'A new job matching your services is available.',
-            budget: typeof payload.budget === 'number' ? payload.budget : null,
+            budget: payload.budget !== undefined && payload.budget !== null ? String(payload.budget) : null,
             city: typeof payload.city === 'string' && payload.city !== 'Not specified' ? payload.city : null,
             province: typeof payload.province === 'string' && payload.province !== '' ? payload.province : null,
             createdAt: typeof payload.createdAt === 'string' ? payload.createdAt : null,
