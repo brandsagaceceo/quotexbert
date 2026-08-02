@@ -173,7 +173,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-4 text-rose-200 text-sm font-medium">
               <MapPin className="w-4 h-4" />
-              <Link href={`/renovation-cost/${citySlug}`} className="hover:text-white transition-colors">
+              <Link href="/renovation-costs" className="hover:text-white transition-colors">
                 {city.name}
               </Link>
               <span>/</span>

@@ -107,7 +107,7 @@ export default function ContractorsCityPage({
     }));
 
   const renoTypeLinks = RENOVATION_TYPES.slice(0, 4).map((r) => ({
-    href: `/${r.baseSlug}-cost-toronto`,
+    href: `/${r.baseSlug}`,
     label: `${r.name} Cost Toronto`,
   }));
 

@@ -73,11 +73,11 @@ export default function SiteFooter() {
             {/* Popular cities teaser */}
             <h3 className="text-sm font-bold text-ink-900 mt-6 mb-3 uppercase tracking-wide">Popular Guides</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/renovation-cost/mississauga/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Mississauga</Link></li>
-              <li><Link href="/renovation-cost/oshawa/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Oshawa</Link></li>
-              <li><Link href="/renovation-cost/ajax/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Ajax</Link></li>
-              <li><Link href="/renovation-cost/whitby/basement" className="text-ink-600 hover:text-brand transition-colors">Basements — Whitby</Link></li>
-              <li><Link href="/renovation-cost/scarborough/basement" className="text-ink-600 hover:text-brand transition-colors">Basements — Scarborough</Link></li>
+              <li><Link href="/renovation-cost/mississauga/kitchen-renovation" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Mississauga</Link></li>
+              <li><Link href="/renovation-cost/oshawa/kitchen-renovation" className="text-ink-600 hover:text-brand transition-colors">Kitchens — Oshawa</Link></li>
+              <li><Link href="/renovation-cost/ajax/bathroom-renovation" className="text-ink-600 hover:text-brand transition-colors">Bathrooms — Ajax</Link></li>
+              <li><Link href="/renovation-cost/whitby/basement-finishing" className="text-ink-600 hover:text-brand transition-colors">Basements — Whitby</Link></li>
+              <li><Link href="/renovation-cost/scarborough/basement-finishing" className="text-ink-600 hover:text-brand transition-colors">Basements — Scarborough</Link></li>
             </ul>
           </div>
         </div>
@@ -111,8 +111,8 @@ export default function SiteFooter() {
               <ul className="space-y-1">
                 <li><Link href="/clarington" className="hover:text-brand transition-colors">Clarington</Link></li>
                 <li><Link href="/bowmanville" className="hover:text-brand transition-colors">Bowmanville</Link></li>
-                <li><Link href="/ajax" className="hover:text-brand transition-colors">Newcastle</Link></li>
-                <li><Link href="/durham-region" className="hover:text-brand transition-colors">Courtice</Link></li>
+                <li><Link href="/newcastle" className="hover:text-brand transition-colors">Newcastle</Link></li>
+                <li><Link href="/courtice" className="hover:text-brand transition-colors">Courtice</Link></li>
               </ul>
             </div>
             <div>

@@ -3,6 +3,7 @@ import { GTA_CITIES, RENOVATION_TYPES } from '@/lib/seo/gta-cities'
 import { TORONTO_NEIGHBOURHOODS, TORONTO_SERVICES } from '@/lib/seo/toronto-pinpoint'
 import { ALL_CONTRACTOR_CITY_SLUGS } from '@/lib/seo/contractor-city-data'
 import { ALL_CITY_SLUGS, ALL_TRADE_SLUGS, ALL_COMBO_PARAMS } from '@/lib/seo/contractor-acquisition-data'
+import { blogPostMetadata } from '@/app/blog/blog-metadata'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
@@ -161,16 +162,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
-  // Contractor pages
-  const contractorPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/contractor/jobs`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.65,
-    },
-  ]
-
   // Legal pages
   const legalPages: MetadataRoute.Sitemap = [
     {
@@ -187,74 +178,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // Blog posts (existing + NEW 2026 SEO posts)
-  const blogPosts = [
-    'home-renovation-projects-add-value-toronto-2025',
-    'choose-contractor-toronto-gta-guide',
-    'kitchen-remodel-costs-toronto-gta-2025',
-    'toronto-condo-bathroom-renovation-ideas',
-    'toronto-roofing-repair-replacement-guide',
-    'toronto-seasonal-home-maintenance-checklist',
-    'basement-finishing-toronto-guide-2025',
-    'complete-guide-to-basement-finishing-in-toronto-2025',
-    'kitchen-renovation-costs-in-toronto-gta-2025',
-    'how-to-hire-a-reliable-contractor-in-toronto-2025',
-    'bathroom-remodeling-ideas-for-small-toronto-condos',
-    'toronto-roofing-guide-when-to-repair-vs-replace-your-roof',
-    'hardwood-flooring-installation-in-toronto-types-costs-care',
-    'home-addition-permits-in-toronto-complete-2025-guide',
-    'deck-building-in-toronto-design-ideas-materials-costs',
-    'energy-efficient-home-upgrades-for-toronto-climate',
-    'painting-your-toronto-home-interior-exterior-guide',
-    'toronto-hvac-systems-choosing-the-right-heating-cooling',
-    'waterproofing-your-toronto-basement-prevention-solutions',
-    'landscaping-ideas-for-toronto-yards-climate-appropriate-plants',
-    'window-replacement-in-toronto-types-costs-energy-savings',
-    // NEW 2026 SEO-focused blog posts
-    'bathroom-renovation-cost-toronto-2026',
-    'kitchen-renovation-cost-gta-2026',
-    'why-contractors-overquote-avoid-it-2026',
-    // Programmatic SEO blog posts 2026
-    'average-bathroom-renovation-cost-toronto-2026',
-    'kitchen-renovation-cost-toronto-2026',
-    'how-contractors-get-more-renovation-jobs-toronto',
-    'basement-finishing-cost-ontario-2026',
-    'renovation-mistakes-toronto-homeowners-make',
-    // Existing content blog posts
-    'basement-renovation-pickering-ajax',
-    'bathroom-costs-oshawa-vs-toronto',
-    'deck-building-costs-clarington',
-    'electrical-panel-upgrade-toronto',
-    'hardwood-flooring-cost-toronto',
-    'kitchen-faucet-replacement-cost-toronto',
-    'roof-repair-vs-replacement-gta',
-    'toronto-basement-renovation-complete-guide-2026',
-    'toronto-home-renovation-costs-2026',
-    // Durham Region & Clarington blog posts (NEW)
-    'how-much-do-renovations-cost-in-durham-region',
-    'best-way-to-find-contractors-in-clarington',
-    'how-quotexbert-helps-durham-homeowners-compare-renovation-quotes',
-    'contractor-lead-generation-in-durham-region',
-    'how-oshawa-contractors-can-get-more-renovation-leads',
-    'renovation-pricing-guide-bowmanville-and-newcastle',
-    'quotexbert-vs-traditional-contractor-lead-sites-gta',
-    'why-durham-contractors-should-use-quotexbert-for-local-leads',
-    // NEW Durham Region blog posts
-    'bathroom-renovation-cost-durham-region',
-    'kitchen-renovation-trends-oshawa',
-    'best-flooring-options-ontario-homes',
-    'should-you-finish-your-basement',
-    'top-home-renovation-mistakes',
-    'how-ai-helps-homeowners-avoid-expensive-quotes',
-    'renovation-permits-durham-region',
-    'hiring-contractors-durham-region',
-    'home-renovation-checklist-ontario',
-    'kitchen-vs-bathroom-roi-ontario',
-  ]
-
-  const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map(slug => ({
+  const blogSitemapEntries: MetadataRoute.Sitemap = Object.entries(blogPostMetadata).map(([slug, post]) => ({
     url: `${baseUrl}/blog/${slug}`,
-    lastModified: new Date(),
+    lastModified: new Date(post.publishedAt),
     changeFrequency: 'monthly' as const,
     priority: 0.75,
   }))
@@ -302,11 +228,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'renovation-estimates-ajax',
     'renovation-estimates-whitby',
     'renovation-estimates-oshawa',
-    'renovation-estimates-clarington',
-    'renovation-estimates-courtice',
-    'renovation-estimates-newcastle',
-    'renovation-estimates-bowmanville',
-    'renovation-estimates-port-perry',
     'renovation-estimates-burlington',
     'renovation-estimates-oakville',
     'renovation-estimates-milton',
@@ -377,11 +298,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.78,
   }))
 
-  return [
+  const pages: MetadataRoute.Sitemap = [
     ...locationPages,
     ...torontoPages,
     ...staticPages,
-    ...contractorPages,
     ...affiliateSeoPages,
     ...legalPages,
     ...renovationCostPages,
@@ -511,4 +431,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     },
   ]
+
+  return pages.map((entry) => {
+    if (entry.url.includes('/blog/')) return entry
+
+    const { lastModified: _lastModified, ...page } = entry
+    return page
+  })
 }

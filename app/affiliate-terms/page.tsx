@@ -175,7 +175,7 @@ export default function AffiliateTermsPage() {
               Start earning commissions by referring homeowners and contractors to QuoteXbert!
             </p>
             <a 
-              href="/affiliate-signup" 
+              href="/affiliates"
               className="inline-block bg-rose-700 hover:bg-rose-800 text-white font-semibold px-6 py-3 rounded-lg transition"
             >
               Apply for Affiliate Program
