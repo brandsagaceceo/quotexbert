@@ -107,7 +107,7 @@ export const getEmailTemplate = (type: NotificationType, data: Record<string, an
 
     case 'subscription_payment_receipt':
       return template('QuoteXbert subscription payment confirmed', [
-        { type: 'tag', content: 'Subscription Billing' },
+        { type: 'tag', content: 'Subscription Billing', tone: 'success' },
         { type: 'heading', content: 'QuoteXbert subscription payment confirmed' },
         { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${data.planName || data.plan || 'Contractor Plan'}<br><strong>Amount Charged:</strong> ${data.amountCharged || data.amount || '$0.00 CAD'}<br><strong>Billing Date:</strong> ${data.billingDate || new Date().toLocaleDateString('en-CA')}<br><strong>Renewal Date:</strong> ${data.renewalDate || data.nextBillingDate || 'Available in billing settings'}` },
         { type: 'text', content: 'This receipt is for your QuoteXbert contractor subscription billed through Stripe.' },

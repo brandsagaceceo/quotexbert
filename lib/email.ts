@@ -196,11 +196,12 @@ async function getUserEmail(userId: string): Promise<string | null> {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface EmailBlock {
-  type: 'heading' | 'text' | 'card' | 'cta' | 'tag';
+  type: 'heading' | 'text' | 'card' | 'cta' | 'tag' | 'sectionTitle' | 'infoBox' | 'warningBox' | 'successBox';
   content: string;
   href?: string;    // for 'cta'
   label?: string;   // for 'card' section labels
   rawHtml?: boolean; // skip HTML escaping when content is pre-sanitized
+  tone?: 'default' | 'success'; // 'tag' pill color: burgundy (default) or green for successful billing/payment
 }
 
 /** Escape user-supplied values before injecting into HTML email templates */
@@ -218,25 +219,42 @@ export function buildEmail(
     // templates that compose their own inner HTML). Otherwise, escape by default.
     const c = b.rawHtml ? b.content : escHtml(b.content);
     if (b.type === 'heading') {
-      return `<h1 class="qx-heading" style="margin:0 0 14px;font-size:24px;font-weight:800;color:#111827;line-height:1.2;letter-spacing:-0.02em;">${c}</h1>`;
+      return `<h1 class="qx-heading" style="margin:0 0 18px;font-size:30px;font-weight:800;color:#111111;line-height:1.22;letter-spacing:-0.02em;">${c}</h1>`;
     }
     if (b.type === 'text') {
-      return `<p class="qx-text" style="margin:0 0 16px;font-size:15px;color:#475569;line-height:1.65;">${c}</p>`;
+      return `<p class="qx-text" style="margin:0 0 18px;font-size:16px;color:#4b5563;line-height:1.7;">${c}</p>`;
     }
     if (b.type === 'tag') {
-      return `<span class="qx-tag" style="display:inline-block;background:#fff1f2;color:#9f1239;font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 16px;border:1px solid #fecdd3;">${c}</span>`;
+      // Green pill for successful billing/payment; burgundy for leads, account actions, and general notices.
+      const isSuccess = b.tone === 'success';
+      const tagBg = isSuccess ? '#ecfdf3' : '#fff6f8';
+      const tagColor = isSuccess ? '#067647' : '#800020';
+      const tagBorder = isSuccess ? '#abefc6' : '#f3d6df';
+      return `<span class="qx-tag" style="display:inline-block;background:${tagBg};color:${tagColor};font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 18px;border:1px solid ${tagBorder};">${c}</span>`;
+    }
+    if (b.type === 'sectionTitle') {
+      return `<p class="qx-section-title" style="margin:0 0 12px;font-size:12px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.09em;">${c}</p>`;
     }
     if (b.type === 'card') {
       return `
-        <div class="qx-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:20px 22px;margin:0 0 20px;box-shadow:0 1px 2px rgba(15,23,42,0.04);">
-          ${b.label ? `<p style="margin:0 0 10px;font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em;">${escHtml(b.label)}</p>` : ''}
-          <div style="font-size:15px;color:#334155;line-height:1.65;">${b.rawHtml ? b.content : c}</div>
+        <div class="qx-card" style="background:#F9FAFB;border:1px solid #edf0f3;border-radius:12px;padding:20px 22px;margin:0 0 14px;box-shadow:0 1px 2px rgba(16,24,40,0.04);">
+          ${b.label ? `<p style="margin:0 0 10px;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;">${escHtml(b.label)}</p>` : ''}
+          <div style="font-size:15px;color:#111827;line-height:1.68;">${b.rawHtml ? b.content : c}</div>
         </div>`;
+    }
+    if (b.type === 'infoBox') {
+      return `<div class="qx-note" style="background:#f6f7fb;border:1px solid #dbe3ef;border-radius:12px;padding:16px 18px;margin:0 0 14px;font-size:14px;color:#374151;line-height:1.65;">${b.rawHtml ? b.content : c}</div>`;
+    }
+    if (b.type === 'warningBox') {
+      return `<div class="qx-note" style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:16px 18px;margin:0 0 14px;font-size:14px;color:#9a3412;line-height:1.65;">${b.rawHtml ? b.content : c}</div>`;
+    }
+    if (b.type === 'successBox') {
+      return `<div class="qx-note" style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px 18px;margin:0 0 14px;font-size:14px;color:#166534;line-height:1.65;">${b.rawHtml ? b.content : c}</div>`;
     }
     if (b.type === 'cta') {
       return `
-        <div style="text-align:center;margin:26px 0 10px;">
-          <a class="qx-button" href="${b.href ? escHtml(b.href) : '#'}" style="display:inline-block;background:#800020;color:#ffffff;font-size:16px;font-weight:800;padding:15px 28px;border-radius:12px;text-decoration:none;letter-spacing:-0.01em;box-shadow:0 10px 20px rgba(128,0,32,0.18);">${c}</a>
+        <div class="qx-cta-wrap" style="text-align:center;margin:26px 0 6px;">
+          <a class="qx-button" href="${b.href ? escHtml(b.href) : '#'}" style="display:inline-block;background:#800020;color:#ffffff;font-size:16px;font-weight:800;padding:15px 30px;border-radius:12px;text-decoration:none;letter-spacing:-0.01em;min-width:240px;">${c}</a>
         </div>`;
     }
     return '';
@@ -250,59 +268,56 @@ export function buildEmail(
 <title>${escHtml(subject)}</title>
 <style>
   @media (max-width: 640px) {
-    .qx-shell { padding: 16px 10px !important; }
+    .qx-shell { padding: 12px 10px !important; }
     .qx-container { width: 100% !important; max-width: 100% !important; }
     .qx-header { padding: 22px 18px !important; }
-    .qx-body { padding: 24px 18px 20px !important; }
-    .qx-footer { padding: 18px !important; }
-    .qx-heading { font-size: 22px !important; }
-    .qx-button { display: block !important; width: auto !important; }
-    .qx-card { padding: 18px !important; }
-  }
-  @media (prefers-color-scheme: dark) {
-    body, .qx-shell { background: #0f172a !important; }
-    .qx-body { background: #111827 !important; }
-    .qx-card { background: #1f2937 !important; border-color: #334155 !important; }
-    .qx-heading { color: #f8fafc !important; }
-    .qx-text, .qx-card div { color: #cbd5e1 !important; }
-    .qx-footer { background: #0f172a !important; border-color: #334155 !important; }
+    .qx-body { padding: 26px 18px 20px !important; }
+    .qx-footer { padding: 20px 18px 22px !important; }
+    .qx-heading { font-size: 25px !important; }
+    .qx-button { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
+    .qx-card { padding: 18px 18px !important; }
+    .qx-note { padding: 15px 16px !important; }
+    .qx-cta-wrap { margin: 22px 0 4px !important; }
   }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#111111;">
 <div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0;">${escHtml(subject)} - QuoteXbert</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qx-shell" style="background:#f1f5f9;padding:32px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qx-shell" style="background:#ffffff;padding:20px 10px;">
   <tr><td align="center">
-    <table role="presentation" width="100%" class="qx-container" style="max-width:600px;border-collapse:separate;border-spacing:0;" cellpadding="0" cellspacing="0">
+    <table role="presentation" width="100%" class="qx-container" style="max-width:600px;border-collapse:separate;border-spacing:0;border-radius:16px;box-shadow:0 1px 3px rgba(16,24,40,0.06);" cellpadding="0" cellspacing="0">
 
       <!-- Header -->
-      <tr><td class="qx-header" style="background:#800020;border-radius:18px 18px 0 0;padding:20px 28px;text-align:left;">
+      <tr><td class="qx-header" style="background:#ffffff;border:1px solid #e5e7eb;border-bottom:0;border-radius:16px 16px 0 0;padding:24px 30px 20px;text-align:left;">
         <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-          <td style="vertical-align:middle;padding-right:11px;">
-            <img src="${LOGO_URL}" width="38" height="44" alt="QuoteXbert" style="display:block;border:0;outline:none;text-decoration:none;">
+          <td style="vertical-align:middle;padding-right:12px;">
+            <div style="background:#F9FAFB;border:1px solid #edf0f3;border-radius:10px;padding:8px 10px;display:inline-block;line-height:0;">
+              <img src="${LOGO_URL}" width="34" height="40" alt="QuoteXbert" style="display:block;border:0;outline:none;text-decoration:none;">
+            </div>
           </td>
           <td style="vertical-align:middle;">
-            <div style="font-size:20px;font-weight:900;color:#ffffff;letter-spacing:-0.03em;line-height:1.1;">QuoteXbert</div>
-            <div style="font-size:11px;font-weight:700;color:#fecdd3;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;">Renovation Intelligence</div>
+            <div style="font-size:28px;font-weight:900;color:#111111;letter-spacing:-0.03em;line-height:1.05;">QuoteXbert</div>
+            <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;">Renovation Intelligence</div>
           </td>
         </tr></table>
+        <div style="height:3px;background:linear-gradient(90deg,#800020,#b91c4b);border-radius:99px;margin-top:20px;"></div>
       </td></tr>
 
       <!-- Body -->
-      <tr><td class="qx-body" style="background:#ffffff;padding:32px 34px 26px;">
+      <tr><td class="qx-body" style="background:#ffffff;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:34px 30px 28px;">
         ${renderedBlocks}
       </td></tr>
 
       <!-- Footer -->
-      <tr><td class="qx-footer" style="background:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 18px 18px;padding:20px 32px;text-align:center;">
-        <p style="margin:0 0 8px;font-size:13px;color:#64748b;line-height:1.55;">Need help? Reach us at
-          <a href="mailto:quotexbert@gmail.com" style="color:#9f1239;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
-          or call <a href="tel:9052429460" style="color:#9f1239;text-decoration:none;font-weight:600;">905-242-9460</a>
+      <tr><td class="qx-footer" style="background:#ffffff;border:1px solid #e5e7eb;border-top:0;border-radius:0 0 16px 16px;padding:20px 30px 24px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:13px;color:#6b7280;line-height:1.6;">Need help? Reach us at
+          <a href="mailto:quotexbert@gmail.com" style="color:#800020;text-decoration:none;font-weight:600;">quotexbert@gmail.com</a>
+          or call <a href="tel:9052429460" style="color:#800020;text-decoration:none;font-weight:600;">905-242-9460</a>
         </p>
         <p style="margin:0 0 6px;font-size:12px;">
-          <a href="${BASE_URL}/notifications" style="color:#9f1239;text-decoration:none;font-weight:600;">Manage email preferences</a>${footer?.unsubscribeUrl ? ` &middot; <a href="${footer.unsubscribeUrl}" style="color:#94a3b8;text-decoration:none;">${footer.unsubscribeLabel || 'Unsubscribe'}</a>` : ''}
+          <a href="${BASE_URL}/notifications" style="color:#800020;text-decoration:none;font-weight:600;">Manage email preferences</a>${footer?.unsubscribeUrl ? ` &middot; <a href="${footer.unsubscribeUrl}" style="color:#6b7280;text-decoration:none;">${footer.unsubscribeLabel || 'Unsubscribe'}</a>` : ''}
         </p>
-        <p style="margin:0;font-size:11px;color:#94a3b8;line-height:1.5;">© ${new Date().getFullYear()} QuoteXbert · Toronto, Durham Region & the GTA</p>
+        <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.5;">© ${new Date().getFullYear()} QuoteXbert · Toronto, Durham Region & the GTA</p>
       </td></tr>
 
     </table>
@@ -310,6 +325,47 @@ export function buildEmail(
 </table>
 </body>
 </html>`;
+}
+
+export function sectionTitle(content: string): EmailBlock {
+  return { type: 'sectionTitle', content };
+}
+
+export function infoBox(content: string, rawHtml = false): EmailBlock {
+  return { type: 'infoBox', content, rawHtml };
+}
+
+export function warningBox(content: string, rawHtml = false): EmailBlock {
+  return { type: 'warningBox', content, rawHtml };
+}
+
+export function successBox(content: string, rawHtml = false): EmailBlock {
+  return { type: 'successBox', content, rawHtml };
+}
+
+export function keyValueCard(label: string, rows: Array<{ label: string; value: string }>): EmailBlock {
+  const htmlRows = rows
+    .map((row) => `<tr><td style="padding:4px 0;color:#6b7280;font-size:14px;width:40%;">${escHtml(row.label)}</td><td style="padding:4px 0;color:#111827;font-size:14px;font-weight:600;">${escHtml(row.value)}</td></tr>`)
+    .join('');
+  return {
+    type: 'card',
+    label,
+    rawHtml: true,
+    content: `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">${htmlRows}</table>`,
+  };
+}
+
+export function photoGalleryCard(label: string, urls: string[]): EmailBlock {
+  const images = urls
+    .slice(0, 4)
+    .map((url) => `<td style="padding:4px;"><img src="${escHtml(url)}" alt="Project photo" width="120" style="display:block;width:100%;max-width:120px;border-radius:10px;border:1px solid #e5e7eb;"></td>`)
+    .join('');
+  return {
+    type: 'card',
+    label,
+    rawHtml: true,
+    content: `<table role="presentation" cellpadding="0" cellspacing="0"><tr>${images}</tr></table>`,
+  };
 }
 
 // Email templates
@@ -1381,7 +1437,7 @@ export async function sendSubscriptionCreatedEmail(params: {
       to: contractor.email,
       subject: `✅ Your ${tierLabel} Plan is now active — QuoteXbert`,
       html: buildEmail(`${tierLabel} Plan Activated — QuoteXbert`, [
-        { type: 'tag', content: `${tierLabel} Plan` },
+        { type: 'tag', content: `${tierLabel} Plan`, tone: 'success' },
         { type: 'heading', content: 'Welcome to QuoteXbert Pro!' },
         { type: 'text', content: `Your subscription is active. You can now access leads in your selected categories.` },
         { type: 'card', label: 'Your Categories', rawHtml: true, content: `<ul style="margin:0;padding-left:18px;">${catList}</ul>${moreCount ? `<p style="margin:8px 0 0;font-size:12px;color:#64748b;">${escHtml(moreCount)}</p>` : ''}` },
@@ -1497,7 +1553,7 @@ export async function sendSubscriptionRenewalEmail(params: {
       to: contractor.email,
       subject: 'QuoteXbert subscription payment confirmed',
       html: buildEmail('QuoteXbert subscription payment confirmed', [
-        { type: 'tag', content: 'Subscription Billing' },
+        { type: 'tag', content: 'Subscription Billing', tone: 'success' },
         { type: 'heading', content: 'QuoteXbert subscription payment confirmed' },
         { type: 'card', label: 'Receipt', rawHtml: true, content: `<strong>Plan:</strong> ${escHtml(tierLabel)} Plan<br><strong>Amount Charged:</strong> $${amountPaid.toFixed(2)} CAD<br><strong>Billing Date:</strong> ${escHtml(billingDate)}<br><strong>Renewal Date:</strong> ${escHtml(renewalDate)}` },
         { type: 'cta', content: 'Manage Subscription', href: `${BASE_URL}/contractor/subscriptions` },
