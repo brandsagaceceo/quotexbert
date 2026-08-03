@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: 'AI visualization service is not configured.' },
+        { status: 503 }
+      );
+    }
+    const openai = new OpenAI({ apiKey });
+
     const { description, items, style = 'realistic' } = await request.json();
 
     if (!description) {

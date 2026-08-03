@@ -2,12 +2,20 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: 'AI explanation service is not configured.' },
+        { status: 503 }
+      );
+    }
+    const openai = new OpenAI({ apiKey });
+
     const body = await request.json();
     const { description, minCost, maxCost, items } = body;
 

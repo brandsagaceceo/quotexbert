@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "AI quote service is not configured." },
+        { status: 503 }
+      );
+    }
+    const openai = new OpenAI({ apiKey });
+
     const { jobDescription, category, city, images } = await req.json();
 
     // Build a detailed prompt for AI quote estimation
