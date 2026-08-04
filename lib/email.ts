@@ -97,7 +97,7 @@ async function logEmailEvent(
 ) {
   try {
     await prisma.$executeRaw`
-      INSERT INTO "EmailEvent" (
+      INSERT INTO email_events (
         "id",
         "type",
         "to",
@@ -863,83 +863,18 @@ export async function sendNewJobEmail(
     return { success: false, error: 'Rate limit exceeded' };
   }
 
-  const urgency = getJobUrgencyForEmail(job.createdAt ?? undefined);
-  const cityProvince = [job.city, job.province].filter(
-    (v): v is string => typeof v === 'string' && v.trim() !== '' && v !== 'Not specified'
-  ).join(', ');
-  const displayLocation = cityProvince || job.location || null;
-  const submittedDate = job.createdAt
-    ? new Date(job.createdAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
-    : new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
-  const estimatedProjectValue = job.budget || 'Contact for pricing';
-  const jobDeepLink = `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(job.id)}`;
-
   // Check subscription status so we can tailor CTA for free vs paid contractors
   const isPaid = await contractorHasPaidSubscription(contractor.id).catch(() => false);
 
   try {
-    // Build lead details card HTML
-    const detailRows = [
-      `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;width:38%;">📍 Location</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(displayLocation || 'Available in lead details')}</td></tr>`,
-      `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">🔧 Category</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(job.category)}</td></tr>`,
-      `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">💰 Budget</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(estimatedProjectValue)}</td></tr>`,
-      `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">📅 Posted</td><td style="padding:4px 0;font-size:14px;color:#0f172a;">${escHtml(submittedDate)}</td></tr>`,
-    ].join('');
-
-    const urgencyBadgeHtml = `<div style="display:inline-block;background:#fff1f2;color:#9f1239;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 14px;border:1px solid #fecdd3;">${urgency.emoji} HOT LEAD JUST POSTED NEAR YOU</div>`;
-    const postedTimeHtml = `<p style="margin:0 0 16px;font-size:13px;color:#64748b;font-style:italic;">${urgency.label}</p>`;
-
-    const upgradeBlock = !isPaid ? `
-      <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:14px;padding:18px 20px;margin:20px 0 0;">
-        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#6b21a8;">🔓 Want to claim this lead?</p>
-        <p style="margin:0 0 14px;font-size:13px;color:#475569;line-height:1.6;">This lead is live on the QuoteXbert Job Board. Choose a plan to unlock full access, submit quotes, and start securing projects.</p>
-        <div style="text-align:center;">
-          <a href="${BASE_URL}/contractor/subscriptions" style="display:inline-block;background:#6b21a8;color:#ffffff;font-size:14px;font-weight:800;padding:11px 22px;border-radius:10px;text-decoration:none;">View Plans &amp; Access Jobs →</a>
-        </div>
-      </div>` : '';
-
-    const emailBlocks: EmailBlock[] = [
-      { type: 'heading', rawHtml: true, content: urgencyBadgeHtml + postedTimeHtml + escHtml(job.title) },
-      {
-        type: 'card',
-        rawHtml: true,
-        label: 'Estimated Project Value',
-        content: `<div style="font-size:28px;line-height:1.1;font-weight:900;color:#800020;letter-spacing:-0.03em;">${escHtml(estimatedProjectValue)}</div><p style="margin:6px 0 0;color:#64748b;font-size:12px;">Review the full scope before submitting your quote.</p>`,
-      },
-      {
-        type: 'card',
-        rawHtml: true,
-        label: 'Lead Details',
-        content: `<table style="width:100%;border-collapse:collapse;">${detailRows}</table>`,
-      },
-      {
-        type: 'card',
-        label: 'Homeowner Description',
-        content: job.description.substring(0, 500) + (job.description.length > 500 ? '...' : ''),
-      },
-      { type: 'cta', content: isPaid ? 'View This Job →' : 'View Job Details', href: jobDeepLink },
-      {
-        type: 'text',
-        rawHtml: true,
-        content: `<p style="margin:0 0 0;font-size:12px;color:#94a3b8;text-align:center;">Review the full project details and act before another contractor claims it.</p>${upgradeBlock}`,
-      },
-      {
-        type: 'text',
-        rawHtml: true,
-        content: `<span style="font-size:11px;color:#94a3b8;">You're receiving this as a QuoteXbert contractor. <a href="${BASE_URL}/notifications" style="color:#9f1239;font-weight:700;text-decoration:none;">Manage alerts</a></span>`,
-      },
-    ];
-
-    const emailSubject = cityProvince
-      ? `${urgency.emoji} New ${job.category} job in ${cityProvince} — QuoteXbert`
-      : `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`;
+    const { subject, html } = buildNewJobEmailContent(job, isPaid);
 
     await resend.emails.send({
       from: fromEmail,
       replyTo: REPLY_TO,
       to: contractor.email,
-      subject: emailSubject,
-      html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, emailBlocks),
+      subject,
+      html,
     });
 
     await logEmailEvent('new_job', contractor.email, contractor.id, job.id, undefined, 'sent');
@@ -951,6 +886,171 @@ export async function sendNewJobEmail(
     console.error('[EMAIL] Failed to send job notification:', error);
     return { success: false, error };
   }
+}
+
+/**
+ * Build the subject + HTML for the "new job" contractor email.
+ * Extracted so both the single-send path (sendNewJobEmail) and the batched
+ * bulk-send path (sendBulkEmails, used by NotificationService.notifyAllContractors)
+ * render an identical email without duplicating template markup.
+ */
+export function buildNewJobEmailContent(
+  job: {
+    id: string;
+    title: string;
+    category: string;
+    description: string;
+    budget?: string | null;
+    city?: string | null;
+    province?: string | null;
+    location?: string | null;
+    createdAt?: string | null;
+  },
+  isPaid: boolean
+): { subject: string; html: string } {
+  const urgency = getJobUrgencyForEmail(job.createdAt ?? undefined);
+  const cityProvince = [job.city, job.province].filter(
+    (v): v is string => typeof v === 'string' && v.trim() !== '' && v !== 'Not specified'
+  ).join(', ');
+  const displayLocation = cityProvince || job.location || null;
+  const submittedDate = job.createdAt
+    ? new Date(job.createdAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
+    : new Date().toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+  const estimatedProjectValue = job.budget || 'Contact for pricing';
+  const jobDeepLink = `${BASE_URL}/contractor/jobs?highlight=${encodeURIComponent(job.id)}`;
+
+  // Build lead details card HTML
+  const detailRows = [
+    `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;width:38%;">📍 Location</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(displayLocation || 'Available in lead details')}</td></tr>`,
+    `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">🔧 Category</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(job.category)}</td></tr>`,
+    `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">💰 Budget</td><td style="padding:4px 0;font-size:14px;color:#0f172a;font-weight:600;">${escHtml(estimatedProjectValue)}</td></tr>`,
+    `<tr><td style="padding:4px 0;font-size:14px;color:#64748b;">📅 Posted</td><td style="padding:4px 0;font-size:14px;color:#0f172a;">${escHtml(submittedDate)}</td></tr>`,
+  ].join('');
+
+  const urgencyBadgeHtml = `<div style="display:inline-block;background:#fff1f2;color:#9f1239;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 14px;border:1px solid #fecdd3;">${urgency.emoji} HOT LEAD JUST POSTED NEAR YOU</div>`;
+  const postedTimeHtml = `<p style="margin:0 0 16px;font-size:13px;color:#64748b;font-style:italic;">${urgency.label}</p>`;
+
+  const upgradeBlock = !isPaid ? `
+      <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:14px;padding:18px 20px;margin:20px 0 0;">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#6b21a8;">🔓 Want to claim this lead?</p>
+        <p style="margin:0 0 14px;font-size:13px;color:#475569;line-height:1.6;">This lead is live on the QuoteXbert Job Board. Choose a plan to unlock full access, submit quotes, and start securing projects.</p>
+        <div style="text-align:center;">
+          <a href="${BASE_URL}/contractor/subscriptions" style="display:inline-block;background:#6b21a8;color:#ffffff;font-size:14px;font-weight:800;padding:11px 22px;border-radius:10px;text-decoration:none;">View Plans &amp; Access Jobs →</a>
+        </div>
+      </div>` : '';
+
+  const emailBlocks: EmailBlock[] = [
+    { type: 'heading', rawHtml: true, content: urgencyBadgeHtml + postedTimeHtml + escHtml(job.title) },
+    {
+      type: 'card',
+      rawHtml: true,
+      label: 'Estimated Project Value',
+      content: `<div style="font-size:28px;line-height:1.1;font-weight:900;color:#800020;letter-spacing:-0.03em;">${escHtml(estimatedProjectValue)}</div><p style="margin:6px 0 0;color:#64748b;font-size:12px;">Review the full scope before submitting your quote.</p>`,
+    },
+    {
+      type: 'card',
+      rawHtml: true,
+      label: 'Lead Details',
+      content: `<table style="width:100%;border-collapse:collapse;">${detailRows}</table>`,
+    },
+    {
+      type: 'card',
+      label: 'Homeowner Description',
+      content: job.description.substring(0, 500) + (job.description.length > 500 ? '...' : ''),
+    },
+    { type: 'cta', content: isPaid ? 'View This Job →' : 'View Job Details', href: jobDeepLink },
+    {
+      type: 'text',
+      rawHtml: true,
+      content: `<p style="margin:0 0 0;font-size:12px;color:#94a3b8;text-align:center;">Review the full project details and act before another contractor claims it.</p>${upgradeBlock}`,
+    },
+    {
+      type: 'text',
+      rawHtml: true,
+      content: `<span style="font-size:11px;color:#94a3b8;">You're receiving this as a QuoteXbert contractor. <a href="${BASE_URL}/notifications" style="color:#9f1239;font-weight:700;text-decoration:none;">Manage alerts</a></span>`,
+    },
+  ];
+
+  const subject = cityProvince
+    ? `${urgency.emoji} New ${job.category} job in ${cityProvince} — QuoteXbert`
+    : `${urgency.emoji} New ${job.category} lead near you — QuoteXbert`;
+
+  return { subject, html: buildEmail(`New ${escHtml(job.category)} Lead — QuoteXbert`, emailBlocks) };
+}
+
+/**
+ * Build the subject + HTML for the "teaser" job alert sent to contractors who do
+ * not have a claimable entitlement for the job's category (free / non-matching tiers).
+ */
+export function buildTeaserJobEmailContent(category: string): { subject: string; html: string } {
+  const cat = category || 'Home Improvement';
+  return {
+    subject: `${cat} job posted on QuoteXbert`,
+    html: buildEmail('New Job Posted on QuoteXbert', [
+      { type: 'tag', content: 'New Job Alert' },
+      { type: 'heading', content: `A new ${cat} job is live` },
+      { type: 'text', content: 'New homeowner work is available on QuoteXbert. Upgrade this category to unlock full details, submit quotes, and claim the lead.' },
+      {
+        type: 'card',
+        label: 'What you can see now',
+        rawHtml: true,
+        content: `<strong>Category:</strong> ${escHtml(cat)}<br><strong>Access:</strong> Locked until you subscribe to this category`,
+      },
+      { type: 'cta', content: 'View Plans & Unlock Jobs', href: `${BASE_URL}/contractor/subscriptions` },
+    ]),
+  };
+}
+
+/**
+ * Send many pre-built emails through Resend's batch endpoint (up to 100 per request).
+ *
+ * Firing one HTTP request per recipient with Promise.all exceeded Resend's rate limit
+ * (429), and the SDK returns that error instead of throwing — so those failures were
+ * silently swallowed and contractors received nothing. Batching keeps the whole fan-out
+ * to a single request per 100 recipients, which stays within the rate limit.
+ */
+export async function sendBulkEmails(
+  messages: Array<{ to: string; subject: string; html: string }>
+): Promise<{ sent: number; failed: number; failedTo: Set<string> }> {
+  const failedTo = new Set<string>();
+  if (!resendClient) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping bulk send of', messages.length, 'emails');
+    for (const m of messages) failedTo.add(m.to);
+    return { sent: 0, failed: messages.length, failedTo };
+  }
+
+  let sent = 0;
+  let failed = 0;
+  const CHUNK_SIZE = 100;
+
+  for (let i = 0; i < messages.length; i += CHUNK_SIZE) {
+    const chunk = messages.slice(i, i + CHUNK_SIZE);
+    try {
+      const result = await resendClient.batch.send(
+        chunk.map((m) => ({
+          from: fromEmail,
+          replyTo: REPLY_TO,
+          to: m.to,
+          subject: m.subject,
+          html: m.html,
+          text: htmlToPlainText(m.html),
+        }))
+      );
+      if ((result as any)?.error) {
+        failed += chunk.length;
+        for (const m of chunk) failedTo.add(m.to);
+        console.error('[EMAIL] Bulk send chunk failed:', (result as any).error);
+      } else {
+        sent += chunk.length;
+      }
+    } catch (error) {
+      failed += chunk.length;
+      for (const m of chunk) failedTo.add(m.to);
+      console.error('[EMAIL] Bulk send chunk threw:', error);
+    }
+  }
+
+  return { sent, failed, failedTo };
 }
 // New Message Email
 export async function sendNewMessageEmail(

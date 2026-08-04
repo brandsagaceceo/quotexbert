@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail } from "@/lib/email";
+import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail, buildNewJobEmailContent, buildTeaserJobEmailContent, sendBulkEmails } from "@/lib/email";
 import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
 const CLAIMABLE_STATUSES = new Set(["active", "trialing"]);
@@ -353,27 +353,55 @@ export class NotificationService {
       }
 
       const emailRecipients = Array.from(emailRecipientMap.values());
-      const emailPromises = emailRecipients.map(async (recipient) => {
-        try {
-          await this.sendEmailNotification(
+
+      // Build every contractor job email up front, then dispatch them through Resend's
+      // batch endpoint (one request per 100 recipients). Previously each email was sent
+      // as its own request via Promise.all, which exceeded Resend's rate limit; the SDK
+      // returns a 429 as { error } instead of throwing, so those failures were silently
+      // swallowed and contractors received nothing.
+      const bulkMessages = emailRecipients.map((recipient) => {
+        const category = jobDetails.category || 'Home Improvement';
+        if (recipient.accessLevel === 'full') {
+          const content = buildNewJobEmailContent(
             {
-              id: recipient.contractor.id,
-              email: recipient.contractor.email,
-              name: recipient.contractor.name,
-              contractorProfile: recipient.contractor.contractorProfile,
-              homeownerProfile: null,
+              id: jobDetails.leadId,
+              title: jobDetails.title,
+              category,
+              description: jobDetails.description,
+              budget: jobDetails.budget != null ? String(jobDetails.budget) : null,
+              city: jobDetails.city ?? null,
+              province: jobDetails.province ?? null,
+              createdAt: jobDetails.createdAt ?? null,
             },
-            'LEAD_MATCHED',
-            recipient.accessLevel === 'full' ? fullPayload : teaserPayload
+            true,
           );
-          successCount++;
-        } catch (err) {
-          failCount++;
-          console.error(`${logTag} Failed to notify contractor ${recipient.contractor.id}: ${err instanceof Error ? err.message : String(err)}`);
+          return { to: recipient.contractor.email, subject: content.subject, html: content.html };
         }
+        const teaser = buildTeaserJobEmailContent(category);
+        return { to: recipient.contractor.email, subject: teaser.subject, html: teaser.html };
       });
 
-      await Promise.all(emailPromises);
+      if (bulkMessages.length > 0) {
+        const { sent, failed, failedTo } = await sendBulkEmails(bulkMessages);
+        successCount = sent;
+        failCount = failed;
+
+        // Restore EmailEvent logging (previously broken) so contractor deliveries are auditable.
+        try {
+          await prisma.emailEvent.createMany({
+            data: emailRecipients.map((recipient) => ({
+              type: 'new_job',
+              to: recipient.contractor.email,
+              userId: recipient.contractor.id,
+              relatedJobId: jobDetails.leadId,
+              status: failedTo.has(recipient.contractor.email) ? 'failed' : 'sent',
+            })),
+          });
+        } catch (logErr) {
+          console.error(`${logTag} Failed to log email events: ${logErr instanceof Error ? logErr.message : String(logErr)}`);
+        }
+      }
+
       console.log(
         `${logTag} Complete | In-app: ${inAppRecipients.length} | Emails sent: ${successCount} | Failed: ${failCount} | Total recipients: ${recipients.length}`,
       );

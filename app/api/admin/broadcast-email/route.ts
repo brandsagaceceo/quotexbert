@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
 
         // Log the email event
         await prisma.$executeRaw`
-          INSERT INTO "EmailEvent" ("id","type","to","userId","status","createdAt")
+          INSERT INTO email_events ("id","type","to","userId","status","createdAt")
           VALUES (
             'email_' || substr(md5(random()::text), 1, 16),
             'subscription_broadcast',
