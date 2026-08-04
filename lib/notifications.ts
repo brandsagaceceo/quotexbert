@@ -382,20 +382,25 @@ export class NotificationService {
       });
 
       if (bulkMessages.length > 0) {
-        const { sent, failed, failedTo } = await sendBulkEmails(bulkMessages, { jobId: jobDetails.leadId });
+        const { sent, failed, failedTo, errorByRecipient } = await sendBulkEmails(bulkMessages, { jobId: jobDetails.leadId });
         successCount = sent;
         failCount = failed;
 
         // Restore EmailEvent logging (previously broken) so contractor deliveries are auditable.
         try {
           await prisma.emailEvent.createMany({
-            data: emailRecipients.map((recipient) => ({
-              type: 'new_job',
-              to: recipient.contractor.email,
-              userId: recipient.contractor.id,
-              relatedJobId: jobDetails.leadId,
-              status: failedTo.has(recipient.contractor.email) ? 'failed' : 'sent',
-            })),
+            data: emailRecipients.map((recipient) => {
+              const didFail = failedTo.has(recipient.contractor.email);
+              return {
+                type: 'new_job',
+                to: recipient.contractor.email,
+                userId: recipient.contractor.id,
+                relatedJobId: jobDetails.leadId,
+                status: didFail ? 'failed' : 'sent',
+                // Sanitized, PII-free JSON error for failed sends; null on success.
+                error: didFail ? (errorByRecipient.get(recipient.contractor.email) ?? null) : null,
+              };
+            }),
           });
         } catch (logErr) {
           console.error(`${logTag} Failed to log email events: ${logErr instanceof Error ? logErr.message : String(logErr)}`);

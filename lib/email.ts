@@ -1368,11 +1368,20 @@ function isRateLimitError(err: any): boolean {
   return statusCode === 429 || name.includes('rate_limit') || message.includes('rate limit') || message.includes('too many requests');
 }
 
+/** Build a concise, PII-free JSON string suitable for persisting in EmailEvent.error. */
+function normalizeBatchError(failure: unknown, thrown: boolean, attempts: number): string {
+  const { status, name, message } = describeResendError(failure);
+  const concise = message.length > 300 ? `${message.slice(0, 300)}…` : message;
+  return JSON.stringify({ status, name, message: concise, thrown, attempts });
+}
+
 export async function sendBulkEmails(
   messages: Array<{ to: string; subject: string; html: string }>,
   context: BulkEmailContext = {}
-): Promise<{ sent: number; failed: number; failedTo: Set<string> }> {
+): Promise<{ sent: number; failed: number; failedTo: Set<string>; errorByRecipient: Map<string, string> }> {
   const failedTo = new Set<string>();
+  // Keyed by the exact `to` string used for the send (same key space as failedTo).
+  const errorByRecipient = new Map<string, string>();
   const jobId = context.jobId;
 
   const batchSend = context.batchSend
@@ -1380,8 +1389,12 @@ export async function sendBulkEmails(
 
   if (!batchSend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping bulk send', { jobId, batchSize: messages.length });
-    for (const m of messages) failedTo.add(m.to);
-    return { sent: 0, failed: messages.length, failedTo };
+    const configError = JSON.stringify({ status: null, name: 'not_configured', message: 'RESEND_API_KEY not configured', thrown: false, attempts: 0 });
+    for (const m of messages) {
+      failedTo.add(m.to);
+      errorByRecipient.set(m.to, configError);
+    }
+    return { sent: 0, failed: messages.length, failedTo, errorByRecipient };
   }
 
   const maxRetries = context.maxRetries ?? 4;
@@ -1404,6 +1417,7 @@ export async function sendBulkEmails(
     }));
 
     let delivered = false;
+    let chunkError: string | null = null;
     // Resend's default limit is ~2 requests/second; a job post fires several emails in quick
     // succession, so the contractor batch is frequently throttled with a 429 (returned as
     // { error }, not thrown). ONLY 429/rate-limit failures are retried with exponential backoff;
@@ -1436,6 +1450,7 @@ export async function sendBulkEmails(
         continue;
       }
 
+      chunkError = normalizeBatchError(failure, threw, attempt + 1);
       console.error('[EMAIL] Bulk send failed', {
         jobId, batchSize: chunk.length, attempt: attempt + 1, status, name, message, thrown: threw,
       });
@@ -1444,11 +1459,14 @@ export async function sendBulkEmails(
 
     if (!delivered) {
       failed += chunk.length;
-      for (const m of chunk) failedTo.add(m.to);
+      for (const m of chunk) {
+        failedTo.add(m.to);
+        if (chunkError) errorByRecipient.set(m.to, chunkError);
+      }
     }
   }
 
-  return { sent, failed, failedTo };
+  return { sent, failed, failedTo, errorByRecipient };
 }
 // New Message Email
 export async function sendNewMessageEmail(
