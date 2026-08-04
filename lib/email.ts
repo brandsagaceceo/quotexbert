@@ -1324,15 +1324,69 @@ export function buildTeaserJobEmailContent(category: string): { subject: string;
  * silently swallowed and contractors received nothing. Batching keeps the whole fan-out
  * to a single request per 100 recipients, which stays within the rate limit.
  */
+interface BulkBatchPayload {
+  from: string;
+  replyTo: string;
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}
+
+export interface BulkEmailContext {
+  /** Job/lead id included in structured logs for traceability. */
+  jobId?: string;
+  /** Injectable batch sender (tests); defaults to the module Resend client. */
+  batchSend?: (payload: BulkBatchPayload[]) => Promise<unknown>;
+  /** Base backoff in ms for rate-limit retries. */
+  baseRetryDelayMs?: number;
+  /** Max rate-limit retries per chunk (in addition to the first attempt). */
+  maxRetries?: number;
+}
+
+/** Replace anything that looks like an email address so logs never leak recipients. */
+function redactEmails(input: unknown): string {
+  const text = typeof input === 'string' ? input : (() => {
+    try { return JSON.stringify(input); } catch { return String(input); }
+  })();
+  return (text || '').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]');
+}
+
+function describeResendError(err: any): { status: number | null; name: string; message: string } {
+  return {
+    status: err?.statusCode ?? err?.status ?? null,
+    name: String(err?.name || 'unknown'),
+    message: redactEmails(err?.message ?? err),
+  };
+}
+
+function isRateLimitError(err: any): boolean {
+  if (!err) return false;
+  const statusCode = err.statusCode ?? err.status;
+  const name = String(err.name || '').toLowerCase();
+  const message = String(err.message || '').toLowerCase();
+  return statusCode === 429 || name.includes('rate_limit') || message.includes('rate limit') || message.includes('too many requests');
+}
+
 export async function sendBulkEmails(
-  messages: Array<{ to: string; subject: string; html: string }>
+  messages: Array<{ to: string; subject: string; html: string }>,
+  context: BulkEmailContext = {}
 ): Promise<{ sent: number; failed: number; failedTo: Set<string> }> {
   const failedTo = new Set<string>();
-  if (!resendClient) {
-    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping bulk send of', messages.length, 'emails');
+  const jobId = context.jobId;
+
+  const batchSend = context.batchSend
+    ?? (resendClient ? (payload: BulkBatchPayload[]) => resendClient.batch.send(payload as any) : null);
+
+  if (!batchSend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping bulk send', { jobId, batchSize: messages.length });
     for (const m of messages) failedTo.add(m.to);
     return { sent: 0, failed: messages.length, failedTo };
   }
+
+  const maxRetries = context.maxRetries ?? 4;
+  const baseRetryDelayMs = context.baseRetryDelayMs ?? 600;
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   let sent = 0;
   let failed = 0;
@@ -1340,28 +1394,57 @@ export async function sendBulkEmails(
 
   for (let i = 0; i < messages.length; i += CHUNK_SIZE) {
     const chunk = messages.slice(i, i + CHUNK_SIZE);
-    try {
-      const result = await resendClient.batch.send(
-        chunk.map((m) => ({
-          from: fromEmail,
-          replyTo: REPLY_TO,
-          to: m.to,
-          subject: m.subject,
-          html: m.html,
-          text: htmlToPlainText(m.html),
-        }))
-      );
-      if ((result as any)?.error) {
-        failed += chunk.length;
-        for (const m of chunk) failedTo.add(m.to);
-        console.error('[EMAIL] Bulk send chunk failed:', (result as any).error);
-      } else {
-        sent += chunk.length;
+    const batchPayload: BulkBatchPayload[] = chunk.map((m) => ({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: m.to,
+      subject: m.subject,
+      html: m.html,
+      text: htmlToPlainText(m.html),
+    }));
+
+    let delivered = false;
+    // Resend's default limit is ~2 requests/second; a job post fires several emails in quick
+    // succession, so the contractor batch is frequently throttled with a 429 (returned as
+    // { error }, not thrown). ONLY 429/rate-limit failures are retried with exponential backoff;
+    // permanent errors (invalid address, validation) break immediately. A 429 means nothing was
+    // sent, so retrying the identical batch cannot deliver a duplicate email.
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      let threw = false;
+      let failure: unknown;
+      try {
+        const result = await batchSend(batchPayload);
+        failure = (result as any)?.error ?? undefined;
+      } catch (err) {
+        threw = true;
+        failure = err;
       }
-    } catch (error) {
+
+      if (!failure) {
+        sent += chunk.length;
+        delivered = true;
+        break;
+      }
+
+      const { status, name, message } = describeResendError(failure);
+      if (isRateLimitError(failure) && attempt < maxRetries) {
+        const retryInMs = baseRetryDelayMs * Math.pow(2, attempt);
+        console.warn('[EMAIL] Bulk send rate-limited, retrying', {
+          jobId, batchSize: chunk.length, attempt: attempt + 1, status, name, message, retryInMs, thrown: threw,
+        });
+        await sleep(retryInMs);
+        continue;
+      }
+
+      console.error('[EMAIL] Bulk send failed', {
+        jobId, batchSize: chunk.length, attempt: attempt + 1, status, name, message, thrown: threw,
+      });
+      break;
+    }
+
+    if (!delivered) {
       failed += chunk.length;
       for (const m of chunk) failedTo.add(m.to);
-      console.error('[EMAIL] Bulk send chunk threw:', error);
     }
   }
 

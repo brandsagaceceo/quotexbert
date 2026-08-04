@@ -382,7 +382,7 @@ export class NotificationService {
       });
 
       if (bulkMessages.length > 0) {
-        const { sent, failed, failedTo } = await sendBulkEmails(bulkMessages);
+        const { sent, failed, failedTo } = await sendBulkEmails(bulkMessages, { jobId: jobDetails.leadId });
         successCount = sent;
         failCount = failed;
 
