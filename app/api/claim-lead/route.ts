@@ -14,6 +14,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        { success: false, error: "Payment service is temporarily unavailable." },
+        { status: 503 },
+      );
+    }
+
     const body = await request.json();
     const { leadId, userId } = body;
 

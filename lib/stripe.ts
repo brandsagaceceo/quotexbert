@@ -3,13 +3,33 @@ import { isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
 
 export { isFoundingOfferEnabled } from "@/lib/founding-contractor-config";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set in environment variables. Please configure it in your production environment.");
+const STRIPE_API_VERSION = "2025-08-27.basil";
+
+let stripeSingleton: Stripe | null = null;
+
+// Construct Stripe lazily at request time. Building the client at module load made
+// `next build` page-data collection crash when STRIPE_SECRET_KEY was absent.
+export function getStripe(): Stripe {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("STRIPE_SECRET_KEY is not set in environment variables. Please configure it in your production environment.");
+  }
+  if (!stripeSingleton) {
+    stripeSingleton = new Stripe(secretKey, {
+      apiVersion: STRIPE_API_VERSION,
+      typescript: true,
+    });
+  }
+  return stripeSingleton;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-08-27.basil",
-  typescript: true,
+// Preserve existing `stripe.*` call sites without constructing Stripe at import time.
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop, receiver) {
+    const client = getStripe();
+    const value = Reflect.get(client as unknown as object, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
 });
 
 // Subscription pricing configuration

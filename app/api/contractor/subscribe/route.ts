@@ -2,13 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Use the Stripe library's expected API version literal
-  apiVersion: "2025-08-27.basil",
-});
+let stripeSingleton: Stripe | null = null;
+
+// Construct Stripe lazily at request time so module import does not crash the build.
+function getStripe(): Stripe {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error("STRIPE_SECRET_KEY is not set in environment variables. Please configure it in your production environment.");
+  }
+  if (!stripeSingleton) {
+    stripeSingleton = new Stripe(secretKey, {
+      // Use the Stripe library's expected API version literal
+      apiVersion: "2025-08-27.basil",
+    });
+  }
+  return stripeSingleton;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        { success: false, error: "Payment service is temporarily unavailable." },
+        { status: 503 },
+      );
+    }
+
+    const stripe = getStripe();
+
     const {
       userId,
       categories,

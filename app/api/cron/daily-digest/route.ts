@@ -72,8 +72,11 @@ async function runContractorDigests() {
       // Mirror the same partial city-match heuristic used by
       // NotificationService.notifyAllContractors (lib/notifications.ts) —
       // no location data on either side means "don't filter it out".
+      // Contractors WITHOUT a claimable subscription (categories = []) still receive
+      // the digest showing all recent available jobs — this is the "homeowners are
+      // waiting for quotes" re-engagement email that entices them to subscribe.
       const matchedJobs = candidateJobs
-        .filter((job) => isGod || categories.some((category) => categoryMatchesEntitlement(job.category, category)))
+        .filter((job) => isGod || categories.length === 0 || categories.some((category) => categoryMatchesEntitlement(job.category, category)))
         .filter((job) => {
           if (!contractorCity) return true;
           const jobCity = (job.zipCode || "").toLowerCase().trim();

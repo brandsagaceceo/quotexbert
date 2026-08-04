@@ -213,6 +213,7 @@ export async function POST(
         title: lead.title,
         description: lead.description,
         budget: lead.budget,
+        category: lead.category, // was omitted → all contractors got teaser instead of full
         ...(resolvedCity ? { city: resolvedCity } : {}),
         createdAt: lead.createdAt.toISOString(),
         isSeeded: lead.isSeeded,

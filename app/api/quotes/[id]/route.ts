@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import { sendQuoteReceivedEmail } from "@/lib/email";
+import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from "@/lib/quote-limits";
 
 export async function GET(
   request: NextRequest,
@@ -73,13 +74,28 @@ export async function PUT(
     // Guard: accepted quotes are frozen — prevent accidental overwrites
     const existing = await prisma.quote.findUnique({
       where: { id: quoteId },
-      select: { status: true },
+      select: { status: true, jobId: true, contractorId: true },
     });
     if (existing?.status === 'accepted') {
       return NextResponse.json(
         { error: 'Accepted quotes cannot be modified. Create a revision instead.' },
         { status: 403 }
       );
+    }
+
+    // Enforce the max active-quote cap when a quote is being submitted to the homeowner.
+    // A contractor re-submitting their own already-active quote is never blocked.
+    if (typeof status === 'string' && status.toLowerCase() === 'sent') {
+      const wasActive = ['sent', 'revision_requested', 'accepted'].includes((existing?.status || '').toLowerCase());
+      if (!wasActive && existing?.jobId && existing?.contractorId) {
+        const { allowed, activeCount } = await canSubmitQuote(existing.jobId, existing.contractorId);
+        if (!allowed) {
+          return NextResponse.json(
+            { error: `This project already has ${activeCount} active quotes (max ${MAX_ACTIVE_QUOTES_PER_JOB}). No new quotes can be submitted until a slot opens.` },
+            { status: 409 }
+          );
+        }
+      }
     }
 
     // Update the quote

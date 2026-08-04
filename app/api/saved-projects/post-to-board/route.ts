@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NotificationService } from "@/lib/notifications";
 
 // POST - Convert a saved project to a job board listing
 export async function POST(request: NextRequest) {
@@ -72,6 +73,21 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+
+    // Notify all active contractors about the new job (fire-and-forget — don't block the response).
+    // Previously this path created a published lead but never notified contractors, so jobs
+    // posted from the project page silently reached no one.
+    NotificationService.notifyAllContractors({
+      leadId: lead.id,
+      title: lead.title,
+      description: lead.description,
+      category: lead.category,
+      city: savedProject.location?.split(",")[0]?.trim() || undefined,
+      province: savedProject.location?.split(",")[1]?.trim() || undefined,
+      budget: null,
+      createdAt: lead.createdAt.toISOString(),
+      isSeeded: lead.isSeeded,
+    }).catch((err) => console.error("[post-to-board] notifyAllContractors error:", err));
 
     // Also update the AI estimate if it exists
     if (savedProject.aiEstimateId) {

@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import { sendNotificationEmail, sendBulkNotifications, NotificationType } from '@/lib/email-notifications';
+import { sendNotificationEmail, sendBulkNotifications, NotificationType, getEmailTemplate } from '@/lib/email-notifications';
+import { sendSharedEmail } from '@/lib/email';
 
 export const dynamic = "force-dynamic";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
   .split(',')
   .map((e) => e.trim().toLowerCase());
+
+const TEST_SEND_EMAILS = new Set([
+  'brandsagaceo@gmail.com',
+  'quotexbert@gmail.com',
+]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,6 +97,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const type = url.searchParams.get('type') as NotificationType;
   const preview = url.searchParams.get('preview') === 'true';
+  const requestedTestEmail = (url.searchParams.get('testEmail') || '').trim().toLowerCase();
 
   if (!type) {
     return NextResponse.json(
@@ -128,9 +135,8 @@ export async function GET(request: NextRequest) {
 
     if (preview) {
       // Return HTML preview - Import dynamically to avoid issues
-      const emailLib = await import('@/lib/email-notifications');
-      const template = emailLib.getEmailTemplate ? 
-        emailLib.getEmailTemplate(type, sampleData) : 
+      const template = getEmailTemplate ? 
+        getEmailTemplate(type, sampleData) : 
         { html: '<p>Email template not available</p>' };
       
       return new NextResponse(template.html, {
@@ -138,16 +144,50 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Send test email
-    const success = await sendNotificationEmail({
-      to: 'test@example.com',
-      type,
-      data: sampleData
+    const authResult = await auth();
+    if (!authResult.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const caller = await prisma.user.findFirst({
+      where: { OR: [{ id: authResult.userId }, { clerkUserId: authResult.userId }] },
+      select: { email: true },
+    });
+    if (!caller || !ADMIN_EMAILS.includes(caller.email.toLowerCase())) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
+    if (!requestedTestEmail) {
+      return NextResponse.json(
+        {
+          error: 'Missing testEmail query parameter',
+          allowed: Array.from(TEST_SEND_EMAILS),
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!TEST_SEND_EMAILS.has(requestedTestEmail)) {
+      return NextResponse.json(
+        {
+          error: 'testEmail must be an internal allowlisted address',
+          allowed: Array.from(TEST_SEND_EMAILS),
+        },
+        { status: 400 }
+      );
+    }
+
+    const template = getEmailTemplate(type, sampleData);
+    const success = await sendSharedEmail({
+      to: requestedTestEmail,
+      subject: `[TEST] ${template.subject}`,
+      html: template.html,
+      text: template.text,
     });
 
     return NextResponse.json({
-      success,
-      message: success ? 'Test email sent' : 'Failed to send test email',
+      success: success.success,
+      testSentTo: requestedTestEmail,
+      message: success.success ? 'Internal test email sent' : 'Failed to send internal test email',
       sampleData
     });
 

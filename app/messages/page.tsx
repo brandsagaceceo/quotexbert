@@ -129,6 +129,12 @@ export default function MessagesPage() {
   // Quote polling — clears when bridge conversation changes or thread is deselected
   const quotePollRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Keyboard-aware shell sizing — keeps header/composer visible when the mobile keyboard opens.
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [shellHeight, setShellHeight] = useState<string>(
+    'calc(100dvh - var(--header-height, 64px) - var(--bottom-nav-height, 44px))',
+  );
+
   // Select a thread and optimistically clear its unread badge
   const selectThread = (thread: Thread) => {
     if (process.env.NODE_ENV === 'development') {
@@ -175,39 +181,42 @@ export default function MessagesPage() {
     }
   }, [user]);
 
-  // Auto-select thread from URL parameter (?threadId= or ?leadId=)
+  // Auto-select the conversation referenced by a notification/email deep link.
+  // Accepts ?threadId=, ?leadId=, or ?conversationId=. Some legacy emails put a
+  // Conversation.id in the threadId slot, so any id that doesn't match a Thread
+  // directly is resolved through the Conversation → jobId → Thread bridge.
+  // No `selectedThread` guard: clicking a second notification always switches.
   useEffect(() => {
+    if (threads.length === 0) return;
+
     const threadId = searchParams.get('threadId');
     const leadId = searchParams.get('leadId');
-
-    if (threads.length > 0) {
-      const targetThread = threadId
-        ? threads.find(thread => thread.id === threadId)
-        : leadId
-          ? threads.find(thread => thread.lead.id === leadId)
-          : null;
-
-      if (targetThread) {
-        selectThread(targetThread);
-      }
-    }
-  }, [threads, searchParams]);
-
-  // Phase B: Handle ?conversationId= URL param — legacy notification links.
-  // Looks up the Conversation's jobId, then finds the matching Thread.
-  // Runs separately from the threadId/leadId effect so it doesn't interfere.
-  useEffect(() => {
     const conversationId = searchParams.get('conversationId');
-    if (!conversationId || threads.length === 0 || selectedThread) return;
 
-    fetch(`/api/conversations/${encodeURIComponent(conversationId)}`)
+    if (threadId) {
+      const direct = threads.find(thread => thread.id === threadId);
+      if (direct) { selectThread(direct); return; }
+    }
+    if (leadId) {
+      const byLead = threads.find(thread => thread.lead.id === leadId);
+      if (byLead) { selectThread(byLead); return; }
+    }
+
+    // Resolve an explicit conversationId, or a threadId that was actually a
+    // Conversation.id, to its Thread via the bridge lookup.
+    const idToResolve = conversationId || threadId;
+    if (!idToResolve) return;
+
+    let cancelled = false;
+    fetch(`/api/conversations/${encodeURIComponent(idToResolve)}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (!data?.jobId) return;
+        if (cancelled || !data?.jobId) return;
         const match = threads.find(t => t.lead.id === data.jobId);
         if (match) selectThread(match);
       })
       .catch(() => { /* non-critical — user lands on /messages without auto-select */ });
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threads, searchParams]);
 
@@ -217,12 +226,38 @@ export default function MessagesPage() {
   // Restored automatically when the thread is closed or this page unmounts.
   useEffect(() => {
     if (!selectedThread) return;
+    // Only lock on mobile — on desktop, hiding the page scrollbar shifts layout width (visible "jump").
+    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) return;
     const original = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = original;
     };
   }, [selectedThread]);
+
+  // Keyboard-aware height: size the shell to the visible viewport so the composer
+  // stays above the on-screen keyboard instead of being pushed below it.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const vv = window.visualViewport;
+    const el = shellRef.current;
+    if (!vv || !el) return;
+    const apply = () => {
+      const top = el.getBoundingClientRect().top;
+      // Bottom nav is mobile-only (md:hidden); reserve its height only below the md breakpoint.
+      const navPx = window.matchMedia('(min-width: 768px)').matches ? 0 : 44;
+      setShellHeight(`${Math.max(320, Math.round(vv.height - top - navPx))}px`);
+    };
+    apply();
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
+    window.addEventListener('orientationchange', apply);
+    return () => {
+      vv.removeEventListener('resize', apply);
+      vv.removeEventListener('scroll', apply);
+      window.removeEventListener('orientationchange', apply);
+    };
+  }, []);
 
   // Phase 2: Bridge + quotes — runs whenever the selected thread changes.
   // Calls the bridge API to find/create a Conversation for this Thread's lead,
@@ -508,9 +543,10 @@ export default function MessagesPage() {
 
   return (
     <div
+      ref={shellRef}
       className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 flex flex-col overflow-hidden"
       style={{
-        height: 'calc(100dvh - var(--header-height, 64px) - var(--bottom-nav-height, 72px))',
+        height: shellHeight,
         minHeight: '400px',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}

@@ -77,7 +77,7 @@ export async function POST(
       }),
       prisma.user.findFirst({
         where: { OR: [{ id: toUserId }, { clerkUserId: toUserId }] },
-        select: { id: true, name: true, email: true },
+        select: { id: true, name: true, email: true, notifyMessageEmail: true },
       }),
     ]);
 
@@ -171,24 +171,26 @@ export async function POST(
       }
     });
 
-    // Send email notification to recipient
-    try {
-      const { sendNewMessageEmail } = await import('@/lib/email');
-      await sendNewMessageEmail(
-        {
-          id: newMessage.toUser.id,
-          email: newMessage.toUser.email,
-          name: newMessage.toUser.contractorProfile?.companyName || newMessage.toUser.homeownerProfile?.name || newMessage.toUser.name
-        },
-        {
-          name: senderName
-        },
-        message.substring(0, 100),
-        threadId
-      );
-    } catch (emailError) {
-      console.error('Failed to send email notification:', emailError);
-      // Don't fail the request if email fails
+    // Send email notification to recipient (skipped if they opted out)
+    if (toUser.notifyMessageEmail !== false) {
+      try {
+        const { sendNewMessageEmail } = await import('@/lib/email');
+        await sendNewMessageEmail(
+          {
+            id: newMessage.toUser.id,
+            email: newMessage.toUser.email,
+            name: newMessage.toUser.contractorProfile?.companyName || newMessage.toUser.homeownerProfile?.name || newMessage.toUser.name
+          },
+          {
+            name: senderName
+          },
+          message.substring(0, 100),
+          threadId
+        );
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // Don't fail the request if email fails
+      }
     }
 
     // Track analytics — always log resolved DB IDs

@@ -88,6 +88,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const mode: 'dry' | 'live' = body.mode === 'live' ? 'live' : 'dry';
 
+    if (mode === 'live' && body.confirmLive !== 'SEND_LIVE_EMAILS') {
+      return NextResponse.json(
+        {
+          error: 'Live mode requires explicit confirmation',
+          required: 'confirmLive=SEND_LIVE_EMAILS',
+        },
+        { status: 400 }
+      );
+    }
+
     // Fetch all active contractors who haven't explicitly opted out of email communications
     const contractors = await prisma.user.findMany({
       where: {

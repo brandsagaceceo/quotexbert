@@ -15,6 +15,9 @@ const baseUrl = BASE_URL;
 const REPLY_TO = 'quotexbert@gmail.com';
 const CONTRACTOR_ONBOARDING_CAMPAIGN = 'contractor_onboarding_offer';
 const CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN = 'contractor_onboarding_offer_reminder';
+export const CONTRACTOR_ACCOUNT_WELCOME_PHASE1_VARIANT = 'contractor-account-welcome-phase1-2026';
+export const CONTRACTOR_ACCOUNT_WELCOME_SUBJECT = 'Welcome to QuoteXbert — your contractor account is ready';
+export const CONTRACTOR_ACCOUNT_WELCOME_PREHEADER = 'Complete your profile and start browsing local homeowner projects.';
 const LOGO_URL = `${BASE_URL}/logo.svg`;
 
 function htmlToPlainText(html: string): string {
@@ -637,6 +640,267 @@ export function buildContractorOfferBlocks(isReminder = false, isPaid = false): 
   return [heroBlock, divider, featureCard, projectTypesCard, urgencyBlock, subscriptionBlock];
 }
 
+export const CONTRACTOR_JOB_BOARD_OFFER_CAMPAIGN = 'contractor-job-board-99-cent-offer-2026';
+export const CONTRACTOR_JOB_BOARD_OFFER_SUBJECT = 'Homeowner jobs are waiting — your first month is only $0.99';
+export const CONTRACTOR_JOB_BOARD_OFFER_ALTERNATIVE_SUBJECT = 'Your QuoteXbert contractor account is ready';
+export const CONTRACTOR_JOB_BOARD_OFFER_PREHEADER = 'Browse local homeowner projects and unlock the categories you want to work in.';
+
+export interface ContractorJobBoardOfferRecipient {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
+  isActive: boolean;
+  notifyMarketingEmail: boolean;
+  subscriptionStatus: string | null;
+  subscriptions: Array<{
+    status: string;
+    monthlyPrice: number;
+    currentPeriodEnd: Date | null;
+  }>;
+}
+
+export interface ContractorJobBoardOfferCounts {
+  eligible: number;
+  missingEmail: number;
+  invalidEmail: number;
+  inactive: number;
+  wrongRole: number;
+  internalAccount: number;
+  marketingOptOut: number;
+  activePaidSubscription: number;
+  duplicateCampaignRecipient: number;
+  alreadySentCampaign: number;
+}
+
+export interface ContractorJobBoardOfferPlan {
+  recipients: Array<{ id: string; email: string; name: string | null }>;
+  counts: ContractorJobBoardOfferCounts;
+}
+
+const CONTRACTOR_JOB_BOARD_OFFER_INTERNAL_EMAILS = new Set([
+  'brandsagaceo@gmail.com',
+  'quotexbert@gmail.com',
+]);
+
+function isInternalOrStaffAccountEmail(email: string): boolean {
+  const normalized = email.trim().toLowerCase();
+  if (CONTRACTOR_JOB_BOARD_OFFER_INTERNAL_EMAILS.has(normalized)) return true;
+  if (normalized.endsWith('@quotexbert.com')) return true;
+  if (isUnlimitedTestContractor(normalized)) return true;
+  return false;
+}
+
+function isValidCampaignEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+function hasCurrentAccessWindowForCampaign(currentPeriodEnd: Date | null): boolean {
+  return !currentPeriodEnd || currentPeriodEnd.getTime() >= Date.now();
+}
+
+function hasPaidSubscriptionForCampaign(recipient: ContractorJobBoardOfferRecipient): boolean {
+  if (["active", "trialing"].includes(recipient.subscriptionStatus || "")) {
+    return true;
+  }
+
+  return recipient.subscriptions.some((subscription) => {
+    return (
+      ["active", "trialing"].includes(subscription.status) &&
+      subscription.monthlyPrice > 0 &&
+      hasCurrentAccessWindowForCampaign(subscription.currentPeriodEnd)
+    );
+  });
+}
+
+export function planContractorJobBoardOfferRecipients(
+  contractors: ContractorJobBoardOfferRecipient[],
+  alreadySentRecipientKeys = new Set<string>()
+): ContractorJobBoardOfferPlan {
+  const counts: ContractorJobBoardOfferCounts = {
+    eligible: 0,
+    missingEmail: 0,
+    invalidEmail: 0,
+    inactive: 0,
+    wrongRole: 0,
+    internalAccount: 0,
+    marketingOptOut: 0,
+    activePaidSubscription: 0,
+    duplicateCampaignRecipient: 0,
+    alreadySentCampaign: 0,
+  };
+
+  const recipients: Array<{ id: string; email: string; name: string | null }> = [];
+  const seenEmails = new Set<string>();
+
+  for (const contractor of contractors) {
+    if (contractor.role !== 'contractor') {
+      counts.wrongRole++;
+      continue;
+    }
+
+    if (!contractor.isActive) {
+      counts.inactive++;
+      continue;
+    }
+
+    if (!contractor.email) {
+      counts.missingEmail++;
+      continue;
+    }
+
+    const normalizedEmail = contractor.email.trim().toLowerCase();
+    if (!isValidCampaignEmail(normalizedEmail)) {
+      counts.invalidEmail++;
+      continue;
+    }
+
+    if (isInternalOrStaffAccountEmail(normalizedEmail)) {
+      counts.internalAccount++;
+      continue;
+    }
+
+    if (!contractor.notifyMarketingEmail) {
+      counts.marketingOptOut++;
+      continue;
+    }
+
+    if (hasPaidSubscriptionForCampaign(contractor)) {
+      counts.activePaidSubscription++;
+      continue;
+    }
+
+    if (alreadySentRecipientKeys.has(normalizedEmail) || alreadySentRecipientKeys.has(contractor.id)) {
+      counts.alreadySentCampaign++;
+      continue;
+    }
+
+    if (seenEmails.has(normalizedEmail)) {
+      counts.duplicateCampaignRecipient++;
+      continue;
+    }
+
+    seenEmails.add(normalizedEmail);
+    counts.eligible++;
+    recipients.push({ id: contractor.id, email: normalizedEmail, name: contractor.name });
+  }
+
+  return { recipients, counts };
+}
+
+export function buildContractorJobBoardOfferHtml(params: {
+  firstName?: string | null;
+  availableJobCount?: number | null;
+  unsubscribeUserId: string;
+}): string {
+  const firstName = params.firstName?.trim() || 'there';
+  const availableJobCount =
+    typeof params.availableJobCount === 'number' && Number.isFinite(params.availableJobCount)
+      ? Math.max(0, Math.floor(params.availableJobCount))
+      : null;
+  const jobCountLine = availableJobCount !== null
+    ? `There are currently ${availableJobCount} open homeowner projects on the QuoteXbert Job Board.`
+    : 'Homeowners are actively posting local projects on the QuoteXbert Job Board.';
+
+  return buildEmail(CONTRACTOR_JOB_BOARD_OFFER_SUBJECT, [
+    { type: 'tag', content: 'Contractor Account Ready' },
+    { type: 'heading', content: `Hi ${firstName},` },
+    { type: 'text', content: 'Thanks for joining QuoteXbert.' },
+    { type: 'text', content: 'Your contractor account is active, and homeowners are posting renovation and home-service projects on the QuoteXbert Job Board.' },
+    { type: 'text', content: jobCountLine },
+    { type: 'text', content: 'You can browse available opportunities for free and see the types of projects being posted in your area.' },
+    { type: 'text', content: 'To unlock the full project details and accept a homeowner job, activate a subscription for the category that matches your services.' },
+    { type: 'text', content: 'For a limited time, your first month is only $0.99.' },
+    {
+      type: 'card',
+      label: 'With an active category subscription, you can unlock:',
+      rawHtml: true,
+      content:
+        '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Full project descriptions</li><li style="margin-bottom:6px;">Homeowner project photos</li><li style="margin-bottom:6px;">Available homeowner contact details</li><li style="margin-bottom:6px;">The ability to accept matching jobs</li><li>New lead alerts for your selected categories</li></ul>',
+    },
+    { type: 'text', content: 'Do not wait until another contractor responds to a project that fits your business.' },
+    { type: 'cta', content: 'View My Job Board', href: `${BASE_URL}/contractor/jobs` },
+    { type: 'cta', content: 'Unlock My Categories', href: `${BASE_URL}/contractor/subscriptions` },
+    { type: 'text', content: 'Thanks for being part of QuoteXbert. The QuoteXbert Team' },
+    {
+      type: 'text',
+      rawHtml: true,
+      content:
+        '<p style="margin:0;font-size:13px;color:#64748b;line-height:1.65;">P.S. Free contractors can browse available jobs. Contractors with an active matching category subscription can unlock the full details and accept homeowner projects.</p>',
+    },
+  ], {
+    unsubscribeUrl: buildUnsubscribeUrl(params.unsubscribeUserId, 'marketing'),
+    unsubscribeLabel: 'Turn off marketing emails',
+  });
+}
+
+export async function sendContractorJobBoardOfferEmail(contractor: {
+  id: string;
+  email: string;
+  name?: string | null;
+}, options: { availableJobCount?: number | null } = {}) {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor job board offer');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  if (isUnlimitedTestContractor(contractor.email)) {
+    return { success: false, skipped: true, reason: 'internal_bypass_account' };
+  }
+
+  if (await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_JOB_BOARD_OFFER_CAMPAIGN)) {
+    return { success: false, skipped: true, reason: 'already_sent' };
+  }
+
+  const firstName = (contractor.name || '').split(' ')[0] || 'there';
+
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: CONTRACTOR_JOB_BOARD_OFFER_SUBJECT,
+      html: buildContractorJobBoardOfferHtml({
+        firstName,
+        availableJobCount: options.availableJobCount,
+        unsubscribeUserId: contractor.id,
+      }),
+    });
+
+    await logEmailEvent(CONTRACTOR_JOB_BOARD_OFFER_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'sent');
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent(CONTRACTOR_JOB_BOARD_OFFER_CAMPAIGN, contractor.email, contractor.id, undefined, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send contractor job board offer:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendContractorJobBoardOfferTestEmail({
+  testEmail,
+  firstName,
+  availableJobCount,
+  unsubscribeUserId,
+}: {
+  testEmail: string;
+  firstName?: string | null;
+  availableJobCount?: number | null;
+  unsubscribeUserId: string;
+}) {
+  const subject = `[TEST] ${CONTRACTOR_JOB_BOARD_OFFER_SUBJECT}`;
+
+  return sendSharedEmail({
+    to: testEmail,
+    subject,
+    html: buildContractorJobBoardOfferHtml({
+      firstName,
+      availableJobCount,
+      unsubscribeUserId,
+    }),
+  });
+}
+
 // Campaign type for the general contractor announcement blast (separate from founding offer dedup key)
 const CONTRACTOR_ANNOUNCEMENT_CAMPAIGN = 'contractor_announcement_v1';
 
@@ -724,6 +988,57 @@ export async function sendContractorAnnouncementTestEmail({
       unsubscribeUrl: fakeUnsubscribeUrl,
       unsubscribeLabel: 'Turn off marketing emails',
     }),
+  });
+}
+
+export function buildContractorAccountWelcomeHtml(params: {
+  firstName?: string | null;
+  unsubscribeUserId: string;
+}) {
+  const firstName = params.firstName?.trim() || 'there';
+
+  return buildEmail(CONTRACTOR_ACCOUNT_WELCOME_SUBJECT, [
+    { type: 'tag', content: 'Contractor Account' },
+    { type: 'heading', content: `Hi ${firstName},` },
+    { type: 'text', content: CONTRACTOR_ACCOUNT_WELCOME_PREHEADER },
+    { type: 'text', content: 'Welcome to QuoteXbert.' },
+    { type: 'text', content: 'Your contractor account is now active.' },
+    { type: 'text', content: 'QuoteXbert helps contractors discover homeowner renovation and home-service projects in their area.' },
+    {
+      type: 'card',
+      label: 'Best next steps',
+      rawHtml: true,
+      content:
+        '<ol style="margin:0;padding-left:18px;"><li style="margin-bottom:7px;">Complete your contractor profile</li><li style="margin-bottom:7px;">Choose the service categories you offer</li><li style="margin-bottom:7px;">Set your service area</li><li style="margin-bottom:7px;">Browse available homeowner projects</li><li>Turn on job alerts for the categories that matter to you</li></ol>',
+    },
+    {
+      type: 'text',
+      content:
+        'Free contractors can browse available opportunities. An active matching category subscription is required to unlock full project details and accept a job.',
+    },
+    { type: 'cta', content: 'View My Job Board', href: `${BASE_URL}/contractor/jobs` },
+    { type: 'cta', content: 'Complete My Profile', href: `${BASE_URL}/contractor/profile/edit` },
+    { type: 'text', content: 'Thanks for joining QuoteXbert.' },
+    { type: 'text', content: 'The QuoteXbert Team' },
+  ], {
+    unsubscribeUrl: buildUnsubscribeUrl(params.unsubscribeUserId, 'job'),
+    unsubscribeLabel: 'Turn off job emails',
+  });
+}
+
+export async function sendContractorAccountWelcomeTestEmail({
+  testEmail,
+  firstName,
+  unsubscribeUserId,
+}: {
+  testEmail: string;
+  firstName?: string | null;
+  unsubscribeUserId: string;
+}) {
+  return sendSharedEmail({
+    to: testEmail,
+    subject: `[TEST] ${CONTRACTOR_ACCOUNT_WELCOME_SUBJECT}`,
+    html: buildContractorAccountWelcomeHtml({ firstName, unsubscribeUserId }),
   });
 }
 

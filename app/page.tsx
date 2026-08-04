@@ -50,13 +50,11 @@ import {
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
 const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection").then(mod => ({ default: mod.TestimonialsSection })));
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(mod => ({ default: mod.ExitIntentModal })));
-const ReviewCaptureModal = lazy(() => import("@/components/ReviewCaptureModal").then(mod => ({ default: mod.ReviewCaptureModal })));
 const ExampleEstimates = lazy(() => import("@/components/ExampleEstimates"));
 const TrustFAQ = lazy(() => import("@/components/TrustFAQ"));
 
 export default function Home() {
   const [estimateResult, setEstimateResult] = useState<any>(null);
-  const [showReviewModal, setShowReviewModal] = useState(false);
   const [hasUsedFree, setHasUsedFree] = useState(false);
   const [showSignUpGate, setShowSignUpGate] = useState(false);
   const [savingEstimate, setSavingEstimate] = useState(false);
@@ -220,11 +218,6 @@ export default function Home() {
       localStorage.setItem('estimateUsed', '1');
       setHasUsedFree(true);
     }
-    
-    // Show review modal after successful estimate (5 second delay)
-    setTimeout(() => {
-      setShowReviewModal(true);
-    }, 5000);
   };
 
   const handleCaptureEmail = async (email: string) => {
@@ -309,14 +302,6 @@ export default function Home() {
       {/* Founding Contractor floating urgency banner — shown to non-contractors */}
       {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorBanner />}
 
-      {/* Review Capture Modal */}
-      <Suspense fallback={null}>
-        <ReviewCaptureModal 
-          isOpen={showReviewModal} 
-          onClose={() => setShowReviewModal(false)}
-          {...(process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL ? { googleReviewUrl: process.env.NEXT_PUBLIC_GOOGLE_REVIEW_URL } : {})}
-        />
-      </Suspense>
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
         {/* Hero Section - 2 Column Layout - Mobile-Optimized */}

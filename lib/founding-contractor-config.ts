@@ -3,7 +3,7 @@
 // Edit this file to update numbers shown across the entire site
 // ============================================================
 
-const SPOTS_REMAINING = 37;
+const SPOTS_REMAINING = 34;
 
 export const FOUNDING_CONTRACTOR_CONFIG = {
   /** How many spots remain out of the total */

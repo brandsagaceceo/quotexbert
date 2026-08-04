@@ -72,7 +72,12 @@ export default function MobileBottomNav() {
     };
     fetchMessageUnread();
     const interval = setInterval(fetchMessageUnread, 30000);
-    return () => clearInterval(interval);
+    // Refresh immediately when a thread is marked read so the badge clears without a 30s wait.
+    window.addEventListener('messages:read', fetchMessageUnread);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('messages:read', fetchMessageUnread);
+    };
   }, [isSignedIn, authUser?.id]);
 
   if (!isSignedIn || !authUser) {

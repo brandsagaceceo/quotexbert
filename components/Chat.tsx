@@ -285,7 +285,11 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
         const readResult = await res.clone().json().catch(() => ({}));
         console.debug('[Chat][mark-read-result]', { threadId: thread.id, status: res.status, ok: res.ok, result: readResult });
       }
-      if (res.ok) hasMarkedReadRef.current = true;
+      if (res.ok) {
+        hasMarkedReadRef.current = true;
+        // Let global badges (bottom nav) refresh promptly instead of waiting for the 30s poll.
+        window.dispatchEvent(new CustomEvent('messages:read', { detail: { threadId: thread.id } }));
+      }
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.debug('[Chat][mark-read-error]', { threadId: thread.id, error: err });

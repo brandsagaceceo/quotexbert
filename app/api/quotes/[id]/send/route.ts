@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { sendQuoteReceivedEmail } from '@/lib/email';
+import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from '@/lib/quote-limits';
 
 export async function POST(
   request: NextRequest,
@@ -35,6 +36,20 @@ export async function POST(
 
     if (!quote) {
       return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    }
+
+    // Enforce the max active-quote cap. A contractor re-sending their own
+    // already-active quote is never blocked; a new contractor is blocked once
+    // the job already has MAX_ACTIVE_QUOTES_PER_JOB active quotes.
+    const alreadyActive = ['sent', 'revision_requested', 'accepted'].includes((quote.status || '').toLowerCase());
+    if (!alreadyActive) {
+      const { allowed, activeCount } = await canSubmitQuote(quote.jobId, quote.contractorId);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: `This project already has ${activeCount} active quotes (max ${MAX_ACTIVE_QUOTES_PER_JOB}). No new quotes can be submitted until a slot opens.` },
+          { status: 409 }
+        );
+      }
     }
 
     // Update quote status to sent
