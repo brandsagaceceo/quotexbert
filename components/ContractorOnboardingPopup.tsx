@@ -18,6 +18,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
   const tiers = [
     {
       id: "handyman",
+      tier: "handyman",
       name: "Handyman",
       price: 79,
       leadLimit: 15,
@@ -35,6 +36,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
     },
     {
       id: "renovation",
+      tier: "renovation",
       name: "Renovation Expert",
       price: 139,
       leadLimit: 30,
@@ -54,6 +56,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
     },
     {
       id: "general-contractor",
+      tier: "general",
       name: "General Contractor",
       price: 199,
       leadLimit: 50,
@@ -189,7 +192,7 @@ export function ContractorOnboardingPopup({ isOpen, onClose, contractorName }: O
                 </ul>
 
                 <Link
-                  href="/contractor/subscriptions"
+                  href={`/contractor/subscriptions?tier=${tier.tier}`}
                   onClick={onClose}
                   className={`block w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-sm sm:text-lg text-center transition-all duration-300 ${
                     tier.recommended

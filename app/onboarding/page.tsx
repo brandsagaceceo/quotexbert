@@ -12,6 +12,25 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { getToken } = useAuth();
 
+  // After onboarding, new contractors who arrived from a pricing CTA should
+  // continue into the canonical category-selection flow with their chosen tier
+  // preserved, instead of being stranded on the profile page.
+  const consumePostAuthRedirect = (role: string): string => {
+    if (typeof window === "undefined") return "/profile";
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("post_auth_redirect");
+      if (stored) localStorage.removeItem("post_auth_redirect");
+    } catch {
+      /* ignore storage errors */
+    }
+    // Only honor the canonical subscription route, and only for contractors.
+    if (role === "contractor" && stored && stored.startsWith("/contractor/subscriptions")) {
+      return stored;
+    }
+    return "/profile";
+  };
+
   // Check if user already has a role on mount
   useEffect(() => {
     const checkExistingRole = async () => {
@@ -20,8 +39,9 @@ export default function OnboardingPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.role && (data.role === "contractor" || data.role === "homeowner")) {
-            console.log("[Onboarding] User already has role:", data.role, "redirecting to profile");
-            router.push("/profile");
+            const dest = consumePostAuthRedirect(data.role);
+            console.log("[Onboarding] User already has role:", data.role, "redirecting to", dest);
+            router.push(dest);
             return;
           }
         }
@@ -89,8 +109,9 @@ export default function OnboardingPage() {
         localStorage.setItem("show_onboarding_tour", "1");
       }
 
-      // Always send to profile after first role selection
-      window.location.href = "/profile";
+      // Send to canonical subscription flow if the user arrived from a pricing
+      // CTA; otherwise land on profile after first role selection.
+      window.location.href = consumePostAuthRedirect(roleId);
     } catch (err) {
       console.error("Error in handleRoleSelection:", err);
       const message = err instanceof Error ? err.message : "Unknown error";

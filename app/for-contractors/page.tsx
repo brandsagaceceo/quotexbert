@@ -8,6 +8,7 @@ import { trackContractorJoinClicked } from "@/lib/tracking";
 import { CheckCircle, Shield, TrendingUp, Clock } from "lucide-react";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import ContractorPlanCTA from "@/components/ContractorPlanCTA";
 import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 
 const pricingTiers = [
@@ -712,17 +713,16 @@ export default function ForContractorsPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={isSignedIn && authUser?.role === "contractor" ? "/contractor/subscriptions" : "/sign-up?role=contractor"}
-                  onClick={() => trackContractorJoinClicked("pricing_section")}
+                <ContractorPlanCTA
+                  tier={tier.id}
+                  label="Get Started"
+                  source="for_contractors_pricing"
                   className={`block w-full py-4 rounded-xl font-bold text-lg text-center transition-all duration-300 ${
                     tier.popular
                       ? "bg-brand text-white hover:bg-brand-dark shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                       : "bg-slate-100 text-slate-800 hover:bg-brand hover:text-white"
                   }`}
-                >
-                  Get Started
-                </Link>
+                />
                 <p className="text-center text-xs text-slate-500 mt-3">Cancel anytime · No contracts</p>
               </div>
             ))}

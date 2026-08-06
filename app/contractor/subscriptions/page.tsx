@@ -3,7 +3,7 @@
 // DO NOT confuse with /contractor/subscription (singular) — that is a deprecated redirect.
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/ToastProvider";
 import { useSearchParams } from "next/navigation";
@@ -237,6 +237,23 @@ export default function SubscriptionsPage() {
     setModalSearch('');
     setShowCategoryModal(true);
   };
+
+  // Deep-link support: arriving at /contractor/subscriptions?tier=... (from a
+  // pricing CTA or onboarding) auto-opens the same category picker used by the
+  // job-board flow, with the chosen tier preserved. Runs once auth is ready.
+  const tierAutoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (tierAutoOpenedRef.current) return;
+    if (!authUser || authUser.role !== 'contractor') return;
+    if (searchParams.get('success') || searchParams.get('canceled')) return;
+    const tierParam = searchParams.get('tier');
+    if (tierParam === 'handyman' || tierParam === 'renovation' || tierParam === 'general') {
+      tierAutoOpenedRef.current = true;
+      handleTierSubscription(tierParam);
+      window.history.replaceState({}, '', '/contractor/subscriptions');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authUser, searchParams]);
 
   // Called from modal "Continue to Payment" button
   const handleProceedToCheckout = async (tier: 'handyman' | 'renovation' | 'general', categories: string[]) => {

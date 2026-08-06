@@ -6,6 +6,7 @@ import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import EarningsCalculator from "./EarningsCalculator";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
+import ContractorPlanCTA from "@/components/ContractorPlanCTA";
 import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
 const PLANS = [
   {
     name: "Handyman",
+    tier: "handyman",
     price: "$49",
     period: "per month",
     features: [
@@ -45,11 +47,11 @@ const PLANS = [
       "Cancel anytime",
     ],
     cta: "Get Started",
-    href: "/sign-up?role=contractor",
     highlighted: false,
   },
   {
     name: "Renovation Xbert",
+    tier: "renovation",
     price: "$99",
     period: "per month",
     features: [
@@ -61,11 +63,11 @@ const PLANS = [
       "Advanced analytics",
     ],
     cta: "Get Started",
-    href: "/sign-up?role=contractor",
     highlighted: true,
   },
   {
     name: "General Contractor",
+    tier: "general",
     price: "$149",
     period: "per month",
     features: [
@@ -77,7 +79,6 @@ const PLANS = [
       "Dedicated account manager",
     ],
     cta: "Get Started",
-    href: "/sign-up?role=contractor",
     highlighted: false,
   },
 ];
@@ -378,16 +379,16 @@ export default function ContractorsJoinPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={plan.href}
+                <ContractorPlanCTA
+                  tier={plan.tier}
+                  label={plan.cta}
+                  source="contractors_join_pricing"
                   className={`block w-full text-center py-2.5 rounded-xl font-semibold transition ${
                     plan.highlighted
                       ? "bg-[#800020] hover:bg-[#600018] text-white shadow-lg"
                       : "bg-slate-100 hover:bg-slate-200 text-slate-900"
                   }`}
-                >
-                  {plan.cta}
-                </Link>
+                />
               </div>
             ))}
           </div>
