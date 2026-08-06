@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail, buildNewJobEmailContent, buildTeaserJobEmailContent, sendBulkEmails } from "@/lib/email";
+import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail, buildNewJobEmailContent, buildTeaserJobEmailContent, sendBulkEmails, isSendableEmail } from "@/lib/email";
 import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
 const CLAIMABLE_STATUSES = new Set(["active", "trialing"]);
@@ -342,14 +342,30 @@ export class NotificationService {
       let failCount = 0;
 
       const emailRecipientMap = new Map<string, typeof recipients[number]>();
+      // Contractors selected for a full/teaser email but whose address is undeliverable
+      // (seed/test @example.com accounts, the ${clerkId}@clerk.user fallback, malformed
+      // addresses). Resend's batch endpoint is all-or-nothing: one bad address makes it
+      // reject the ENTIRE batch (422), so every real contractor gets nothing. We drop them
+      // here so they can never poison the batch, and log them as skipped for auditability.
+      const undeliverableRecipients: typeof recipients = [];
       for (const recipient of recipients) {
         const email = recipient.contractor.email?.toLowerCase();
         if (!email || recipient.contractor.notifyJobEmail === false) continue;
+        if (!isSendableEmail(email)) {
+          undeliverableRecipients.push(recipient);
+          continue;
+        }
 
         const existing = emailRecipientMap.get(email);
         if (!existing || (existing.accessLevel === 'teaser' && recipient.accessLevel === 'full')) {
           emailRecipientMap.set(email, recipient);
         }
+      }
+
+      if (undeliverableRecipients.length > 0) {
+        console.warn(
+          `${logTag} Skipping ${undeliverableRecipients.length} undeliverable email address(es) — excluded from batch to protect deliverable recipients`,
+        );
       }
 
       const emailRecipients = Array.from(emailRecipientMap.values());
@@ -407,8 +423,27 @@ export class NotificationService {
         }
       }
 
+      // Audit the addresses we deliberately excluded as undeliverable so every selected
+      // contractor is accounted for in EmailEvent (sent / failed / skipped).
+      if (undeliverableRecipients.length > 0) {
+        try {
+          await prisma.emailEvent.createMany({
+            data: undeliverableRecipients.map((recipient) => ({
+              type: 'new_job',
+              to: recipient.contractor.email,
+              userId: recipient.contractor.id,
+              relatedJobId: jobDetails.leadId,
+              status: 'skipped',
+              error: JSON.stringify({ reason: 'undeliverable_email' }),
+            })),
+          });
+        } catch (logErr) {
+          console.error(`${logTag} Failed to log skipped email events: ${logErr instanceof Error ? logErr.message : String(logErr)}`);
+        }
+      }
+
       console.log(
-        `${logTag} Complete | In-app: ${inAppRecipients.length} | Emails sent: ${successCount} | Failed: ${failCount} | Total recipients: ${recipients.length}`,
+        `${logTag} Complete | In-app: ${inAppRecipients.length} | Emails sent: ${successCount} | Failed: ${failCount} | Skipped(undeliverable): ${undeliverableRecipients.length} | Total recipients: ${recipients.length}`,
       );
     } catch (error) {
       console.error(`${logTag} Critical error in notifyAllContractors:`, error);

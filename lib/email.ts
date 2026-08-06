@@ -20,6 +20,36 @@ export const CONTRACTOR_ACCOUNT_WELCOME_SUBJECT = 'Welcome to QuoteXbert — you
 export const CONTRACTOR_ACCOUNT_WELCOME_PREHEADER = 'Complete your profile and start browsing local homeowner projects.';
 const LOGO_URL = `${BASE_URL}/logo.svg`;
 
+// Domains that Resend rejects as undeliverable (seed/test/placeholder accounts).
+// Including one of these in a batch send makes Resend reject the ENTIRE batch with
+// a 422, so real contractors in the same batch receive nothing. We drop them before
+// they ever enter a send.
+const UNDELIVERABLE_EMAIL_DOMAINS = new Set([
+  'example.com',
+  'example.org',
+  'example.net',
+  'test.com',
+  'email.com',
+  'clerk.user',
+  'user.clerk',
+  'localhost',
+]);
+
+/**
+ * True only for addresses Resend will actually accept. Rejects empty/malformed
+ * addresses and known non-deliverable placeholder domains (example.com, the
+ * `${clerkId}@clerk.user` fallback, etc.). Used to keep poison addresses out of
+ * batch sends so one seed account can't block every real contractor.
+ */
+export function isSendableEmail(email: string | null | undefined): boolean {
+  const value = (email || '').trim().toLowerCase();
+  if (!value) return false;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return false;
+  const domain = value.split('@')[1] || '';
+  if (UNDELIVERABLE_EMAIL_DOMAINS.has(domain)) return false;
+  return true;
+}
+
 function htmlToPlainText(html: string): string {
   return html
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -1405,8 +1435,14 @@ export async function sendBulkEmails(
   let failed = 0;
   const CHUNK_SIZE = 100;
 
-  for (let i = 0; i < messages.length; i += CHUNK_SIZE) {
-    const chunk = messages.slice(i, i + CHUNK_SIZE);
+  type BatchOutcome = { ok: true } | { ok: false; error: string; rateLimited: boolean };
+
+  // Send a single batch, retrying only on 429/rate-limit with exponential backoff.
+  // Resend's default limit is ~2 requests/second; a job post fires several emails in quick
+  // succession, so the batch is frequently throttled with a 429 (returned as { error }, not
+  // thrown). A 429 means nothing was sent, so retrying the identical batch cannot duplicate.
+  // Validation errors (e.g. an undeliverable address) are permanent and returned immediately.
+  async function attemptBatch(chunk: typeof messages): Promise<BatchOutcome> {
     const batchPayload: BulkBatchPayload[] = chunk.map((m) => ({
       from: fromEmail,
       replyTo: REPLY_TO,
@@ -1416,32 +1452,24 @@ export async function sendBulkEmails(
       text: htmlToPlainText(m.html),
     }));
 
-    let delivered = false;
-    let chunkError: string | null = null;
-    // Resend's default limit is ~2 requests/second; a job post fires several emails in quick
-    // succession, so the contractor batch is frequently throttled with a 429 (returned as
-    // { error }, not thrown). ONLY 429/rate-limit failures are retried with exponential backoff;
-    // permanent errors (invalid address, validation) break immediately. A 429 means nothing was
-    // sent, so retrying the identical batch cannot deliver a duplicate email.
+    let lastError = '';
+    let lastRateLimited = false;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       let threw = false;
       let failure: unknown;
       try {
-        const result = await batchSend(batchPayload);
+        const result = await batchSend!(batchPayload);
         failure = (result as any)?.error ?? undefined;
       } catch (err) {
         threw = true;
         failure = err;
       }
 
-      if (!failure) {
-        sent += chunk.length;
-        delivered = true;
-        break;
-      }
+      if (!failure) return { ok: true };
 
       const { status, name, message } = describeResendError(failure);
-      if (isRateLimitError(failure) && attempt < maxRetries) {
+      const rateLimited = isRateLimitError(failure);
+      if (rateLimited && attempt < maxRetries) {
         const retryInMs = baseRetryDelayMs * Math.pow(2, attempt);
         console.warn('[EMAIL] Bulk send rate-limited, retrying', {
           jobId, batchSize: chunk.length, attempt: attempt + 1, status, name, message, retryInMs, thrown: threw,
@@ -1450,20 +1478,46 @@ export async function sendBulkEmails(
         continue;
       }
 
-      chunkError = normalizeBatchError(failure, threw, attempt + 1);
+      lastError = normalizeBatchError(failure, threw, attempt + 1);
+      lastRateLimited = rateLimited;
       console.error('[EMAIL] Bulk send failed', {
         jobId, batchSize: chunk.length, attempt: attempt + 1, status, name, message, thrown: threw,
       });
-      break;
+      return { ok: false, error: lastError, rateLimited: lastRateLimited };
+    }
+    return { ok: false, error: lastError, rateLimited: lastRateLimited };
+  }
+
+  // Deliver a chunk. Resend's batch endpoint is all-or-nothing on validation: a SINGLE
+  // undeliverable address makes it reject the ENTIRE batch with a 422, so every real
+  // contractor in that batch would otherwise receive nothing. On a permanent (non-rate-limit)
+  // failure we split the chunk and retry each half, isolating the bad address so all
+  // deliverable recipients still get their email. Splitting is safe: a rejected batch sent
+  // nothing, so re-sending sub-batches cannot duplicate. We do NOT split on rate-limit
+  // exhaustion — the whole batch was throttled, and splitting would only multiply throttled requests.
+  async function deliverChunk(chunk: typeof messages): Promise<void> {
+    const outcome = await attemptBatch(chunk);
+    if (outcome.ok) {
+      sent += chunk.length;
+      return;
     }
 
-    if (!delivered) {
-      failed += chunk.length;
-      for (const m of chunk) {
-        failedTo.add(m.to);
-        if (chunkError) errorByRecipient.set(m.to, chunkError);
-      }
+    if (!outcome.rateLimited && chunk.length > 1) {
+      const mid = Math.ceil(chunk.length / 2);
+      await deliverChunk(chunk.slice(0, mid));
+      await deliverChunk(chunk.slice(mid));
+      return;
     }
+
+    failed += chunk.length;
+    for (const m of chunk) {
+      failedTo.add(m.to);
+      if (outcome.error) errorByRecipient.set(m.to, outcome.error);
+    }
+  }
+
+  for (let i = 0; i < messages.length; i += CHUNK_SIZE) {
+    await deliverChunk(messages.slice(i, i + CHUNK_SIZE));
   }
 
   return { sent, failed, failedTo, errorByRecipient };

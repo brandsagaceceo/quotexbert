@@ -50,7 +50,9 @@ async function main() {
         return { data: null, error: { statusCode: 422, name: "validation_error", message: "Invalid `to` field" } };
       },
     });
-    assert.equal(calls, 1, "permanent errors are not retried");
+    // Validation failures are not rate-limit retried, but the all-or-nothing batch is split
+    // to isolate the bad address: batch(2) fails -> [1] + [1], so 1 + 2 = 3 requests.
+    assert.equal(calls, 3, "validation failure splits the batch to isolate the bad address");
     assert.equal(result.sent, 0, "permanent error sends nothing");
     assert.equal(result.failed, 2, "permanent error marks every recipient failed");
     assert.equal(result.failedTo.size, 2, "both recipients recorded in failedTo once");
@@ -80,7 +82,8 @@ async function main() {
         throw Object.assign(new Error("Something broke"), { statusCode: 500, name: "application_error" });
       },
     });
-    assert.equal(calls, 1, "thrown non-rate-limit error is not retried");
+    // Permanent thrown errors also split the batch to isolate the failing recipient: 1 + 2 = 3.
+    assert.equal(calls, 3, "permanent thrown error splits the batch to isolate the failing recipient");
     const err = parseErr(result, "a@example.com");
     assert.equal(err.status, 500, "persisted thrown status");
     assert.equal(err.name, "application_error", "persisted thrown name");
@@ -142,6 +145,34 @@ async function main() {
     assert.equal(err.status, 429, "persisted final rate-limit status");
     assert.equal(err.thrown, true, "final thrown flag preserved");
     assert.equal(err.attempts, 4, "records total attempts after exhaustion");
+  }
+
+  // 7. All-or-nothing batch poisoning: one undeliverable address rejects the whole batch
+  //    (Resend's real 422 behavior), but splitting must still deliver to the good recipient.
+  {
+    const batch = [
+      { to: "real.contractor@gmail.com", subject: "New job", html: "<p>good</p>" },
+      { to: "seed_account@example.com", subject: "New job", html: "<p>bad</p>" },
+    ];
+    let calls = 0;
+    const result = await sendBulkEmails(batch, {
+      baseRetryDelayMs: 0,
+      jobId: "lead_poison",
+      // Simulate Resend: reject the ENTIRE batch if any recipient is undeliverable.
+      batchSend: async (payload) => {
+        calls += 1;
+        const hasBad = payload.some((p) => p.to.endsWith("@example.com"));
+        return hasBad
+          ? { data: null, error: { statusCode: 422, name: "validation_error", message: "Invalid `to` field" } }
+          : { data: { data: payload.map((_, i) => ({ id: String(i) })) }, error: null };
+      },
+    });
+    assert.equal(calls, 3, "batch(2) fails -> splits into [good] + [bad]");
+    assert.equal(result.sent, 1, "the deliverable recipient still receives the email");
+    assert.equal(result.failed, 1, "only the undeliverable recipient is marked failed");
+    assert.ok(!result.failedTo.has("real.contractor@gmail.com"), "good recipient is NOT in failedTo");
+    assert.ok(result.failedTo.has("seed_account@example.com"), "bad recipient IS in failedTo");
+    assert.equal(result.errorByRecipient.size, 1, "only the bad recipient has a stored error");
   }
 
   console.log("bulk-email-retry tests passed");

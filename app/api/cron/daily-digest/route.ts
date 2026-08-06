@@ -31,7 +31,9 @@ function sinceWindow(lastSentAt: Date | null): Date {
 
 async function runContractorDigests() {
   const contractors = await prisma.user.findMany({
-    where: { role: "contractor", isActive: true, digestFrequency: { not: "off" } },
+    // The digest is JOB AVAILABILITY, so it is gated by notifyJobEmail — NOT
+    // notifyMarketingEmail. digestFrequency controls cadence (daily/weekly/off).
+    where: { role: "contractor", isActive: true, notifyJobEmail: { not: false }, digestFrequency: { not: "off" } },
     include: {
       contractorProfile: {
         include: { portfolio: { select: { id: true }, take: 1 } },
