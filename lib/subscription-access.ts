@@ -4,6 +4,13 @@ import { canAccessLead as canAccessLeadGod, isGodUser } from "@/lib/god-access";
 
 const ACCESS_STATUSES = new Set(["active", "trialing"]);
 
+export interface ClaimableCategorySubscription {
+  category: string;
+  status: string;
+  canClaimLeads: boolean;
+  currentPeriodEnd: Date | null;
+}
+
 export function uniqueNormalizedCategories(categories: Array<string | null | undefined>): string[] {
   return Array.from(
     new Set(
@@ -29,12 +36,24 @@ function getCategoryQueryValues(activeCategories: string[]): string[] {
   );
 }
 
-function hasCurrentAccessWindow(currentPeriodEnd: Date | null): boolean {
-  return !currentPeriodEnd || currentPeriodEnd.getTime() >= Date.now();
+function hasCurrentAccessWindow(currentPeriodEnd: Date | null, now = Date.now()): boolean {
+  return !currentPeriodEnd || currentPeriodEnd.getTime() >= now;
 }
 
-function isClaimableSubscription(subscription: { status: string; canClaimLeads: boolean; currentPeriodEnd: Date | null }): boolean {
-  return subscription.canClaimLeads && ACCESS_STATUSES.has(subscription.status) && hasCurrentAccessWindow(subscription.currentPeriodEnd);
+function isClaimableSubscription(subscription: ClaimableCategorySubscription, now = Date.now()): boolean {
+  return subscription.canClaimLeads && ACCESS_STATUSES.has(subscription.status) && hasCurrentAccessWindow(subscription.currentPeriodEnd, now);
+}
+
+export function hasClaimableCategoryEntitlement(
+  subscriptions: ClaimableCategorySubscription[],
+  leadCategory: string,
+  now = Date.now(),
+): boolean {
+  return subscriptions.some(
+    (subscription) =>
+      isClaimableSubscription(subscription, now) &&
+      categoryMatchesEntitlement(leadCategory, subscription.category),
+  );
 }
 
 export async function resolveContractorDbId(contractorId: string): Promise<string | null> {
@@ -59,9 +78,7 @@ export async function hasActiveSubscription(contractorId: string, category: stri
       select: { category: true, status: true, canClaimLeads: true, currentPeriodEnd: true }
     });
 
-    return subscriptions.some(
-      (subscription) => isClaimableSubscription(subscription) && categoryMatchesEntitlement(category, subscription.category)
-    );
+    return hasClaimableCategoryEntitlement(subscriptions, category);
   } catch (error) {
     console.error('Error checking subscription:', error);
     return false;

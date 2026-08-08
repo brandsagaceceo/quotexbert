@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { buildEmail, sendNewMessageEmail, sendNewJobEmail, sendWelcomeEmail, sendReviewReceivedEmail, sendSharedEmail, buildNewJobEmailContent, buildTeaserJobEmailContent, sendBulkEmails, isSendableEmail } from "@/lib/email";
-import { categoryMatchesEntitlement } from "@/lib/subscription-access";
+import { hasClaimableCategoryEntitlement } from "@/lib/subscription-access";
 
-const CLAIMABLE_STATUSES = new Set(["active", "trialing"]);
 const LEAD_NOTIFICATION_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export type LeadNotificationAccessLevel = "full" | "teaser" | "skip";
@@ -45,10 +44,6 @@ interface LeadNotificationPayload {
   fullAccess: boolean;
 }
 
-function hasCurrentAccessWindow(currentPeriodEnd: Date | null, now = Date.now()): boolean {
-  return !currentPeriodEnd || currentPeriodEnd.getTime() >= now;
-}
-
 export function getLeadNotificationAccess(
   contractor: LeadNotificationAudience,
   jobCategory?: string,
@@ -60,11 +55,10 @@ export function getLeadNotificationAccess(
     return "teaser";
   }
 
-  const hasMatchingEntitlement = contractor.subscriptions.some((subscription) =>
-    subscription.canClaimLeads &&
-    CLAIMABLE_STATUSES.has(subscription.status) &&
-    hasCurrentAccessWindow(subscription.currentPeriodEnd, now) &&
-    categoryMatchesEntitlement(jobCategory, subscription.category)
+  const hasMatchingEntitlement = hasClaimableCategoryEntitlement(
+    contractor.subscriptions,
+    jobCategory,
+    now,
   );
 
   return hasMatchingEntitlement ? "full" : "teaser";

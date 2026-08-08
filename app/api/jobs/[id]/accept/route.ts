@@ -4,19 +4,26 @@ import { canAccessLead } from "@/lib/subscription-access";
 import { isGodUser } from "@/lib/god-access";
 import { sendEmailNotification } from "@/lib/email-notifications";
 import { sendJobAcceptedEmail } from "@/lib/email";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { contractorId, message } = await request.json();
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
+    const contractorId = authResult.user.dbUserId;
+    const { message } = await request.json();
     const resolvedParams = await params;
     const jobId = resolvedParams.id;
 
-    if (!jobId || !contractorId) {
+    if (!jobId) {
       return NextResponse.json(
-        { error: "Job ID and Contractor ID are required" },
+        { error: "Job ID is required" },
         { status: 400 }
       );
     }
@@ -54,22 +61,22 @@ export async function POST(
       );
     }
 
-    // Fetch contractor user — resolve by either DB id or Clerk user id
-    const contractor = await prisma.user.findFirst({
-      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] }
+    // Fetch the authenticated contractor record.
+    const contractor = await prisma.user.findUnique({
+      where: { id: contractorId }
     });
 
-    if (!contractor) {
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
       return NextResponse.json(
-        { error: "Contractor not found" },
-        { status: 404 }
+        { error: "Active contractor access required" },
+        { status: 403 }
       );
     }
 
     // God users bypass subscription checks
     const isGod = isGodUser(contractor.email || "");
     
-    // Use the DB id for all subsequent operations (contractorId from request may be Clerk id)
+    // Use the authenticated DB id for all subsequent operations.
     const dbContractorId = contractor.id;
     
     if (!isGod) {

@@ -561,21 +561,18 @@ export default function SubscriptionsPage() {
               )}
             </div>
             
-            {/* Mobile-only swipe hint */}
-            <p className="md:hidden text-center text-xs text-gray-400 italic mb-6">← Swipe to view plans →</p>
-
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pt-6 pb-4 -mx-4 px-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-6 md:max-w-5xl md:mx-auto md:overflow-x-visible md:pb-0 md:pt-8" style={{WebkitOverflowScrolling:'touch'}}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8 max-w-5xl mx-auto items-stretch">
                 {/* Handyman Tier */}
-                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
+                <div className="group relative isolate min-w-0 w-full h-full">
                   <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'handyman' ? 'bg-green-400 opacity-80' : 'bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 opacity-50 group-hover:opacity-80'}`}></div>
-                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'handyman' ? 'border-4 border-green-500 ring-4 ring-green-200' : 'border-4 border-green-400 hover:scale-105 hover:shadow-3xl'}`}>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-shadow duration-300 h-full flex flex-col ${selectedPlan === 'handyman' ? 'border-4 border-green-500 ring-4 ring-green-200' : 'border-4 border-green-400 hover:shadow-3xl'}`}>
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                       <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         STARTER
                       </span>
                     </div>
                     
-                      <div className="text-center mt-4">
+                      <div className="text-center mt-4 flex flex-1 flex-col">
                         <div className="text-5xl mb-4">🔧</div>
                         <h3 className="text-2xl font-black text-gray-900 mb-2">Handyman</h3>
                         <div className="mb-3">
@@ -592,7 +589,7 @@ export default function SubscriptionsPage() {
                           <p className="text-sm font-black text-green-800">3 Categories — Perfect for solo contractors</p>
                         </div>
                       
-                        <ul className="text-left space-y-2 mb-6">
+                        <ul className="text-left space-y-2 mb-6 flex-1">
                           <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Choose any 3 job categories</li>
                           <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Unlimited job applications</li>
                           <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-green-600 font-bold">✓</span> Direct homeowner messaging</li>
@@ -613,15 +610,15 @@ export default function SubscriptionsPage() {
                   </div>
 
                 {/* Renovation Xbert Tier */}
-                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none md:scale-105 z-20">
+                <div className="group relative isolate min-w-0 w-full h-full">
                   <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'renovation' ? 'bg-orange-400 opacity-90' : 'bg-gradient-to-br from-orange-400 via-rose-500 to-pink-600 opacity-60 group-hover:opacity-90'}`}></div>
-                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'renovation' ? 'border-4 border-orange-500 ring-4 ring-orange-200' : 'border-4 border-orange-400 hover:scale-105 hover:shadow-3xl'}`}>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-shadow duration-300 h-full flex flex-col ${selectedPlan === 'renovation' ? 'border-4 border-orange-500 ring-4 ring-orange-200' : 'border-4 border-orange-400 hover:shadow-3xl'}`}>
                     <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-30">
                       <span className="bg-[#800020] text-white px-8 py-2.5 rounded-full text-sm font-black shadow-2xl border-2 border-white whitespace-nowrap">
                         ⭐ MOST POPULAR
                       </span>
                     </div>
-                    <div className="text-center mt-4">
+                    <div className="text-center mt-4 flex flex-1 flex-col">
                       <div className="text-5xl mb-4">🏗️</div>
                       <h3 className="text-2xl font-black text-gray-900 mb-2">Renovation Xbert</h3>
                       <div className="mb-3">
@@ -637,7 +634,7 @@ export default function SubscriptionsPage() {
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
                         <p className="text-sm font-black text-orange-800">6 Categories — Best value for growing businesses</p>
                       </div>
-                      <ul className="text-left space-y-2 mb-6">
+                      <ul className="text-left space-y-2 mb-6 flex-1">
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Choose any 6 job categories</li>
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Unlimited job applications</li>
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-orange-600 font-bold">✓</span> Priority in search results</li>
@@ -657,15 +654,15 @@ export default function SubscriptionsPage() {
                 </div>
 
                 {/* General Contractor Tier */}
-                <div className="group relative flex-shrink-0 snap-center w-[85vw] max-w-[340px] md:w-auto md:max-w-none">
+                <div className="group relative isolate min-w-0 w-full h-full sm:col-span-2 lg:col-span-1">
                   <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 ${selectedPlan === 'general' ? 'bg-rose-400 opacity-80' : 'bg-[#800020] opacity-50 group-hover:opacity-80'}`}></div>
-                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-all duration-300 ${selectedPlan === 'general' ? 'border-4 border-rose-600 ring-4 ring-rose-200' : 'border-4 border-rose-400 hover:scale-105 hover:shadow-3xl'}`}>
+                  <div className={`relative bg-white rounded-3xl shadow-2xl p-6 md:p-8 transition-shadow duration-300 h-full flex flex-col ${selectedPlan === 'general' ? 'border-4 border-rose-600 ring-4 ring-rose-200' : 'border-4 border-rose-400 hover:shadow-3xl'}`}>
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <span className="bg-[#800020] text-white px-6 py-2 rounded-full text-xs font-black shadow-lg">
                         PRO
                       </span>
                     </div>
-                    <div className="text-center mt-4">
+                    <div className="text-center mt-4 flex flex-1 flex-col">
                       <div className="text-5xl mb-4">👷</div>
                       <h3 className="text-2xl font-black text-gray-900 mb-2">General Contractor</h3>
                       <div className="mb-3">
@@ -681,7 +678,7 @@ export default function SubscriptionsPage() {
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
                         <p className="text-sm font-black text-rose-900">ALL Categories — Full-service contractors</p>
                       </div>
-                      <ul className="text-left space-y-2 mb-6">
+                      <ul className="text-left space-y-2 mb-6 flex-1">
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> ALL job categories included</li>
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Unlimited job applications</li>
                         <li className="flex items-center gap-2 text-sm text-gray-700"><span className="text-rose-700 font-bold">✓</span> Top priority in search results</li>
@@ -699,13 +696,6 @@ export default function SubscriptionsPage() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Mobile swipe dots */}
-              <div className="flex md:hidden justify-center gap-2 mt-3 mb-2">
-                <div className="w-4 h-2 rounded-full bg-green-500"></div>
-                <div className="w-6 h-2 rounded-full bg-orange-500"></div>
-                <div className="w-4 h-2 rounded-full bg-rose-700"></div>
               </div>
 
               {/* Trust Badges */}

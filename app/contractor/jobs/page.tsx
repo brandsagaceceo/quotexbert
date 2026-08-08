@@ -313,15 +313,9 @@ function ContractorJobsContent() {
       return;
     }
 
-    // Check if contractor is subscribed to this job's category (normalize for simple vs. detailed IDs)
-    const isSubscribed = subscriptions.some(sub => {
-      const normalizedJob = normalizeCategory(job.category);
-      const normalizedContractor = normalizeCategory(sub.category);
-      return normalizedJob === normalizedContractor && sub.status === 'active' && sub.canClaimLeads;
-    });
-
-    // God users can accept ANY job without subscription
-    const hasAccess = canAcceptJob(user?.email, isSubscribed);
+    // The authenticated jobs API computes category access from current server-side
+    // entitlements. The accept API rechecks it before writing anything.
+    const hasAccess = canAcceptJob(user?.email, job.hasAccess === true);
 
     if (!hasAccess) {
       toast.warning(`You must be subscribed to the "${job.category}" category to accept jobs.`, {
@@ -346,7 +340,6 @@ function ContractorJobsContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contractorId: user.id,
           message: acceptanceData?.message || `I'm interested in this project and would like to provide you with a quote. Let's discuss the details!`
         })
       });
@@ -771,11 +764,7 @@ function ContractorJobsContent() {
         ) : (
           <div className="grid gap-6">
             {filteredJobs.map((job) => {
-              const _hasAccess = job.hasAccess ?? canAcceptJob(user?.email, subscriptions.some(sub =>
-                normalizeCategory(sub.category) === normalizeCategory(job.category) &&
-                sub.status === 'active' &&
-                sub.canClaimLeads
-              ));
+              const _hasAccess = canAcceptJob(user?.email, job.hasAccess === true);
               const _displayCategory = job.simpleCategory || job.category;
               // For non-subscribers, only show city-level location
               const _displayLocation = _hasAccess
