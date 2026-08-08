@@ -15,6 +15,15 @@ interface JobsRouteDeps {
   findActorFn: (dbUserId: string) => Promise<{ id: string; role: string | null; isActive: boolean } | null>;
 }
 
+function parseAcceptedContractors(value: string | null | undefined): string[] {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 export function createJobsGetHandler(overrides: Partial<JobsRouteDeps> = {}) {
   const deps: JobsRouteDeps = {
     resolveAuthUserFn: resolveAuthUser,
@@ -99,6 +108,7 @@ export function createJobsGetHandler(overrides: Partial<JobsRouteDeps> = {}) {
         claimed: lead.claimed,
         claimedBy: lead.claimedBy,
         claimedAt: lead.claimedAt,
+        acceptedByCurrentContractor: parseAcceptedContractors(lead.acceptedContractors).includes(authenticatedContractorId),
         _count: {
           applications: lead._count?.applications || 0
         }

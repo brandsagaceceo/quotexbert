@@ -55,6 +55,14 @@ async function runRelist(request: NextRequest) {
           },
         },
       },
+      acceptances: {
+        where: { status: { in: ['accepted', 'quoted', 'selected'] } },
+        select: { contractorId: true },
+      },
+      quotes: {
+        where: { status: { in: ['sent', 'revision_requested', 'accepted'] } },
+        select: { contractorId: true },
+      },
     },
     take: 100,
   });
@@ -75,14 +83,43 @@ async function runRelist(request: NextRequest) {
         data: { status: 'open', published: true },
       });
 
+      const involvedContractorIds = Array.from(
+        new Set([
+          ...lead.acceptances.map((acceptance) => acceptance.contractorId),
+          ...lead.quotes.map((quote) => quote.contractorId),
+        ])
+      );
+
+      if (involvedContractorIds.length > 0) {
+        await prisma.notification.createMany({
+          data: involvedContractorIds.map((contractorId) => ({
+            userId: contractorId,
+            type: 'job_inactivity_reminder',
+            title: 'Homeowner has been inactive',
+            message: `No message activity for 7+ days on "${lead.title}". Review the project and withdraw if you no longer plan to participate.`,
+            relatedId: lead.id,
+            relatedType: 'job',
+            payload: {
+              action: 'withdraw_from_job',
+              leadId: lead.id,
+            },
+            read: false,
+          })),
+        });
+      }
+
       await prisma.notification.create({
         data: {
           userId: lead.homeownerId,
           type: 'job_relisted',
           title: 'Your project was re-listed',
-          message: `Your project "${lead.title}" was quiet for a while, so we re-listed it to reach more contractors. Your existing quotes and conversations are still here.`,
+          message: `We re-listed "${lead.title}" to reach more contractors. Your existing quotes and conversations are still here.`,
           relatedId: lead.id,
           relatedType: 'job',
+          payload: {
+            action: 'request_more_quotes',
+            leadId: lead.id,
+          },
           read: false,
         },
       });

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ALL_CATEGORIES, getCategoryById, normalizeCategory } from "@/lib/categories";
 import { canAccessLead as canAccessLeadGod, isGodUser } from "@/lib/god-access";
+import { MAX_ACTIVE_QUOTES_PER_JOB, isActiveQuoteStatus } from "@/lib/quote-limits";
 
 const ACCESS_STATUSES = new Set(["active", "trialing"]);
 
@@ -160,7 +161,7 @@ export async function getAccessibleLeads(contractorId: string) {
     const candidateLeads = await prisma.lead.findMany({
       where: {
         category: { in: categoryQueryValues },
-        status: 'open',     // Only show open leads
+        status: { in: ['open', 'reviewing', 'claimed'] },
         published: true,    // Only show published leads
         isSeeded: false,    // Never show demo/seed data
       },
@@ -176,13 +177,26 @@ export async function getAccessibleLeads(contractorId: string) {
           select: {
             applications: true
           }
-        }
+        },
+        quotes: {
+          select: {
+            contractorId: true,
+            status: true,
+          },
+        },
       }
     });
 
     return candidateLeads.filter((lead) => {
-      const acceptedContractors = JSON.parse(lead.acceptedContractors || '[]');
-      return acceptedContractors.length < 3 && activeCategories.includes(normalizeCategory(lead.category));
+      const activeQuoteContractorIds = new Set(
+        lead.quotes
+          .filter((quote) => isActiveQuoteStatus(quote.status))
+          .map((quote) => quote.contractorId)
+      );
+      return (
+        activeQuoteContractorIds.size < MAX_ACTIVE_QUOTES_PER_JOB &&
+        activeCategories.includes(normalizeCategory(lead.category))
+      );
     });
   } catch (error) {
     console.error('Error fetching accessible leads:', error);
@@ -224,7 +238,7 @@ export async function getAllOpenLeads() {
   try {
     const leads = await prisma.lead.findMany({
       where: {
-        status: 'open',    // Only show open leads
+        status: { in: ['open', 'reviewing', 'claimed'] },
         published: true,   // Only show published leads
         isSeeded: false,   // Never show demo/seed data in production
       },
@@ -240,14 +254,24 @@ export async function getAllOpenLeads() {
           select: {
             applications: true
           }
-        }
+        },
+        quotes: {
+          select: {
+            contractorId: true,
+            status: true,
+          },
+        },
       }
     });
 
-    // Filter out jobs that have reached maximum contractors (3)
-    const availableLeads = leads.filter(lead => {
-      const acceptedContractors = JSON.parse(lead.acceptedContractors || '[]');
-      return acceptedContractors.length < 3;
+    // Only hide a lead once it reaches the active submitted-quote cap.
+    const availableLeads = leads.filter((lead) => {
+      const activeQuoteContractorIds = new Set(
+        lead.quotes
+          .filter((quote) => isActiveQuoteStatus(quote.status))
+          .map((quote) => quote.contractorId)
+      );
+      return activeQuoteContractorIds.size < MAX_ACTIVE_QUOTES_PER_JOB;
     });
 
     return availableLeads;

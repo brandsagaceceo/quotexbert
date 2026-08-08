@@ -2,9 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
 import { isGodUser } from "@/lib/god-access";
-import { sendEmailNotification } from "@/lib/email-notifications";
 import { sendJobAcceptedEmail } from "@/lib/email";
+import { countPendingAcceptedLeads, MAX_PENDING_ACCEPTED_LEADS_PER_CONTRACTOR } from "@/lib/job-acceptance";
 import { resolveAuthUser } from "@/lib/server-auth";
+
+function parseAcceptedContractors(value: string | null | undefined): string[] {
+  try {
+    const parsed = JSON.parse(value || "[]");
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
+  } catch {
+    return [];
+  }
+}
 
 export async function POST(
   request: NextRequest,
@@ -61,7 +70,6 @@ export async function POST(
       );
     }
 
-    // Fetch the authenticated contractor record.
     const contractor = await prisma.user.findUnique({
       where: { id: contractorId }
     });
@@ -91,7 +99,7 @@ export async function POST(
     }
 
     // Check current accepted contractors
-    const currentAcceptedList = JSON.parse(currentLead.acceptedContractors || "[]");
+    const currentAcceptedList = parseAcceptedContractors(currentLead.acceptedContractors);
     
     // Check if contractor already accepted
     if (currentAcceptedList.includes(dbContractorId)) {
@@ -101,37 +109,66 @@ export async function POST(
       );
     }
 
+    const pendingAcceptedLeads = await countPendingAcceptedLeads(dbContractorId);
+    if (pendingAcceptedLeads >= MAX_PENDING_ACCEPTED_LEADS_PER_CONTRACTOR) {
+      return NextResponse.json(
+        {
+          error:
+            "You already have 3 pending accepted leads without submitted quotes. Submit a quote or withdraw from one of them to accept another job.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Check if this is the first claim
     const isFirstClaim = !currentLead.claimed && currentAcceptedList.length === 0;
 
-    // Check if job has reached maximum acceptances (3 contractors)
-    if (currentAcceptedList.length >= 3) {
+    const existingAcceptance = await prisma.jobAcceptance.findUnique({
+      where: {
+        leadId_contractorId: {
+          leadId: jobId,
+          contractorId: dbContractorId,
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+      },
+    });
+
+    if (existingAcceptance && ['accepted', 'quoted', 'selected'].includes((existingAcceptance.status || '').toLowerCase())) {
       return NextResponse.json(
-        { error: "This job has reached the maximum number of contractors (3)" },
+        { error: 'You have already accepted this job' },
         { status: 400 }
       );
     }
 
     // Create job acceptance record (contractor already verified above)
-    const acceptance = await prisma.jobAcceptance.create({
-      data: {
-        leadId: jobId,
-        contractorId: dbContractorId,
-        message: message || null,
-        status: "accepted"
-      }
-    });
+    const acceptance = existingAcceptance
+      ? await prisma.jobAcceptance.update({
+          where: { id: existingAcceptance.id },
+          data: {
+            message: message || null,
+            status: 'accepted',
+            quoteAmount: null,
+            estimatedDays: null,
+          },
+        })
+      : await prisma.jobAcceptance.create({
+          data: {
+            leadId: jobId,
+            contractorId: dbContractorId,
+            message: message || null,
+            status: "accepted"
+          }
+        });
 
     // Update acceptedContractors array
     const updatedAccepted = [...currentAcceptedList, dbContractorId];
     
-    // Determine new status based on acceptance count
+    // Accepting interest should never close the board listing.
     let newStatus = currentLead.status;
-    if (updatedAccepted.length >= 3) {
-      newStatus = 'closed'; // Job is closed after 3 contractors
-    } else if (isFirstClaim) {
-      newStatus = 'claimed'; // First contractor claimed the job
-    } else if (currentAcceptedList.length === 0) {
+    if (newStatus === 'open' || newStatus === 'claimed') {
       newStatus = 'reviewing';
     }
     
@@ -248,7 +285,7 @@ export async function POST(
         id: thread.id
       },
       budget: currentLead.budget,
-      spotsRemaining: 3 - updatedAccepted.length,
+      pendingAcceptedLeads: pendingAcceptedLeads + 1,
       redirectUrl: `/messages?threadId=${thread.id}`
     });
 

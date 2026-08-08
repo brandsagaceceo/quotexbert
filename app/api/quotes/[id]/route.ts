@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import { sendQuoteReceivedEmail } from "@/lib/email";
 import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from "@/lib/quote-limits";
+import { markAcceptanceQuoted } from "@/lib/job-acceptance";
 
 export async function GET(
   request: NextRequest,
@@ -151,6 +152,8 @@ export async function PUT(
 
     // Send notification to homeowner if quote was sent
     if (status === "sent") {
+      await markAcceptanceQuoted(updatedQuote.jobId, updatedQuote.contractorId);
+
       await prisma.notification.create({
         data: {
           userId: updatedQuote.conversation.homeowner.id,

@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { sendQuoteReceivedEmail } from '@/lib/email';
 import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from '@/lib/quote-limits';
+import { markAcceptanceQuoted } from '@/lib/job-acceptance';
 
 export async function POST(
   request: NextRequest,
@@ -60,6 +61,8 @@ export async function POST(
         sentAt: new Date(),
       },
     });
+
+    await markAcceptanceQuoted(quote.jobId, quote.contractorId);
 
     // Create notification for homeowner
     await prisma.notification.create({

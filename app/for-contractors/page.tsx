@@ -33,7 +33,7 @@ const pricingTiers = [
     price: 99,
     categories: 6,
     features: [
-      "8 Trade Categories",
+      "6 Trade Categories",
       "Up to 30 leads/month",
       "Enhanced profile badge",
       "Priority support",

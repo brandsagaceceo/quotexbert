@@ -34,6 +34,7 @@ function ContractorJobsContent() {
   const [message, setMessage] = useState<string>('');
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [accepting, setAccepting] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState<string | null>(null);
   const [acceptanceModal, setAcceptanceModal] = useState<{jobId: string; title: string} | null>(null);
   const [filters, setFilters] = useState<JobFilters>({});
   const [showFilters, setShowFilters] = useState(false);
@@ -387,6 +388,37 @@ function ContractorJobsContent() {
 
   const openAcceptanceModal = (jobId: string, title: string) => {
     setAcceptanceModal({ jobId, title });
+  };
+
+  const withdrawFromJob = async (jobId: string) => {
+    setWithdrawing(jobId);
+    try {
+      const response = await fetch(`/api/jobs/${jobId}/withdraw`, {
+        method: 'POST',
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success('You have withdrawn from this job. Your pending lead slot was freed.', {
+          title: 'Withdrawn Successfully',
+          duration: 5000,
+        });
+        fetchJobs();
+      } else {
+        toast.error(result.error || 'Failed to withdraw from job', {
+          title: 'Withdraw Failed',
+          duration: 6000,
+        });
+      }
+    } catch (error) {
+      console.error('Error withdrawing from job:', error);
+      toast.error('Failed to withdraw from job. Please try again.', {
+        title: 'Error',
+        duration: 5000,
+      });
+    } finally {
+      setWithdrawing(null);
+    }
   };
 
   const toggleJobDetails = (jobId: string) => {
@@ -901,16 +933,26 @@ function ContractorJobsContent() {
                         Upgrade to Unlock
                       </Link>
                     )}
-                    {job.status === 'open' && (() => {
+                    {['open', 'reviewing', 'claimed'].includes(job.status) && (() => {
                       // Access already computed per card above as _hasAccess
                       return _hasAccess ? (
-                        <button 
-                          onClick={() => openAcceptanceModal(job.id, job.title)}
-                          disabled={accepting === job.id}
-                          className="bg-[#800020] hover:bg-[#600018] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
-                        >
-                          {accepting === job.id ? 'Accepting...' : 'Accept Job'}
-                        </button>
+                        job.acceptedByCurrentContractor ? (
+                          <button
+                            onClick={() => withdrawFromJob(job.id)}
+                            disabled={withdrawing === job.id}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
+                          >
+                            {withdrawing === job.id ? 'Withdrawing...' : 'Withdraw From Job'}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => openAcceptanceModal(job.id, job.title)}
+                            disabled={accepting === job.id}
+                            className="bg-[#800020] hover:bg-[#600018] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
+                          >
+                            {accepting === job.id ? 'Accepting...' : 'Accept Job'}
+                          </button>
+                        )
                       ) : (
                         <div className="flex flex-col items-end gap-1">
                           <button 

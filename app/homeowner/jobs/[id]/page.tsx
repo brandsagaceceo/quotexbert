@@ -99,6 +99,7 @@ export default function HomeownerJobDetailPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [requestingMoreQuotes, setRequestingMoreQuotes] = useState(false);
 
   useEffect(() => {
     if (user && jobId) {
@@ -123,6 +124,26 @@ export default function HomeownerJobDetailPage() {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const requestMoreQuotes = async () => {
+    if (!job) return;
+    setRequestingMoreQuotes(true);
+    try {
+      const res = await fetch(`/api/homeowner/jobs/${job.id}/request-more-quotes`, {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || 'Failed to request more quotes.');
+      } else {
+        await fetchJob();
+      }
+    } catch {
+      setError('Failed to request more quotes. Please try again.');
+    } finally {
+      setRequestingMoreQuotes(false);
     }
   };
 
@@ -315,6 +336,16 @@ export default function HomeownerJobDetailPage() {
             Messages
           </Link>
         </div>
+
+        {['open', 'reviewing', 'claimed'].includes(job.status) && (
+          <button
+            onClick={requestMoreQuotes}
+            disabled={requestingMoreQuotes}
+            className="w-full sm:w-auto mt-2 inline-flex items-center justify-center gap-2 bg-amber-100 text-amber-900 border border-amber-300 px-5 py-3 rounded-xl font-semibold hover:bg-amber-200 disabled:opacity-60 transition-colors"
+          >
+            {requestingMoreQuotes ? 'Reopening...' : 'Request More Quotes'}
+          </button>
+        )}
 
         {/* Back link */}
         <div className="pt-2">

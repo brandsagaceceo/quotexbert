@@ -4,7 +4,31 @@ import { prisma } from '@/lib/prisma';
 export const MAX_ACTIVE_QUOTES_PER_JOB = 5;
 
 // Statuses (case-insensitive) that mean a quote is actively submitted and occupies a slot.
-const ACTIVE_QUOTE_STATUSES = new Set(['sent', 'revision_requested', 'accepted']);
+export const ACTIVE_QUOTE_STATUSES = new Set(['sent', 'revision_requested', 'accepted']);
+
+export function isActiveQuoteStatus(status: string | null | undefined): boolean {
+  return ACTIVE_QUOTE_STATUSES.has((status || '').toLowerCase());
+}
+
+export interface QuoteSlotRecord {
+  contractorId: string;
+  status: string | null;
+}
+
+export function evaluateQuoteSlotAccess(
+  quotes: QuoteSlotRecord[],
+  contractorId: string,
+): { allowed: boolean; activeCount: number } {
+  const activeContractorIds = new Set(
+    quotes.filter((quote) => isActiveQuoteStatus(quote.status)).map((quote) => quote.contractorId)
+  );
+  const activeCount = activeContractorIds.size;
+
+  return {
+    allowed: activeContractorIds.has(contractorId) || activeCount < MAX_ACTIVE_QUOTES_PER_JOB,
+    activeCount,
+  };
+}
 
 /**
  * Decide whether `contractorId` may submit/re-submit a quote for `jobId`.
@@ -24,14 +48,5 @@ export async function canSubmitQuote(
     select: { contractorId: true, status: true },
   });
 
-  const activeContractorIds = new Set<string>();
-  for (const q of quotes) {
-    if (ACTIVE_QUOTE_STATUSES.has((q.status || '').toLowerCase())) {
-      activeContractorIds.add(q.contractorId);
-    }
-  }
-
-  const activeCount = activeContractorIds.size;
-  const allowed = activeContractorIds.has(contractorId) || activeCount < MAX_ACTIVE_QUOTES_PER_JOB;
-  return { allowed, activeCount };
+  return evaluateQuoteSlotAccess(quotes, contractorId);
 }

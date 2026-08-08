@@ -41,12 +41,12 @@ export const TIER_CONFIG = {
   [TIERS.RENOVATION]: {
     name: 'Renovation Xbert',
     price: 99,
-    categoryLimit: 8,
+    categoryLimit: 6,
     canBrowseJobs: true,
     canAcceptJobs: true,
     canPickCategories: true,
     canViewAllLeads: true,
-    features: ['8 categories', 'Priority leads', 'Advanced analytics', 'Featured profile']
+    features: ['6 categories', 'Priority leads', 'Advanced analytics', 'Featured profile']
   },
   [TIERS.GENERAL]: {
     name: 'General Contractor',
