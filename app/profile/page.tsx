@@ -838,7 +838,7 @@ export default function UnifiedProfilePage() {
             </div>
 
             {/* Profile Info Card */}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-3 md:p-5 border border-slate-200">
                   {/* Mobile Edit/Save Buttons - Inline (shown only on mobile) */}
                   <div className="md:hidden flex justify-end gap-1.5 mb-1.5">
@@ -977,7 +977,7 @@ export default function UnifiedProfilePage() {
       <div className="container mx-auto px-4 md:px-4 py-4 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-4 md:space-y-8">
+          <div className="min-w-0 lg:col-span-2 space-y-4 md:space-y-8">
             {activeTab === 'overview' && (
               <>
                 {/* Bio Section */}
@@ -1031,9 +1031,9 @@ export default function UnifiedProfilePage() {
                               <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full capitalize">{item.projectType}</span>
                               <span className="text-xs text-slate-400">{new Date(item.createdAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                             </div>
-                            <h3 className="font-semibold text-slate-900 text-base leading-snug">{item.title}</h3>
+                            <h3 className="font-semibold text-slate-900 text-base leading-snug break-words">{item.title}</h3>
                             {item.description && (
-                              <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.description}</p>
+                              <p className="text-sm text-slate-600 mt-1 leading-relaxed line-clamp-2 break-words">{item.description}</p>
                             )}
                             <div className="mt-2">
                               <PortfolioLikeButton itemId={item.id} readOnly />
@@ -1503,7 +1503,7 @@ export default function UnifiedProfilePage() {
                 {savedEstimates.length > 0 ? (
                   <div className="grid md:grid-cols-2 gap-4">
                     {savedEstimates.map((estimate) => (
-                      <div key={estimate.id} className="border-2 border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50">
+                      <div key={estimate.id} className="w-full max-w-full min-w-0 border-2 border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50">
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                           {(estimate as any).lead ? (
                             <span className="text-xs font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-800">
@@ -1525,7 +1525,7 @@ export default function UnifiedProfilePage() {
                         </p>
                         <p className="text-slate-600 text-xs mb-3 line-clamp-2">{estimate.description}</p>
                         <div className="bg-gradient-to-r from-rose-50 to-orange-50 rounded-lg p-3 border border-rose-100">
-                          <div className="text-lg font-bold text-rose-900">
+                          <div className="text-lg font-bold text-rose-900 break-words">
                             ${estimate.minCost.toLocaleString()} - ${estimate.maxCost.toLocaleString()}
                           </div>
                           {estimate.confidence > 0 && (
@@ -1598,10 +1598,10 @@ export default function UnifiedProfilePage() {
                 {jobs.length > 0 ? (
                   <div className="space-y-4">
                     {jobs.map((job) => (
-                      <div key={job.id} className="border-2 border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
+                      <div key={job.id} className="w-full max-w-full min-w-0 border-2 border-slate-200 rounded-xl p-5 hover:shadow-lg transition-all">
+                        <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-2 mb-3">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-bold text-slate-900 mb-1 break-words">{job.title}</h3>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
                               <span>Budget: {typeof job.budget === 'number' ? `$${job.budget.toLocaleString()}` : job.budget}</span>
                               <span>•</span>
