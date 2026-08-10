@@ -16,6 +16,19 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Resolve the Clerk session to the DB user id — Quote.contractorId stores
+    // the DB primary key, which differs from the Clerk user id for
+    // webhook-created accounts. Comparing against the raw Clerk id caused
+    // every send to 404 as "Quote not found" for those contractors.
+    const caller = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: { id: true },
+    });
+    if (!caller) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const dbContractorId = caller.id;
+
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
 
@@ -23,7 +36,7 @@ export async function POST(
     const quote = await prisma.quote.findFirst({
       where: {
         id: quoteId,
-        contractorId: userId,
+        contractorId: dbContractorId,
       },
       include: {
         contractor: { select: { name: true, email: true } },
@@ -54,10 +67,13 @@ export async function POST(
     }
 
     // Update quote status to sent
+    // NOTE: lowercase 'sent' — every other status check/comparison in the app
+    // (LiveQuoteBuilder UI, canSubmitQuote, isActiveQuoteStatus) is lowercase.
+    // The previous 'SENT' here caused this quote to look un-sent in the UI.
     const updatedQuote = await prisma.quote.update({
       where: { id: quoteId },
       data: {
-        status: 'SENT',
+        status: 'sent',
         sentAt: new Date(),
       },
     });

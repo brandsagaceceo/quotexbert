@@ -4,6 +4,7 @@ import { emitQuoteSignal } from "@/lib/quote-signals";
 import { sendQuoteReceivedEmail } from "@/lib/email";
 import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from "@/lib/quote-limits";
 import { markAcceptanceQuoted } from "@/lib/job-acceptance";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function GET(
   request: NextRequest,
@@ -57,6 +58,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: "Your session expired. Please sign in again." }, { status: authResult.status });
+    }
+
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
     const body = await request.json();
@@ -77,11 +83,29 @@ export async function PUT(
       where: { id: quoteId },
       select: { status: true, jobId: true, contractorId: true },
     });
-    if (existing?.status === 'accepted') {
+    if (!existing) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
+    // Only the owning contractor may edit/send their own quote.
+    if (existing.contractorId !== authResult.user.dbUserId) {
+      return NextResponse.json({ error: "You do not have access to this quote." }, { status: 403 });
+    }
+    if (existing.status === 'accepted') {
       return NextResponse.json(
         { error: 'Accepted quotes cannot be modified. Create a revision instead.' },
         { status: 403 }
       );
+    }
+
+    // Require a real amount before a quote can be sent to the homeowner.
+    if (typeof status === 'string' && status.toLowerCase() === 'sent') {
+      const amount = Number(totalCost);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        return NextResponse.json(
+          { error: 'Enter your quote amount before sending.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Enforce the max active-quote cap when a quote is being submitted to the homeowner.
@@ -214,15 +238,23 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: "Your session expired. Please sign in again." }, { status: authResult.status });
+    }
+
     const { id: quoteId } = await params;
 
     // Only allow deleting draft quotes — never delete sent/accepted quotes
     const existing = await prisma.quote.findUnique({
       where: { id: quoteId },
-      select: { status: true },
+      select: { status: true, contractorId: true },
     });
     if (!existing) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
+    if (existing.contractorId !== authResult.user.dbUserId) {
+      return NextResponse.json({ error: "You do not have access to this quote." }, { status: 403 });
     }
     if (!['draft', 'revision_requested'].includes(existing.status)) {
       return NextResponse.json(

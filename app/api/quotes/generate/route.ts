@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { extractQuoteContextFromConversation } from "@/lib/quote-context";
 import { normalizeQuoteDraft, sanitizeMoneyValue, RESIDENTIAL_CAP } from "@/lib/quote-validation";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { conversationId, contractorId } = await request.json();
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: "Your session expired. Please sign in again." }, { status: authResult.status });
+    }
 
-    if (!conversationId || !contractorId) {
+    const { conversationId, contractorId: bodyContractorId } = await request.json();
+
+    if (!conversationId || !bodyContractorId) {
       return NextResponse.json(
         { error: "Conversation ID and contractor ID are required" },
         { status: 400 }
@@ -30,6 +36,13 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // The browser-supplied contractorId is never trusted on its own — the
+    // authenticated caller must actually be the contractor on this conversation.
+    if (authResult.user.dbUserId !== conversation.contractorId) {
+      return NextResponse.json({ error: "You do not have access to this conversation." }, { status: 403 });
+    }
+    const contractorId = conversation.contractorId;
 
     // ── Fetch REAL chat messages from the Thread (where actual conversation lives) ──
     // ConversationMessage table is typically empty because the bridge creates Conversation

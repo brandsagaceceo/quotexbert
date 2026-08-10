@@ -66,9 +66,32 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // 4. Authorise — caller must be homeowner or contractor on this lead
+  // 4. Authorise — caller must be the homeowner, the lead's primary contractor
+  //    (Lead.contractorId, set for the FIRST contractor to accept the job), OR
+  //    another contractor who has legitimately accepted this job.
+  //
+  //    Root cause fix: the job-fairness system allows up to several contractors
+  //    to accept/quote the same job, but Lead.contractorId only ever tracks the
+  //    first one to claim it. Contractors #2/#3/etc. were being rejected here
+  //    with 403 "Forbidden" whenever they tried to open Generate/Send Quote,
+  //    even though they had a valid JobAcceptance on this lead. Fall back to
+  //    checking JobAcceptance so every accepted contractor can reach their own
+  //    quote conversation, not just the first claimer.
+  let resolvedContractorId = lead.contractorId;
   if (dbUserId !== lead.homeownerId && dbUserId !== lead.contractorId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const acceptance = await prisma.jobAcceptance.findUnique({
+      where: { leadId_contractorId: { leadId: lead.id, contractorId: dbUserId } },
+      select: { status: true },
+    });
+    const hasValidAcceptance =
+      !!acceptance && ["accepted", "quoted", "selected"].includes((acceptance.status || "").toLowerCase());
+    if (!hasValidAcceptance) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    // This caller is an accepted contractor other than the lead's primary
+    // contractor — the Conversation/Quote must be attributed to THEM, not to
+    // whoever happens to be Lead.contractorId.
+    resolvedContractorId = dbUserId;
   }
 
   // 5. Find or create the Conversation using the @@unique index as the upsert key.
@@ -81,7 +104,7 @@ export async function GET(request: NextRequest) {
         where: {
           jobId: lead.id,
           homeownerId: lead.homeownerId,
-          contractorId: lead.contractorId!,
+          contractorId: resolvedContractorId!,
         },
         select: { id: true, jobId: true, homeownerId: true, contractorId: true },
       });
@@ -92,7 +115,7 @@ export async function GET(request: NextRequest) {
         data: {
           jobId: lead.id,
           homeownerId: lead.homeownerId,
-          contractorId: lead.contractorId!,
+          contractorId: resolvedContractorId!,
           status: "active",
         },
         select: { id: true, jobId: true, homeownerId: true, contractorId: true },

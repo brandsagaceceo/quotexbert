@@ -298,6 +298,10 @@ export default function LiveQuoteBuilder({
   const saveQuote = async (newStatus: 'draft' | 'sent') => {
     if (!quote) return;
     const isSending = newStatus === 'sent';
+    if (isSending && !(quote.totalCost > 0)) {
+      setError('Enter your quote amount before sending.');
+      return;
+    }
     isSending ? setSending(true) : setSaving(true);
     setError(null);
 
@@ -338,7 +342,7 @@ export default function LiveQuoteBuilder({
         onQuoteSent(data.quote as QuoteData);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "We couldn't send your quote. Please try again.");
     } finally {
       setSaving(false);
       setSending(false);
@@ -738,7 +742,7 @@ export default function LiveQuoteBuilder({
               <button
                 type="button"
                 onClick={() => saveQuote('sent')}
-                disabled={saving || sending || !quote.title.trim() || !quote.scope.trim()}
+                disabled={saving || sending || !quote.title.trim() || !quote.scope.trim() || !(quote.totalCost > 0)}
                 className="flex-1 flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#600018] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
               >
                 {sending ? (
