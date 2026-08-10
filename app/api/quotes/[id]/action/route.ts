@@ -102,6 +102,28 @@ export async function POST(
         },
       }).catch((e: unknown) => console.error('[quote action] notification failed', e));
 
+      // Email the contractor — mirrors the request_changes email leg below.
+      // Previously missing entirely, so acceptance only ever reached the in-app bell.
+      if (quote.contractor?.email) {
+        try {
+          const homeownerUser = await prisma.user.findUnique({
+            where: { id: homeowner.id },
+            select: { name: true, homeownerProfile: { select: { name: true } } },
+          });
+          const homeownerName = homeownerUser?.homeownerProfile?.name || homeownerUser?.name || 'The homeowner';
+          const { sendQuoteAcceptedEmail } = await import('@/lib/email');
+          await sendQuoteAcceptedEmail({
+            contractor: { id: quote.contractor.id, email: quote.contractor.email, name: quote.contractor.name },
+            homeownerName,
+            jobTitle: quote.conversation.job.title,
+            totalCost: quote.totalCost,
+            leadId: quote.conversation.job.id,
+          });
+        } catch (e) {
+          console.error('[quote action] accepted email failed', e);
+        }
+      }
+
       // Phase 6: learning signal
       void emitQuoteSignal({
         event: 'quote_accepted',

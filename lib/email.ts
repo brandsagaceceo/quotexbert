@@ -1985,6 +1985,44 @@ export async function sendQuoteReceivedEmail(params: {
   }
 }
 
+// Quote Accepted Email (contractor receives when homeowner accepts their quote)
+export async function sendQuoteAcceptedEmail(params: {
+  contractor: { id: string; email: string; name?: string | null };
+  homeownerName: string;
+  jobTitle: string;
+  totalCost: number;
+  leadId: string;
+}): Promise<{ success: boolean; error?: any }> {
+  if (!resend) {
+    console.warn('[EMAIL] RESEND_API_KEY not configured, skipping quote-accepted email');
+    return { success: false, error: 'Email service not configured' };
+  }
+  const { contractor, homeownerName, jobTitle, totalCost, leadId } = params;
+  try {
+    await resend.emails.send({
+      from: fromEmail,
+      replyTo: REPLY_TO,
+      to: contractor.email,
+      subject: `Your quote was accepted — ${jobTitle}`,
+      html: buildEmail('Quote Accepted — QuoteXbert', [
+        { type: 'tag', content: 'Quote Accepted', tone: 'success' },
+        { type: 'heading', content: 'Your quote was accepted!' },
+        { type: 'text', content: `${escHtml(homeownerName)} accepted your quote.` },
+        { type: 'card', label: 'Quote Details', rawHtml: true, content: `<strong>Project:</strong> ${escHtml(jobTitle)}<br><strong>Quote Total:</strong> $${escHtml(totalCost.toLocaleString())}` },
+        { type: 'cta', content: 'Message Homeowner', href: `${baseUrl}/messages?leadId=${encodeURIComponent(leadId)}` },
+      ]),
+    });
+    await logEmailEvent('quote_accepted', contractor.email, contractor.id, leadId, undefined, 'sent');
+    console.log(`[EMAIL] Quote-accepted email sent to ${contractor.email}`);
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent('quote_accepted', contractor.email, contractor.id, leadId, undefined, 'failed', errorMsg);
+    console.error('[EMAIL] Failed to send quote-accepted email:', error);
+    return { success: false, error };
+  }
+}
+
 // ─── Subscription Created / Payment Success (contractor) ──────────────────────
 export async function sendSubscriptionCreatedEmail(params: {
   contractor: { id: string; email: string; name?: string | null };
