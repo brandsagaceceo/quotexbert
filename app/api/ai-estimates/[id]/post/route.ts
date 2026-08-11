@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NotificationService } from '@/lib/notifications';
 import { normalizeEstimatePricing } from '@/lib/estimate-pricing';
 import { postalCodeToCity } from '@/lib/postal-to-city';
+import { normalizeCategory } from '@/lib/categories';
 
 const prisma = new PrismaClient();
 
@@ -119,7 +120,10 @@ export async function POST(
 
     // Determine category from estimate items
     const categories = estimate.items.map(item => item.category);
-    const primaryCategory = categories[0] || 'General Contractor';
+    // Normalize to the canonical contractor-matching category set — the previous
+    // 'General Contractor' fallback was a subscription TIER name, not a real
+    // category, and never matched any contractor's entitlement.
+    const primaryCategory = normalizeCategory(categories[0] || '');
 
     // Get visualization URL + reviewed photo list from the request body, if provided.
     const body = await request.json().catch(() => ({}));

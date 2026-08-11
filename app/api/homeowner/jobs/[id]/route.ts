@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveAuthUser } from '@/lib/server-auth';
+import { SIMPLE_CATEGORIES, CATEGORY_TO_SIMPLE, normalizeCategory } from '@/lib/categories';
 
 export const dynamic = "force-dynamic";
 
@@ -171,7 +172,18 @@ export async function PATCH(
 
     if (typeof body.title !== 'undefined') updateData.title = nextTitle ?? job.title;
     if (typeof body.description !== 'undefined') updateData.description = nextDescription ?? job.description;
-    if (typeof body.category !== 'undefined') updateData.category = nextCategory ?? job.category;
+    if (typeof body.category !== 'undefined') {
+      const rawCategory = nextCategory ?? '';
+      // Accept the canonical simple names (what the dropdown now sends) or a
+      // recognized legacy/detailed alias — reject anything else with a clean
+      // error rather than silently guessing via the freeform keyword fallback.
+      const isKnownCategory = (SIMPLE_CATEGORIES as readonly string[]).some((c) => c.toLowerCase() === rawCategory.toLowerCase())
+        || Object.keys(CATEGORY_TO_SIMPLE).some((k) => k.toLowerCase() === rawCategory.toLowerCase());
+      if (!rawCategory || !isKnownCategory) {
+        return NextResponse.json({ error: 'Please select a valid project category.' }, { status: 400 });
+      }
+      updateData.category = normalizeCategory(rawCategory);
+    }
     if (typeof body.budget !== 'undefined') updateData.budget = nextBudget ?? job.budget;
     if (typeof body.city !== 'undefined') updateData.city = nextCity ?? job.city;
     if (typeof body.province !== 'undefined') updateData.province = nextProvince ?? job.province;

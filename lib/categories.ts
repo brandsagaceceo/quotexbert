@@ -354,7 +354,12 @@ export function normalizeCategory(category: string): string {
   if (lower.includes("clean")) return "Cleaning";
   if (lower.includes("hvac") || lower.includes("furnace") || lower.includes("heating") || lower.includes("cooling") || lower.includes("insul")) return "HVAC";
   if (lower.includes("moving") || lower.includes("junk") || lower.includes("haul")) return "Moving";
-  if (lower.includes("renovat") || lower.includes("kitchen") || lower.includes("bathroom") || lower.includes("basement") || lower.includes("roof")) return "Renovation";
+  // Extended aliases for common freeform values already seen in production leads —
+  // each maps to a category concept that already exists in CATEGORY_GROUPS
+  // (decks-fences, masonry-stone-interlock-concrete, siding-repair-installation,
+  // garage-builds-repairs — all → Renovation). No new canonical category added.
+  if (lower.includes("renovat") || lower.includes("kitchen") || lower.includes("bathroom") || lower.includes("basement") || lower.includes("roof")
+    || lower.includes("deck") || lower.includes("fenc") || lower.includes("concrete") || lower.includes("siding") || lower.includes("garage")) return "Renovation";
   if (lower.includes("handyman") || lower.includes("repair") || lower.includes("fix") || lower.includes("odd job")) return "Handyman";
 
   // Fallback — safe default so no job is ever unreachable

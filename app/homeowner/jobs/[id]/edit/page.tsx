@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import PhotoUpload from "@/components/PhotoUpload";
-import { CATEGORY_GROUPS } from "@/lib/categories";
+import { SIMPLE_CATEGORIES, normalizeCategory } from "@/lib/categories";
 
 export default function EditJobPage() {
   const { user } = useAuth();
@@ -45,7 +45,10 @@ export default function EditJobPage() {
         setFormData({
           title: job.title,
           description: job.description,
-          category: job.category,
+          // Normalize so a job saved under a legacy/detailed category value (or
+          // one created before this fix) still shows as correctly selected —
+          // same canonical set used by contractor subscriptions/matching.
+          category: normalizeCategory(job.category),
           budget: job.budget ? job.budget.toString() : "",
           city: job.city || "",
           province: job.province || "ON",
@@ -191,14 +194,10 @@ export default function EditJobPage() {
                 required
               >
                 <option value="">Select a category</option>
-                {CATEGORY_GROUPS.map((group) => (
-                  <optgroup key={group.name} label={group.name}>
-                    {group.categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </optgroup>
+                {SIMPLE_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
             </div>
