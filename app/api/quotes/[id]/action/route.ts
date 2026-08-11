@@ -124,6 +124,27 @@ export async function POST(
         }
       }
 
+      // Post a Thread message so this shows up in the chat list's activity
+      // ordering/unread state, same pattern as request_changes below — non-fatal.
+      try {
+        const thread = await prisma.thread.findUnique({
+          where: { leadId: quote.conversation.job.id },
+          select: { id: true },
+        });
+        if (thread) {
+          await prisma.message.create({
+            data: {
+              threadId: thread.id,
+              fromUserId: homeowner.id,
+              toUserId: quote.conversation.contractorId,
+              body: `✅ Quote accepted: $${quote.totalCost.toLocaleString()}`,
+            },
+          });
+        }
+      } catch (e) {
+        console.error('[quote action] accepted thread message failed', e);
+      }
+
       // Phase 6: learning signal
       void emitQuoteSignal({
         event: 'quote_accepted',

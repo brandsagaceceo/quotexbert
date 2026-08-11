@@ -128,6 +128,8 @@ export default function MessagesPage() {
   const currentBridgeThreadIdRef = useRef<string | null>(null);
   // Quote polling — clears when bridge conversation changes or thread is deselected
   const quotePollRef = useRef<NodeJS.Timeout | null>(null);
+  // Thread-list polling — keeps ordering/unread state current without a full page reload
+  const threadsPollRef = useRef<NodeJS.Timeout | null>(null);
 
   // Keyboard-aware shell sizing — keeps header/composer visible when the mobile keyboard opens.
   const shellRef = useRef<HTMLDivElement>(null);
@@ -179,6 +181,21 @@ export default function MessagesPage() {
     } else {
       setLoading(false);
     }
+  }, [user]);
+
+  // Keep the conversation list (ordering + unread state) current so a new
+  // message/quote activity moves its thread to the top without a full reload.
+  // Silent — never triggers the full-page loading state or disturbs an open chat.
+  useEffect(() => {
+    if (threadsPollRef.current) clearInterval(threadsPollRef.current);
+    if (!user) return;
+    threadsPollRef.current = setInterval(() => {
+      fetchThreads({ silent: true });
+    }, 15000);
+    return () => {
+      if (threadsPollRef.current) clearInterval(threadsPollRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Auto-select the conversation referenced by a notification/email deep link.
@@ -422,11 +439,12 @@ export default function MessagesPage() {
     setShowQuoteBuilder(true);
   };
 
-  const fetchThreads = async () => {
+  const fetchThreads = async (opts?: { silent?: boolean }) => {
     if (!user) return;
-    
+    const silent = opts?.silent === true;
+
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       setThreadsError(null);
       const response = await fetch(`/api/threads?userId=${user.id}`);
       if (response.ok) {
@@ -449,14 +467,14 @@ export default function MessagesPage() {
             role: user.role,
           });
         }
-      } else {
+      } else if (!silent) {
         setThreadsError("Failed to load conversations. Please refresh.");
       }
     } catch (error) {
       console.error('Error fetching threads:', error);
-      setThreadsError("Network error — please check your connection.");
+      if (!silent) setThreadsError("Network error — please check your connection.");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 

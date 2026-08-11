@@ -96,13 +96,26 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      // Thread.createdAt never changes after creation — sorting by it here would
+      // freeze the list in first-accepted order forever. Real activity order is
+      // computed below (latest message time, which also captures quote activity
+      // once it's posted as a Thread message) and applied via a JS sort instead.
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    // Sort by most recent activity — latest message time if any messages exist
+    // (this also reflects quote sends/revisions/acceptances, which post a Thread
+    // message), falling back to thread creation time for threads with no messages yet.
+    const sorted = [...threads].sort((a, b) => {
+      const aTime = a.messages[0]?.createdAt ?? a.createdAt;
+      const bTime = b.messages[0]?.createdAt ?? b.createdAt;
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
+    });
+
     // Attach unreadCount as a top-level field for convenience
-    const threadsWithUnread = threads.map((t) => ({
+    const threadsWithUnread = sorted.map((t) => ({
       ...t,
       unreadCount: t._count.messages,
       _count: undefined,

@@ -191,6 +191,30 @@ export async function PUT(
         }
       });
 
+      // Post a Thread message so this quote send surfaces in the chat list's
+      // activity ordering/unread state — mirrors the existing request_changes
+      // pattern in /api/quotes/[id]/action. Does not touch the notification/email
+      // system above; a plain Message row, non-fatal if it fails.
+      try {
+        const isRevision = (updatedQuote.version ?? 1) > 1 || !!updatedQuote.parentQuoteId;
+        const thread = await prisma.thread.findUnique({
+          where: { leadId: updatedQuote.jobId },
+          select: { id: true },
+        });
+        if (thread) {
+          await prisma.message.create({
+            data: {
+              threadId: thread.id,
+              fromUserId: updatedQuote.contractorId,
+              toUserId: updatedQuote.conversation.homeowner.id,
+              body: `📋 ${isRevision ? "Revised quote" : "New quote"}: $${Number(totalCost).toLocaleString()}`,
+            },
+          });
+        }
+      } catch (threadMsgErr) {
+        console.error('[QUOTE] Failed to post quote-sent thread message (non-fatal):', threadMsgErr);
+      }
+
       // Email homeowner — non-fatal if Resend is not configured
       try {
         const contractorName =
