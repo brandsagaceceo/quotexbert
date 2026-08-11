@@ -402,16 +402,20 @@ export function photoGalleryCard(label: string, urls: string[]): EmailBlock {
 }
 
 // Email templates
-function createMessageReceivedTemplate(preview: string, threadId: string, senderName?: string, jobTitle?: string, recipientId?: string): string {
+function createMessageReceivedTemplate(preview: string, threadId: string, senderName?: string, jobTitle?: string, recipientId?: string, contractorId?: string): string {
   const safePreview = escHtml(preview);
   const safeSender = senderName ? escHtml(senderName) : null;
   const safeJob = jobTitle ? escHtml(jobTitle) : null;
+  // contractorId identifies WHICH contractor this message is from — a lead can
+  // have several contractors sharing one Thread, so threadId alone isn't enough
+  // to open the right contractor's conversation. Same routing rule as in-app.
+  const ctaHref = `${baseUrl}/messages?threadId=${threadId}${contractorId ? `&contractorId=${contractorId}` : ''}`;
   return buildEmail(`New Message${safeSender ? ` from ${safeSender}` : ''} — QuoteXbert`, [
     { type: 'tag', content: 'New Message' },
     { type: 'heading', content: safeSender ? `Message from ${safeSender}` : 'You have a new message', rawHtml: true },
     ...(safeJob ? [{ type: 'text' as const, content: `Re: <strong>${safeJob}</strong>`, rawHtml: true }] : []),
     { type: 'card', content: `<em style="color:#64748b;">"${safePreview}"</em>`, label: 'Message Preview', rawHtml: true },
-    { type: 'cta', content: 'Reply Now →', href: `${baseUrl}/messages?threadId=${threadId}` },
+    { type: 'cta', content: 'Reply Now →', href: ctaHref },
     { type: 'text', content: `View all your conversations at <a href="${baseUrl}/messages" style="color:#9f1239;text-decoration:none;font-weight:600;">QuoteXbert Messages</a>. For your security, never share payment details or send money outside QuoteXbert.`, rawHtml: true },
   ], recipientId ? { unsubscribeUrl: buildUnsubscribeUrl(recipientId, 'message'), unsubscribeLabel: 'Turn off message emails' } : undefined);
 }
@@ -1525,7 +1529,7 @@ export async function sendBulkEmails(
 // New Message Email
 export async function sendNewMessageEmail(
   recipient: { id: string; email: string; name?: string | null },
-  sender: { name?: string | null },
+  sender: { name?: string | null; id?: string },
   messagePreview: string,
   threadId: string,
   jobTitle?: string,
@@ -1550,7 +1554,7 @@ export async function sendNewMessageEmail(
       replyTo: REPLY_TO,
       to: recipient.email,
       subject: `New message from ${sender.name || 'a user'} on QuoteXbert`,
-      html: createMessageReceivedTemplate(messagePreview, threadId, sender.name ?? undefined, jobTitle, recipient.id),
+      html: createMessageReceivedTemplate(messagePreview, threadId, sender.name ?? undefined, jobTitle, recipient.id, sender.id),
     });
 
     await logEmailEvent('new_message', recipient.email, recipient.id, undefined, threadId, 'sent');
@@ -1748,7 +1752,7 @@ export async function sendContractAcceptedEmail(params: {
 // Job Accepted Email (for homeowner)
 export async function sendJobAcceptedEmail(
   homeowner: { id: string; email: string; name?: string | null },
-  contractor: { companyName: string; name?: string | null },
+  contractor: { id: string; companyName: string; name?: string | null },
   job: { id: string; title: string; category: string; city?: string }
 ) {
   if (!resend) {
@@ -1767,7 +1771,8 @@ export async function sendJobAcceptedEmail(
         { type: 'text', content: `<strong>${escHtml(contractor.companyName)}</strong> has accepted your job request for <strong>${escHtml(job.title)}</strong>.`, rawHtml: true },
         { type: 'card', label: 'Job Details', rawHtml: true, content: `<strong>Category:</strong> ${escHtml(job.category)}${job.city ? `<br><strong>Location:</strong> ${escHtml(job.city)}` : ''}` },
         { type: 'card', label: 'Suggested next steps', rawHtml: true, content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">Message the contractor to discuss details</li><li style="margin-bottom:6px;">Schedule a site visit if needed</li><li>Request and review their formal quote</li></ul>' },
-        { type: 'cta', content: 'Message Contractor', href: `${baseUrl}/messages` },
+        // Previously linked to the bare /messages inbox with no job/contractor context at all.
+        { type: 'cta', content: 'Message Contractor', href: `${baseUrl}/messages?leadId=${encodeURIComponent(job.id)}&contractorId=${encodeURIComponent(contractor.id)}` },
       ])
     });
 
@@ -1953,12 +1958,13 @@ export async function sendQuoteReceivedEmail(params: {
   jobTitle: string;
   totalCost: number;
   leadId: string;
+  contractorId?: string;
 }): Promise<{ success: boolean; error?: any }> {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping quote-received email');
     return { success: false, error: 'Email service not configured' };
   }
-  const { homeowner, contractorName, jobTitle, totalCost, leadId } = params;
+  const { homeowner, contractorName, jobTitle, totalCost, leadId, contractorId } = params;
   try {
     await resend.emails.send({
       from: fromEmail,
@@ -1970,7 +1976,7 @@ export async function sendQuoteReceivedEmail(params: {
         { type: 'heading', content: 'You received a quote!' },
         { type: 'text', content: `${escHtml(contractorName)} has sent you a quote.` },
         { type: 'card', label: 'Quote Details', rawHtml: true, content: `<strong>Project:</strong> ${escHtml(jobTitle)}<br><strong>Quote Total:</strong> $${escHtml(totalCost.toLocaleString())}` },
-        { type: 'cta', content: 'View Quote & Reply', href: `${baseUrl}/messages?leadId=${encodeURIComponent(leadId)}` },
+        { type: 'cta', content: 'View Quote & Reply', href: `${baseUrl}/messages?leadId=${encodeURIComponent(leadId)}${contractorId ? `&contractorId=${encodeURIComponent(contractorId)}` : ''}` },
         { type: 'text', content: '<span style="font-size:12px;color:#94a3b8;">Reply to this email if you need help from our support team.</span>', rawHtml: true },
       ]),
     });

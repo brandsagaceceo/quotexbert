@@ -52,6 +52,14 @@ interface ChatProps {
   onSendInstantly?: (draft: NonNullable<AutoDraftState['draft']>, displayPrice: string) => Promise<boolean>;
   /** When true, hides the "Draft quote ready" CTA because a quote is already sent/active */
   quoteSent?: boolean;
+  /**
+   * Some leads have multiple contractors sharing this one Thread (job-fairness:
+   * several contractors can accept/message the same homeowner). thread.lead.contractor
+   * only ever holds the FIRST contractor. When a notification/deep link is about a
+   * DIFFERENT contractor in this thread, pass their id here so the header shows the
+   * right person instead of always falling back to the primary contractor.
+   */
+  focusContractorId?: string;
 }
 
 function getDisplayName(user: UserProfile | null | undefined): string {
@@ -103,7 +111,7 @@ function Avatar({ user, size = "sm" }: { user: UserProfile | null | undefined; s
   );
 }
 
-export default function Chat({ thread, currentUserId, onDeleteThread, onBack, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly, quoteSent }: ChatProps) {
+export default function Chat({ thread, currentUserId, onDeleteThread, onBack, userRole, jobTitle, aiEnhanceEnabled, onAutoDraftReview, onSendInstantly, quoteSent, focusContractorId }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -168,12 +176,26 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   // count stays constant across renders.  previousIds start with "user_" when
   // User.id was set to an old Clerk ID — this is expected for users whose Clerk
   // workspace was reset.  The value is still the canonical DB primary key.
+  const isHomeowner = !!currentUserId && currentUserId === thread.lead.homeowner.id;
+
+  // Resolve the contractor this conversation should display for a homeowner.
+  // thread.lead.contractor is only ever the FIRST contractor on the lead — when
+  // focusContractorId points at someone else who has actually messaged in this
+  // shared thread, use their profile (already available on one of their messages)
+  // instead of silently mislabeling the conversation as the primary contractor.
+  const focusedContractor = (() => {
+    if (!isHomeowner || !focusContractorId) return null;
+    if (thread.lead.contractor?.id === focusContractorId) return null; // already the default — no override needed
+    const msg = messages.find(m => m.fromUser.id === focusContractorId || m.toUser.id === focusContractorId);
+    if (!msg) return null;
+    return msg.fromUser.id === focusContractorId ? msg.fromUser : msg.toUser;
+  })();
+
   const otherUser =
-    currentUserId && thread.lead.homeowner.id === currentUserId
-      ? thread.lead.contractor
+    isHomeowner
+      ? (focusedContractor ?? thread.lead.contractor)
       : thread.lead.homeowner;
 
-  const isHomeowner = !!currentUserId && currentUserId === thread.lead.homeowner.id;
   const canHireContractor =
     isHomeowner && thread.lead.contractor && thread.lead.status !== "assigned" && !contractorHired;
   // Self-user profile — used for optimistic message rendering (mirrors otherUser logic)
@@ -555,9 +577,14 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   }, []);
 
   // Re-measure whenever the message text changes (typing, clearing after send, AI enhance, etc.)
+  // Composer growth/shrink (e.g. wrapping to a new line) shrinks/grows the message
+  // list's available height via flexbox, which visually shifts the last message —
+  // re-anchor to the bottom instantly so it doesn't appear to jump while typing.
+  // scrollToBottom already no-ops when the user has scrolled up to read history.
   useEffect(() => {
     resizeComposer();
-  }, [newMessage, resizeComposer]);
+    scrollToBottom("instant");
+  }, [newMessage, resizeComposer, scrollToBottom]);
 
   // Guard: parent should prevent rendering without currentUserId, but catch it safely.
   // Placed AFTER all hooks to satisfy React Rules of Hooks.

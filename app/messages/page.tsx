@@ -28,6 +28,7 @@ interface Message {
   body: string;
   createdAt: string;
   fromUser: UserInThread;
+  toUser?: UserInThread;
 }
 
 interface Thread {
@@ -96,6 +97,10 @@ export default function MessagesPage() {
   // webhook-created accounts.  The threads API resolves and returns it.
   const [selfUserId, setSelfUserId] = useState<string>("");
   const [threadsError, setThreadsError] = useState<string | null>(null);
+  // Which contractor a deep link (notification/quote alert) is actually about,
+  // for leads where multiple contractors share one Thread. Null = show the
+  // thread's default/primary contractor (unchanged existing behavior).
+  const [deepLinkContractorId, setDeepLinkContractorId] = useState<string | null>(null);
 
   // Phase 2: Quote panel + LiveQuoteBuilder state
   const [showQuoteBuilder, setShowQuoteBuilder] = useState(false);
@@ -137,18 +142,24 @@ export default function MessagesPage() {
     'calc(100dvh - var(--header-height, 64px) - var(--bottom-nav-height, 44px))',
   );
 
-  // Select a thread and optimistically clear its unread badge
-  const selectThread = (thread: Thread) => {
+  // Select a thread and optimistically clear its unread badge.
+  // focusContractorId: when a lead has multiple contractors sharing one Thread,
+  // this identifies WHICH contractor the caller (e.g. a notification deep link)
+  // is actually about, so Chat can display that contractor instead of always
+  // falling back to lead.contractorId (the first/primary contractor).
+  const selectThread = (thread: Thread, focusContractorId?: string) => {
     if (process.env.NODE_ENV === 'development') {
       console.debug('[Messages][select-thread]', {
         threadId: thread.id,
         leadId: thread.lead.id,
         homeownerId: thread.lead.homeowner?.id,
         contractorId: thread.lead.contractor?.id,
+        focusContractorId,
         selfUserId,
       });
     }
     setSelectedThread(thread);
+    setDeepLinkContractorId(focusContractorId ?? null);
     if ((thread.unreadCount ?? 0) > 0) {
       setThreads(prev => prev.map(t => t.id === thread.id ? { ...t, unreadCount: 0 } : t));
     }
@@ -209,14 +220,17 @@ export default function MessagesPage() {
     const threadId = searchParams.get('threadId');
     const leadId = searchParams.get('leadId');
     const conversationId = searchParams.get('conversationId');
+    // Present on NEW_MESSAGE/quote notifications so multi-contractor leads open
+    // the correct contractor's identity instead of the thread's primary one.
+    const contractorId = searchParams.get('contractorId') || undefined;
 
     if (threadId) {
       const direct = threads.find(thread => thread.id === threadId);
-      if (direct) { selectThread(direct); return; }
+      if (direct) { selectThread(direct, contractorId); return; }
     }
     if (leadId) {
       const byLead = threads.find(thread => thread.lead.id === leadId);
-      if (byLead) { selectThread(byLead); return; }
+      if (byLead) { selectThread(byLead, contractorId); return; }
     }
 
     // Resolve an explicit conversationId, or a threadId that was actually a
@@ -230,7 +244,7 @@ export default function MessagesPage() {
       .then(data => {
         if (cancelled || !data?.jobId) return;
         const match = threads.find(t => t.lead.id === data.jobId);
-        if (match) selectThread(match);
+        if (match) selectThread(match, contractorId ?? data.contractorId ?? undefined);
       })
       .catch(() => { /* non-critical — user lands on /messages without auto-select */ });
     return () => { cancelled = true; };
@@ -513,9 +527,24 @@ export default function MessagesPage() {
     // Compare against the resolved DB id (selfUserId) rather than the raw Clerk ID (user.id).
     // For webhook-created users, User.id is a UUID while user.id from useAuth is the Clerk ID.
     if (!selfUserId) return null;
-    return thread.lead.homeowner.id === selfUserId
-      ? thread.lead.contractor
-      : thread.lead.homeowner;
+    return resolveThreadContractor(thread, selfUserId);
+  };
+
+  // A shared Thread can host several contractors (job-fairness: multiple
+  // contractors can accept/message the same homeowner). thread.lead.contractor
+  // is only ever the FIRST one. For the homeowner's view, resolve the contractor
+  // implicated by the most recent activity in the thread (already-fetched latest
+  // message's sender, or recipient if the homeowner sent it) instead of always
+  // falling back to the primary contractor — reuses existing message data, no
+  // new model. Contractor's own view is unambiguous (one homeowner per lead).
+  const resolveThreadContractor = (thread: Thread, myId: string): UserInThread | null | undefined => {
+    if (thread.lead.homeowner.id !== myId) return thread.lead.homeowner;
+    const last = thread.messages[0];
+    if (last) {
+      if (last.fromUser.id !== myId) return last.fromUser;
+      if (last.toUser && last.toUser.id !== myId) return last.toUser;
+    }
+    return thread.lead.contractor;
   };
 
   const getLastMessage = (thread: Thread) => {
@@ -710,14 +739,18 @@ export default function MessagesPage() {
                       const lastMessage = thread.messages[0] || null;
                       const isSelected = selectedThread?.id === thread.id;
                       const myId = selfUserId;
-                      const otherUser = thread.lead.homeowner.id === myId
-                        ? thread.lead.contractor
-                        : thread.lead.homeowner;
-                      
+                      const otherUser = resolveThreadContractor(thread, myId);
+                      // Only pass a focus contractor when it's someone other than the
+                      // thread's default primary contractor — keeps normal single-
+                      // contractor threads byte-for-byte unchanged.
+                      const rowFocusContractorId = otherUser && otherUser.id !== thread.lead.contractor?.id
+                        ? otherUser.id
+                        : undefined;
+
                       return (
                         <div
                           key={thread.id}
-                          onClick={() => selectThread(thread)}
+                          onClick={() => selectThread(thread, rowFocusContractorId)}
                           className={`group relative p-3 cursor-pointer rounded-lg border-b border-slate-100 last:border-b-0 transition-all duration-150 active:scale-[0.99] ${
                             isSelected
                               ? 'bg-rose-50 border-l-4 border-l-rose-700 shadow-sm'
@@ -905,7 +938,8 @@ export default function MessagesPage() {
                   <Chat
                     thread={selectedThread}
                     currentUserId={selfUserId}
-                    onBack={() => setSelectedThread(null)}
+                    focusContractorId={deepLinkContractorId ?? undefined}
+                    onBack={() => { setSelectedThread(null); setDeepLinkContractorId(null); }}
                     onDeleteThread={(threadId) => {
                       setThreads(prev => prev.filter(t => t.id !== threadId));
                       setSelectedThread(null);

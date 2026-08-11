@@ -222,7 +222,10 @@ export async function POST(
       }
     });
 
-    // Create notification for homeowner — includes threadId so Alerts page deep-links to /messages
+    // Create notification for homeowner — includes threadId so Alerts page deep-links to /messages.
+    // payload.contractorId identifies WHICH contractor just accepted — a lead can
+    // have several contractors accept and share one Thread, so threadId alone
+    // isn't enough to show the right contractor's identity when opened.
     await prisma.notification.create({
       data: {
         userId: currentLead.homeownerId,
@@ -235,6 +238,7 @@ export async function POST(
           threadId: thread.id,
           jobId,
           jobTitle: currentLead.title,
+          contractorId: dbContractorId,
         }
       }
     });
@@ -254,6 +258,7 @@ export async function POST(
           email: currentLead.homeowner.email,
         },
         {
+          id: dbContractorId,
           name: contractor.name || contractor.email,
           companyName: contractorProfile?.companyName || contractor.name || contractor.email,
         },

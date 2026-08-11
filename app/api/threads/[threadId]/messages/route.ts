@@ -182,7 +182,10 @@ export async function POST(
             name: newMessage.toUser.contractorProfile?.companyName || newMessage.toUser.homeownerProfile?.name || newMessage.toUser.name
           },
           {
-            name: senderName
+            name: senderName,
+            // Lets the email CTA include &contractorId= so a shared multi-contractor
+            // thread opens the right person instead of the thread's primary contractor.
+            id: dbFromUserId,
           },
           message.substring(0, 100),
           threadId

@@ -83,6 +83,15 @@ export async function GET(request: NextRequest) {
                 homeownerProfile: { select: { name: true, profilePhoto: true } },
               },
             },
+            // Needed so the client can resolve WHICH contractor a shared multi-
+            // contractor thread's latest activity belongs to when the homeowner
+            // sent the last message (not just when a contractor sent it).
+            toUser: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
           },
         },
         _count: {

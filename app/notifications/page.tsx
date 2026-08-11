@@ -216,17 +216,24 @@ export default function NotificationsPage() {
 
   const getTargetUrl = (notification: AppNotification) => {
     const payload = notification.payload || {};
+    // A lead can have multiple contractors sharing one Thread — leadId/threadId
+    // alone doesn't say WHICH contractor this notification is about. Prefer an
+    // explicit payload.contractorId (quote/job-accepted alerts), falling back to
+    // payload.fromUserId (NEW_MESSAGE alerts already carry the sender's id).
+    const contractorSuffix = (payload.contractorId || payload.fromUserId)
+      ? `&contractorId=${payload.contractorId || payload.fromUserId}`
+      : '';
 
     if (payload.threadId) {
-      return `/messages?threadId=${payload.threadId}`;
+      return `/messages?threadId=${payload.threadId}${contractorSuffix}`;
     }
 
     if (payload.conversationId) {
-      return `/messages?conversationId=${payload.conversationId}`;
+      return `/messages?conversationId=${payload.conversationId}${contractorSuffix}`;
     }
 
     if (payload.leadId) {
-      return `/messages?leadId=${payload.leadId}`;
+      return `/messages?leadId=${payload.leadId}${contractorSuffix}`;
     }
 
     // Contractors: job match notification goes to contractor jobs board

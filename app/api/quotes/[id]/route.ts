@@ -186,8 +186,11 @@ export async function PUT(
           message: `You've received a quote for "${updatedQuote.conversation.job.title}" - $${totalCost}`,
           relatedId: quoteId,
           relatedType: "quote",
-          // payload.leadId enables NotificationBell to deep-link to /messages?leadId=
-          payload: { leadId: updatedQuote.conversation.job.id },
+          // payload.leadId enables NotificationBell to deep-link to /messages?leadId=.
+          // payload.contractorId identifies WHICH contractor this quote is from —
+          // a lead can have multiple contractors sharing one Thread, so leadId
+          // alone isn't enough to open the right contractor's conversation.
+          payload: { leadId: updatedQuote.conversation.job.id, contractorId: updatedQuote.contractorId },
         }
       });
 
@@ -231,6 +234,7 @@ export async function PUT(
           jobTitle: updatedQuote.conversation.job.title,
           totalCost: parseFloat(totalCost || 0),
           leadId: updatedQuote.conversation.job.id,
+          contractorId: updatedQuote.contractorId,
         });
         console.log(`[QUOTE] Quote-received email sent to ${updatedQuote.conversation.homeowner.email}`);
       } catch (emailErr) {
