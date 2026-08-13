@@ -3,6 +3,7 @@
 // Individual quote operations (GET by id, PUT, status updates) are in /api/quotes/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,37 +15,57 @@ export const dynamic = "force-dynamic";
  *   ?conversationId=<conversation-id>
  * Returns: { quotes: Quote[] }
  * If no filter is provided returns { quotes: [] } so pages don't crash.
+ *
+ * PRIVACY: reads are scoped to the authenticated caller on the SERVER. A
+ * contractor may only ever receive their OWN quotes; a homeowner may only
+ * receive quotes on their own jobs. Client-supplied ids are never trusted for
+ * authorization — they can't be tampered to read a competing contractor's quote.
  */
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
+
     const { searchParams } = new URL(request.url);
     const contractorId = searchParams.get("contractorId");
     const homeownerId = searchParams.get("homeownerId");
     const conversationId = searchParams.get("conversationId");
 
     if (!contractorId && !homeownerId && !conversationId) {
-      // Return empty rather than 400 so pages calling without auth do not break.
+      // Return empty rather than 400 so pages calling without a filter do not break.
       return NextResponse.json({ quotes: [] });
     }
 
     const where: Record<string, unknown> = {};
 
-    if (contractorId) {
-      // Support both DB primary key and Clerk user ID
-      const user = await prisma.user.findFirst({
-        where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
-        select: { id: true },
+    if (conversationId) {
+      // Caller must be a participant of this conversation. Conversations are keyed
+      // per (jobId, homeownerId, contractorId), so a contractor's conversation only
+      // ever contains their own quotes — but verify participation regardless so a
+      // tampered conversationId can't surface a co-bidder's quotes.
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        select: { homeownerId: true, contractorId: true },
       });
-      where.contractorId = user?.id ?? contractorId;
-    } else if (homeownerId) {
-      // Quotes are linked to Conversations which carry homeownerId
-      const user = await prisma.user.findFirst({
-        where: { OR: [{ id: homeownerId }, { clerkUserId: homeownerId }] },
-        select: { id: true },
-      });
-      where.conversation = { homeownerId: user?.id ?? homeownerId };
-    } else if (conversationId) {
+      if (!conversation) return NextResponse.json({ quotes: [] });
+      const isHomeowner = conversation.homeownerId === dbUserId;
+      const isContractor = conversation.contractorId === dbUserId;
+      if (!isHomeowner && !isContractor) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
       where.conversationId = conversationId;
+      // Defense in depth: a contractor is pinned to their own quotes only.
+      if (!isHomeowner) where.contractorId = dbUserId;
+    } else if (contractorId) {
+      // Contractors may only read their own quotes — pin to the authenticated
+      // user and ignore the supplied id so it can't be tampered to read a rival's.
+      where.contractorId = dbUserId;
+    } else if (homeownerId) {
+      // Homeowners may only read quotes on their own jobs (via Conversation.homeownerId).
+      where.conversation = { homeownerId: dbUserId };
     }
 
     const quotes = await prisma.quote.findMany({

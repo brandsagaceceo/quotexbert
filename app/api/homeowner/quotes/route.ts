@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const homeownerId = searchParams.get("homeownerId");
-
-    if (!homeownerId) {
-      return NextResponse.json(
-        { error: "Homeowner ID is required" },
-        { status: 400 }
-      );
+    // PRIVACY: scope to the authenticated homeowner. The client-supplied
+    // homeownerId is ignored for authorization so it can't be tampered to read
+    // another user's quotes.
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
+    const { dbUserId } = authResult.user;
 
     // Get quotes for jobs owned by this homeowner
     const quotes = await prisma.quote.findMany({
       where: {
         job: {
-          homeownerId: homeownerId
+          homeownerId: dbUserId
         }
       },
       include: {

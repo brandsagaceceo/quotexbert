@@ -11,6 +11,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
+
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
 
@@ -40,6 +46,14 @@ export async function GET(
         { error: "Quote not found" },
         { status: 404 }
       );
+    }
+
+    // PRIVACY: only the owning contractor or the job's homeowner may read a
+    // quote's full details — a competing contractor cannot fetch it by id.
+    const ownsAsContractor = quote.contractorId === dbUserId;
+    const ownsAsHomeowner = quote.conversation?.homeownerId === dbUserId;
+    if (!ownsAsContractor && !ownsAsHomeowner) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     return NextResponse.json(quote);
