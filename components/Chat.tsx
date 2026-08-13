@@ -78,6 +78,12 @@ function getProfilePhoto(user: UserProfile | null | undefined): string | null {
   return user.contractorProfile?.profilePhoto || user.homeownerProfile?.profilePhoto || null;
 }
 
+// Composer auto-grow bounds: expands to fit content up to COMPOSER_MAX_HEIGHT, then
+// scrolls internally instead of growing further. Keeps the chat layout stable on long
+// messages. Module-level (not props/state-dependent) so refs can use them as initializers.
+const COMPOSER_MIN_HEIGHT = 44;
+const COMPOSER_MAX_HEIGHT = 140;
+
 // Presentation-only label map for the existing `thread.lead.status` field
 // (values already supported by the schema: draft | open | reviewing | assigned |
 // pending_completion | completed | closed). Purely visual — does not affect any business logic.
@@ -155,6 +161,10 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const lastMessageIdRef = useRef<string | null>(null);
   const hasMarkedReadRef = useRef(false);
   const isFirstRenderRef = useRef(true);
+  // Tracks the composer's last measured pixel height so the re-anchor effect below
+  // only fires when typing actually changes the composer's height (line wrap/unwrap),
+  // never on every keystroke — this was the cause of the mobile "bounce" while typing.
+  const composerHeightRef = useRef<number>(COMPOSER_MIN_HEIGHT);
 
   const { notifyNewMessage } = useMessageNotifications({
     enabled: true,
@@ -563,10 +573,6 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
   const formatTime = (ts: string) =>
     new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  // Composer auto-grow: expands to fit content up to COMPOSER_MAX_HEIGHT, then scrolls
-  // internally instead of growing further. Keeps the chat layout stable on long messages.
-  const COMPOSER_MIN_HEIGHT = 44;
-  const COMPOSER_MAX_HEIGHT = 140;
   const resizeComposer = useCallback(() => {
     const el = composerRef.current;
     if (!el) return;
@@ -576,14 +582,20 @@ export default function Chat({ thread, currentUserId, onDeleteThread, onBack, us
     el.style.overflowY = el.scrollHeight > COMPOSER_MAX_HEIGHT ? "auto" : "hidden";
   }, []);
 
-  // Re-measure whenever the message text changes (typing, clearing after send, AI enhance, etc.)
-  // Composer growth/shrink (e.g. wrapping to a new line) shrinks/grows the message
-  // list's available height via flexbox, which visually shifts the last message —
-  // re-anchor to the bottom instantly so it doesn't appear to jump while typing.
-  // scrollToBottom already no-ops when the user has scrolled up to read history.
+  // Re-measure whenever the message text changes (typing, clearing after send, AI enhance, etc.).
+  // Only re-anchor scroll to the bottom when the composer's PIXEL HEIGHT actually changed
+  // (e.g. wrapping to a new line growing/shrinking the message list above it via flexbox) —
+  // NOT on every keystroke. Calling scrollIntoView on every character (the previous behavior)
+  // was the root cause of the mobile "bounce" while typing a single-line message.
+  // scrollToBottom itself still no-ops when the user has scrolled up to read history.
   useEffect(() => {
     resizeComposer();
-    scrollToBottom("instant");
+    const el = composerRef.current;
+    const measuredHeight = el ? el.offsetHeight : composerHeightRef.current;
+    if (measuredHeight !== composerHeightRef.current) {
+      composerHeightRef.current = measuredHeight;
+      scrollToBottom("instant");
+    }
   }, [newMessage, resizeComposer, scrollToBottom]);
 
   // Guard: parent should prevent rendering without currentUserId, but catch it safely.
