@@ -245,7 +245,8 @@ function escHtml(s: string): string {
 export function buildEmail(
   subject: string,
   blocks: EmailBlock[],
-  footer?: { unsubscribeUrl?: string; unsubscribeLabel?: string }
+  footer?: { unsubscribeUrl?: string; unsubscribeLabel?: string },
+  preheader = `${subject} - QuoteXbert`,
 ): string {
   const renderedBlocks = blocks.map((b) => {
     // When rawHtml is set, the caller has already sanitised the content (e.g. email
@@ -315,7 +316,7 @@ export function buildEmail(
 </style>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#111111;">
-<div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0;">${escHtml(subject)} - QuoteXbert</div>
+<div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0;">${escHtml(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="qx-shell" style="background:#ffffff;padding:20px 10px;">
   <tr><td align="center">
     <table role="presentation" width="100%" class="qx-container" style="max-width:600px;border-collapse:separate;border-spacing:0;border-radius:16px;box-shadow:0 1px 3px rgba(16,24,40,0.06);" cellpadding="0" cellspacing="0">
@@ -933,6 +934,299 @@ export async function sendContractorJobBoardOfferTestEmail({
       unsubscribeUserId,
     }),
   });
+}
+
+export const CONTRACTOR_PROFILE_OPTIMIZATION_CAMPAIGN = 'contractor_profile_optimization_aug_2026';
+export const CONTRACTOR_PROFILE_OPTIMIZATION_SUBJECT = 'A quick way to improve your QuoteXbert profile';
+export const CONTRACTOR_PROFILE_OPTIMIZATION_PREHEADER = 'A strong profile photo and recent work can help homeowners feel more confident reaching out.';
+
+export interface ContractorProfileOptimizationRecipient {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string | null;
+  isActive: boolean;
+  notifyMarketingEmail: boolean;
+  subscriptionStatus: string | null;
+  subscriptionCurrentPeriodEnd: Date | null;
+  subscriptions: Array<{
+    status: string;
+    monthlyPrice: number;
+    currentPeriodEnd: Date | null;
+  }>;
+}
+
+export interface ContractorProfileOptimizationCounts {
+  contractorsScanned: number;
+  payingActive: number;
+  eligibleRecipients: number;
+  excludedFree: number;
+  excludedCanceledInactive: number;
+  excludedPreferenceUnsubscribed: number;
+  excludedInvalidEmail: number;
+  excludedInternalAccount: number;
+  excludedDuplicateEmail: number;
+  alreadyReceivedCampaign: number;
+  wouldSend: number;
+}
+
+export interface ContractorProfileOptimizationPlan {
+  recipients: Array<{ id: string; email: string; name: string | null }>;
+  counts: ContractorProfileOptimizationCounts;
+}
+
+function hasCurrentPaidProfileOptimizationAccess(contractor: ContractorProfileOptimizationRecipient, now: number): boolean {
+  const userAccessIsCurrent =
+    ['active', 'trialing'].includes(contractor.subscriptionStatus || '') &&
+    (!contractor.subscriptionCurrentPeriodEnd || contractor.subscriptionCurrentPeriodEnd.getTime() >= now);
+
+  if (userAccessIsCurrent) return true;
+
+  return contractor.subscriptions.some((subscription) =>
+    ['active', 'trialing'].includes(subscription.status) &&
+    subscription.monthlyPrice > 0 &&
+    (!subscription.currentPeriodEnd || subscription.currentPeriodEnd.getTime() >= now)
+  );
+}
+
+function hasPaidSubscriptionHistory(contractor: ContractorProfileOptimizationRecipient): boolean {
+  return Boolean(contractor.subscriptionStatus) || contractor.subscriptions.some((subscription) => subscription.monthlyPrice > 0);
+}
+
+export function planContractorProfileOptimizationRecipients(
+  contractors: ContractorProfileOptimizationRecipient[],
+  alreadySentRecipientKeys = new Set<string>(),
+  now = Date.now(),
+): ContractorProfileOptimizationPlan {
+  const counts: ContractorProfileOptimizationCounts = {
+    contractorsScanned: contractors.length,
+    payingActive: 0,
+    eligibleRecipients: 0,
+    excludedFree: 0,
+    excludedCanceledInactive: 0,
+    excludedPreferenceUnsubscribed: 0,
+    excludedInvalidEmail: 0,
+    excludedInternalAccount: 0,
+    excludedDuplicateEmail: 0,
+    alreadyReceivedCampaign: 0,
+    wouldSend: 0,
+  };
+  const recipients: Array<{ id: string; email: string; name: string | null }> = [];
+  const seenEmails = new Set<string>();
+
+  for (const contractor of contractors) {
+    const hasCurrentPaidAccess = hasCurrentPaidProfileOptimizationAccess(contractor, now);
+    if (hasCurrentPaidAccess) counts.payingActive++;
+
+    if (contractor.role !== 'contractor' || !contractor.isActive) {
+      counts.excludedCanceledInactive++;
+      continue;
+    }
+
+    if (!hasCurrentPaidAccess) {
+      if (hasPaidSubscriptionHistory(contractor)) counts.excludedCanceledInactive++;
+      else counts.excludedFree++;
+      continue;
+    }
+
+    if (!contractor.email || !isSendableEmail(contractor.email)) {
+      counts.excludedInvalidEmail++;
+      continue;
+    }
+
+    const normalizedEmail = contractor.email.trim().toLowerCase();
+    if (isInternalOrStaffAccountEmail(normalizedEmail)) {
+      counts.excludedInternalAccount++;
+      continue;
+    }
+
+    if (!contractor.notifyMarketingEmail) {
+      counts.excludedPreferenceUnsubscribed++;
+      continue;
+    }
+
+    if (alreadySentRecipientKeys.has(contractor.id.toLowerCase()) || alreadySentRecipientKeys.has(normalizedEmail)) {
+      counts.alreadyReceivedCampaign++;
+      continue;
+    }
+
+    if (seenEmails.has(normalizedEmail)) {
+      counts.excludedDuplicateEmail++;
+      continue;
+    }
+
+    seenEmails.add(normalizedEmail);
+    recipients.push({ id: contractor.id, email: normalizedEmail, name: contractor.name });
+  }
+
+  counts.eligibleRecipients = recipients.length;
+  counts.wouldSend = recipients.length;
+  return { recipients, counts };
+}
+
+export function buildContractorProfileOptimizationHtml(params: {
+  firstName?: string | null;
+  unsubscribeUserId?: string | null;
+}): string {
+  const firstName = params.firstName?.trim() || 'there';
+  const footer = params.unsubscribeUserId
+    ? {
+        unsubscribeUrl: buildUnsubscribeUrl(params.unsubscribeUserId, 'marketing'),
+        unsubscribeLabel: 'Turn off marketing emails',
+      }
+    : {
+        unsubscribeUrl: `${BASE_URL}/unsubscribe?preview=1`,
+        unsubscribeLabel: 'Turn off marketing emails',
+      };
+
+  return buildEmail(CONTRACTOR_PROFILE_OPTIMIZATION_SUBJECT, [
+    { type: 'tag', content: 'Profile Tip' },
+    { type: 'heading', content: 'A quick tip to help you stand out' },
+    { type: 'text', content: `Hi ${firstName},` },
+    { type: 'text', content: "We hope you're enjoying QuoteXbert so far." },
+    { type: 'text', content: 'As we continue bringing more homeowners onto the platform, we wanted to share a few simple things you can do to help your profile stand out when homeowners are comparing contractors.' },
+    { type: 'sectionTitle', content: 'Put a face to your business' },
+    { type: 'text', content: "If you haven't already, upload a profile photo. A clear personal photo or simple selfie works great." },
+    { type: 'text', content: "Homeowners aren't just hiring a company - they're choosing the person they feel comfortable inviting into their home." },
+    { type: 'text', content: '<strong>People buy from people.</strong> Having a clear, friendly photo can help build trust before you have even had the first conversation.', rawHtml: true },
+    { type: 'sectionTitle', content: 'Show homeowners your recent work' },
+    { type: 'text', content: 'Make sure your QuoteXbert profile includes photos of your recent projects. Whether it is a renovation, painting job, flooring installation, landscaping project, repair, or other completed work, real project photos help homeowners understand the quality of work you provide.' },
+    {
+      type: 'card',
+      label: 'A strong profile should ideally have',
+      rawHtml: true,
+      content: '<ul style="margin:0;padding-left:18px;"><li style="margin-bottom:6px;">A clear profile photo</li><li style="margin-bottom:6px;">A short description of what you specialize in</li><li style="margin-bottom:6px;">Photos of recent work</li><li style="margin-bottom:6px;">Accurate service categories</li><li>An up-to-date service area</li></ul>',
+    },
+    { type: 'cta', content: 'Update My Profile', href: `${BASE_URL}/contractor/profile/edit` },
+    { type: 'sectionTitle', content: 'Keep an eye on the Job Board' },
+    { type: 'text', content: 'We have increased our homeowner marketing efforts for the coming months and will continue working to bring more homeowners and job opportunities onto QuoteXbert. Make sure you are checking the Job Board regularly so you do not miss opportunities in your categories and service area.' },
+    { type: 'text', content: `<div style="text-align:center;"><a href="${BASE_URL}/contractor/jobs" style="color:#800020;text-decoration:none;font-weight:700;">View Job Board</a></div>`, rawHtml: true },
+    { type: 'sectionTitle', content: "We're building this with contractors" },
+    { type: 'text', content: 'Your feedback matters. If there is something you would like to see improved, changed, or added to QuoteXbert, please reach out.' },
+    { type: 'text', content: 'If you have questions about your profile, the Job Board, quoting, or anything else, we are happy to help.' },
+    { type: 'text', content: '<strong>Text us at <a href="sms:9052429460" style="color:#800020;text-decoration:none;">905-242-9460</a> to schedule a quick call.</strong>', rawHtml: true },
+    { type: 'text', content: 'Thanks for being part of QuoteXbert.' },
+    { type: 'text', content: '<strong>The QuoteXbert Team</strong>', rawHtml: true },
+  ], footer, CONTRACTOR_PROFILE_OPTIMIZATION_PREHEADER);
+}
+
+export async function sendContractorProfileOptimizationEmail(contractorId: string) {
+  const contractor = await prisma.user.findUnique({
+    where: { id: contractorId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      isActive: true,
+      notifyMarketingEmail: true,
+      subscriptionStatus: true,
+      subscriptionCurrentPeriodEnd: true,
+      subscriptions: {
+        select: { status: true, monthlyPrice: true, currentPeriodEnd: true },
+      },
+    },
+  });
+
+  if (!contractor) return { success: false, skipped: true, reason: 'contractor_not_found' };
+
+  const sentKeys = new Set<string>();
+  if (await hasCampaignEmail(contractor.id, contractor.email, CONTRACTOR_PROFILE_OPTIMIZATION_CAMPAIGN)) {
+    sentKeys.add(contractor.id.toLowerCase());
+    sentKeys.add(contractor.email.toLowerCase());
+  }
+  const plan = planContractorProfileOptimizationRecipients([contractor], sentKeys);
+  const recipient = plan.recipients[0];
+  if (!recipient) return { success: false, skipped: true, reason: 'no_longer_eligible' };
+
+  try {
+    const result = await sendSharedEmail({
+      to: recipient.email,
+      subject: CONTRACTOR_PROFILE_OPTIMIZATION_SUBJECT,
+      html: buildContractorProfileOptimizationHtml({
+        firstName: (recipient.name || '').split(' ')[0] || 'there',
+        unsubscribeUserId: recipient.id,
+      }),
+    });
+    if (!result.success) throw result.error;
+    await logEmailEvent(CONTRACTOR_PROFILE_OPTIMIZATION_CAMPAIGN, recipient.email, recipient.id, undefined, undefined, 'sent');
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    await logEmailEvent(CONTRACTOR_PROFILE_OPTIMIZATION_CAMPAIGN, recipient.email, recipient.id, undefined, undefined, 'failed', errorMsg);
+    return { success: false, error };
+  }
+}
+
+interface ProfileOptimizationTestSendResponse {
+  data: { id: string } | null;
+  error: unknown | null;
+}
+
+export async function sendContractorProfileOptimizationTestEmail(
+  testEmail: string,
+  send = (payload: any) => resend!.emails.send(payload) as Promise<ProfileOptimizationTestSendResponse>,
+) {
+  const subject = `[TEST] ${CONTRACTOR_PROFILE_OPTIMIZATION_SUBJECT}`;
+  const payload = {
+    from: fromEmail,
+    replyTo: REPLY_TO,
+    to: testEmail,
+    subject,
+    html: buildContractorProfileOptimizationHtml({ firstName: 'QuoteXbert Test' }),
+  };
+
+  if (!resend && arguments.length < 2) {
+    return {
+      success: false,
+      apiAccepted: false,
+      messageId: null,
+      error: 'Email service not configured',
+      payload: { to: testEmail, subject, from: fromEmail, replyTo: REPLY_TO },
+    };
+  }
+
+  try {
+    const response = await send(payload);
+    if (response.error) {
+      return {
+        success: false,
+        apiAccepted: false,
+        messageId: null,
+        error: response.error,
+        payload: { to: testEmail, subject, from: fromEmail, replyTo: REPLY_TO },
+      };
+    }
+
+    const messageId = response.data?.id || null;
+    return {
+      success: Boolean(messageId),
+      apiAccepted: Boolean(messageId),
+      messageId,
+      error: messageId ? null : 'Resend returned no error and no message ID',
+      payload: { to: testEmail, subject, from: fromEmail, replyTo: REPLY_TO },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      apiAccepted: false,
+      messageId: null,
+      error,
+      payload: { to: testEmail, subject, from: fromEmail, replyTo: REPLY_TO },
+    };
+  }
+}
+
+export async function getContractorProfileOptimizationTestEmailStatus(messageId: string) {
+  if (!resendClient) return { success: false, status: null, error: 'Email service not configured' };
+
+  try {
+    const response = await resendClient.emails.get(messageId);
+    if (response.error) return { success: false, status: null, error: response.error };
+    return { success: true, status: response.data.last_event, error: null };
+  } catch (error) {
+    return { success: false, status: null, error };
+  }
 }
 
 // Campaign type for the general contractor announcement blast (separate from founding offer dedup key)
