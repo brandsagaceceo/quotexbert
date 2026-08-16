@@ -3,16 +3,15 @@ import Link from "next/link";
 import RenovationCTA from "@/components/seo/RenovationCTA";
 import FAQSection from "@/components/seo/FAQSection";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
-import EarningsCalculator from "./EarningsCalculator";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
 import ContractorPlanCTA from "@/components/ContractorPlanCTA";
-import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
+import { FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 export const metadata: Metadata = {
-  title: "Join as a Renovation Contractor | QuoteXbert GTA",
+  title: "Join QuoteXbert as an Ontario Contractor | Plans & Features",
   description:
-    "Get more renovation jobs in Toronto and the GTA. No monthly fees, AI-screened homeowner leads, instant quote requests. Join free — pay only for leads you want.",
+    "Compare QuoteXbert contractor subscription tiers and create a profile to review relevant homeowner project opportunities across Ontario.",
   keywords: [
     "renovation contractor leads toronto",
     "contractor lead generation gta",
@@ -21,9 +20,9 @@ export const metadata: Metadata = {
     "join contractor marketplace toronto",
   ],
   openGraph: {
-    title: "Join as a Renovation Contractor | QuoteXbert GTA",
+    title: "Join QuoteXbert as an Ontario Contractor | Plans & Features",
     description:
-      "Get verified renovation leads across the GTA. AI-screened homeowners with real budgets. No monthly fees.",
+      "Compare paid contractor subscription tiers and create a profile for relevant Ontario homeowner project opportunities.",
     type: "website",
     url: "https://www.quotexbert.com/contractors/join",
   },
@@ -83,55 +82,10 @@ const PLANS = [
   },
 ];
 
-const COMPETITOR_TABLE = [
-  {
-    feature: "Monthly subscription",
-    quotexbert: "From $49/mo",
-    homestars: "$300–$600/mo",
-    houzz: "$299–$799/mo",
-    bidmii: "Free + commission",
-  },
-  {
-    feature: "AI cost estimate for homeowner",
-    quotexbert: "✓",
-    homestars: "✗",
-    houzz: "✗",
-    bidmii: "✗",
-  },
-  {
-    feature: "GTA-specific coverage",
-    quotexbert: "✓",
-    homestars: "Partial",
-    houzz: "✗ (global)",
-    bidmii: "Partial",
-  },
-  {
-    feature: "Homeowner pre-qualified by budget",
-    quotexbert: "✓",
-    homestars: "✗",
-    houzz: "✗",
-    bidmii: "✗",
-  },
-  {
-    feature: "Direct messaging with homeowner",
-    quotexbert: "✓ All plans",
-    homestars: "✓",
-    houzz: "✓ paid",
-    bidmii: "✓",
-  },
-  {
-    feature: "Verified contractor badge",
-    quotexbert: "✓",
-    homestars: "✓ paid",
-    houzz: "✓ paid",
-    bidmii: "✗",
-  },
-];
-
 const JOIN_STEPS = [
   {
     step: "1",
-    title: "Create your free profile",
+    title: "Create your contractor profile",
     desc: "Add your trade, service area, portfolio photos, and licensing info. Takes less than 10 minutes.",
   },
   {
@@ -141,13 +95,13 @@ const JOIN_STEPS = [
   },
   {
     step: "3",
-    title: "Receive AI-screened leads",
-    desc: "Homeowners submit a photo and our AI pre-estimates the cost. You receive leads from informed buyers — no sticker shock.",
+    title: "Review relevant project opportunities",
+    desc: "Homeowners describe their project and may upload photos. Review the information available before deciding whether the opportunity fits your business.",
   },
   {
     step: "4",
-    title: "Submit quotes, win jobs",
-    desc: "Send your proposal, chat directly with the homeowner, and close the deal — without auction-style bidding wars.",
+    title: "Submit a clear quote",
+    desc: "Ask questions, send your proposal, and follow up professionally. Multiple relevant contractors may participate, and the homeowner chooses whom to hire.",
   },
 ];
 
@@ -170,7 +124,7 @@ const FAQS = [
   {
     question: "How is QuoteXbert different from HomeStars?",
     answer:
-      "HomeStars charges $300–$600/month and uses a pay-to-rank review system. QuoteXbert has no expensive monthly subscription, and our AI pre-qualifies every homeowner so the leads you receive already have realistic budgets.",
+      "QuoteXbert is focused on Ontario homeowner renovation projects and uses paid contractor subscription tiers without a separate per-lead fee. HomeStars is a separate platform with its own pricing and features, which can change. Review each platform's current terms directly before deciding which model fits your business.",
   },
   {
     question: "Do I need to be licensed or insured to join?",
@@ -180,7 +134,7 @@ const FAQS = [
   {
     question: "How quickly do homeowners expect quotes?",
     answer:
-      "Homeowners on QuoteXbert expect responses within 2–4 hours. Pro tier members receive push notifications and can respond directly via in-app messaging.",
+      "Response expectations vary by homeowner and project. Reply promptly when an opportunity fits, acknowledge the request, and set a realistic time for questions, a site visit, or a written quote.",
   },
 ];
 
@@ -191,9 +145,9 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://www.quotexbert.com/contractors/join",
       url: "https://www.quotexbert.com/contractors/join",
-      name: "Join as a Renovation Contractor | QuoteXbert",
+      name: "Join QuoteXbert as an Ontario Contractor | Plans & Features",
       description:
-        "Get verified renovation leads across the GTA. AI-screened homeowners with real budgets.",
+        "Compare paid contractor subscription tiers and create a profile for Ontario homeowner project opportunities.",
       inLanguage: "en-CA",
       breadcrumb: {
         "@type": "BreadcrumbList",
@@ -251,12 +205,11 @@ export default function ContractorsJoinPage() {
             For Renovation Contractors
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Get Renovation Leads in Toronto<br className="hidden md:block" /> Without Bidding Wars
+            Join the QuoteXbert<br className="hidden md:block" /> Contractor Marketplace
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-            Stop paying $300/month for HomeStars and chasing bad leads. QuoteXbert
-            uses AI to pre-qualify homeowners before they contact you — so every
-            lead has a real budget.
+            Create a contractor profile, choose a paid subscription tier, and review
+            relevant homeowner project opportunities in the areas and trades you serve.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -264,7 +217,7 @@ export default function ContractorsJoinPage() {
               data-track="contractor_join_clicked"
               className="bg-brand hover:bg-brand-dark text-white font-bold px-8 py-3 rounded-xl transition shadow-lg"
             >
-              Join as Contractor — Free
+              View Plans and Join
             </Link>
             <Link
               href="#how-it-works"
@@ -274,30 +227,30 @@ export default function ContractorsJoinPage() {
             </Link>
           </div>
           <p className="text-slate-400 text-sm mt-4">
-            {FOUNDING_CONTRACTOR_CONFIG.foundingJoinLine}
+            New contractor offer: first eligible month $0.99, then the selected plan&apos;s regular monthly price.
           </p>
         </div>
       </section>
 
-      {/* Pain points */}
-      <section className="bg-red-50 border-y border-red-100 py-10 px-4">
+      {/* Marketplace expectations */}
+      <section className="bg-slate-50 border-y border-slate-200 py-10 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-xl font-bold text-slate-900 text-center mb-6">
-            Sound Familiar?
+            Know What You Are Joining
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
-                icon: "💸",
-                text: "Paying $400+/month for HomeStars with no guarantee of ROI",
+                icon: "1",
+                text: "QuoteXbert uses paid monthly contractor subscription tiers.",
               },
               {
-                icon: "😤",
-                text: "Receiving leads from homeowners with unrealistic $5,000 kitchen budgets",
+                icon: "2",
+                text: "Multiple relevant contractors may participate in the same homeowner project.",
               },
               {
-                icon: "🏆",
-                text: "Competing in blind auctions where the cheapest bid wins regardless of quality",
+                icon: "3",
+                text: "An opportunity does not guarantee a response, quote acceptance, or paid work.",
               },
             ].map((item) => (
               <div
@@ -312,7 +265,7 @@ export default function ContractorsJoinPage() {
         </div>
       </section>
 
-      {/* Founding Contractor Program */}
+      {/* New Contractor Offer */}
       <FoundingContractorSection />
 
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-16">
@@ -322,8 +275,8 @@ export default function ContractorsJoinPage() {
             How QuoteXbert Works for Contractors
           </h2>
           <p className="text-slate-600 mb-8">
-            Our AI acts as a pre-sales filter — setting homeowner expectations
-            before you ever spend time quoting.
+            Review the available project context, ask questions, and decide which
+            opportunities fit your trade, location, schedule, and estimating process.
           </p>
           <ol className="space-y-5">
             {JOIN_STEPS.map((item) => (
@@ -368,7 +321,7 @@ export default function ContractorsJoinPage() {
                 </div>
                 {FOUNDING_OFFER_ENABLED && (
                   <p className="inline-block text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 rounded-full px-3 py-1 mb-3">
-                    🎉 First month $0.99 — then {plan.price}/mo · {FOUNDING_CONTRACTOR_CONFIG.spotsRemaining} spots remain · Cancel anytime
+                    First eligible month $0.99 — then {plan.price}/mo · Cancel anytime
                   </p>
                 )}
                 <ul className="space-y-2 my-5">
@@ -394,99 +347,30 @@ export default function ContractorsJoinPage() {
           </div>
         </section>
 
-        {/* Competitor comparison table */}
+        {/* Choosing a marketplace */}
         <section>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Platform Comparison
+            Compare the Model, Not Just the Headline Price
           </h2>
           <p className="text-slate-600 mb-6">
-            How QuoteXbert stacks up against HomeStars, Houzz, and Bidmii.
+            Different contractor platforms use subscriptions, per-lead charges, commissions, or combinations of those models. Before subscribing, compare the current terms, project context, service-area fit, cancellation rules, and your own cost per booked project.
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="bg-slate-800 text-white">
-                  <th className="text-left px-4 py-3 rounded-tl-xl">Feature</th>
-                  <th className="px-4 py-3 bg-[#800020] text-white font-bold">
-                    QuoteXbert
-                  </th>
-                  <th className="px-4 py-3">HomeStars</th>
-                  <th className="px-4 py-3">Houzz</th>
-                  <th className="px-4 py-3 rounded-tr-xl">Bidmii</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPETITOR_TABLE.map((row, i) => (
-                  <tr
-                    key={row.feature}
-                    className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                  >
-                    <td className="px-4 py-3 font-medium text-slate-800 border-b border-slate-100">
-                      {row.feature}
-                    </td>
-                    <td className="px-4 py-3 text-center text-rose-700 font-semibold border-b border-slate-100 bg-rose-50">
-                      {row.quotexbert}
-                    </td>
-                    <td className="px-4 py-3 text-center text-slate-500 border-b border-slate-100">
-                      {row.homestars}
-                    </td>
-                    <td className="px-4 py-3 text-center text-slate-500 border-b border-slate-100">
-                      {row.houzz}
-                    </td>
-                    <td className="px-4 py-3 text-center text-slate-500 border-b border-slate-100">
-                      {row.bidmii}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section>
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
-            What Contractors Are Saying
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 gap-4">
             {[
-              {
-                quote:
-                  "I cancelled my HomeStars subscription after 2 weeks on QuoteXbert. My close rate is way higher because homeowners actually have a budget.",
-                name: "James M.",
-                trade: "Kitchen Contractor, Toronto",
-              },
-              {
-                quote:
-                  "No more 'we thought it would be $8,000' conversations. The AI estimate does the expectation-setting for me.",
-                name: "Priya S.",
-                trade: "Bathroom Renovator, Mississauga",
-              },
-              {
-                quote:
-                  "I got 3 serious kitchen jobs in my first month. The leads are local, the homeowners are engaged, and I'm not bidding against 12 other contractors.",
-                name: "Carlos B.",
-                trade: "General Contractor, Vaughan",
-              },
-            ].map((t) => (
-              <blockquote
-                key={t.name}
-                className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
-              >
-                <p className="text-slate-700 text-sm italic mb-3">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <footer className="text-sm font-semibold text-slate-900">
-                  {t.name}
-                  <span className="font-normal text-slate-500"> — {t.trade}</span>
-                </footer>
-              </blockquote>
+              "Confirm the current monthly, per-lead, or commission cost directly with each platform.",
+              "Track qualified opportunities, quotes, booked projects, and gross profit by source.",
+              "Check whether the service area and project categories match your actual capacity.",
+              "Read cancellation, renewal, lead-credit, and communication terms before paying.",
+            ].map((item) => (
+              <div key={item} className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700">
+                {item}
+              </div>
             ))}
           </div>
+          <Link href="/pay-per-lead-alternative" className="inline-block mt-5 text-sm font-semibold text-rose-700 hover:underline">
+            Compare subscription and pay-per-lead models →
+          </Link>
         </section>
-
-        {/* Earnings calculator */}
-        <EarningsCalculator />
 
         {/* FAQs */}
         <FAQSection faqs={FAQS} title="Contractor FAQ" />
@@ -496,6 +380,10 @@ export default function ContractorsJoinPage() {
           title="Explore Contractor Resources"
           links={[
             { href: "/for-contractors", label: "Contractor Overview" },
+            { href: "/contractor-leads", label: "Ontario Contractor Opportunities" },
+            { href: "/contractor-growth-guide", label: "Contractor Growth Guide" },
+            { href: "/how-to-get-contractor-leads", label: "How to Build a Lead Pipeline" },
+            { href: "/pay-per-lead-alternative", label: "Compare Lead Pricing Models" },
             { href: "/contractors/toronto", label: "Contractors in Toronto" },
             { href: "/contractors/mississauga", label: "Contractors in Mississauga" },
             { href: "/contractors/brampton", label: "Contractors in Brampton" },
@@ -511,8 +399,8 @@ export default function ContractorsJoinPage() {
 
       {/* CTA */}
       <RenovationCTA
-        heading="Ready to Fill Your Project Calendar?"
-        subheading="Join QuoteXbert free. Get verified renovation leads across the GTA with AI-screened homeowners who already know the budget."
+        heading="Ready to Join the Contractor Marketplace?"
+        subheading="Compare the paid subscription tiers, create your contractor profile, and choose which relevant homeowner projects to pursue."
       />
     </>
   );

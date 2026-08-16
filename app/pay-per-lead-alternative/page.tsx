@@ -6,7 +6,7 @@ import FAQSection from "@/components/seo/FAQSection";
 export const metadata: Metadata = {
   title: "Pay-Per-Lead Alternative for Contractors | QuoteXbert Ontario",
   description:
-    "Looking for a pay-per-lead alternative in Ontario? QuoteXbert offers flat monthly pricing with no per-lead fees — and homeowners come pre-qualified with project photos.",
+    "Compare subscription and pay-per-lead pricing models for Ontario contractor opportunities, including cost predictability, participation, and measurement.",
   alternates: { canonical: "https://www.quotexbert.com/pay-per-lead-alternative" },
   openGraph: {
     title: "Pay-Per-Lead Alternative for Contractors | QuoteXbert",
@@ -18,33 +18,33 @@ export const metadata: Metadata = {
 
 const COMPARISON_ROWS = [
   { feature: "Monthly cost predictability", flat: "Fixed — you know your cost in advance", perLead: "Variable — depends on lead volume" },
-  { feature: "Project context before contact", flat: "Yes — photos and description attached to every lead", perLead: "Typically none — you pay before seeing details" },
-  { feature: "Lead exclusivity", flat: "Match-based — relevant contractors notified", perLead: "Often sold to multiple contractors simultaneously" },
-  { feature: "Volume flexibility", flat: "Unlimited leads in your tier for one flat fee", perLead: "Each additional lead incurs additional cost" },
-  { feature: "Risk profile", flat: "Low — fixed monthly cost, cancel anytime", perLead: "Higher — costs can escalate unpredictably" },
-  { feature: "Homeowner pre-qualification", flat: "AI estimates pre-qualify budgets", perLead: "No pre-qualification in most services" },
+  { feature: "How charges accrue", flat: "Subscription cost applies for the billing period", perLead: "A charge applies to each lead under the provider's terms" },
+  { feature: "Participation", flat: "Can be shared, matched, or exclusive depending on the platform", perLead: "Can be shared, matched, or exclusive depending on the platform" },
+  { feature: "Project context", flat: "Varies by platform and homeowner submission", perLead: "Varies by platform and homeowner submission" },
+  { feature: "Best comparison metric", flat: "Cost per booked project and gross profit", perLead: "Cost per booked project and gross profit" },
+  { feature: "Terms to verify", flat: "Renewal, cancellation, plan limits, and included features", perLead: "Lead definition, credits, disputes, filters, and refunds" },
 ];
 
 const FAQS = [
   {
     question: "What is pay-per-lead for contractors?",
     answer:
-      "Pay-per-lead services charge contractors a fee for each homeowner contact they receive. Fees typically range from $30 to $150 per lead depending on the trade and project type. The significant risk is that the same lead is often sold to multiple contractors simultaneously, immediately creating price competition.",
+      "Pay-per-lead services charge a fee for each lead defined by the provider's terms. Pricing, project context, filters, credits, and the number of participating contractors vary, so verify those details directly before purchasing leads.",
   },
   {
     question: "What is the alternative to pay-per-lead?",
     answer:
-      "Subscription-based platforms like QuoteXbert charge a flat monthly fee and deliver leads included in the subscription. This provides cost predictability, allows you to respond to as many or as few leads as you choose, and removes the pressure to immediately outbid competitors because you haven't paid for each individual contact.",
+      "Subscription platforms charge for access during a billing period rather than separately for each lead. This can make platform cost more predictable, but it does not guarantee lead volume, exclusivity, homeowner responses, or booked projects.",
   },
   {
     question: "Is a flat-fee platform better than pay-per-lead?",
     answer:
-      "Neither model is universally better — it depends on your volume of jobs, the quality of leads on each platform, and your conversion rate. Flat-fee platforms work well when lead volume is consistent and conversion rates are reasonable. Pay-per-lead can work when lead quality is very high. Most contractors find flat-fee subscriptions more predictable.",
+      "Neither model is universally better. Track total source cost, qualified opportunities, quotes, booked projects, project revenue, and gross profit. Compare the cost per booked project and the operational time each source requires.",
   },
   {
     question: "What does QuoteXbert charge for leads?",
     answer:
-      "QuoteXbert charges a flat monthly subscription ($49–$149/month depending on plan). There are no per-lead fees on any plan. You can respond to as many leads as your capacity allows within your subscription period without incurring additional charges.",
+      "QuoteXbert currently presents paid monthly contractor tiers and does not list a separate per-lead charge. Review the current plan page for prices, limits, included features, renewal, and cancellation terms before subscribing.",
   },
 ];
 
@@ -67,7 +67,7 @@ export default function PayPerLeadAlternativePage() {
             Pay-Per-Lead Alternative<br />for Ontario Contractors
           </h1>
           <p className="text-slate-300 text-xl max-w-2xl mb-8 leading-relaxed">
-            QuoteXbert offers flat monthly pricing with no per-lead fees. Homeowners arrive pre-qualified with project photos and AI estimates already reviewed.
+            QuoteXbert uses paid monthly contractor subscription tiers rather than a separate per-lead charge. Compare the full terms and measure results using booked work, not inquiry counts.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
@@ -80,9 +80,18 @@ export default function PayPerLeadAlternativePage() {
               href="/contractor-leads"
               className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/10 transition-colors"
             >
-              View All Leads
+              Explore Contractor Opportunities
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="py-14 px-4 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-black text-slate-900 mb-4">Shared, Matched, and Exclusive Leads</h2>
+          <p className="text-slate-700 leading-relaxed">
+            Pricing model and participation are separate questions. A subscription or pay-per-lead provider may offer shared opportunities, match a limited group, or sell exclusive access. Ask how many contractors can participate, what “exclusive” covers, and whether a lead can be credited before comparing prices. QuoteXbert is a marketplace where multiple relevant contractors may participate.
+          </p>
         </div>
       </section>
 

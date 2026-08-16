@@ -26,9 +26,9 @@ const TIPS = [
   },
   {
     number: "02",
-    title: "Join a Verified Lead Platform",
+    title: "Evaluate Contractor Marketplaces",
     content:
-      "Lead generation platforms give you consistent access to homeowners actively looking for contractors. The key is choosing a platform that pre-qualifies leads — platforms where homeowners describe projects with photos and budget information before contacting you save significant time compared to cold contact forms. QuoteXbert includes an AI estimation step that helps homeowners understand project costs before reaching out.",
+      "Contractor marketplaces can add homeowner project opportunities to your pipeline. Compare the trades and locations covered, available project context, participation model, pricing, renewal terms, and your own cost per booked project. A marketplace opportunity is not guaranteed work, and more than one contractor may participate.",
   },
   {
     number: "03",
@@ -44,15 +44,15 @@ const TIPS = [
   },
   {
     number: "05",
-    title: "Respond to Leads Fast",
+    title: "Respond Promptly and Clearly",
     content:
-      "Studies consistently show that the first contractor to respond to an inquiry wins a disproportionate share of jobs. On platforms like QuoteXbert, lead notifications are sent in real time. Enable push notifications on your phone, and aim to respond to every new lead within 2 hours during business hours. Speed signals professionalism and availability.",
+      "Acknowledge relevant inquiries promptly, ask focused questions, and state when you can provide the next step. Do not sacrifice scope accuracy for speed. A clear response that confirms location, timing, access, and project fit is more useful than an unsupported promise.",
   },
   {
     number: "06",
     title: "Get More Online Reviews",
     content:
-      "After completing every job, ask your client to leave a Google review and a review on any platform you use. Send them a direct link to your review page to reduce friction. Reviews are cumulative — contractors with 50+ verified Google reviews consistently outperform competitors with fewer reviews, even if the overall rating is similar.",
+      "After completing a project, ask a satisfied client for an honest Google review or a review on a platform you use. Send a direct link to reduce friction, never offer incentives that violate the platform's policies, and respond professionally to both positive and critical feedback.",
   },
   {
     number: "07",
@@ -64,7 +64,7 @@ const TIPS = [
     number: "08",
     title: "Follow Up on Every Proposal",
     content:
-      "Most contractors send a quote and wait. Many homeowners choose contractors who follow up once (not repeatedly) to ask if they have questions. A simple 'Do you have any questions about my proposal?' message sent 3–5 days after submission converts a meaningful fraction of otherwise lost leads. This single habit often increases conversion rates significantly.",
+      "Many contractors send a quote and wait. Schedule one respectful follow-up to ask whether the homeowner has questions about scope, assumptions, timing, or payment terms. Record the outcome and avoid repeated pressure when the homeowner has made a decision.",
   },
 ];
 
@@ -72,17 +72,17 @@ const FAQS = [
   {
     question: "How do I get renovation leads without advertising?",
     answer:
-      "A strong Google Business Profile with verified reviews is the most effective low-cost way to attract leads. Referral programs, before-and-after photos on social media, and word of mouth amplified by post-project follow-up can generate significant lead volume without paid advertising. Most successful established contractors get the majority of their work through non-paid channels.",
+      "A complete Google Business Profile, referrals, completed-work photos, local relationships, and useful website content can generate inquiries without paid advertising. Results vary by trade and market, so track which channels produce qualified opportunities and booked projects for your business.",
   },
   {
     question: "How many leads does a contractor need per month?",
     answer:
-      "It depends on your average project value and conversion rate. A contractor with a 30% conversion rate and $25,000 average project value needs roughly 1 lead per $7,500 of revenue. To achieve $200,000 annual revenue, that means approximately 27 leads per year — roughly 2–3 per month. Higher-value work (general contracting, additions) requires fewer leads to hit revenue targets.",
+      "There is no useful universal target. Start with your available capacity, average project size, historical quote acceptance, seasonality, and gross margin. Work backward from the projects your team can deliver, then track how many qualified opportunities and quotes your own business needs.",
   },
   {
     question: "What is a good lead conversion rate for contractors?",
     answer:
-      "Industry conversion rates vary by trade and platform, but a healthy range for renovation contractors is 20–40% of qualified leads resulting in a contracted job. Lower rates often indicate either pricing issues, slow response times, or mismatched lead quality. Higher rates are common when leads are pre-qualified and arrive with realistic budgets already set.",
+      "Use your own baseline rather than a generic benchmark. Define each stage consistently, then track inquiry, qualified opportunity, site visit, quote, and booked project by source. Investigate changes in fit, response, scope, pricing, schedule, and follow-up before drawing conclusions.",
   },
   {
     question: "Should I use multiple lead platforms?",
@@ -171,8 +171,22 @@ export default function HowToGetContractorLeadsPage() {
             Contractor lead generation in Ontario works best as a layered approach: a Google Business Profile for organic local search visibility, a lead platform for consistent new client acquisition, a systematic referral program, and strong before-and-after photo content wherever you are online.
           </p>
           <p className="text-slate-700 leading-relaxed">
-            No single method produces enough volume alone for most contractors. Combining 2–3 sources creates resilience — when one channel slows, others compensate. QuoteXbert is designed to be one part of that approach: a platform that delivers pre-qualified renovation leads to Ontario contractors at a predictable monthly cost.
+            A mix of sources can reduce reliance on any single channel. QuoteXbert can be one part of that approach: a paid subscription marketplace where Ontario contractors review relevant homeowner project opportunities. Multiple contractors may participate, and outcomes are not guaranteed.
           </p>
+        </div>
+      </section>
+
+      <section className="py-14 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-black text-slate-900 mb-4">Track Lead Sources Through to Booked Work</h2>
+          <p className="text-slate-700 leading-relaxed mb-6">Record the same stages for every source so you can compare business outcomes rather than inquiry counts.</p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {["Source and acquisition cost", "Trade, location, and project fit", "Qualified opportunity and site visit", "Quote sent and decision", "Booked revenue and direct project cost", "Reason declined or not selected"].map((item) => (
+              <div key={item} className="flex items-center gap-3 border border-slate-200 rounded-lg p-4 text-sm text-slate-700">
+                <CheckCircle className="w-5 h-5 text-rose-700 flex-none" />{item}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

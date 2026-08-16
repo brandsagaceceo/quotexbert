@@ -9,7 +9,6 @@ import { CheckCircle, Shield, TrendingUp, Clock } from "lucide-react";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
 import ContractorPlanCTA from "@/components/ContractorPlanCTA";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 
 const pricingTiers = [
   {
@@ -18,7 +17,7 @@ const pricingTiers = [
     price: 49,
     categories: 3,
     features: [
-      "4 Trade Categories",
+      "3 Trade Categories",
       "Up to 15 leads/month",
       "Professional profile",
       "Email & phone support",
@@ -50,7 +49,7 @@ const pricingTiers = [
     price: 149,
     categories: 10,
     features: [
-      "ALL 12 Categories",
+      "All 10 Plan Categories",
       "Up to 50 leads/month",
       "Premium profile badge",
       "24/7 priority support",
@@ -90,11 +89,11 @@ export default function ForContractorsPage() {
     },
     {
       q: "What verification do I need?",
-      a: "We verify your business license, insurance, and WSIB coverage. This protects both you and homeowners, and builds trust in our platform."
+      a: "Provide accurate business, insurance, and trade credentials when requested. You remain responsible for any licence, registration, insurance, or WSIB obligations that apply to your work. Requirements vary by trade, municipality, business structure, and project."
     },
     {
       q: "How fast do I get leads?",
-      a: "New leads are posted daily. You'll get instant notifications for projects matching your categories and service area. Most contractors see their first lead within 24 hours."
+      a: "Opportunity timing and volume vary by trade, location, season, and homeowner activity. When a relevant project is available, notifications help you review it promptly. A subscription does not guarantee a minimum number of leads or booked projects."
     },
     {
       q: "What areas do you serve?",
@@ -117,14 +116,14 @@ export default function ForContractorsPage() {
             </div>
             
             <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-              Get Toronto Renovation Leads<br />
+              QuoteXbert for Ontario Contractors<br />
               <span className="text-rose-200">
-                Without Bidding Wars
+                Features, Opportunities & Pricing
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Join contractors across Toronto receiving real homeowner renovation leads.
+              Build a contractor profile and review relevant homeowner project opportunities through a paid marketplace subscription.
             </p>
             
             {/* Benefits List */}
@@ -134,7 +133,7 @@ export default function ForContractorsPage() {
                   <svg className="w-6 h-6 text-rose-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span className="text-slate-200 text-lg">Instant renovation leads</span>
+                  <span className="text-slate-200 text-lg">Relevant project notifications</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <svg className="w-6 h-6 text-rose-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,7 +145,7 @@ export default function ForContractorsPage() {
                   <svg className="w-6 h-6 text-rose-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                   </svg>
-                  <span className="text-slate-200 text-lg">No bidding wars</span>
+                  <span className="text-slate-200 text-lg">Choose which opportunities to pursue</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <svg className="w-6 h-6 text-rose-400 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -184,11 +183,11 @@ export default function ForContractorsPage() {
               </a>
             </div>
             
-            {/* Trust Stats */}
+            {/* Product facts */}
             <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
-                <div className="text-3xl md:text-4xl font-black text-white mb-1">45+</div>
-                <div className="text-slate-400 text-sm">Active Leads</div>
+                <div className="text-3xl md:text-4xl font-black text-white mb-1">3</div>
+                <div className="text-slate-400 text-sm">Paid Plans</div>
               </div>
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
                 <div className="text-3xl md:text-4xl font-black text-rose-200 mb-1">12</div>
@@ -242,8 +241,8 @@ export default function ForContractorsPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-bold text-slate-900 text-sm md:text-base">No Bidding Wars</div>
-                <div className="text-xs text-slate-600">Fair Pricing</div>
+                <div className="font-bold text-slate-900 text-sm md:text-base">Marketplace Choice</div>
+                <div className="text-xs text-slate-600">Homeowners Compare</div>
               </div>
             </div>
 
@@ -263,209 +262,28 @@ export default function ForContractorsPage() {
         </div>
       </section>
 
-      {/* Earnings Calculator */}
+      {/* Marketplace transparency */}
       <section className="py-20 bg-brand/5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Estimate Your Potential Earnings
+              A Marketplace, Not an Employer
             </h2>
             <p className="text-xl text-slate-600">
-              See how much you could earn as a QuoteXbert contractor
+              QuoteXbert provides access to homeowner project opportunities. It does not employ contractors or guarantee work.
             </p>
           </div>
-
-          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-brand/30">
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {/* Input 1: Jobs per month */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-3">
-                  Number of jobs per month
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  defaultValue="3"
-                  className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
-                  onChange={(e) => {
-                    const jobs = parseInt(e.target.value);
-                    const jobValue = parseInt((document.getElementById('jobValue') as HTMLInputElement)?.value || '5000');
-                    const revenue = jobs * jobValue;
-                    const revenueEl = document.getElementById('monthlyRevenue');
-                    const jobsEl = document.getElementById('jobsDisplay');
-                    if (revenueEl) revenueEl.textContent = `$${revenue.toLocaleString()}`;
-                    if (jobsEl) jobsEl.textContent = jobs.toString();
-                  }}
-                  id="jobsInput"
-                />
-                <div className="flex justify-between text-sm text-slate-600 mt-2">
-                  <span>1</span>
-                  <span id="jobsDisplay" className="font-bold text-brand">3</span>
-                  <span>20</span>
-                </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: "No employment relationship", text: "Contractors remain independent businesses and set their own prices, availability, scope, and customer terms." },
+              { title: "No guaranteed outcomes", text: "A subscription does not guarantee lead volume, homeowner responses, accepted quotes, revenue, or completed work." },
+              { title: "Shared participation", text: "Multiple relevant contractors may review or respond to the same project, and the homeowner decides whom to contact or hire." },
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl p-6 border border-slate-200">
+                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{item.text}</p>
               </div>
-
-              {/* Input 2: Average job value */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-3">
-                  Average renovation value
-                </label>
-                <input
-                  type="range"
-                  min="500"
-                  max="50000"
-                  step="500"
-                  defaultValue="5000"
-                  className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
-                  onChange={(e) => {
-                    const jobValue = parseInt(e.target.value);
-                    const jobs = parseInt((document.getElementById('jobsInput') as HTMLInputElement)?.value || '3');
-                    const revenue = jobs * jobValue;
-                    const revenueEl = document.getElementById('monthlyRevenue');
-                    const valueEl = document.getElementById('valueDisplay');
-                    if (revenueEl) revenueEl.textContent = `$${revenue.toLocaleString()}`;
-                    if (valueEl) valueEl.textContent = `$${jobValue.toLocaleString()}`;
-                  }}
-                  id="jobValue"
-                />
-                <div className="flex justify-between text-sm text-slate-600 mt-2">
-                  <span>$500</span>
-                  <span id="valueDisplay" className="font-bold text-brand">$5,000</span>
-                  <span>$50,000</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Result Display */}
-            <div className="bg-brand rounded-xl p-8 text-center">
-              <p className="text-rose-100 text-lg mb-2">Estimated Monthly Revenue</p>
-              <p id="monthlyRevenue" className="text-6xl font-black text-white mb-4">
-                $15,000
-              </p>
-              <p className="text-rose-100 text-sm">
-                Based on completing <span id="jobsCalc">3</span> jobs per month
-              </p>
-            </div>
-
-            <div className="mt-6 bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> Actual earnings vary based on your trade, location, and business efficiency. 
-                QuoteXbert provides leads - your success depends on your quality of work and customer service.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contractor Success Stories */}
-      <section className="py-20 bg-brand/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              What Contractors Are Saying
-            </h2>
-            <p className="text-xl text-slate-600">
-              Real feedback from contractors growing their business with QuoteXbert
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Testimonial 1 */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 shadow-lg border border-slate-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="w-6 h-6 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
-                "I started getting renovation leads within days of signing up. No more cold calling or expensive advertising. 
-                The homeowners are serious and have realistic budgets. Best decision for my business."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-brand rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  J
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">John D.</div>
-                  <div className="text-sm text-slate-600">General Contractor, Toronto</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 2 */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 shadow-lg border border-slate-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="w-6 h-6 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
-                "QuoteXbert sends real homeowners ready to hire, not tire kickers. Every lead comes with photos, 
-                budget estimates, and clear project details. Way better than bidding sites where I waste time on lowball offers."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-sky-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  M
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">Maria R.</div>
-                  <div className="text-sm text-slate-600">Renovation Specialist, GTA</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 shadow-lg border border-slate-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="w-6 h-6 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
-                "The flat monthly fee makes budgeting simple. I'm not worrying about per-lead costs eating my profit. 
-                Plus the AI estimates help homeowners understand realistic pricing before they even contact me."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  T
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">Tom K.</div>
-                  <div className="text-sm text-slate-600">Kitchen & Bath Specialist, North York</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 4 */}
-            <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-8 shadow-lg border border-slate-200">
-              <div className="flex items-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="w-6 h-6 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-lg text-slate-700 mb-6 leading-relaxed italic">
-                "Finally, a platform that respects contractors. No bidding wars, no racing to the bottom on price. 
-                I get to review leads and choose the projects that fit my schedule and expertise. Growing steadily every month."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  A
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">Alex P.</div>
-                  <div className="text-sm text-slate-600">Handyman Services, Mississauga</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -531,7 +349,7 @@ export default function ForContractorsPage() {
               Example Renovation Leads
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Real examples of the kinds of projects homeowners post on QuoteXbert
+              Illustrative examples of project types contractors may encounter. They are not current job listings.
             </p>
           </div>
 
@@ -604,7 +422,7 @@ export default function ForContractorsPage() {
               How QuoteXbert Works for Contractors
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Get quality leads faster than traditional methods. No cold calling. No dead ends.
+              Review available project details and decide whether an opportunity fits your business.
             </p>
           </div>
 
@@ -619,7 +437,7 @@ export default function ForContractorsPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-3">Sign Up & Get Verified</h3>
                 <p className="text-slate-600 leading-relaxed">
                   Create your profile, choose service categories, and set your coverage area. 
-                  We verify your license, insurance, and credentials to build homeowner trust.
+                  Add accurate business and trade credentials that homeowners can use when evaluating your profile.
                 </p>
               </div>
             </div>
@@ -634,7 +452,7 @@ export default function ForContractorsPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-3">Get Instant Notifications</h3>
                 <p className="text-slate-600 leading-relaxed">
                   Receive real-time alerts when homeowners post projects matching your trades and location. 
-                  View project details, photos, budgets, and timelines instantly.
+                  Review the project information the homeowner has provided before deciding whether to respond.
                 </p>
               </div>
             </div>
@@ -646,10 +464,9 @@ export default function ForContractorsPage() {
                   3
                 </div>
                 <div className="text-5xl mb-4 mt-2">💼</div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-3">Accept & Connect</h3>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">Evaluate, Quote & Connect</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Review leads, accept jobs you want, and message homeowners directly through our platform. 
-                  Build your portfolio, get reviews, and grow your business.
+                  Ask questions, prepare a clear quote, and communicate with the homeowner. Multiple relevant contractors may participate in the same project.
                 </p>
               </div>
             </div>
@@ -669,7 +486,7 @@ export default function ForContractorsPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6 mt-6 text-slate-600 text-sm font-semibold">
               <div className="flex items-center gap-2"><Shield className="w-5 h-5 text-green-600" /><span>Stripe Secured</span></div>
-              <div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-rose-600" /><span>{FOUNDING_CONTRACTOR_CONFIG.spotsRemaining} Founding Spots Remain</span></div>
+              <div className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-rose-600" /><span>First eligible month $0.99</span></div>
               <div className="flex items-center gap-2"><Clock className="w-5 h-5 text-orange-600" /><span>Cancel Anytime</span></div>
             </div>
           </div>
@@ -737,7 +554,7 @@ export default function ForContractorsPage() {
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
               Why Contractors Choose QuoteXbert
             </h2>            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Stop wasting time on unqualified leads. Focus on what you do best: great work.
+              Use your profile, service area, and project information to focus on opportunities that fit your business.
             </p>
           </div>
 
@@ -749,8 +566,8 @@ export default function ForContractorsPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Pre-Qualified Homeowners</h3>
-                <p className="text-slate-600">Every lead has a budget, timeline, and project details. No tire kickers or price shoppers—just serious homeowners ready to hire.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Project Context</h3>
+                <p className="text-slate-600">Review the information a homeowner provides, then ask follow-up questions before deciding whether to quote.</p>
               </div>
             </div>
 
@@ -762,7 +579,7 @@ export default function ForContractorsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">No Per-Lead Fees</h3>
-                <p className="text-slate-600">Flat monthly subscription. Accept unlimited leads in your categories without worrying about per-lead costs eating your margins.</p>
+                <p className="text-slate-600">Paid monthly subscriptions use plan limits and features rather than a separate charge for each lead.</p>
               </div>
             </div>
 
@@ -775,7 +592,7 @@ export default function ForContractorsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Local Toronto & GTA Focus</h3>
-                <p className="text-slate-600">All projects are in your service area. Set your coverage radius and only see leads you can actually service. No wasted time on out-of-area jobs.</p>
+                <p className="text-slate-600">Set your coverage area so project matching can account for the locations you serve.</p>
               </div>
             </div>
 
@@ -787,7 +604,7 @@ export default function ForContractorsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Instant Notifications</h3>
-                <p className="text-slate-600">Get email and in-app alerts the moment a matching lead is posted. Be first to respond and win more jobs with fast turnaround times.</p>
+                <p className="text-slate-600">Use email and in-app alerts to review relevant opportunities and respond on a realistic timeline.</p>
               </div>
             </div>
 
@@ -799,7 +616,7 @@ export default function ForContractorsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Build Your Reputation</h3>
-                <p className="text-slate-600">Showcase your portfolio, collect verified reviews, and build credibility. Your profile helps homeowners choose you with confidence.</p>
+                <p className="text-slate-600">Showcase your portfolio and completed work to help homeowners evaluate your experience and fit.</p>
               </div>
             </div>
 
@@ -811,7 +628,7 @@ export default function ForContractorsPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Full Control</h3>
-                <p className="text-slate-600">Choose which leads to accept. Set your own prices. Control your workload. No bidding wars or pressure to underprice your services.</p>
+                <p className="text-slate-600">Choose which opportunities to pursue, set your own prices, and control your workload. Homeowners may compare multiple contractors.</p>
               </div>
             </div>
           </div>
@@ -843,7 +660,7 @@ export default function ForContractorsPage() {
         </div>
       </section>
 
-      {/* Founding Contractor Program */}
+      {/* New Contractor Offer */}
       <FoundingContractorSection />
 
       {/* FAQ */}

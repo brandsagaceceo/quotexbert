@@ -1,223 +1,74 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
-import FoundingContractorSection from "@/components/FoundingContractorSection";
 import FAQSection from "@/components/seo/FAQSection";
 
 export const metadata: Metadata = {
-  title: "Best App for Contractors in Canada | Find Renovation Jobs | QuoteXbert",
+  title: "Contractor Apps in Canada | Platform Evaluation Checklist",
   description:
-    "Looking for the best app to find renovation jobs in Canada? Compare contractor apps and platforms for finding homeowner leads in Ontario and the GTA.",
+    "Evaluate Canadian contractor apps and lead platforms by local fit, project context, pricing, participation, mobile workflow, terms, and booked-project results.",
   alternates: { canonical: "https://www.quotexbert.com/best-app-for-contractors-canada" },
-  openGraph: {
-    title: "Best App for Contractors in Canada | QuoteXbert",
-    description: "Compare contractor apps and platforms for finding renovation jobs in Ontario and the GTA.",
-    url: "https://www.quotexbert.com/best-app-for-contractors-canada",
-    type: "website",
-  },
 };
 
-const APPS_COMPARED = [
-  {
-    name: "QuoteXbert",
-    focus: "Ontario / GTA / Durham Region",
-    pricingModel: "Flat monthly subscription ($49–$149/mo)",
-    preQualification: "Yes — AI estimates before homeowner posts",
-    viewBeforeContact: "Yes — photos and project description",
-    perLeadFees: "None",
-    reviewSystem: "Verified project reviews",
-    mobileApp: "Mobile-optimized web app",
-    bestFor: "Ontario renovation contractors wanting pre-qualified local leads",
-    highlight: true,
-  },
-  {
-    name: "HomeStars",
-    focus: "Canada-wide",
-    pricingModel: "Subscription ($300–$600/mo, publicly listed 2026)",
-    preQualification: "No",
-    viewBeforeContact: "Limited",
-    perLeadFees: "Some plans",
-    reviewSystem: "Large established review database",
-    mobileApp: "iOS and Android apps",
-    bestFor: "Contractors wanting national brand exposure",
-    highlight: false,
-  },
-  {
-    name: "Houzz Pro",
-    focus: "Global, not Ontario-specific",
-    pricingModel: "Subscription ($299–$799/mo, publicly listed 2026)",
-    preQualification: "No",
-    viewBeforeContact: "Partial",
-    perLeadFees: "None on subscription plans",
-    reviewSystem: "Review system included",
-    mobileApp: "iOS and Android apps",
-    bestFor: "Interior designers and high-end residential contractors",
-    highlight: false,
-  },
-  {
-    name: "Thumbtack",
-    focus: "USA and Canada (limited Canadian presence)",
-    pricingModel: "Pay-per-contact / Credits",
-    preQualification: "No",
-    viewBeforeContact: "Partial",
-    perLeadFees: "Yes — credits per contact",
-    reviewSystem: "Review system included",
-    mobileApp: "iOS and Android apps",
-    bestFor: "Handymen and small service contractors",
-    highlight: false,
-  },
-];
-
-const FEATURES = [
-  "View project photos before deciding to quote",
-  "No per-lead fees — flat monthly pricing",
-  "AI homeowner cost pre-qualification",
-  "Direct messaging with homeowners",
-  "Toronto, GTA, and Durham Region focus",
-  "Verified contractor credentials displayed",
-  "Founding Contractor pricing lock-in",
+const CRITERIA = [
+  { title: "Trade and geographic fit", detail: "Confirm current project activity for your exact trade and service area. National coverage does not prove local fit." },
+  { title: "Project context", detail: "Ask what information is available before you spend time responding, visiting, or quoting." },
+  { title: "Contractor participation", detail: "Confirm whether opportunities are shared, matched, or exclusive and what those terms mean." },
+  { title: "Complete pricing", detail: "Include subscriptions, per-lead charges, commissions, credits, add-ons, renewal, and cancellation terms." },
+  { title: "Mobile workflow", detail: "Test notifications, project review, messaging, document access, and accessibility on the devices your team uses." },
+  { title: "Trust and profile tools", detail: "Check how credentials, portfolios, reviews, moderation, disputes, and corrections are handled." },
+  { title: "Data and privacy", detail: "Review how contact and project information is collected, used, retained, and shared in Canada." },
+  { title: "Measured return", detail: "Compare total cost and staff time with qualified opportunities, quotes, booked projects, and gross profit." },
 ];
 
 const FAQS = [
-  {
-    question: "What is the best app for contractors to find jobs in Canada?",
-    answer:
-      "The 'best' app depends on your trade, location, and business model. For Ontario renovation contractors — particularly those serving Toronto, the GTA, and Durham Region — QuoteXbert is designed specifically for this market with local pricing, AI pre-qualification, and flat monthly fees. National platforms like HomeStars and Houzz work across Canada but may have less local market density.",
-  },
-  {
-    question: "Is there a contractor app specifically for Ontario?",
-    answer:
-      "QuoteXbert is focused specifically on Ontario and primarily serves the Greater Toronto Area and Durham Region. Its homeowner base, pricing data, and contractor network are all built around the Ontario renovation market.",
-  },
-  {
-    question: "Can I use a contractor app on my phone?",
-    answer:
-      "Yes. QuoteXbert is mobile-optimized and works on any smartphone browser. Lead notifications are sent in real time and can be set up as push notifications. Full native iOS and Android apps are in development.",
-  },
-  {
-    question: "What features matter most in a contractor lead app?",
-    answer:
-      "The most important features are: (1) project context before you commit to quoting, (2) homeowner qualification to filter out tire-kickers, (3) direct messaging without phone tag, (4) honest reviews from completed projects, and (5) transparent pricing with no surprise charges. QuoteXbert is specifically designed around these priorities.",
-  },
+  { question: "What is the best contractor app in Canada?", answer: "There is no universal best app. The right platform depends on trade, service area, capacity, pricing model, project context, contractor participation, workflow, and your measured cost per booked project." },
+  { question: "Is QuoteXbert a contractor job app?", answer: "QuoteXbert is a paid contractor marketplace for homeowner project opportunities, not an employer or employee job board. Multiple relevant contractors may participate, and no opportunity guarantees work." },
+  { question: "Should I rely on online platform comparisons?", answer: "Use comparisons to build a question list, then verify current pricing and features through each platform's official materials. Competitor offerings and contract terms can change." },
+  { question: "How long should I test a contractor platform?", answer: "Choose a period that fits the platform terms and your normal sales cycle. Define qualified opportunity, quote, booked project, and gross profit before the test so results are comparable." },
 ];
 
-export default function BestAppForContractorsCanadaPage() {
+export default function ContractorAppsCanadaPage() {
   return (
-    <>
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16 px-4">
+    <main className="min-h-screen bg-white">
+      <section className="bg-slate-950 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <nav className="text-slate-400 text-xs mb-4">
-            <Link href="/" className="hover:text-white">Home</Link>
-            {" / "}
-            <Link href="/contractor-leads" className="hover:text-white">Contractor Leads</Link>
-            {" / "}
-            <span className="text-slate-300">Best App for Contractors Canada</span>
-          </nav>
-          <p className="text-rose-400 text-xs font-bold uppercase tracking-widest mb-4">
-            Platform Guide · Canadian Contractors
-          </p>
-          <h1 className="text-4xl md:text-5xl font-black mb-5">
-            Best App for Contractors in Canada
-          </h1>
-          <p className="text-slate-300 text-xl max-w-2xl mb-8 leading-relaxed">
-            A straightforward comparison of contractor apps and platforms available to Canadian renovation contractors — with honest notes on who each option works best for.
-          </p>
-          <Link
-            href="/sign-up?role=contractor"
-            className="inline-flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#a0002a] text-white font-black px-8 py-4 rounded-xl transition-all shadow-lg"
-          >
-            Try QuoteXbert Free →
-          </Link>
+          <nav className="text-sm text-slate-400 mb-6"><Link href="/" className="hover:text-white">Home</Link> / <Link href="/contractor-leads" className="hover:text-white">Contractor Leads</Link> / Contractor Apps Canada</nav>
+          <p className="text-rose-300 text-sm font-bold uppercase tracking-widest mb-4">Canadian Platform Checklist</p>
+          <h1 className="text-4xl md:text-5xl font-black mb-5">How to Evaluate Contractor Apps in Canada</h1>
+          <p className="text-xl text-slate-300 leading-relaxed">Compare the actual workflow, terms, local fit, and booked-project results instead of relying on an undated “best app” ranking.</p>
         </div>
       </section>
 
-      {/* Transparency note */}
-      <section className="py-6 px-4 bg-amber-50 border-y border-amber-200">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-amber-800 text-sm">
-            <strong>Note:</strong> This comparison is written by QuoteXbert. We have tried to be factual and fair, but you should verify current pricing and features on each platform directly before deciding. Competitor pricing data is based on publicly available information as of 2026.
-          </p>
-        </div>
+      <section className="py-8 px-4 bg-amber-50 border-y border-amber-200">
+        <p className="max-w-4xl mx-auto text-sm text-amber-900"><strong>Disclosure:</strong> QuoteXbert publishes this guide and operates a contractor marketplace. Verify every platform's current pricing, availability, features, and terms directly before subscribing.</p>
       </section>
 
-      {/* QuoteXbert features */}
-      <section className="py-14 px-4 bg-white">
+      <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-black text-slate-900 mb-6">What QuoteXbert Offers Ontario Contractors</h2>
-          <div className="grid sm:grid-cols-2 gap-3 mb-8">
-            {FEATURES.map((f) => (
-              <div key={f} className="flex items-center gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4">
-                <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-                <span className="text-slate-800 text-sm font-medium">{f}</span>
-              </div>
-            ))}
+          <h2 className="text-3xl font-black text-slate-900 mb-3">Eight Checks Before Choosing a Platform</h2>
+          <p className="text-slate-600 mb-10">Use the same checklist for QuoteXbert and every alternative.</p>
+          <div className="grid md:grid-cols-2 gap-5">
+            {CRITERIA.map((item) => <article key={item.title} className="border border-slate-200 rounded-lg p-6"><h3 className="flex items-center gap-2 font-bold text-slate-900 mb-2"><CheckCircle className="w-5 h-5 text-rose-700" />{item.title}</h3><p className="text-sm text-slate-600 leading-relaxed">{item.detail}</p></article>)}
           </div>
         </div>
       </section>
 
-      {/* Platform comparison */}
-      <section className="py-12 px-4 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-black text-slate-900 mb-8">Platform Comparison</h2>
-          <div className="space-y-6">
-            {APPS_COMPARED.map((app) => (
-              <div
-                key={app.name}
-                className={`rounded-2xl border-2 p-6 ${app.highlight ? "border-[#800020] bg-rose-50" : "border-slate-200 bg-white"}`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-bold text-slate-900">
-                    {app.name}
-                    {app.highlight && (
-                      <span className="ml-2 text-xs font-bold bg-[#800020] text-white px-2 py-1 rounded-full">
-                        Reviewed Here
-                      </span>
-                    )}
-                  </h3>
-                  <span className="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{app.focus}</span>
-                </div>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                  {[
-                    ["Pricing", app.pricingModel],
-                    ["View before contact", app.viewBeforeContact],
-                    ["Per-lead fees", app.perLeadFees],
-                    ["Pre-qualification", app.preQualification],
-                    ["Mobile", app.mobileApp],
-                    ["Best for", app.bestFor],
-                  ].map(([label, value]) => (
-                    <div key={label} className="bg-white/70 rounded-lg p-3 border border-slate-100">
-                      <div className="text-xs text-slate-500 mb-1">{label}</div>
-                      <div className="font-medium text-slate-800">{value}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <FoundingContractorSection compact />
-
-      <FAQSection faqs={FAQS} title="Contractor App Questions" />
-
-      <section className="py-12 px-4 bg-white">
+      <section className="py-14 px-4 bg-slate-50 border-y border-slate-200">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-wrap gap-4">
-            {[
-              { href: "/contractor-leads", label: "Ontario Contractor Leads" },
-              { href: "/homestars-alternative", label: "HomeStars Alternative" },
-              { href: "/pay-per-lead-alternative", label: "Pay-Per-Lead Alternative" },
-              { href: "/how-to-get-contractor-leads", label: "How to Get Contractor Leads" },
-              { href: "/contractors/join", label: "Join QuoteXbert" },
-            ].map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm font-medium text-rose-700 hover:underline">
-                {link.label} →
-              </Link>
-            ))}
-          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-4">How QuoteXbert Should Be Evaluated</h2>
+          <p className="text-slate-700 leading-relaxed mb-4">QuoteXbert offers paid contractor subscription tiers for Ontario homeowner project opportunities. It does not list a separate per-lead fee. Multiple relevant contractors may participate, and a subscription does not guarantee lead volume, homeowner responses, accepted quotes, or revenue.</p>
+          <Link href="/contractors/join" className="font-bold text-rose-800 hover:underline">Review current QuoteXbert plans and features →</Link>
         </div>
       </section>
-    </>
+
+      <FAQSection faqs={FAQS} title="Contractor App Evaluation Questions" />
+
+      <section className="py-12 px-4"><div className="max-w-4xl mx-auto flex flex-wrap gap-4 text-sm font-semibold">
+        <Link href="/homestars-alternative" className="text-rose-800 hover:underline">HomeStars evaluation guide →</Link>
+        <Link href="/pay-per-lead-alternative" className="text-rose-800 hover:underline">Compare pricing models →</Link>
+        <Link href="/contractor-growth-guide" className="text-rose-800 hover:underline">Contractor growth workflow →</Link>
+      </div></section>
+    </main>
   );
 }

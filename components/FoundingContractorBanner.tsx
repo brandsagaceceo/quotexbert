@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FOUNDING_CONTRACTOR_CONFIG, FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
-const { spotsRemaining, programName, ctaHref } = FOUNDING_CONTRACTOR_CONFIG;
+const { ctaHref } = FOUNDING_CONTRACTOR_CONFIG;
 
 export default function FoundingContractorBanner() {
   const [visible, setVisible] = useState(false);
@@ -31,7 +31,7 @@ export default function FoundingContractorBanner() {
         animate-slide-up
       "
       role="banner"
-      aria-label="Founding Contractor Program"
+      aria-label="New Contractor Offer"
     >
       {/* Dismiss button */}
       <button
@@ -48,38 +48,12 @@ export default function FoundingContractorBanner() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {/* Icon + text */}
         <div className="flex-1 min-w-0">
-          <p className="text-white font-bold text-sm flex items-center gap-1.5 mb-1">
-            <span className="text-base">🚨</span>
-            {programName}
+          <p className="text-white font-bold text-sm mb-1">
+            New Contractor Offer — First month only $0.99
           </p>
           <p className="text-white/80 text-xs leading-snug">
-            First month <span className="font-bold text-white">$0.99</span>, then renews at your selected monthly plan price. Only{" "}
-            <span className="font-bold text-white">{spotsRemaining} founding contractor spots</span>{" "}
-            remain.{" "}
-            <span className="text-yellow-300 font-semibold">
-              Cancel anytime.
-            </span>
+            Offer available to eligible first-time contractor subscribers. Then regular monthly plan pricing applies.
           </p>
-
-          {/* Mini progress bar */}
-          <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-yellow-400 rounded-full animate-shimmer"
-                style={{
-                  width: `${
-                    ((FOUNDING_CONTRACTOR_CONFIG.spotsTotal -
-                      spotsRemaining) /
-                      FOUNDING_CONTRACTOR_CONFIG.spotsTotal) *
-                    100
-                  }%`,
-                }}
-              />
-            </div>
-            <span className="text-white/70 text-xs whitespace-nowrap">
-              {spotsRemaining} left
-            </span>
-          </div>
         </div>
 
         {/* CTA */}
@@ -94,7 +68,7 @@ export default function FoundingContractorBanner() {
             whitespace-nowrap
           "
         >
-          Claim Your Spot →
+          View Plans →
         </Link>
       </div>
     </div>

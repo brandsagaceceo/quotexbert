@@ -6,11 +6,10 @@
  * pages. Existing ContractorLeadTemplate is NOT modified.
  */
 import Link from "next/link";
-import { Sparkles, CheckCircle, Users, Briefcase, ArrowRight, Star, MapPin, DollarSign } from "lucide-react";
+import { Sparkles, CheckCircle, Users, Briefcase, ArrowRight, Star, MapPin } from "lucide-react";
 import { ContractorLeadData } from "@/lib/seo/contractor-lead-data";
 import FAQSection from "@/components/seo/FAQSection";
 import InternalLinksSection from "@/components/seo/InternalLinksSection";
-import StructuredData from "@/components/seo/StructuredData";
 
 interface Props {
   data: ContractorLeadData;
@@ -64,9 +63,6 @@ const tradeJobLinks = [
 export default function ContractorCityTemplate({ data }: Props) {
   return (
     <>
-      <StructuredData type="Organization" />
-      <StructuredData type="Service" serviceName={`Renovation Lead Generation for ${data.tradeName}`} city={data.h1} />
-
       <div className="min-h-screen bg-white">
         {/* Hero */}
         <div className="bg-gradient-to-r from-slate-800 to-slate-700 text-white py-16 px-4">
@@ -78,15 +74,9 @@ export default function ContractorCityTemplate({ data }: Props) {
             <h1 className="text-3xl md:text-5xl font-bold mb-4">{data.h1}</h1>
             <p className="text-lg text-slate-300 mb-6 max-w-2xl">{data.intro}</p>
 
-            {/* Stats */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              {data.stats.map((stat, i) => (
-                <div key={i} className="bg-white/10 rounded-xl px-5 py-3 text-center">
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
-                  <p className="text-xs text-slate-300">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-slate-300 mb-8 max-w-2xl">
+              QuoteXbert is a paid contractor marketplace, not an employer or job board. Multiple relevant contractors may participate in a homeowner project, and opportunities do not guarantee work.
+            </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -94,7 +84,7 @@ export default function ContractorCityTemplate({ data }: Props) {
                 className="inline-flex items-center gap-2 bg-[#800020] text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
               >
                 <Briefcase className="w-5 h-5" />
-                Join as a {data.tradeName.replace(/s$/, "")} — Free
+                Review Contractor Plans
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -112,7 +102,12 @@ export default function ContractorCityTemplate({ data }: Props) {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">How QuoteXbert Works for {data.tradeName}</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {data.howItWorks.map((step, i) => (
+              {[
+                { step: "Create an accurate profile", description: "List the trades, service areas, credentials, and completed work homeowners can use to evaluate your business." },
+                { step: "Review relevant opportunities", description: "Check the available location, scope, timing, and project details before deciding whether to respond." },
+                { step: "Ask questions", description: "Clarify missing information and confirm whether the project fits your trade, schedule, and service area." },
+                { step: "Quote and follow up", description: "Prepare a clear proposal. Homeowners may compare multiple contractors before choosing whom to hire." },
+              ].map((step, i) => (
                 <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex gap-4">
                   <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-rose-600">
                     {i + 1}
@@ -132,7 +127,12 @@ export default function ContractorCityTemplate({ data }: Props) {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Why {data.tradeName} Choose QuoteXbert</h2>
             <div className="grid sm:grid-cols-2 gap-3">
-              {data.benefits.map((benefit, i) => (
+              {[
+                "Choose which opportunities fit your business",
+                "Set your own prices and project terms",
+                "Present your portfolio and relevant experience",
+                "Track source cost through to booked work",
+              ].map((benefit, i) => (
                 <div key={i} className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                   <span className="text-gray-800 font-medium">{benefit}</span>
@@ -142,13 +142,11 @@ export default function ContractorCityTemplate({ data }: Props) {
           </div>
         </div>
 
-        {/* Example Jobs */}
+        {/* Illustrative project examples */}
         <div className="py-16 px-4 bg-gray-50">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-              <DollarSign className="w-7 h-7 text-rose-500" />
-              Example Jobs Available Right Now
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Illustrative Project Examples</h2>
+            <p className="text-gray-600 mb-8">These static examples show possible project types. They are not current listings, offers of employment, or guaranteed opportunities.</p>
             <div className="space-y-4">
               {data.exampleJobs.map((job, i) => (
                 <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -159,10 +157,6 @@ export default function ContractorCityTemplate({ data }: Props) {
                       <span className="text-sm text-gray-500">{job.location}</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-rose-600">{job.budget}</p>
-                    <span className="text-xs text-gray-400">estimated budget</span>
-                  </div>
                 </div>
               ))}
             </div>
@@ -172,7 +166,7 @@ export default function ContractorCityTemplate({ data }: Props) {
                 className="inline-flex items-center gap-2 bg-[#800020] text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg"
               >
                 <Sparkles className="w-5 h-5" />
-                View All Available Leads
+                Explore Contractor Opportunities
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -183,16 +177,16 @@ export default function ContractorCityTemplate({ data }: Props) {
         <div className="py-16 px-4 bg-[#800020] text-white">
           <div className="max-w-3xl mx-auto text-center">
             <Star className="w-12 h-12 text-white/80 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-4">Start Getting {data.tradeName} Leads Today</h2>
+            <h2 className="text-3xl font-bold mb-4">Explore {data.tradeName} Project Opportunities</h2>
             <p className="text-rose-100 mb-8">
-              Join hundreds of GTA contractors who are growing their business with QuoteXbert. Creating a profile is free and takes under 10 minutes.
+              Review the current paid subscription tiers and decide whether the marketplace fits your trade, service area, and project pipeline.
             </p>
             <Link
               href="/onboarding"
               className="inline-flex items-center gap-2 bg-white text-rose-600 px-8 py-4 rounded-xl font-bold text-xl hover:bg-rose-50 transition-all shadow-lg"
             >
               <Briefcase className="w-6 h-6" />
-              Create Free Contractor Profile
+              Review Plans and Join
             </Link>
           </div>
         </div>
@@ -200,24 +194,15 @@ export default function ContractorCityTemplate({ data }: Props) {
         {/* FAQ */}
         <FAQSection faqs={data.faqs} title={`${data.h1} — FAQ`} />
 
-        {/* Internal Links — city pages (excludes current page) */}
+        {/* Focused internal links */}
         <InternalLinksSection
-          title="Contractor Leads by GTA City"
-          links={cityContractorLinks.filter((l) => !l.href.includes(data.slug))}
-          columns={3}
-        />
-
-        {/* Internal Links — trade-specific pages */}
-        <InternalLinksSection
-          title="Contractor Leads by Trade — Toronto & GTA"
-          links={tradeContractorLinks}
-          columns={4}
-        />
-
-        {/* Internal Links — job opportunity pages */}
-        <InternalLinksSection
-          title="Find Trade-Specific Job Opportunities"
-          links={tradeJobLinks}
+          title="Contractor Resources"
+          links={[
+            { href: "/contractor-leads", label: "Ontario Contractor Opportunities" },
+            { href: "/contractor-growth-guide", label: "Contractor Growth Guide" },
+            { href: "/how-to-get-contractor-leads", label: "How to Get Contractor Leads" },
+            { href: "/contractors/join", label: "QuoteXbert Plans" },
+          ]}
           columns={3}
         />
       </div>

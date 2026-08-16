@@ -299,7 +299,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Founding Contractor floating urgency banner — shown to non-contractors */}
+      {/* New contractor offer banner — shown to non-contractors */}
       {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorBanner />}
 
 
@@ -952,7 +952,7 @@ export default function Home() {
         </section>
         )}
 
-        {/* Founding Contractor Program */}
+        {/* New Contractor Offer */}
         {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorSection />}
 
         {/* Final CTA */}

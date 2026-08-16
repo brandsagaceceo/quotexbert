@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
-import FoundingContractorSection from "@/components/FoundingContractorSection";
 import FAQSection from "@/components/seo/FAQSection";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 import {
   CityLeadData,
   TradeLeadData,
@@ -17,12 +15,10 @@ function HeroSection({
   eyebrow,
   h1,
   intro,
-  stats,
 }: {
   eyebrow: string;
   h1: string;
   intro: string;
-  stats: Array<{ label: string; value: string }>;
 }) {
   return (
     <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-[#600018] text-white py-16 px-4">
@@ -49,26 +45,16 @@ function HeroSection({
           {intro}
         </p>
 
-        {stats.length > 0 && (
-          <div className="flex flex-wrap gap-4 mb-8">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 text-center"
-              >
-                <p className="text-2xl font-black text-white">{s.value}</p>
-                <p className="text-xs text-slate-300 mt-0.5">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <p className="text-sm text-slate-300 mb-8 max-w-3xl">
+          QuoteXbert is a paid contractor marketplace, not an employer. Multiple relevant contractors may participate, and project opportunities do not guarantee work.
+        </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             href="/sign-up?role=contractor"
             className="inline-flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg text-base"
           >
-            Claim My Founding Contractor Spot →
+            Review Plans and Join →
           </Link>
           <Link
             href="/contractor-leads"
@@ -83,36 +69,15 @@ function HeroSection({
 }
 
 function SpotsBanner() {
-  const { spotsRemaining, spotsTotal } = FOUNDING_CONTRACTOR_CONFIG;
-  const fillPct = Math.round(((spotsTotal - spotsRemaining) / spotsTotal) * 100);
-  return (
-    <div className="bg-[#800020] text-white py-3 px-4">
-      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-sm font-semibold">
-          🚨 <strong>{spotsRemaining} Founding Contractor spots</strong> remaining — lock in discounted pricing for life.
-        </p>
-        <div className="flex items-center gap-3">
-          <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
-            <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${fillPct}%` }} />
-          </div>
-          <Link
-            href="/sign-up?role=contractor"
-            className="text-xs font-bold bg-white text-[#800020] px-4 py-1.5 rounded-full hover:bg-yellow-50 transition-colors whitespace-nowrap"
-          >
-            Claim Spot
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }
 
-function CTABox({ label = "Claim My Founding Contractor Spot" }: { label?: string }) {
+function CTABox({ label = "Review Plans and Join" }: { label?: string }) {
   return (
     <div className="bg-slate-900 text-white rounded-2xl p-8 text-center">
-      <h3 className="text-2xl font-black mb-3">Ready to Start Receiving Leads?</h3>
+      <h3 className="text-2xl font-black mb-3">Ready to Explore Contractor Opportunities?</h3>
       <p className="text-slate-300 mb-6 text-base">
-        Join QuoteXbert — only <strong className="text-yellow-300">{FOUNDING_CONTRACTOR_CONFIG.spotsRemaining}</strong> founding spots remain.
+        Review the current paid plans and decide whether the marketplace fits your trade, service area, and project pipeline.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
@@ -152,12 +117,6 @@ export function CityLeadPageTemplate({ data }: CityPageProps) {
         eyebrow={`Contractor Leads · ${data.region}`}
         h1={data.h1}
         intro={data.intro}
-        stats={[
-          { label: "Avg Project Value", value: data.avgProjectValue },
-          { label: "Population", value: data.population },
-          { label: "Avg Home Value", value: data.avgHome },
-          { label: "Region", value: data.region },
-        ]}
       />
 
       {/* Local context */}
@@ -230,7 +189,7 @@ export function CityLeadPageTemplate({ data }: CityPageProps) {
                   {trade.name}
                 </h3>
                 <p className="text-slate-500 text-sm">
-                  Avg project: {trade.avgProjectValue}
+                  Explore trade opportunities
                 </p>
                 <span className="text-rose-600 text-xs font-semibold mt-2 inline-block group-hover:underline">
                   View {trade.name} Leads →
@@ -240,9 +199,6 @@ export function CityLeadPageTemplate({ data }: CityPageProps) {
           </div>
         </div>
       </section>
-
-      {/* Founding contractor program */}
-      <FoundingContractorSection compact />
 
       {/* Other cities */}
       <section className="py-14 px-4 bg-white">
@@ -276,7 +232,7 @@ export function CityLeadPageTemplate({ data }: CityPageProps) {
       {/* Final CTA */}
       <section className="py-14 px-4 bg-slate-50">
         <div className="max-w-3xl mx-auto">
-          <CTABox label="Claim My Founding Contractor Spot" />
+          <CTABox label="View Contractor Plans" />
         </div>
       </section>
     </>
@@ -305,11 +261,6 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
         eyebrow={`Contractor Leads · ${data.name}`}
         h1={data.h1}
         intro={data.intro}
-        stats={[
-          { label: "Avg Project Value", value: data.avgProjectValue },
-          { label: "Top Market", value: "Toronto & GTA" },
-          { label: "Coverage", value: "Ontario-wide" },
-        ]}
       />
 
       {/* Job description + how it works */}
@@ -318,27 +269,19 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <h2 className="text-2xl font-black text-slate-900 mb-4">
-                Types of {data.name} Jobs Available
+                Example {data.name} Project Types
               </h2>
               <p className="text-slate-700 mb-6 leading-relaxed">{data.jobDescription}</p>
-              <h3 className="text-lg font-bold text-slate-900 mb-3">Demand Drivers</h3>
-              <ul className="space-y-2">
-                {data.demandFactors.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-slate-700">
-                    <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">{f}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-sm text-slate-600">Project availability varies by location, season, homeowner activity, and contractor fit.</p>
             </div>
             <div>
               <h2 className="text-2xl font-black text-slate-900 mb-4">
                 How QuoteXbert Works for {data.name}
               </h2>
-              <p className="text-slate-700 mb-5 leading-relaxed">{data.howToGetLeads}</p>
+              <p className="text-slate-700 mb-5 leading-relaxed">Create an accurate profile, review the information available for relevant opportunities, ask questions, and decide whether to quote. Homeowners may compare multiple contractors.</p>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <h3 className="font-bold text-slate-900 mb-3">Qualifications & Licensing</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{data.licenseInfo}</p>
+                <p className="text-slate-600 text-sm leading-relaxed">Confirm the licences, registrations, permits, insurance, and WSIB obligations that apply to your trade, business, municipality, and project with the relevant authority.</p>
               </div>
             </div>
           </div>
@@ -356,7 +299,6 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
               <thead>
                 <tr className="bg-slate-900 text-white text-left">
                   <th className="px-4 py-3 rounded-tl-xl">Project Type</th>
-                  <th className="px-4 py-3">Typical Price Range</th>
                   <th className="px-4 py-3 rounded-tr-xl">Notes</th>
                 </tr>
               </thead>
@@ -368,9 +310,6 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
                   >
                     <td className="px-4 py-3 font-medium text-slate-900 border-b border-slate-100">
                       {job.title}
-                    </td>
-                    <td className="px-4 py-3 text-rose-700 font-semibold border-b border-slate-100">
-                      {job.priceRange}
                     </td>
                     <td className="px-4 py-3 text-slate-500 border-b border-slate-100">
                       {job.notes}
@@ -403,7 +342,7 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
                   {city.name}
                 </h3>
                 <p className="text-slate-500 text-sm">
-                  Avg project: {city.avgProjectValue}
+                  Explore local opportunities
                 </p>
                 <span className="text-rose-600 text-xs font-semibold mt-2 inline-block group-hover:underline">
                   {data.singularName} Leads in {city.name} →
@@ -413,9 +352,6 @@ export function TradeLeadPageTemplate({ data }: TradePageProps) {
           </div>
         </div>
       </section>
-
-      {/* Founding contractor program */}
-      <FoundingContractorSection compact />
 
       {/* Related trades */}
       {relatedTradeData.length > 0 && (
@@ -493,7 +429,7 @@ export function CityTradePageTemplate({ combo, cityData, tradeData }: CityTradeP
               href="/sign-up?role=contractor"
               className="inline-flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#600018] text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg"
             >
-              Claim My Founding Contractor Spot →
+              Review Plans and Join →
             </Link>
             <Link
               href={`/contractor-leads/${cityData.slug}`}
@@ -513,17 +449,16 @@ export function CityTradePageTemplate({ combo, cityData, tradeData }: CityTradeP
               <h2 className="text-2xl font-black text-slate-900 mb-4">
                 {tradeData.singularName} Opportunities in {cityData.name}
               </h2>
-              <p className="text-slate-700 leading-relaxed mb-5">{combo.localOpportunities}</p>
-              <p className="text-slate-700 leading-relaxed">{cityData.localContext}</p>
+              <p className="text-slate-700 leading-relaxed">Project availability varies. Review each opportunity for location, scope, timing, access, and fit before deciding whether to quote.</p>
             </div>
             <div>
               <h2 className="text-2xl font-black text-slate-900 mb-4">
                 How QuoteXbert Works
               </h2>
-              <p className="text-slate-700 mb-5 leading-relaxed">{tradeData.howToGetLeads}</p>
+              <p className="text-slate-700 mb-5 leading-relaxed">Create an accurate profile, review available project information, ask questions, and prepare a clear quote when the opportunity fits.</p>
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Licensing in Ontario</h3>
-                <p className="text-slate-600 text-sm">{tradeData.licenseInfo}</p>
+                <p className="text-slate-600 text-sm">Confirm applicable trade, municipal, insurance, permit, and WSIB requirements with the relevant authority.</p>
               </div>
             </div>
           </div>
@@ -543,15 +478,12 @@ export function CityTradePageTemplate({ combo, cityData, tradeData }: CityTradeP
                 className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm"
               >
                 <h3 className="font-bold text-slate-900 text-sm mb-2">{job.title}</h3>
-                <p className="text-rose-700 font-black text-lg mb-1">{job.priceRange}</p>
                 <p className="text-slate-500 text-xs">{job.location}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-
-      <FoundingContractorSection compact />
 
       {/* Cross-links */}
       <section className="py-10 px-4 bg-white">
@@ -611,7 +543,7 @@ export function CityTradePageTemplate({ combo, cityData, tradeData }: CityTradeP
 
       <section className="py-14 px-4 bg-slate-50">
         <div className="max-w-3xl mx-auto">
-          <CTABox label={`Become a Founding ${tradeData.singularName} Member`} />
+          <CTABox label={`View Plans for ${tradeData.singularName}s`} />
         </div>
       </section>
     </>

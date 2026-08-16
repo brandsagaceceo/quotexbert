@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isGodUser } from "@/lib/god-access";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 import { sendContractorDigestEmail, sendHomeownerDigestEmail } from "@/lib/email";
 import { categoryMatchesEntitlement } from "@/lib/subscription-access";
 
@@ -114,7 +113,6 @@ async function runContractorDigests() {
           unreadMessageCount,
           awaitingReplyCount,
           profileIncomplete,
-          foundingSpotsRemaining: FOUNDING_CONTRACTOR_CONFIG.spotsRemaining > 0 ? FOUNDING_CONTRACTOR_CONFIG.spotsRemaining : null,
         });
         if (result.success) sent++;
         else failed++;

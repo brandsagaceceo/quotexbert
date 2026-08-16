@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { FOUNDING_CONTRACTOR_CONFIG } from "@/lib/founding-contractor-config";
 import { ALL_CITY_SLUGS, ALL_TRADE_SLUGS } from "@/lib/seo/contractor-acquisition-data";
 
 interface ContractorLeadsBlockProps {
@@ -37,8 +36,6 @@ export default function ContractorLeadsBlock({
   const cityLeadsLabel = hasCityPage
     ? `View Contractor Leads in ${cityName}`
     : `View Contractor Leads in Ontario`;
-
-  const spotsRemaining = FOUNDING_CONTRACTOR_CONFIG.spotsRemaining;
 
   return (
     <section
@@ -81,9 +78,9 @@ export default function ContractorLeadsBlock({
             can receive matching leads directly.{" "}
           </>
         )}
-        Only{" "}
-        <strong className="text-yellow-300">{spotsRemaining} founding spots</strong> remain — join
-        now to lock in discounted pricing for life.
+        Eligible first-time contractor subscribers can get their first month for{" "}
+        <strong className="text-yellow-300">$0.99</strong>, followed by the selected plan&apos;s
+        regular monthly price.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -91,7 +88,7 @@ export default function ContractorLeadsBlock({
           href="/sign-up?role=contractor"
           className="inline-flex items-center justify-center gap-2 bg-white text-[#800020] font-black text-sm px-6 py-3 rounded-xl hover:bg-yellow-50 active:scale-[0.98] transition-all shadow-lg"
         >
-          Claim My Founding Contractor Spot →
+          View Contractor Plans →
         </Link>
         <Link
           href={cityLeadsHref}

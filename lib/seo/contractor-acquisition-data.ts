@@ -1144,7 +1144,7 @@ export const CONTRACTOR_TRADES: TradeLeadData[] = [
     jobDescription:
       "Plumbing leads on QuoteXbert include bathroom renovation plumbing, water heater replacement (tank and tankless), basement bathroom rough-in, main drain camera inspection and repair, kitchen plumbing for island sinks, and emergency leak repair. Ontario Building Code compliance is expected for all permit-required work.",
     howToGetLeads:
-      "Register your P1 or P2 licence on QuoteXbert and specify your service area. Licensed plumbers who list their credentials and display completed work photos receive higher placement in homeowner search results and win more leads.",
+      "Register your P1 or P2 licence on QuoteXbert and specify your service area. Listing your credentials and completed work photos helps homeowners evaluate your plumbing business.",
     qualifications:
       "All plumbers on QuoteXbert must hold a valid Ontario Certificate of Qualification (P1 or P2). WSIB coverage and liability insurance are required. Plumbers who also hold G2 gas technician certification can offer a broader scope of services and win combined plumbing+gas jobs.",
     relatedTrades: ["general-contractors", "bathroom-renovation-contractors", "hvac-contractors"],

@@ -5,7 +5,7 @@ import { MapPin, ArrowRight, Star, CheckCircle, Shield, Wrench, Users } from 'lu
 export const metadata: Metadata = {
   title: 'Find Contractors in Durham Region | Verified & Licensed | QuoteXbert',
   description:
-    'Find verified, licensed contractors in Durham Region, Ontario. Serving Oshawa, Whitby, Ajax, Pickering, Bowmanville & all Durham cities. Free for homeowners. Join as a founding contractor.',
+    'Find verified, licensed contractors in Durham Region, Ontario. Serving Oshawa, Whitby, Ajax, Pickering, Bowmanville and all Durham cities. Free for homeowners.',
   keywords: [
     'Durham Region contractors',
     'contractors Durham Region Ontario',
@@ -73,8 +73,8 @@ const faqs = [
     a: 'Yes — homeowners use QuoteXbert for free. You can get an AI estimate and connect directly with verified contractors at no cost. There are no booking fees, commissions, or hidden charges for homeowners.',
   },
   {
-    q: 'What is the Founding Contractor Program?',
-    a: "QuoteXbert's Founding Contractor Program offers early contractors in Durham Region priority placement, discounted subscription rates, and exclusive access to homeowner leads before the platform opens to the general contractor market. Founding spots are limited and reserved for contractors who join early.",
+    q: 'What is the New Contractor Offer?',
+    a: "Eligible first-time contractor subscribers can get their first month for $0.99. After the first month, the subscription renews at the regular monthly price for the selected plan.",
   },
   {
     q: 'How do I find a general contractor in Durham Region?',
@@ -198,38 +198,27 @@ export default function DurhamRegionContractorsPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-black mb-4">Are You a Durham Region Contractor?</h2>
+              <h2 className="text-3xl font-black mb-4">New Contractor Offer</h2>
               <p className="text-gray-300 leading-relaxed mb-6">
-                QuoteXbert&apos;s Founding Contractor Program is open to verified contractors across Durham Region.
-                Founding members get:
+                Choose your contractor plan and get your first eligible month for $0.99.
+                After the first month, your subscription renews at the regular monthly
+                price for the selected plan.
               </p>
-              <ul className="space-y-3 text-gray-300">
-                {[
-                  'Priority listing for your service area',
-                  'Discounted founding member subscription rate',
-                  'Access to homeowner leads before public launch',
-                  'QuoteXbert Verified badge and profile',
-                  'Direct lead notifications with no middleman',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-gray-400 text-sm">
+                Offer available to eligible first-time contractor subscribers.
+              </p>
             </div>
             <div className="text-center">
               <div className="bg-rose-600 rounded-2xl p-8">
-                <h3 className="text-2xl font-black mb-3">Limited Founding Spots</h3>
+                <h3 className="text-2xl font-black mb-3">First Month $0.99</h3>
                 <p className="text-rose-100 mb-6">
-                  We limit contractors per trade per area to protect lead quality. Once founding spots are filled,
-                  standard subscription rates apply.
+                  Recurring billing continues at the selected plan&apos;s regular monthly price unless cancelled.
                 </p>
                 <Link
                   href="/for-contractors"
                   className="bg-white text-rose-600 font-bold px-8 py-4 rounded-2xl hover:bg-rose-50 transition-colors block"
                 >
-                  Claim My Founding Contractor Spot
+                  View Contractor Plans
                 </Link>
               </div>
             </div>

@@ -7,7 +7,7 @@ import FAQSection from "@/components/seo/FAQSection";
 export const metadata: Metadata = {
   title: "Contractor Lead Generation in Canada | Find Renovation Leads | QuoteXbert",
   description:
-    "A practical guide to contractor lead generation in Canada — covering platforms, methods, and how QuoteXbert delivers verified renovation leads to Ontario contractors.",
+    "A practical guide to Canadian contractor lead channels, regional fit, trust signals, privacy, measurement, and evaluating marketplace pricing models.",
   alternates: { canonical: "https://www.quotexbert.com/contractor-lead-generation-canada" },
   openGraph: {
     title: "Contractor Lead Generation in Canada | QuoteXbert",
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 const METHODS = [
   {
     title: "Lead Generation Platforms",
-    description: "Platforms like QuoteXbert, HomeStars, and Houzz connect contractors with homeowners seeking quotes. These vary significantly by pricing model (subscription vs per-lead), geographic focus, and lead quality.",
-    pros: ["Consistent lead volume", "Homeowners are actively looking for contractors", "Reviews build long-term visibility"],
+    description: "Contractor marketplaces connect businesses with homeowners seeking quotes. Compare current pricing, geographic and trade coverage, project context, participation, and contract terms directly.",
+    pros: ["Adds another acquisition channel", "Can focus on active homeowner projects", "Profiles can support visibility"],
     cons: ["Monthly costs", "Competition with other contractors on the same platform"],
   },
   {
@@ -32,21 +32,21 @@ const METHODS = [
   },
   {
     title: "Word of Mouth and Referrals",
-    description: "In Canada, word of mouth remains the most trusted source of contractor recommendations. Many established contractors get the majority of their work through referrals.",
-    pros: ["Highest trust factor", "No direct advertising cost", "Best conversion rates"],
+    description: "Past clients, suppliers, designers, property managers, and other trades can introduce homeowners who need relevant work.",
+    pros: ["Existing relationship context", "No direct advertising charge", "Can reinforce local reputation"],
     cons: ["Slow to build initially", "Unpredictable volume"],
   },
   {
     title: "Social Media (Instagram, Facebook)",
     description: "Renovation contractors with strong before-and-after photo content find Instagram and Facebook effective for generating awareness and inbound leads.",
     pros: ["Visual medium suits renovation work", "Organic reach possible", "Builds brand recognition"],
-    cons: ["Requires consistent content creation", "Paid ads needed for meaningful reach"],
+    cons: ["Requires consistent content creation", "Reach and results vary by platform"],
   },
   {
     title: "Pay-Per-Lead Services",
-    description: "Some services charge a fee for each lead provided. Lead quality and exclusivity vary significantly — some services sell the same lead to multiple contractors.",
+    description: "Some services charge for each lead defined by their terms. Lead context, filters, credits, and contractor participation vary by provider.",
     pros: ["No upfront commitment", "Pay only for leads"],
-    cons: ["Costs can escalate quickly", "Many shared/low-quality leads", "No project context before paying"],
+    cons: ["Total cost varies with volume", "Credit and dispute terms require review", "Project context varies"],
   },
 ];
 
@@ -54,17 +54,17 @@ const FAQS = [
   {
     question: "What is the best way to get contractor leads in Canada?",
     answer:
-      "Most established contractors rely on a combination of methods: a strong referral network built through satisfied clients, a Google Business Profile for local search visibility, and a lead generation platform for consistent new client acquisition. QuoteXbert is specifically focused on the Ontario market and includes AI homeowner pre-qualification that reduces unqualified inquiries.",
+      "There is no universal best source. Compare referrals, local search, marketplaces, trade relationships, and advertising using your own qualified-opportunity, quote, booked-project, and gross-profit data. QuoteXbert is focused on the Ontario market.",
   },
   {
     question: "How much should a Canadian contractor spend on lead generation?",
     answer:
-      "Marketing costs for contractors typically range from 3% to 8% of annual revenue. A contractor billing $200,000 per year might spend $6,000–$16,000 annually on lead generation. A QuoteXbert subscription ($49–$149/month = $588–$1,788/year) represents a low-cost entry point for consistent digital lead generation.",
+      "Set a test budget your business can sustain, define the outcome you will measure, and include platform fees, advertising, staff time, estimating time, and creative costs. Compare total acquisition cost with gross profit from booked projects rather than using a generic percentage.",
   },
   {
     question: "Are pay-per-lead services worth it in Canada?",
     answer:
-      "Pay-per-lead services can work but carry hidden costs: leads are often sold to multiple contractors simultaneously (creating immediate competition), and there's typically no project context before purchasing the lead. Contractors on subscription-based platforms like QuoteXbert pay a flat monthly fee and receive leads with project photos and details attached.",
+      "Pay-per-lead and subscription services can both work. Verify whether opportunities are shared, matched, or exclusive; what project context is available; how credits work; and how charges accrue. Then calculate cost per booked project using your own results.",
   },
   {
     question: "Is Google effective for contractor lead generation in Canada?",
@@ -124,7 +124,7 @@ export default function ContractorLeadGenerationCanadaPage() {
             Lead Generation Methods for Canadian Contractors
           </h2>
           <p className="text-slate-600 mb-10 text-lg">
-            Most successful contractors combine multiple lead sources. Here's an honest look at each method.
+            A resilient pipeline usually combines sources. Evaluate each one against your service area, trade, capacity, and measured outcomes.
           </p>
           <div className="space-y-8">
             {METHODS.map((method) => (
@@ -168,13 +168,13 @@ export default function ContractorLeadGenerationCanadaPage() {
             How QuoteXbert Fits into Your Lead Generation Strategy
           </h2>
           <p className="text-slate-700 text-lg leading-relaxed mb-6">
-            QuoteXbert is a lead generation platform focused specifically on the Ontario renovation market. It differs from most lead platforms in one important way: homeowners receive AI-powered cost estimates before they contact contractors. This means the homeowners who reach out through QuoteXbert have already reviewed a realistic cost range for their project.
+            QuoteXbert is a paid contractor marketplace focused on Ontario renovation projects. Homeowners can describe a project and use estimation tools, while relevant contractors decide whether an available opportunity fits their trade, service area, and schedule.
           </p>
           <p className="text-slate-700 leading-relaxed mb-6">
-            This pre-qualification step reduces the fraction of inquiries where homeowners are surprised by market-rate pricing — a common source of wasted time for contractors. It doesn't eliminate all mismatched expectations, but it meaningfully improves lead quality compared to platforms with no pre-qualification step.
+            QuoteXbert does not employ contractors or guarantee project volume, homeowner responses, accepted quotes, or revenue. Multiple relevant contractors may participate in the same project.
           </p>
           <p className="text-slate-700 leading-relaxed">
-            For Ontario contractors serving the GTA, Toronto, and Durham Region, QuoteXbert is one component of a broader lead generation approach that should also include Google Business Profile optimization, a strong referral system, and trade-specific platforms where relevant.
+            Canadian contractors should also account for provincial trade rules, municipal licensing and permits, insurance and workers' compensation obligations, Canadian privacy and anti-spam requirements, taxes, climate, and travel distance. Confirm requirements with the appropriate authority for each project and province.
           </p>
         </div>
       </section>

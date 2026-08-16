@@ -190,12 +190,12 @@ export default function AjaxPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Are You a Contractor in Ajax?</h2>
           <p className="text-gray-300 text-lg mb-6">
-            Join QuoteXbert&apos;s Founding Contractor Program. Get exclusive access to homeowner leads in Ajax
-            and all of Durham Region. Limited spots available.
+            New contractor offer: eligible first-time subscribers get their first month for $0.99,
+            followed by the selected plan&apos;s regular monthly price.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/for-contractors" className="bg-white text-gray-900 font-bold px-8 py-4 rounded-2xl hover:bg-gray-100 transition-colors">
-              Claim My Founding Contractor Spot
+              View Contractor Plans
             </Link>
             <Link href="/durham-region-contractors" className="border border-gray-600 text-white font-semibold px-8 py-4 rounded-2xl hover:border-gray-400 transition-colors">
               Learn About Durham Contractor Program

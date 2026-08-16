@@ -2493,13 +2493,12 @@ export async function sendContractorDigestEmail(params: {
   unreadMessageCount: number;
   awaitingReplyCount: number;
   profileIncomplete?: boolean;
-  foundingSpotsRemaining?: number | null;
 }): Promise<{ success: boolean; error?: any }> {
   if (!resend) {
     console.warn('[EMAIL] RESEND_API_KEY not configured, skipping contractor digest');
     return { success: false, error: 'Email service not configured' };
   }
-  const { contractor, matchedJobs, unreadMessageCount, awaitingReplyCount, profileIncomplete, foundingSpotsRemaining } = params;
+  const { contractor, matchedJobs, unreadMessageCount, awaitingReplyCount, profileIncomplete } = params;
 
   const blocks: EmailBlock[] = [
     { type: 'tag', content: 'Daily Update' },
@@ -2528,14 +2527,6 @@ export async function sendContractorDigestEmail(params: {
 
   if (profileIncomplete) {
     blocks.push({ type: 'text', content: 'Tip: a complete profile (photos, bio, verified badge) gets noticed first by homeowners.' });
-  }
-
-  if (typeof foundingSpotsRemaining === 'number' && foundingSpotsRemaining > 0) {
-    blocks.push({
-      type: 'text',
-      rawHtml: true,
-      content: `<strong>${foundingSpotsRemaining}</strong> Founding Contractor spots remain — <a href="${BASE_URL}/contractors/join" style="color:#9f1239;font-weight:600;">learn more</a>.`,
-    });
   }
 
   blocks.push({ type: 'cta', content: 'View All Opportunities', href: `${BASE_URL}/contractor/jobs` });

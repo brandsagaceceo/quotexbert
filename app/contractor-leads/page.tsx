@@ -6,23 +6,23 @@ import FAQSection from "@/components/seo/FAQSection";
 import { CONTRACTOR_CITIES, CONTRACTOR_TRADES } from "@/lib/seo/contractor-acquisition-data";
 
 export const metadata: Metadata = {
-  title: "Contractor Leads in Ontario | Find Renovation Jobs | QuoteXbert",
+  title: "Contractor Leads in Ontario | Homeowner Projects | QuoteXbert",
   description:
-    "Find homeowner renovation leads across Toronto, Durham Region, Clarington and the GTA. Join QuoteXbert, view local opportunities and grow your contracting business.",
+    "Explore homeowner renovation project opportunities across Toronto, Durham Region, Clarington and the GTA through the QuoteXbert contractor marketplace.",
   alternates: {
     canonical: "https://www.quotexbert.com/contractor-leads",
   },
   openGraph: {
-    title: "Contractor Leads in Ontario | Find Renovation Jobs | QuoteXbert",
+    title: "Contractor Leads in Ontario | Homeowner Projects | QuoteXbert",
     description:
-      "Find homeowner renovation leads across Toronto, Durham Region and the GTA. Join QuoteXbert to receive verified leads and grow your contracting business.",
+      "Explore homeowner renovation project opportunities across Toronto, Durham Region and the GTA through the QuoteXbert marketplace.",
     url: "https://www.quotexbert.com/contractor-leads",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Contractor Leads in Ontario | QuoteXbert",
-    description: "Find verified renovation leads across Toronto, Durham Region, and the GTA.",
+    description: "Explore homeowner renovation project opportunities across Toronto, Durham Region, and the GTA.",
   },
 };
 
@@ -30,33 +30,23 @@ const HOW_IT_WORKS = [
   {
     step: "1",
     title: "Create Your Contractor Profile",
-    desc: "List your trade specializations, service area, credentials, and portfolio. Verified profiles rank higher in homeowner search results.",
+    desc: "List your trade specializations, service area, credentials, and completed work so homeowners can assess whether you fit their project.",
   },
   {
     step: "2",
-    title: "Receive Matched Leads",
-    desc: "When a homeowner posts a renovation project matching your trade and service area, you receive an instant notification with project photos and details.",
+    title: "Review Relevant Opportunities",
+    desc: "When a homeowner submits a project in a relevant trade and service area, participating contractors can review the available project information.",
   },
   {
     step: "3",
     title: "Review and Quote",
-    desc: "Assess the project photos and scope before committing to a site visit. Submit your proposal directly through QuoteXbert's messaging system.",
+    desc: "Check the scope, location, timing, and available project details. Ask questions before deciding whether to prepare a quote.",
   },
   {
     step: "4",
-    title: "Win Jobs and Build Reputation",
-    desc: "Homeowners compare contractors and choose based on reviews, portfolio, and responsiveness. Complete jobs, earn verified reviews, and grow your pipeline.",
+    title: "Quote and Follow Up",
+    desc: "Submit a clear proposal and follow up professionally. Homeowners may compare multiple contractors before choosing who to hire.",
   },
-];
-
-const COMPARISON_ROWS = [
-  { feature: "Monthly subscription", quotexbert: "From $49/mo", homestars: "$300–$600/mo", houzz: "$299–$799/mo", perLead: "$30–$150/lead" },
-  { feature: "Pay-per-lead fees", quotexbert: "None", homestars: "Some plans", houzz: "None", perLead: "Every lead" },
-  { feature: "View project before quoting", quotexbert: "✓ Always", homestars: "✗", houzz: "Partial", perLead: "✗" },
-  { feature: "AI homeowner pre-qualification", quotexbert: "✓", homestars: "✗", houzz: "✗", perLead: "✗" },
-  { feature: "Direct homeowner messaging", quotexbert: "✓ All plans", homestars: "✓", houzz: "✓ Paid", perLead: "Varies" },
-  { feature: "Contractor profile page", quotexbert: "✓", homestars: "✓", houzz: "✓", perLead: "Varies" },
-  { feature: "GTA & Durham Region coverage", quotexbert: "✓ Full", homestars: "Partial", houzz: "✗ Global", perLead: "Varies" },
 ];
 
 const FAQS = [
@@ -68,7 +58,7 @@ const FAQS = [
   {
     question: "Is QuoteXbert free for contractors?",
     answer:
-      "Creating a contractor profile and receiving lead notifications is included in the free tier. Paid subscription plans ($49–$149/month) unlock unlimited lead access, priority placement in search results, and additional trade categories. There are no per-lead fees on any plan.",
+      "QuoteXbert offers paid contractor subscription tiers. Review the current plans and included features on the contractor signup page before choosing a subscription. QuoteXbert does not charge a separate fee for each lead.",
   },
   {
     question: "What trades can join QuoteXbert?",
@@ -81,14 +71,14 @@ const FAQS = [
       "QuoteXbert covers Toronto and the Greater Toronto Area — including Scarborough, North York, Etobicoke, Mississauga, Brampton, Vaughan, Markham, Richmond Hill — plus Durham Region (Oshawa, Whitby, Ajax, Pickering, Clarington, Bowmanville, Newcastle, Courtice) and surrounding Ontario communities.",
   },
   {
-    question: "How is QuoteXbert different from HomeStars?",
+    question: "Are QuoteXbert opportunities exclusive to one contractor?",
     answer:
-      "HomeStars charges $300–$600/month and reviews are largely pay-to-rank. QuoteXbert starts at $49/month, homeowners submit AI-estimated project photos before contacting contractors, and every lead includes project photos and a budget description so you know what you're bidding on before committing time to a quote.",
+      "No. QuoteXbert is a marketplace, and multiple relevant contractors may participate in the same homeowner project. Homeowners decide which contractors to contact, compare, or hire. A project opportunity is not a guarantee of work or a homeowner response.",
   },
   {
     question: "Do I need to be licensed to join QuoteXbert?",
     answer:
-      "Regulated trades (electricians, plumbers, HVAC) must provide their Ontario licence number during registration. General contractors and renovation contractors must carry liability insurance and WSIB. Verified credentials are displayed on your profile and increase your ranking in homeowner search results.",
+      "Contractors are responsible for holding any licences, registrations, insurance, or WSIB coverage required for their trade and work. Requirements vary by trade, municipality, business structure, and project. Provide accurate credentials on your profile and confirm current obligations with the relevant authority.",
   },
 ];
 
@@ -100,7 +90,7 @@ export default function ContractorLeadsHubPage() {
         "@type": "WebPage",
         "@id": "https://www.quotexbert.com/contractor-leads",
         url: "https://www.quotexbert.com/contractor-leads",
-        name: "Contractor Leads in Ontario | Find Renovation Jobs | QuoteXbert",
+        name: "Contractor Leads in Ontario | Homeowner Projects | QuoteXbert",
         description:
           "Find homeowner renovation leads across Toronto, Durham Region, and the GTA. Join QuoteXbert to grow your contracting business.",
         breadcrumb: {
@@ -128,18 +118,18 @@ export default function ContractorLeadsHubPage() {
             For Contractors · Ontario-Wide
           </p>
           <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-            Find Local Contractor Leads<br />
-            <span className="text-yellow-300">Without Paying for Every Lead</span>
+            Find Homeowner Project Opportunities<br />
+            <span className="text-yellow-300">Across Ontario Communities</span>
           </h1>
           <p className="text-slate-300 text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed">
-            QuoteXbert connects qualified Ontario contractors with homeowners who have already described their project, uploaded photos, and are ready to receive quotes.
+            QuoteXbert is a contractor marketplace where homeowners describe renovation projects and relevant contractors can decide whether to participate and quote.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <Link
               href="/sign-up?role=contractor"
               className="inline-flex items-center justify-center gap-2 bg-[#800020] hover:bg-[#a0002a] text-white font-black px-10 py-4 rounded-xl transition-all shadow-2xl text-lg"
             >
-              Claim My Founding Contractor Spot →
+              View Contractor Plans →
             </Link>
             <Link
               href="/for-contractors"
@@ -150,9 +140,9 @@ export default function ContractorLeadsHubPage() {
           </div>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
             <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> No per-lead fees</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> View project before quoting</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> From $49/month</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> Cancel anytime</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> Paid subscription tiers</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> Choose which projects to pursue</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-green-400" /> Multiple contractors may participate</span>
           </div>
         </div>
       </section>
@@ -164,7 +154,7 @@ export default function ContractorLeadsHubPage() {
             How QuoteXbert Works for Contractors
           </h2>
           <p className="text-slate-600 text-center mb-10 text-lg">
-            A platform built to eliminate wasted quoting time.
+            Understand the opportunity before deciding whether it fits your business.
           </p>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
             {HOW_IT_WORKS.map((step) => (
@@ -228,7 +218,7 @@ export default function ContractorLeadsHubPage() {
                 <div className="font-bold text-slate-900 group-hover:text-rose-700 transition-colors mb-1 text-sm">
                   {trade.name}
                 </div>
-                <div className="text-xs text-slate-500">Avg: {trade.avgProjectValue}</div>
+                <div className="text-xs text-slate-500">Ontario opportunities</div>
                 <div className="text-xs text-rose-600 font-semibold mt-1 group-hover:underline">
                   View leads →
                 </div>
@@ -238,49 +228,36 @@ export default function ContractorLeadsHubPage() {
         </div>
       </section>
 
-      {/* Comparison table */}
+      {/* Marketplace transparency */}
       <section className="py-16 px-4 bg-slate-50">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-black text-slate-900 mb-2">
-            How QuoteXbert Compares
+            Contractor Leads Are Marketplace Opportunities
           </h2>
-          <p className="text-slate-600 mb-8 text-lg">
-            An honest comparison across the lead generation options available to Ontario contractors.
+          <p className="text-slate-600 mb-8 text-lg max-w-3xl">
+            QuoteXbert does not employ contractors or post employee vacancies. Homeowners use the marketplace to seek quotes, and more than one relevant contractor may review or respond to the same project.
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-900 text-white text-left">
-                  <th className="px-4 py-3 rounded-tl-xl">Feature</th>
-                  <th className="px-4 py-3 bg-[#800020]">QuoteXbert</th>
-                  <th className="px-4 py-3">HomeStars</th>
-                  <th className="px-4 py-3">Houzz</th>
-                  <th className="px-4 py-3 rounded-tr-xl">Pay-Per-Lead</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARISON_ROWS.map((row, i) => (
-                  <tr key={row.feature} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
-                    <td className="px-4 py-3 font-medium text-slate-800 border-b border-slate-100">{row.feature}</td>
-                    <td className="px-4 py-3 text-rose-700 font-semibold border-b border-slate-100 bg-rose-50">{row.quotexbert}</td>
-                    <td className="px-4 py-3 text-slate-500 border-b border-slate-100">{row.homestars}</td>
-                    <td className="px-4 py-3 text-slate-500 border-b border-slate-100">{row.houzz}</td>
-                    <td className="px-4 py-3 text-slate-500 border-b border-slate-100">{row.perLead}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { title: "Evaluate the fit", text: "Check the trade, service area, scope, timing, and available project information before committing estimating time." },
+              { title: "Ask useful questions", text: "Clarify site conditions, decision-makers, scheduling, and missing scope details before preparing a proposal." },
+              { title: "Quote clearly", text: "Define inclusions, exclusions, assumptions, price, timing, and next steps so the homeowner can compare proposals fairly." },
+            ].map((item) => (
+              <div key={item.title} className="bg-white border border-slate-200 rounded-xl p-6">
+                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600">{item.text}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-xs text-slate-500 mt-3">
-            Pricing data is approximate and based on publicly available information as of 2026. For the most current pricing, visit each platform directly.{" "}
-            <Link href="/homestars-alternative" className="text-rose-700 hover:underline">
-              Full comparison with HomeStars →
-            </Link>
-          </p>
+          <div className="flex flex-wrap gap-4 mt-8">
+            <Link href="/contractor-growth-guide" className="text-sm font-semibold text-rose-700 hover:underline">Follow the contractor growth workflow →</Link>
+            <Link href="/how-to-get-contractor-leads" className="text-sm font-semibold text-rose-700 hover:underline">Learn how to build a balanced lead pipeline →</Link>
+            <Link href="/pay-per-lead-alternative" className="text-sm font-semibold text-rose-700 hover:underline">Compare lead-pricing models →</Link>
+          </div>
         </div>
       </section>
 
-      {/* Founding Contractor Program */}
+      {/* New Contractor Offer */}
       <FoundingContractorSection />
 
       {/* FAQ */}
@@ -291,7 +268,7 @@ export default function ContractorLeadsHubPage() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-black text-slate-900 mb-2">Popular Contractor Opportunities</h2>
           <p className="text-slate-600 mb-8">
-            High-demand city and trade combinations across Ontario.
+            Explore city and trade combinations currently covered by the marketplace.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {[
@@ -327,10 +304,10 @@ export default function ContractorLeadsHubPage() {
             {[
               { href: "/for-contractors", label: "Contractor Overview" },
               { href: "/contractors/join", label: "Join as a Contractor" },
-              { href: "/homestars-alternative", label: "HomeStars Alternative" },
+              { href: "/contractor-growth-guide", label: "Contractor Growth Guide" },
               { href: "/how-to-get-contractor-leads", label: "How to Get Contractor Leads" },
-              { href: "/contractor-lead-generation-canada", label: "Lead Generation in Canada" },
-              { href: "/best-app-for-contractors-canada", label: "Best App for Contractors" },
+              { href: "/pay-per-lead-alternative", label: "Compare Lead Pricing Models" },
+              { href: "/homestars-alternative", label: "Compare QuoteXbert and HomeStars" },
             ].map((link) => (
               <Link
                 key={link.href}

@@ -1,7 +1,4 @@
 import { FAQItem } from "@/components/seo/FAQSection";
-import { FOUNDING_CONTRACTOR_SPOTS_REMAINING } from "@/lib/founding-contractor-config";
-
-const FOUNDING_SPOTS_LABEL = `${FOUNDING_CONTRACTOR_SPOTS_REMAINING} remain`;
 
 export interface ContractorLeadData {
   slug: string;
@@ -49,10 +46,10 @@ export const contractorLeadPages: ContractorLeadData[] = [
       { title: "Roof Replacement", budget: "$12,000–$18,000", location: "Scarborough, Toronto" },
     ],
     stats: [
-      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
+      { label: "First Eligible Month", value: "$0.99" },
       { label: "Toronto & GTA Coverage", value: "50+ cities" },
       { label: "Average Job Value", value: "$28,000" },
-      { label: "Founding Pricing", value: "$0.99 first month" },
+      { label: "New Contractor Offer", value: "$0.99 first month" },
     ],
     faqs: [
       { question: "Is QuoteXbert free for contractors?", answer: "Yes, creating a contractor profile and receiving lead notifications is free. QuoteXbert offers optional subscription plans that unlock unlimited lead access, priority placement, and featured contractor status." },
@@ -203,7 +200,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
       { title: "Deck Board Replacement", budget: "$600–$1,500", location: "Whitby, Ontario" },
     ],
     stats: [
-      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
+      { label: "First Eligible Month", value: "$0.99" },
       { label: "Average Job Duration", value: "Half day" },
       { label: "Most Active Areas", value: "Downtown, Midtown" },
       { label: "Average Job Value", value: "$650" },
@@ -315,7 +312,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
     stats: [
       { label: "Photo-First Leads", value: "Included" },
       { label: "Average Renovation Job", value: "$42,000" },
-      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
+      { label: "First Eligible Month", value: "$0.99" },
       { label: "GTA Municipalities", value: "30+" },
     ],
     faqs: [
@@ -389,7 +386,7 @@ export const contractorLeadPages: ContractorLeadData[] = [
     ],
     stats: [
       { label: "GTA Municipalities Covered", value: "50+" },
-      { label: "Founding Contractor Spots", value: FOUNDING_SPOTS_LABEL },
+      { label: "First Eligible Month", value: "$0.99" },
       { label: "GTA Population Served", value: "7M+" },
       { label: "Average GTA Job Value", value: "$38,000" },
     ],

@@ -449,7 +449,7 @@ export default function SubscriptionsPage() {
   return (
     <Elements stripe={stripePromise}>
       <div className="min-h-screen bg-gray-50">
-        {/* Founding Contractor urgency section */}
+        {/* New Contractor Offer */}
         {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && !loading && (
           <FoundingContractorSection compact />
         )}
@@ -467,7 +467,7 @@ export default function SubscriptionsPage() {
                 </h3>
                 {successFoundingOffer && successTier ? (
                   <p className="text-green-700 mt-1">
-                    🎉 Founding Contractor Offer applied — you were charged <strong>$0.99</strong> for your first month.
+                    New Contractor Offer applied — you were charged <strong>$0.99</strong> for your first month.
                     Your subscription renews at the regular <strong>{TIER_REGULAR_PRICE_LABEL[successTier]}/month</strong> starting
                     next billing cycle. Cancel anytime. Your paid categories are being activated now.
                   </p>
@@ -582,7 +582,7 @@ export default function SubscriptionsPage() {
                         {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                           <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                             <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                            <p className="text-[11px] text-amber-700">Then $49.00/month · Founding offer · Cancel anytime</p>
+                            <p className="text-[11px] text-amber-700">Then $49.00/month · New contractor offer · Cancel anytime</p>
                           </div>
                         )}
                         <div className="bg-green-50 rounded-xl p-3 mb-5 border border-green-200">
@@ -628,7 +628,7 @@ export default function SubscriptionsPage() {
                       {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                           <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $99.00/month · Founding offer · Cancel anytime</p>
+                          <p className="text-[11px] text-amber-700">Then $99.00/month · New contractor offer · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-orange-50 rounded-xl p-3 mb-5 border border-orange-200">
@@ -672,7 +672,7 @@ export default function SubscriptionsPage() {
                       {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && (
                         <div className="bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 mb-3">
                           <p className="text-xs font-black text-amber-800">🎉 First Month $0.99</p>
-                          <p className="text-[11px] text-amber-700">Then $149.00/month · Founding offer · Cancel anytime</p>
+                          <p className="text-[11px] text-amber-700">Then $149.00/month · New contractor offer · Cancel anytime</p>
                         </div>
                       )}
                       <div className="bg-rose-50 rounded-xl p-3 mb-5 border border-rose-200">
@@ -1149,7 +1149,7 @@ export default function SubscriptionsPage() {
                 )}
                 {FOUNDING_OFFER_ENABLED && subscriptions.length === 0 && pendingTier && (
                   <p className="text-center text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg py-2 mb-3">
-                    🎉 First month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. Founding offer · Cancel anytime.
+                    First month $0.99, then {TIER_REGULAR_PRICE_LABEL[pendingTier]}/month. New contractor offer · Cancel anytime.
                   </p>
                 )}
                 <div className="flex items-center gap-3">
