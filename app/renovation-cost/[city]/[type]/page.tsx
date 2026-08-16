@@ -52,8 +52,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const reno = RENO_TYPE_MAP[typeSlug];
   if (!city || !reno) return {};
 
-  const title = `${reno.name} Cost in ${city.name} (2026 Guide) | QuoteXbert`;
-  const description = `How much does a ${reno.name.toLowerCase()} cost in ${city.name}? 2026 price guide for ${city.region}. Average costs, labour rates, and instant AI estimates.`;
+  const override = city.citySpecificOverrides?.[typeSlug];
+  const title = override?.title ?? `${reno.name} Cost in ${city.name} (2026 Guide) | QuoteXbert`;
+  const description = override?.description ?? `How much does a ${reno.name.toLowerCase()} cost in ${city.name}? 2026 price guide for ${city.region}. Average costs, labour rates, and instant AI estimates.`;
   const url = `https://www.quotexbert.com/renovation-cost/${citySlug}/${typeSlug}`;
 
   return {
@@ -84,6 +85,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
   const city = CITY_MAP[citySlug];
   const reno = RENO_TYPE_MAP[typeSlug];
   if (!city || !reno) notFound();
+  const override = city.citySpecificOverrides?.[typeSlug];
 
   // Find the Toronto baseline data for this renovation type
   const torontoData = renovationCostPages.find((p) => p.slug === reno.baseSlug);
@@ -104,7 +106,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
   };
 
   const cityLabel = citySlug === "toronto" ? "Toronto" : `${city.name} (${city.region})`;
-  const h1 = `${reno.name} Cost in ${city.name} (2026 Guide)`;
+  const h1 = override?.h1 ?? `${reno.name} Cost in ${city.name} (2026 Guide)`;
   const canonicalUrl = `https://www.quotexbert.com/renovation-cost/${citySlug}/${typeSlug}`;
 
   // Related city links (same renovation type)
@@ -119,7 +121,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
       {
         "@type": "WebPage",
         name: h1,
-        description: `${reno.name} cost guide for ${city.name}, ${city.region}. 2026 pricing.`,
+        description: override?.description ?? `${reno.name} cost guide for ${city.name}, ${city.region}. 2026 pricing.`,
         url: canonicalUrl,
         breadcrumb: {
           "@type": "BreadcrumbList",
@@ -181,15 +183,21 @@ export default async function ProgrammaticCostPage({ params }: Props) {
             </div>
             <h1 className="text-3xl md:text-5xl font-bold mb-4">{h1}</h1>
             <p className="text-lg text-rose-100 mb-8 max-w-2xl">
-              {reno.name} costs in {cityLabel}. Updated 2026 pricing based on local labour rates and material costs.
-              {city.laborPremium !== 0 && (
-                <span className="ml-1">
-                  Labour in {city.name} is typically{" "}
-                  <strong className="text-white">
-                    {Math.abs(city.laborPremium)}% {city.laborPremium < 0 ? "lower" : "higher"}
-                  </strong>{" "}
-                  than Toronto core.
-                </span>
+              {override?.intro ? (
+                override.intro
+              ) : (
+                <>
+                  {reno.name} costs in {cityLabel}. Updated 2026 pricing based on local labour rates and material costs.
+                  {city.laborPremium !== 0 && (
+                    <span className="ml-1">
+                      Labour in {city.name} is typically{" "}
+                      <strong className="text-white">
+                        {Math.abs(city.laborPremium)}% {city.laborPremium < 0 ? "lower" : "higher"}
+                      </strong>{" "}
+                      than Toronto core.
+                    </span>
+                  )}
+                </>
               )}
             </p>
             <div className="flex flex-wrap gap-4 mb-8">
@@ -238,6 +246,22 @@ export default async function ProgrammaticCostPage({ params }: Props) {
               ))}
             </div>
           </section>
+
+          {override?.localConsiderations && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                Local Considerations for {reno.name} in {city.name}
+              </h2>
+              <div className="space-y-4">
+                {override.localConsiderations.map((consideration) => (
+                  <div key={consideration} className="flex gap-4 p-5 bg-slate-50 rounded-xl border border-slate-100">
+                    <CheckCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-slate-700 text-sm leading-relaxed">{consideration}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Cost Table */}
           {adjustedCostTable.length > 0 && (
@@ -406,6 +430,7 @@ export default async function ProgrammaticCostPage({ params }: Props) {
           <InternalLinksSection
             title="Explore More Renovation Resources"
             links={[
+              ...(override?.internalLinks ?? []),
               { href: "/#estimate", label: "Get Free AI Estimate" },
               { href: "/home-renovation-cost-toronto", label: "Toronto Renovation Costs" },
               { href: "/contractors/join", label: "For Contractors: Get Leads" },

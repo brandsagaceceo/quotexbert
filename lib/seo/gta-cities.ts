@@ -7,6 +7,15 @@ export interface GTACity {
   laborPremium: number; // % on top of Toronto baseline
   description: string;
   nearestCity: string;
+  citySpecificOverrides?: Record<string, {
+    title?: string;
+    description?: string;
+    h1?: string;
+    intro?: string;
+    localConsiderations?: string[];
+    additionalFaqs?: Array<{ question: string; answer: string }>;
+    internalLinks?: Array<{ href: string; label: string }>;
+  }>;
 }
 
 export const GTA_CITIES: GTACity[] = [
@@ -20,6 +29,23 @@ export const GTA_CITIES: GTACity[] = [
     description:
       "Toronto is Ontario's largest city and the heart of the GTA renovation market. Contractor labour costs are highest here, reflecting high demand and cost of living.",
     nearestCity: "Toronto",
+    citySpecificOverrides: {
+      "house-painting": {
+        title: "House Painting Cost in Toronto (2026 Guide) | QuoteXbert",
+        description: "Plan a Toronto house painting project with guidance on preparation, trim, doors, ceilings, condo access, scheduling, and contractor quotes.",
+        h1: "House Painting Cost in Toronto (2026 Guide)",
+        intro: "Painting scope in Toronto depends on the condition of the existing surfaces and the number of rooms and finishes involved. Trim, doors, ceilings, repairs, and detailed preparation add labour, while condo access rules and scheduling can affect project logistics.",
+        localConsiderations: [
+          "Surface repairs and preparation should be documented before comparing quotes.",
+          "Trim, doors, ceilings, and colour changes can add labour beyond wall painting.",
+          "For condo projects, confirm elevator bookings, work hours, and contractor access requirements."
+        ],
+        internalLinks: [
+          { href: "/toronto", label: "Toronto Renovation Hub" },
+          { href: "/renovation-calculator", label: "Renovation Calculator" }
+        ]
+      }
+    },
   },
   {
     slug: "scarborough",
@@ -86,6 +112,23 @@ export const GTA_CITIES: GTACity[] = [
     description:
       "Vaughan has many luxury and semi-luxury homes built in the 2000s–2010s. Kitchen and bathroom renovations are common as owners upgrade builder finishes.",
     nearestCity: "Toronto",
+    citySpecificOverrides: {
+      "deck-building": {
+        title: "Deck Building Cost in Vaughan (2026 Guide) | QuoteXbert",
+        description: "Plan a Vaughan deck project with guidance on deck size, materials, stairs, railings, demolition, permits, and contractor quotes.",
+        h1: "Deck Building Cost in Vaughan (2026 Guide)",
+        intro: "Deck size and material choice shape the base scope of a Vaughan deck project. Stairs, railings, demolition, grading, and access can add work, and homeowners should confirm applicable City of Vaughan permit requirements before construction.",
+        localConsiderations: [
+          "Compare quotes using the same deck dimensions, framing plan, and material specification.",
+          "Stairs, railings, demolition, and difficult access can materially change the scope.",
+          "Confirm applicable municipal permit and zoning requirements before construction begins."
+        ],
+        internalLinks: [
+          { href: "/renovation-calculator", label: "Renovation Calculator" },
+          { href: "/deck-builder-near-me", label: "Deck Builder Guide" }
+        ]
+      }
+    },
   },
   {
     slug: "markham",
@@ -130,6 +173,23 @@ export const GTA_CITIES: GTACity[] = [
     description:
       "Ajax has a large stock of 1990s–2000s suburban homes with growing renovation demand. Lower contractor overhead means competitive pricing versus Toronto.",
     nearestCity: "Toronto",
+    citySpecificOverrides: {
+      "bathroom-renovation": {
+        title: "Bathroom Renovation Cost in Ajax (2026 Guide) | QuoteXbert",
+        description: "Plan an Ajax bathroom renovation with guidance on plumbing changes, tile, waterproofing, project scope, and contractor quotes.",
+        h1: "Bathroom Renovation Cost in Ajax (2026 Guide)",
+        intro: "Bathroom quotes in Ajax vary substantially between a cosmetic refresh and a full gut renovation. Moving plumbing increases the scope, while tile selection, waterproofing details, fixtures, and layout changes all affect the work required.",
+        localConsiderations: [
+          "Keep fixture locations consistent when comparing quotes so plumbing scope is clear.",
+          "Ask each contractor to specify tile preparation and waterproofing in writing.",
+          "Separate cosmetic updates from full demolition and layout changes when defining the project."
+        ],
+        internalLinks: [
+          { href: "/bathroom-renovation-permits-ontario", label: "Ontario Bathroom Permits Guide" },
+          { href: "/renovation-calculator", label: "Renovation Calculator" }
+        ]
+      }
+    },
   },
   {
     slug: "pickering",

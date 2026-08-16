@@ -4,12 +4,15 @@ import { MapPin, ArrowRight, Star, Home, Wrench, Clock, CheckCircle } from 'luci
 
 export const metadata: Metadata = {
   title: 'Instant Home Renovation Estimates in Toronto | QuoteXbert',
-  description: 'Get instant AI-powered home renovation estimates in Toronto. Upload photos, get free quotes from verified contractors across downtown, North York, Scarborough, Etobicoke & more.',
+  description: 'Get AI-powered home renovation estimates in Toronto. Upload photos and compare local contractor profiles across downtown, North York, Scarborough, Etobicoke and more.',
   keywords: ['Toronto renovation estimates', 'Toronto contractors', 'home renovation Toronto', 'Toronto home repair quotes', 'downtown Toronto contractors'],
   openGraph: {
     title: 'Instant Home Renovation Estimates in Toronto | QuoteXbert',
-    description: 'Get instant AI-powered home renovation estimates in Toronto. Upload photos, get free quotes from verified contractors.',
+    description: 'Get AI-powered home renovation estimates in Toronto and compare local contractor profiles.',
     url: 'https://www.quotexbert.com/toronto',
+  },
+  alternates: {
+    canonical: 'https://www.quotexbert.com/toronto'
   }
 };
 
@@ -54,13 +57,13 @@ export default function TorontoPage() {
             {/* Main Heading */}
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
               <span className="text-[#800020]">
-                Instant Home Renovation<br />Estimates in Toronto
+                Home Renovations in Toronto
               </span>
             </h1>
 
             {/* Subheading */}
             <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Get AI-powered renovation estimates in minutes. Connect with verified, background-checked contractors across all Toronto neighborhoods.
+              Get an AI-powered renovation estimate using your project details, then compare local contractor profiles across Toronto neighbourhoods.
             </p>
 
             {/* Stats */}
@@ -186,9 +189,9 @@ export default function TorontoPage() {
               <div className="bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl p-6 w-20 h-20 mx-auto flex items-center justify-center">
                 <CheckCircle className="w-10 h-10 text-emerald-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Verified Toronto Contractors</h3>
+              <h3 className="text-xl font-bold text-gray-900">Toronto Contractor Profiles</h3>
               <p className="text-gray-600">
-                All contractors are background-checked, licensed, and insured. Only the best professionals serving Toronto homeowners.
+                Compare available profile information, reviews, and verification status where displayed before choosing who to contact.
               </p>
             </div>
 
@@ -198,7 +201,7 @@ export default function TorontoPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900">Instant AI Estimates</h3>
               <p className="text-gray-600">
-                Upload photos and get accurate renovation estimates in under 3 minutes. No more waiting days for contractor quotes.
+                Upload photos and project details to generate a renovation cost estimate before requesting contractor quotes.
               </p>
             </div>
 
@@ -222,7 +225,7 @@ export default function TorontoPage() {
             Ready to Start Your Toronto Renovation?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Get an instant, accurate renovation estimate built for Toronto homeowners
+            Generate a renovation cost estimate using your Toronto project details
           </p>
           <Link
             href="/create-lead"
@@ -252,7 +255,7 @@ export default function TorontoPage() {
               "name": "Toronto",
               "sameAs": "https://en.wikipedia.org/wiki/Toronto"
             },
-            "description": "Instant AI-powered home renovation estimates in Toronto with verified contractors"
+            "description": "AI-powered home renovation estimates and local contractor profiles in Toronto"
           })
         }}
       />

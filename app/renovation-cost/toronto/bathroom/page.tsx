@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Bathroom Renovation Cost Toronto 2026 | QuoteXbert Guide",
   description: "Complete bathroom renovation cost guide for Toronto & GTA. Average pricing, timeline, material breakdown, and common mistakes to avoid. Get instant AI estimate.",
   keywords: "bathroom renovation cost Toronto, bathroom remodel price GTA, Toronto bathroom renovation",
+  alternates: {
+    canonical: "https://www.quotexbert.com/renovation-cost/toronto/bathroom"
+  }
 };
 
 export default function BathroomRenovationCostPage() {
@@ -18,10 +21,10 @@ export default function BathroomRenovationCostPage() {
             ← Back to QuoteXbert
           </Link>
           <h1 className="text-4xl md:text-5xl font-black mb-4">
-            Bathroom Renovation Cost in Toronto
+            Bathroom Renovation Cost in Toronto (2026)
           </h1>
-          <p className="text-xl opacity-90">
-            Complete 2026 pricing guide for Toronto & GTA homeowners
+          <p className="text-xl opacity-90 mb-6">
+            Bathroom renovations in Toronto typically range from $8,000 for a cosmetic refresh to $40,000+ for a full ensuite renovation. Local labour rates, plumbing changes, waterproofing requirements, and finish selections can all affect the final quote.
           </p>
         </div>
       </header>
@@ -160,7 +163,7 @@ export default function BathroomRenovationCostPage() {
         {/* Material Breakdown */}
         <section className="mb-12">
           <h2 className="text-3xl font-black text-slate-900 mb-6">Cost Breakdown</h2>
-          <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden mb-8">
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>
@@ -169,6 +172,13 @@ export default function BathroomRenovationCostPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
+                <tr>
+                  <td className="p-4">
+                    <p className="font-semibold text-slate-900">Demolition & Disposal</p>
+                    <p className="text-sm text-slate-600">Bin rental and manual labour removal</p>
+                  </td>
+                  <td className="p-4 text-right font-semibold text-slate-900">Varies by scope</td>
+                </tr>
                 <tr>
                   <td className="p-4">
                     <p className="font-semibold text-slate-900">Vanity & Sink</p>
@@ -236,7 +246,7 @@ export default function BathroomRenovationCostPage() {
               },
               {
                 title: "Skipping Waterproofing",
-                description: "Cutting corners on waterproof membrane saves $500 now but costs thousands in water damage later.",
+                description: "Cutting corners on waterproofing can lead to significant water damage and repair costs later.",
               },
               {
                 title: "Choosing Wrong Tile Size",
@@ -306,26 +316,39 @@ export default function BathroomRenovationCostPage() {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-sm opacity-75 mt-4">
-            Takes 2 minutes • No signup required • Connect with verified contractors
+            Takes 2 minutes • No signup required • Connect with local contractors
           </p>
         </section>
 
         {/* Related Guides & Internal Clusters */}
         <section className="mt-12 bg-slate-50 rounded-xl p-8 border border-slate-200">
-          <h3 className="text-2xl font-black text-slate-900 mb-6">Explore Bathroom Renovation Cluster Guides</h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <h3 className="text-2xl font-black text-slate-900 mb-6">Explore Toronto Renovation Cost Guides</h3>
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
             <Link
-              href="/bathroom-renovation-calculator"
+              href="/toronto"
               className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
             >
               <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
-                🛁 Bathroom Renovation Calculator →
+                🏠 Toronto Hub →
+              </h4>
+              <p className="text-sm text-slate-600">
+                Explore all local Toronto home renovation guides.
+              </p>
+            </Link>
+            
+            <Link
+              href="/renovation-calculator"
+              className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"
+            >
+              <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-[#800020] transition">
+                🧮 Renovation Calculator →
               </h4>
               <p className="text-sm text-slate-600">
                 Get an instant, itemized estimate based on bathroom type, fixtures, and finishes.
               </p>
             </Link>
-            
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/bathroom-renovation-permits-ontario"
               className="bg-white rounded-xl p-6 border border-slate-200 hover:border-[#800020] hover:shadow-md transition group"

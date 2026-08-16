@@ -5,18 +5,18 @@ import { ArrowRight, Star, CheckCircle, Shield, Zap, DollarSign, Users, Lock } f
 export const metadata: Metadata = {
   title: 'Why QuoteXbert | Transparent AI Renovation Estimates | QuoteXbert',
   description:
-    'Why thousands of Ontario homeowners trust QuoteXbert. AI-powered estimates, verified contractors, no hidden fees, transparent pricing, and accurate renovation cost data for Toronto, Durham Region & the GTA.',
-  keywords: ['why QuoteXbert', 'QuoteXbert review', 'AI renovation estimates Ontario', 'trusted renovation platform', 'verified contractors Canada'],
+    'Why Ontario homeowners use QuoteXbert for AI-powered renovation estimates, transparent pricing information, and local contractor profiles.',
+  keywords: ['why QuoteXbert', 'QuoteXbert review', 'AI renovation estimates Ontario', 'trusted renovation platform', 'contractor profiles Canada'],
   openGraph: {
     title: 'Why QuoteXbert | AI Renovation Estimates You Can Trust',
-    description: 'Transparent pricing, verified contractors, no hidden fees. Why Ontario homeowners choose QuoteXbert.',
+    description: 'Transparent renovation pricing information and local contractor profiles for Ontario homeowners.',
     url: 'https://www.quotexbert.com/why-quotexbert',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Why QuoteXbert | Trusted Renovation Estimates Ontario',
-    description: 'AI estimates + verified contractors. Why Ontario homeowners trust QuoteXbert.',
+    description: 'AI estimates and local contractor profiles for Ontario homeowners.',
   },
   alternates: {
     canonical: 'https://www.quotexbert.com/why-quotexbert',
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
 const pillars = [
   {
     icon: '🤖',
-    title: 'Accurate AI Estimates',
-    desc: "Our AI is trained on thousands of completed Ontario renovation projects. When you upload photos and describe your project, you receive a market-calibrated estimate — not a guess. The estimate reflects real 2025 pricing for your specific city in Toronto, Durham Region, or the GTA.",
+    title: 'AI Project Estimates',
+    desc: "QuoteXbert's AI estimator uses the project details you provide to generate a renovation cost estimate. It is a planning tool, not a final contractor quote.",
   },
   {
     icon: '✅',
-    title: 'Verified Contractors Only',
-    desc: 'Every contractor on QuoteXbert is verified before they can appear. We confirm Ontario licences, current liability insurance (minimum $2M), active WSIB coverage, and conduct background checks. No unverified contractors appear on our platform — ever.',
+    title: 'Contractor Profile Information',
+    desc: 'Contractor profiles can display verification status and other profile information to help homeowners evaluate who they want to work with. Look for the verification badge where available.',
   },
   {
     icon: '💰',
@@ -47,29 +47,29 @@ const pillars = [
   {
     icon: '⚡',
     title: 'Speed Without Compromise',
-    desc: 'Traditional contractor quote processes take 2–4 weeks. QuoteXbert delivers an AI estimate in under 3 minutes. You get the speed of technology with the accuracy of local market data.',
+    desc: 'QuoteXbert generates a planning estimate from the project details you provide before you request final contractor quotes.',
   },
   {
     icon: '🎯',
-    title: 'Local Market Accuracy',
-    desc: "One-size-fits-all estimates don't work. A bathroom renovation in Oshawa costs 15% less than the same project in downtown Toronto. QuoteXbert calibrates estimates by city — Oshawa, Whitby, Ajax, Pickering, Bowmanville, and all Toronto neighbourhoods.",
+    title: 'Local Project Context',
+    desc: "Renovation costs vary by project scope, location, materials, and labour. QuoteXbert uses the city and project details you provide when generating an estimate.",
   },
 ];
 
 const howItsDifferent = [
-  { feature: 'AI Estimate Quality', us: 'Trained on 10,000+ Ontario projects', them: 'Generic national pricing' },
-  { feature: 'Contractor Verification', us: 'Licence, insurance, WSIB, background check', them: 'Self-reported only' },
+  { feature: 'AI Estimate Inputs', us: 'Your project details and location', them: 'Generic national pricing' },
+  { feature: 'Contractor Profiles', us: 'Verification status shown where available', them: 'Profile details vary' },
   { feature: 'Cost to Homeowners', us: 'Free forever', them: 'Often free but contractors pay per-lead fees' },
-  { feature: 'Price Accuracy', us: 'Local market calibration by city', them: 'Province or country averages' },
+  { feature: 'Estimate Context', us: 'Your project details and city', them: 'Province or country averages' },
   { feature: 'Privacy', us: "Data used only for your project", them: 'Often sold to advertisers' },
-  { feature: 'Contractor Accountability', us: 'Ongoing monitoring and reviews', them: 'One-time verification' },
+  { feature: 'Contractor Information', us: 'Profiles and customer reviews', them: 'Profile details vary' },
 ];
 
 const faqs = [
   { q: 'Is QuoteXbert really free for homeowners?', a: "Yes, completely. Homeowners use QuoteXbert at no cost — no registration fees, no lead fees, no commissions. We charge contractors a monthly subscription to access homeowner projects, which is far less than per-lead fees on other platforms." },
   { q: 'How does QuoteXbert make money?', a: "Contractors pay a monthly subscription fee to access leads and connect with homeowners. This is a fixed cost for them — they don't pay per lead, which means they have no incentive to inflate quotes to recover lead costs. This model is better for both homeowners and contractors." },
-  { q: 'Are the AI estimates accurate?', a: "AI estimates are reliable benchmarks — typically within 10–20% of final contractor quotes for standard projects. They're not final quotes (a contractor still needs to assess your specific situation), but they're accurate enough to identify unreasonable quotes and give you realistic budget expectations." },
-  { q: 'Why should I trust QuoteXbert over other platforms?', a: "Three reasons: (1) Our AI is trained specifically on Ontario renovation projects, not generic national data. (2) We physically verify contractor credentials — not just take their word for it. (3) Our contractor fee model doesn't incentivize inflated estimates the way per-lead models do." },
+  { q: 'Are AI estimates final quotes?', a: "No. The estimator uses the project information you provide to create a planning estimate. A contractor still needs to assess your specific project and provide a final quote." },
+  { q: 'Why use QuoteXbert?', a: "QuoteXbert combines a project-based renovation cost estimate with local contractor profiles and direct messaging. Review the information available on each profile, including verification status where displayed, before deciding who to contact." },
 ];
 
 export default function WhyQuoteXbertPage() {
@@ -92,13 +92,13 @@ export default function WhyQuoteXbertPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              AI-powered estimates calibrated to your Ontario city. Verified, background-checked contractors.
-              Completely free for homeowners. No hidden fees. No games.
+              Generate an AI-powered estimate from your project details, then compare local contractor profiles.
+              Homeowner access is free.
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 text-sm font-semibold">
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow"><Star className="w-4 h-4 text-yellow-500 fill-yellow-500" /><span>5.0/5 Rating</span></div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow"><CheckCircle className="w-4 h-4 text-green-500" /><span>Verified Contractors</span></div>
+              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow"><CheckCircle className="w-4 h-4 text-green-500" /><span>Profile Details</span></div>
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow"><Shield className="w-4 h-4 text-blue-500" /><span>Free for Homeowners</span></div>
             </div>
 
@@ -157,35 +157,27 @@ export default function WhyQuoteXbertPage() {
         </div>
       </section>
 
-      {/* Founding Contractor Program */}
+      {/* New Contractor Offer */}
       <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h2 className="text-3xl font-black mb-4">The Founding Contractor Program</h2>
+              <h2 className="text-3xl font-black mb-4">New Contractor Offer</h2>
               <p className="text-gray-300 leading-relaxed mb-4">
-                QuoteXbert&apos;s early contractors helped build the platform. In recognition, Founding Contractors receive:
+                Choose your contractor plan and get your first eligible month for $0.99.
+                After the first month, your subscription renews at the regular monthly
+                price for the selected plan.
               </p>
-              <ul className="space-y-2 text-gray-300">
-                {[
-                  'Priority placement for your city and trade',
-                  'Discounted founding member rate — locked in for life',
-                  'Access to homeowner leads before the platform expands',
-                  'QuoteXbert Verified badge on your profile',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-gray-400 text-sm">
+                Offer available to eligible first-time contractor subscribers.
+              </p>
             </div>
             <div className="text-center">
               <div className="bg-rose-600 rounded-2xl p-8">
-                <h3 className="text-2xl font-black mb-3">Limited Spots Remaining</h3>
-                <p className="text-rose-100 mb-6 text-sm">Founding spots are limited per trade per area. Once filled, standard rates apply.</p>
+                <h3 className="text-2xl font-black mb-3">First Month $0.99</h3>
+                <p className="text-rose-100 mb-6 text-sm">Recurring billing continues at the selected plan&apos;s regular monthly price unless cancelled.</p>
                 <Link href="/for-contractors" className="bg-white text-rose-600 font-bold px-8 py-4 rounded-2xl hover:bg-rose-50 transition-colors block">
-                  Claim My Founding Contractor Spot
+                  View Contractor Plans
                 </Link>
               </div>
             </div>

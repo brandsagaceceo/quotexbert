@@ -8,9 +8,9 @@ export default function AboutPage() {
     <>
       <Head>
         <title>About QuoteXbert - AI Home Repair Platform Mission</title>
-        <meta name="description" content="QuoteXbert connects homeowners with verified contractors using AI-powered estimates. Our mission: transparent pricing, quality work, trusted connections." />
+        <meta name="description" content="QuoteXbert connects homeowners with local contractor profiles using AI-powered estimates. Our mission: transparent pricing and informed project decisions." />
         <meta property="og:title" content="About QuoteXbert - AI Home Repair Platform" />
-        <meta property="og:description" content="Our mission: connecting homeowners with verified contractors using AI-powered estimates." />
+        <meta property="og:description" content="Our mission: helping homeowners compare renovation costs and local contractor profiles." />
         <meta property="og:image" content="/og-about.jpg" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
@@ -35,8 +35,8 @@ export default function AboutPage() {
               We believe every homeowner deserves to know what a fair price looks like <em>before</em> contractors submit quotes.
             </p>
             <p className="text-lg text-slate-700 leading-relaxed">
-              QuoteXbert uses AI to analyze your project and provide instant, accurate cost estimates based on real Toronto market data. 
-              Then we connect you with verified, reliable contractors who deliver quality work at fair prices.
+              QuoteXbert uses the project details you provide to generate a renovation cost estimate.
+              You can then compare local contractor profiles, including verification status where available.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function AboutPage() {
                     <h3 className="text-xl font-bold text-rose-800 mb-2">Finding Reliable Contractors Is Hard</h3>
                     <p className="leading-relaxed">
                       Homeowners waste weeks calling contractors who don't respond, show up late, or disappear mid-project. 
-                      Reviews are fake or outdated. There's no easy way to find verified, accountable professionals.
+                      Reviews can be difficult to assess, and finding responsive local professionals takes time.
                     </p>
                   </div>
                 </div>
@@ -108,11 +108,10 @@ export default function AboutPage() {
                 <div className="flex items-start gap-4">
                   <div className="text-4xl mt-1">🏆</div>
                   <div>
-                    <h3 className="text-xl font-bold text-orange-700 mb-2">Verified, Reliable Contractors Only</h3>
+                    <h3 className="text-xl font-bold text-orange-700 mb-2">Detailed Contractor Profiles</h3>
                     <p className="leading-relaxed">
-                      Every contractor on QuoteXbert undergoes background checks, license verification, and insurance confirmation. 
-                      We track response times, project completion rates, and real customer reviews. 
-                      <strong> No fake reviews. No unreliable contractors. Just professionals who show up and deliver quality work.</strong>
+                      Contractor profiles can display verification status, project information, and customer reviews.
+                      Homeowners can compare the available profile details before deciding who they want to contact.
                     </p>
                   </div>
                 </div>
@@ -123,7 +122,7 @@ export default function AboutPage() {
                     <h3 className="text-xl font-bold text-orange-700 mb-2">Fast, Transparent Connections</h3>
                     <p className="leading-relaxed">
                       Post your project once. Multiple pre-qualified contractors see it instantly and submit competitive quotes. 
-                      Compare proposals side-by-side. Read verified reviews. Choose confidently. 
+                      Compare proposals side-by-side. Review contractor profile information. Choose confidently.
                       <strong>The whole process takes hours instead of weeks.</strong>
                     </p>
                   </div>
@@ -191,7 +190,7 @@ export default function AboutPage() {
               </div>
               
               <p className="text-center text-slate-600 mt-6 italic">
-                If it's a home improvement project in Toronto or the GTA, QuoteXbert can estimate it accurately.
+                If it&apos;s a home improvement project in Toronto or the GTA, QuoteXbert can use the details you provide to generate a planning estimate.
               </p>
             </div>
           </div>
@@ -206,7 +205,7 @@ export default function AboutPage() {
                 <strong> We knew there had to be a better way.</strong>
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                We built an AI-powered platform that provides <em>instant, accurate estimates</em> while connecting homeowners with verified, reviewed contractors in their area. 
+                We built an AI-powered platform that provides renovation cost estimates while connecting homeowners with local contractor profiles in their area.
                 Our technology eliminates the guesswork from home repair pricing, giving homeowners confidence in their investment decisions.
               </p>
               <p className="text-slate-700 leading-relaxed">
@@ -262,7 +261,7 @@ export default function AboutPage() {
           <div className="bg-gradient-to-r from-rose-50 to-orange-50 border border-orange-200 rounded-xl p-8 text-center shadow-lg">
             <h2 className="text-2xl font-bold mb-4 text-slate-900">Ready to Get Started?</h2>
             <p className="text-slate-600 mb-6">
-              Join thousands of homeowners and contractors who trust QuoteXbert for their home improvement projects.
+                Join homeowners and contractors who trust QuoteXbert for their home improvement projects.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
