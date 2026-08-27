@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!city || !reno) return {};
 
   const override = city.citySpecificOverrides?.[typeSlug];
-  const title = override?.title ?? `${reno.name} Cost in ${city.name} (2026 Guide) | QuoteXbert`;
+  const title = override?.title ?? `${reno.name} Cost in ${city.name} (2026 Guide)`;
   const description = override?.description ?? `How much does a ${reno.name.toLowerCase()} cost in ${city.name}? 2026 price guide for ${city.region}. Average costs, labour rates, and instant AI estimates.`;
   const url = `https://www.quotexbert.com/renovation-cost/${citySlug}/${typeSlug}`;
 

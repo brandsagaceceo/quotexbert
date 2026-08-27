@@ -4,7 +4,7 @@ import FoundingContractorSection from "@/components/FoundingContractorSection";
 import FAQSection from "@/components/seo/FAQSection";
 
 export const metadata: Metadata = {
-  title: "Pay-Per-Lead Alternative for Contractors | QuoteXbert Ontario",
+  title: "Pay-Per-Lead Alternative for Contractors | Ontario",
   description:
     "Compare subscription and pay-per-lead pricing models for Ontario contractor opportunities, including cost predictability, participation, and measurement.",
   alternates: { canonical: "https://www.quotexbert.com/pay-per-lead-alternative" },

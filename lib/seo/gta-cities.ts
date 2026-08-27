@@ -31,7 +31,7 @@ export const GTA_CITIES: GTACity[] = [
     nearestCity: "Toronto",
     citySpecificOverrides: {
       "house-painting": {
-        title: "House Painting Cost in Toronto (2026 Guide) | QuoteXbert",
+        title: "House Painting Cost in Toronto (2026 Guide)",
         description: "Plan a Toronto house painting project with guidance on preparation, trim, doors, ceilings, condo access, scheduling, and contractor quotes.",
         h1: "House Painting Cost in Toronto (2026 Guide)",
         intro: "Painting scope in Toronto depends on the condition of the existing surfaces and the number of rooms and finishes involved. Trim, doors, ceilings, repairs, and detailed preparation add labour, while condo access rules and scheduling can affect project logistics.",
@@ -114,7 +114,7 @@ export const GTA_CITIES: GTACity[] = [
     nearestCity: "Toronto",
     citySpecificOverrides: {
       "deck-building": {
-        title: "Deck Building Cost in Vaughan (2026 Guide) | QuoteXbert",
+        title: "Deck Building Cost in Vaughan (2026 Guide)",
         description: "Plan a Vaughan deck project with guidance on deck size, materials, stairs, railings, demolition, permits, and contractor quotes.",
         h1: "Deck Building Cost in Vaughan (2026 Guide)",
         intro: "Deck size and material choice shape the base scope of a Vaughan deck project. Stairs, railings, demolition, grading, and access can add work, and homeowners should confirm applicable City of Vaughan permit requirements before construction.",
@@ -175,7 +175,7 @@ export const GTA_CITIES: GTACity[] = [
     nearestCity: "Toronto",
     citySpecificOverrides: {
       "bathroom-renovation": {
-        title: "Bathroom Renovation Cost in Ajax (2026 Guide) | QuoteXbert",
+        title: "Bathroom Renovation Cost in Ajax (2026 Guide)",
         description: "Plan an Ajax bathroom renovation with guidance on plumbing changes, tile, waterproofing, project scope, and contractor quotes.",
         h1: "Bathroom Renovation Cost in Ajax (2026 Guide)",
         intro: "Bathroom quotes in Ajax vary substantially between a cosmetic refresh and a full gut renovation. Moving plumbing increases the scope, while tile selection, waterproofing details, fixtures, and layout changes all affect the work required.",

@@ -5,7 +5,7 @@ import FoundingContractorSection from "@/components/FoundingContractorSection";
 import FAQSection from "@/components/seo/FAQSection";
 
 export const metadata: Metadata = {
-  title: "How to Get More Contractor Leads in Ontario | Practical Guide | QuoteXbert",
+  title: "How to Get More Contractor Leads in Ontario | Practical Guide",
   description:
     "A practical guide for Ontario contractors looking to get more renovation leads — covering platforms, Google, referrals, social media, and what actually works.",
   alternates: { canonical: "https://www.quotexbert.com/how-to-get-contractor-leads" },

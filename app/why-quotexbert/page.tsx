@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Star, CheckCircle, Shield, Zap, DollarSign, Users, Lock } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Why QuoteXbert | Transparent AI Renovation Estimates | QuoteXbert',
+  title: 'Transparent AI Renovation Estimates',
   description:
     'Why Ontario homeowners use QuoteXbert for AI-powered renovation estimates, transparent pricing information, and local contractor profiles.',
   keywords: ['why QuoteXbert', 'QuoteXbert review', 'AI renovation estimates Ontario', 'trusted renovation platform', 'contractor profiles Canada'],

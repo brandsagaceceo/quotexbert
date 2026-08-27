@@ -6,7 +6,7 @@ import FAQSection from "@/components/seo/FAQSection";
 import { CONTRACTOR_CITIES, CONTRACTOR_TRADES } from "@/lib/seo/contractor-acquisition-data";
 
 export const metadata: Metadata = {
-  title: "Contractor Leads in Ontario | Homeowner Projects | QuoteXbert",
+  title: "Contractor Leads in Ontario | Homeowner Projects",
   description:
     "Explore homeowner renovation project opportunities across Toronto, Durham Region, Clarington and the GTA through the QuoteXbert contractor marketplace.",
   alternates: {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { MapPin, ArrowRight, Star, Home, Wrench, Clock, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Instant Home Renovation Estimates in Toronto | QuoteXbert',
+  title: 'Instant Home Renovation Estimates in Toronto',
   description: 'Get AI-powered home renovation estimates in Toronto. Upload photos and compare local contractor profiles across downtown, North York, Scarborough, Etobicoke and more.',
   keywords: ['Toronto renovation estimates', 'Toronto contractors', 'home renovation Toronto', 'Toronto home repair quotes', 'downtown Toronto contractors'],
   openGraph: {

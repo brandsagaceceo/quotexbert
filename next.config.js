@@ -15,12 +15,6 @@ const nextConfig = {
         destination: 'https://www.quotexbert.com/:path*',
         permanent: true,
       },
-      // Legacy contractor landing page → canonical join page
-      {
-        source: '/for-contractors',
-        destination: '/contractors/join',
-        permanent: true,
-      },
       // Durham Region alternate slugs → canonical pages
       {
         source: '/renovation-costs-durham-region',

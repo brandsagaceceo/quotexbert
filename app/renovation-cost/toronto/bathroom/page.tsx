@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle, Clock, TrendingUp, AlertTriangle, Sparkles } f
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Bathroom Renovation Cost Toronto 2026 | QuoteXbert Guide",
+  title: "Bathroom Renovation Cost Toronto 2026",
   description: "Complete bathroom renovation cost guide for Toronto & GTA. Average pricing, timeline, material breakdown, and common mistakes to avoid. Get instant AI estimate.",
   keywords: "bathroom renovation cost Toronto, bathroom remodel price GTA, Toronto bathroom renovation",
   alternates: {

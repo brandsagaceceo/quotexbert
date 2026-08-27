@@ -1,20 +1,26 @@
-"use client";
-
-import Head from "next/head";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const description =
+  "Learn how QuoteXbert helps homeowners plan renovation costs, compare local contractor profiles, and manage project conversations in one marketplace.";
+
+export const metadata: Metadata = {
+  title: "About",
+  description,
+  alternates: {
+    canonical: "https://www.quotexbert.com/about",
+  },
+  openGraph: {
+    title: "About QuoteXbert",
+    description,
+    url: "https://www.quotexbert.com/about",
+    type: "website",
+  },
+};
 
 export default function AboutPage() {
   return (
     <>
-      <Head>
-        <title>About QuoteXbert - AI Home Repair Platform Mission</title>
-        <meta name="description" content="QuoteXbert connects homeowners with local contractor profiles using AI-powered estimates. Our mission: transparent pricing and informed project decisions." />
-        <meta property="og:title" content="About QuoteXbert - AI Home Repair Platform" />
-        <meta property="og:description" content="Our mission: helping homeowners compare renovation costs and local contractor profiles." />
-        <meta property="og:image" content="/og-about.jpg" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50">
         <div className="max-w-4xl mx-auto px-4 py-16">
           {/* Header */}

@@ -5,7 +5,7 @@ import FoundingContractorSection from "@/components/FoundingContractorSection";
 import FAQSection from "@/components/seo/FAQSection";
 
 export const metadata: Metadata = {
-  title: "Contractor Lead Generation in Canada | Find Renovation Leads | QuoteXbert",
+  title: "Contractor Lead Generation in Canada | Find Renovation Leads",
   description:
     "A practical guide to Canadian contractor lead channels, regional fit, trust signals, privacy, measurement, and evaluating marketplace pricing models.",
   alternates: { canonical: "https://www.quotexbert.com/contractor-lead-generation-canada" },

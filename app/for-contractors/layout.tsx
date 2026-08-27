@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "QuoteXbert for Ontario Contractors | Features & Pricing",
+  title: "For Ontario Contractors | Features & Pricing",
   description:
     "Review QuoteXbert contractor marketplace features, paid subscription tiers, and Ontario homeowner project opportunities.",
   alternates: { canonical: "https://www.quotexbert.com/for-contractors" },

@@ -9,7 +9,7 @@ import ContractorPlanCTA from "@/components/ContractorPlanCTA";
 import { FOUNDING_OFFER_ENABLED } from "@/lib/founding-contractor-config";
 
 export const metadata: Metadata = {
-  title: "Join QuoteXbert as an Ontario Contractor | Plans & Features",
+  title: "Join as an Ontario Contractor | Plans & Features",
   description:
     "Compare QuoteXbert contractor subscription tiers and create a profile to review relevant homeowner project opportunities across Ontario.",
   keywords: [
