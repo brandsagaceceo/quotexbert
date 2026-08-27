@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessLead } from "@/lib/subscription-access";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +10,28 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { contractorId, message, proposedPrice, estimatedDays } = await request.json();
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
+    const { dbUserId: contractorId } = authResult.user;
+    const contractor = await prisma.user.findUnique({
+      where: { id: contractorId },
+      select: { id: true, role: true, isActive: true },
+    });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json(
+        { error: "Active contractor access required" },
+        { status: 403 }
+      );
+    }
+
+    const { message, proposedPrice, estimatedDays } = await request.json();
     const resolvedParams = await params;
     const leadId = resolvedParams.id;
 
-    if (!leadId || !contractorId) {
+    if (!leadId) {
       return NextResponse.json(
         { error: "Lead ID and Contractor ID are required" },
         { status: 400 }
@@ -85,18 +103,6 @@ export async function POST(
       );
     }
 
-    // Ensure contractor exists
-    const contractor = await prisma.user.findUnique({
-      where: { id: contractorId }
-    });
-
-    if (!contractor) {
-      return NextResponse.json(
-        { error: "Contractor not found. Please sign in." },
-        { status: 404 }
-      );
-    }
-
     // Create the job application
     const application = await prisma.jobApplication.create({
       data: {
@@ -156,10 +162,25 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
+    const { dbUserId, clerkUserId } = authResult.user;
+    const authenticatedIds = new Set([dbUserId, clerkUserId]);
+    const requester = await prisma.user.findUnique({
+      where: { id: dbUserId },
+      select: { role: true },
+    });
+    if (!requester || requester.role !== "homeowner") {
+      return NextResponse.json({ error: "Homeowner access required" }, { status: 403 });
+    }
+
     const resolvedParams = await params;
     const leadId = resolvedParams.id;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const requestedUserId = searchParams.get('userId');
 
     if (!leadId) {
       return NextResponse.json(
@@ -207,8 +228,14 @@ export async function GET(
       );
     }
 
-    // Check if user is the homeowner who posted this job
-    if (userId && lead.homeownerId !== userId) {
+    if (lead.homeownerId !== dbUserId) {
+      return NextResponse.json(
+        { error: "You can only view applications for your own jobs" },
+        { status: 403 }
+      );
+    }
+
+    if (requestedUserId && !authenticatedIds.has(requestedUserId)) {
       return NextResponse.json(
         { error: "You can only view applications for your own jobs" },
         { status: 403 }

@@ -2,10 +2,17 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifications } from "@/lib/notifications";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const authResult = await resolveAuthUser();
+  if ('error' in authResult) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+  }
+  const { dbUserId, clerkUserId } = authResult.user;
+  const authenticatedIds = new Set([dbUserId, clerkUserId]);
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
   const threadId = searchParams.get("threadId");
@@ -13,9 +20,39 @@ export async function GET(request: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "User ID required" }, { status: 400 });
   }
+  if (!authenticatedIds.has(userId)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     if (threadId) {
+      const thread = await prisma.thread.findUnique({
+        where: { id: threadId },
+        select: {
+          lead: {
+            select: {
+              homeownerId: true,
+              acceptances: {
+                where: { status: { in: ["accepted", "quoted", "selected"] } },
+                select: { contractorId: true },
+              },
+              applications: {
+                where: { status: { in: ["accepted", "in_progress", "completed"] } },
+                select: { contractorId: true },
+              },
+            },
+          },
+        },
+      });
+      const isParticipant = thread && (
+        thread.lead.homeownerId === dbUserId ||
+        thread.lead.acceptances.some(({ contractorId }) => contractorId === dbUserId) ||
+        thread.lead.applications.some(({ contractorId }) => contractorId === dbUserId)
+      );
+      if (!isParticipant) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
       // Get messages for a specific thread
       const messages = await prisma.message.findMany({
         where: { threadId },
@@ -58,9 +95,9 @@ export async function GET(request: NextRequest) {
         where: {
           lead: {
             OR: [
-              { homeownerId: userId },
-              { contractorId: userId },
-              { acceptedById: userId }
+              { homeownerId: dbUserId },
+              { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
+              { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
             ]
           }
         },

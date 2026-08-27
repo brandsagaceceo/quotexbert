@@ -4,12 +4,62 @@ import { prisma } from "@/lib/prisma";
 import { logEventServer } from "@/lib/analytics";
 import { resolveAuthUser } from "@/lib/server-auth";
 
+const ACTIVE_ACCEPTANCE_STATUSES = ['accepted', 'quoted', 'selected'];
+const ACTIVE_APPLICATION_STATUSES = ['accepted', 'in_progress', 'completed'];
+
+async function getThreadParticipants(threadId: string) {
+  return prisma.thread.findUnique({
+    where: { id: threadId },
+    select: {
+      lead: {
+        select: {
+          homeownerId: true,
+          acceptances: {
+            where: { status: { in: ACTIVE_ACCEPTANCE_STATUSES } },
+            select: { contractorId: true },
+          },
+          applications: {
+            where: { status: { in: ACTIVE_APPLICATION_STATUSES } },
+            select: { contractorId: true },
+          },
+        },
+      },
+    },
+  });
+}
+
+function isThreadParticipant(
+  thread: Awaited<ReturnType<typeof getThreadParticipants>>,
+  userId: string,
+) {
+  if (!thread) return false;
+  const { homeownerId, acceptances, applications } = thread.lead;
+  return homeownerId === userId ||
+    acceptances.some((acceptance) => acceptance.contractorId === userId) ||
+    applications.some((application) => application.contractorId === userId);
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ threadId: string }> },
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
     const { threadId } = await params;
+
+    const thread = await getThreadParticipants(threadId);
+
+    if (!thread) {
+      return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    }
+
+    if (!isThreadParticipant(thread, dbUserId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const messages = await prisma.message.findMany({
       where: { threadId },
@@ -90,6 +140,11 @@ export async function POST(
 
     const dbFromUserId = fromUser.id;
     const dbToUserId = toUser.id;
+
+    const thread = await getThreadParticipants(threadId);
+    if (!thread || !isThreadParticipant(thread, callerDbId) || !isThreadParticipant(thread, dbToUserId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Security: verify the authenticated caller IS the sender
     if (dbFromUserId !== callerDbId) {

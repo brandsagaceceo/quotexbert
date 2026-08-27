@@ -29,11 +29,9 @@ export async function GET(req: Request) {
     });
     const contractorDbIds = matchingUsers.map((u) => u.id);
     if (!contractorDbIds.includes(userId)) contractorDbIds.push(userId);
-    if (!contractorDbIds.includes(contractorId)) contractorDbIds.push(contractorId);
 
     // Verify the requested contractorId belongs to the authenticated user
-    const isOwner = contractorDbIds.includes(contractorId) || contractorId === userId;
-    if (!isOwner) {
+    if (!contractorDbIds.includes(contractorId)) {
       return NextResponse.json({ error: 'Invalid contractor ID' }, { status: 403 });
     }
 

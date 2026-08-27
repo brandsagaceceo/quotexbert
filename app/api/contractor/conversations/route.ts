@@ -22,8 +22,6 @@ export async function GET(req: Request) {
     const matchingUsers = await prisma.user.findMany({
       where: {
         OR: [
-          { id: contractorId },
-          { clerkUserId: contractorId },
           { id: userId },
           { clerkUserId: userId },
         ]
@@ -32,8 +30,8 @@ export async function GET(req: Request) {
     });
     const contractorDbIds = matchingUsers.map(u => u.id);
 
-    if (contractorDbIds.length === 0) {
-      return NextResponse.json({ success: true, conversations: [] });
+    if (!contractorDbIds.includes(contractorId)) {
+      return NextResponse.json({ error: 'Invalid contractor ID' }, { status: 403 });
     }
 
     // Fetch threads via JobAcceptance (direct accept flow) and JobApplication (application flow)

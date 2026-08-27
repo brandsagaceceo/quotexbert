@@ -1,37 +1,52 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId, clerkUserId } = authResult.user;
+    const authenticatedIds = new Set([dbUserId, clerkUserId]);
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const requestedUserId = searchParams.get("userId");
 
-    if (!userId) {
+    if (!requestedUserId) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
-
-    // Resolve ALL DB user IDs for this user (handles webhook-created vs /api/user/role-created users).
-    const matchingUsers = await prisma.user.findMany({
-      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
-      select: { id: true },
+    if (!authenticatedIds.has(requestedUserId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const dbUserIds = [dbUserId];
+    const currentUser = await prisma.user.findUnique({
+      where: { id: dbUserId },
+      select: { role: true },
     });
-    const dbUserIds = matchingUsers.map((u) => u.id);
-    if (!dbUserIds.includes(userId)) dbUserIds.push(userId);
+    const leadAccess = currentUser?.role === "contractor"
+      ? {
+          OR: [
+            { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
+            { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
+          ],
+        }
+      : { homeownerId: dbUserId };
 
     // The primary DB id is used for conversation partner comparison on the client
-    const selfUserId = matchingUsers[0]?.id || userId;
+    const selfUserId = dbUserId;
 
     // ── TEMP DEBUG: server-side identity trace ──
     if (process.env.NODE_ENV === 'development') {
       console.log('[API/threads][GET]', {
-        inputUserId: userId,
-        matchCount: matchingUsers.length,
+        inputUserId: requestedUserId,
+        matchCount: 1,
         dbUserIds,
         selfUserId,
-        idMatch: userId === selfUserId,
+        idMatch: requestedUserId === selfUserId,
       });
     }
 
@@ -39,21 +54,7 @@ export async function GET(request: NextRequest) {
     const threads = await prisma.thread.findMany({
       where: {
         OR: [
-          // User is the homeowner of the lead
-          { lead: { homeownerId: { in: dbUserIds } } },
-          // User is the contractor of the lead
-          { lead: { contractorId: { in: dbUserIds } } },
-          // User has sent or received messages in this thread
-          {
-            messages: {
-              some: {
-                OR: [
-                  { fromUserId: { in: dbUserIds } },
-                  { toUserId: { in: dbUserIds } },
-                ],
-              },
-            },
-          },
+          { lead: leadAccess },
         ],
       },
       include: {
