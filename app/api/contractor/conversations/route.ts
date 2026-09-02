@@ -47,7 +47,11 @@ export async function GET(req: Request) {
               homeowner: { select: { id: true, name: true, email: true } },
               Thread: {
                 include: {
-                  messages: { orderBy: { createdAt: 'desc' }, take: 1 }
+                  messages: {
+                    where: { OR: [{ fromUserId: { in: contractorDbIds } }, { toUserId: { in: contractorDbIds } }] },
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                  }
                 }
               }
             }
@@ -66,7 +70,11 @@ export async function GET(req: Request) {
               homeowner: { select: { id: true, name: true, email: true } },
               Thread: {
                 include: {
-                  messages: { orderBy: { createdAt: 'desc' }, take: 1 }
+                  messages: {
+                    where: { OR: [{ fromUserId: { in: contractorDbIds } }, { toUserId: { in: contractorDbIds } }] },
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                  }
                 }
               }
             }
@@ -78,10 +86,11 @@ export async function GET(req: Request) {
 
     // Combine sources, deduplicate by lead ID
     const allAccepted: any[] = [...jobAcceptances, ...jobApplications];
-    const seenLeadIds = new Set<string>();
+    const seenConversationKeys = new Set<string>();
     const uniqueAccepted = allAccepted.filter(item => {
-      if (seenLeadIds.has(item.lead.id)) return false;
-      seenLeadIds.add(item.lead.id);
+      const key = `${item.lead.id}-${item.contractorId}`;
+      if (seenConversationKeys.has(key)) return false;
+      seenConversationKeys.add(key);
       return true;
     });
 

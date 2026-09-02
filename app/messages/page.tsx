@@ -229,7 +229,10 @@ export default function MessagesPage() {
       if (direct) { selectThread(direct, contractorId); return; }
     }
     if (leadId) {
-      const byLead = threads.find(thread => thread.lead.id === leadId);
+      const byLead = threads.find(thread =>
+        thread.lead.id === leadId &&
+        (!contractorId || thread.lead.contractor?.id === contractorId)
+      );
       if (byLead) { selectThread(byLead, contractorId); return; }
     }
 
@@ -700,7 +703,7 @@ export default function MessagesPage() {
                         </svg>
                       </div>
                       <p className="text-sm font-medium text-slate-700">{threadsError}</p>
-                      <button onClick={fetchThreads} className="mt-2 text-xs text-rose-600 hover:underline font-medium">Try again</button>
+                      <button onClick={() => fetchThreads()} className="mt-2 text-xs text-rose-600 hover:underline font-medium">Try again</button>
                     </div>
                   </div>
                 ) : filteredThreads.length === 0 ? (
@@ -938,7 +941,7 @@ export default function MessagesPage() {
                   <Chat
                     thread={selectedThread}
                     currentUserId={selfUserId}
-                    focusContractorId={deepLinkContractorId ?? undefined}
+                    {...(deepLinkContractorId ? { focusContractorId: deepLinkContractorId } : {})}
                     onBack={() => { setSelectedThread(null); setDeepLinkContractorId(null); }}
                     onDeleteThread={(threadId) => {
                       setThreads(prev => prev.filter(t => t.id !== threadId));

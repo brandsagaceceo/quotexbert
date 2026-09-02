@@ -24,6 +24,29 @@ export async function DELETE(
       return NextResponse.json({ error: 'Thread ID is required' }, { status: 400 });
     }
 
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: threadId },
+      select: { id: true, homeownerId: true, contractorId: true },
+    });
+    if (conversation) {
+      if (dbUserId !== conversation.homeownerId && dbUserId !== conversation.contractorId) {
+        return NextResponse.json({ error: 'You are not a participant in this conversation' }, { status: 403 });
+      }
+      await prisma.conversation.delete({ where: { id: conversation.id } });
+      return NextResponse.json({ success: true });
+    }
+
+    const migratedConversation = await prisma.conversation.findFirst({
+      where: { job: { id: threadId } },
+      select: { id: true },
+    });
+    if (migratedConversation) {
+      return NextResponse.json(
+        { error: 'Legacy shared threads with isolated conversations are read-only' },
+        { status: 409 },
+      );
+    }
+
     // 2. Load thread with participant IDs for ownership check
     const thread = await prisma.thread.findUnique({
       where: { id: threadId },

@@ -39,6 +39,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "threadId is required" }, { status: 400 });
   }
 
+  // The active Messages inbox may use a Conversation.id as its selected
+  // thread key. Resolve it directly so quote actions stay on the same
+  // contractor-specific conversation.
+  const directConversation = await prisma.conversation.findUnique({
+    where: { id: threadId },
+    select: { id: true, jobId: true, homeownerId: true, contractorId: true },
+  });
+  if (directConversation) {
+    if (dbUserId !== directConversation.homeownerId && dbUserId !== directConversation.contractorId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.json({
+      conversationId: directConversation.id,
+      jobId: directConversation.jobId,
+      homeownerId: directConversation.homeownerId,
+      contractorId: directConversation.contractorId,
+    });
+  }
+
   // 3. Load the thread with lead participant IDs
   const thread = await prisma.thread.findUnique({
     where: { id: threadId },

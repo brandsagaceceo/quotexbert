@@ -193,39 +193,58 @@ export async function POST(
       data: leadUpdateData
     });
 
-    // Get or create thread for this lead (upsert prevents race if two contractors accept simultaneously)
-    const thread = await prisma.thread.upsert({
-      where: { leadId: jobId },
+    // Conversation identity is homeowner + job + authenticated contractor.
+    // The compound unique key makes retries idempotent while allowing another
+    // contractor to accept the same job in a separate conversation.
+    const conversation = await prisma.conversation.upsert({
+      where: {
+        jobId_homeownerId_contractorId: {
+          jobId,
+          homeownerId: currentLead.homeownerId,
+          contractorId: dbContractorId,
+        },
+      },
       update: {},
-      create: { leadId: jobId },
+      create: {
+        jobId,
+        homeownerId: currentLead.homeownerId,
+        contractorId: dbContractorId,
+        status: "active",
+      },
     });
 
-    // Create initial messages in the thread for both parties
-    
-    // Message from contractor to homeowner
-    await prisma.message.create({
-      data: {
-        threadId: thread.id,
-        fromUserId: dbContractorId,
-        toUserId: currentLead.homeownerId,
-        body: `Hello! I've accepted your project "${currentLead.title}". I'm interested in providing you with a quote. Let's discuss the details so I can give you an accurate estimate.`
-      }
+    // Seed the welcome exchange only for a newly-created conversation.
+    const existingConversationMessage = await prisma.conversationMessage.findFirst({
+      where: { conversationId: conversation.id },
+      select: { id: true },
     });
+    if (!existingConversationMessage) {
+      await prisma.conversationMessage.createMany({
+        data: [
+          {
+            conversationId: conversation.id,
+            senderId: dbContractorId,
+            senderRole: "contractor",
+            receiverId: currentLead.homeownerId,
+            receiverRole: "homeowner",
+            content: `Hello! I've accepted your project "${currentLead.title}". I'm interested in providing you with a quote. Let's discuss the details so I can give you an accurate estimate.`,
+            type: "text",
+          },
+          {
+            conversationId: conversation.id,
+            senderId: currentLead.homeownerId,
+            senderRole: "homeowner",
+            receiverId: dbContractorId,
+            receiverRole: "contractor",
+            content: `Thank you for accepting my project! I look forward to discussing the details and receiving your quote for "${currentLead.title}".`,
+            type: "text",
+          },
+        ],
+      });
+    }
 
-    // Welcome message from homeowner to contractor 
-    await prisma.message.create({
-      data: {
-        threadId: thread.id,
-        fromUserId: currentLead.homeownerId,
-        toUserId: dbContractorId,
-        body: `Thank you for accepting my project! I look forward to discussing the details and receiving your quote for "${currentLead.title}".`
-      }
-    });
-
-    // Create notification for homeowner — includes threadId so Alerts page deep-links to /messages.
-    // payload.contractorId identifies WHICH contractor just accepted — a lead can
-    // have several contractors accept and share one Thread, so threadId alone
-    // isn't enough to show the right contractor's identity when opened.
+    // Create notification for homeowner — conversationId identifies the exact
+    // contractor-specific conversation.
     await prisma.notification.create({
       data: {
         userId: currentLead.homeownerId,
@@ -235,7 +254,7 @@ export async function POST(
         relatedId: jobId,
         relatedType: "job",
         payload: {
-          threadId: thread.id,
+          conversationId: conversation.id,
           jobId,
           jobTitle: currentLead.title,
           contractorId: dbContractorId,
@@ -286,12 +305,10 @@ export async function POST(
         message: acceptance.message,
         createdAt: acceptance.createdAt
       },
-      thread: {
-        id: thread.id
-      },
+      thread: { id: conversation.id },
       budget: currentLead.budget,
       pendingAcceptedLeads: pendingAcceptedLeads + 1,
-      redirectUrl: `/messages?threadId=${thread.id}`
+      redirectUrl: `/messages?conversationId=${conversation.id}`
     });
 
   } catch (error) {

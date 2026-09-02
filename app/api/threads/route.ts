@@ -39,6 +39,76 @@ export async function GET(request: NextRequest) {
     // The primary DB id is used for conversation partner comparison on the client
     const selfUserId = dbUserId;
 
+    const conversations = await prisma.conversation.findMany({
+      where: currentUser?.role === "contractor"
+        ? { contractorId: dbUserId }
+        : { homeownerId: dbUserId },
+      include: {
+        job: {
+          select: {
+            id: true,
+            title: true,
+            homeowner: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
+          },
+        },
+        contractor: {
+          include: {
+            contractorProfile: { select: { companyName: true, profilePhoto: true } },
+            homeownerProfile: { select: { name: true, profilePhoto: true } },
+          },
+        },
+        messages: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: {
+            sender: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
+            receiver: {
+              include: {
+                contractorProfile: { select: { companyName: true, profilePhoto: true } },
+                homeownerProfile: { select: { name: true, profilePhoto: true } },
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            messages: { where: { receiverId: dbUserId, readAt: null } },
+          },
+        },
+      },
+      orderBy: { lastMessageAt: "desc" },
+    });
+
+    const conversationThreads: any[] = conversations.map((conversation) => ({
+      id: conversation.id,
+      unreadCount: conversation._count.messages,
+      createdAt: conversation.createdAt,
+      lead: {
+        id: conversation.job.id,
+        title: conversation.job.title,
+        homeowner: conversation.job.homeowner,
+        contractor: conversation.contractor,
+      },
+      messages: conversation.messages.map((message) => ({
+        id: message.id,
+        body: message.content,
+        createdAt: message.createdAt,
+        readAt: message.readAt,
+        fromUser: message.sender,
+        toUser: message.receiver,
+      })),
+    }));
+
     // ── TEMP DEBUG: server-side identity trace ──
     if (process.env.NODE_ENV === 'development') {
       console.log('[API/threads][GET]', {
@@ -51,10 +121,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all threads where the user is involved (either as homeowner, contractor, or message participant)
-    const threads = await prisma.thread.findMany({
+    const legacyThreads = await prisma.thread.findMany({
       where: {
         OR: [
-          { lead: leadAccess },
+          { lead: { AND: [leadAccess, { conversations: { none: {} } }] } },
         ],
       },
       include: {
@@ -118,6 +188,7 @@ export async function GET(request: NextRequest) {
     // Sort by most recent activity — latest message time if any messages exist
     // (this also reflects quote sends/revisions/acceptances, which post a Thread
     // message), falling back to thread creation time for threads with no messages yet.
+    const threads = [...conversationThreads, ...legacyThreads];
     const sorted = [...threads].sort((a, b) => {
       const aTime = a.messages[0]?.createdAt ?? a.createdAt;
       const bTime = b.messages[0]?.createdAt ?? b.createdAt;

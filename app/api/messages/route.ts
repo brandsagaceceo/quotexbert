@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
                 where: { status: { in: ["accepted", "in_progress", "completed"] } },
                 select: { contractorId: true },
               },
+              conversations: { select: { id: true } },
             },
           },
         },
@@ -49,6 +50,9 @@ export async function GET(request: NextRequest) {
         thread.lead.acceptances.some(({ contractorId }) => contractorId === dbUserId) ||
         thread.lead.applications.some(({ contractorId }) => contractorId === dbUserId)
       );
+      if (thread?.lead.conversations.length && thread.lead.homeownerId !== dbUserId) {
+        return NextResponse.json({ error: "Legacy shared thread access is archived" }, { status: 403 });
+      }
       if (!isParticipant) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
@@ -98,6 +102,7 @@ export async function GET(request: NextRequest) {
               { homeownerId: dbUserId },
               { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
               { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
+              { conversations: { some: { contractorId: dbUserId } } },
             ]
           }
         },
@@ -145,6 +150,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { fromUserId, toUserId, leadId, threadId, content } = body;
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId, clerkUserId } = authResult.user;
 
     if (!fromUserId || !toUserId || !content) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -169,6 +179,27 @@ export async function POST(request: NextRequest) {
 
     if (!actualThreadId) {
       return NextResponse.json({ error: "Thread ID or Lead ID required" }, { status: 400 });
+    }
+
+    const legacyThread = await prisma.thread.findUnique({
+      where: { id: actualThreadId },
+      select: {
+        lead: {
+          select: {
+            homeownerId: true,
+            conversations: { select: { id: true } },
+          },
+        },
+      },
+    });
+    if (legacyThread?.lead.conversations.length) {
+      return NextResponse.json(
+        { error: "This legacy shared thread is archived. Select a contractor-specific conversation." },
+        { status: 409 },
+      );
+    }
+    if (fromUserId !== dbUserId && fromUserId !== clerkUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Create the message

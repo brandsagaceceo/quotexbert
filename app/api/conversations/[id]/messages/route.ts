@@ -2,16 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmailNotification } from "@/lib/email-notifications";
 import { updateContractorResponseTime } from "@/lib/responseTime";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
     const resolvedParams = await params;
     const conversationId = resolvedParams.id;
 
-    // Get all messages for this conversation
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { homeownerId: true, contractorId: true },
+    });
+    if (!conversation) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+    if (dbUserId !== conversation.homeownerId && dbUserId !== conversation.contractorId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Get all messages for this exact conversation
     const messages = await prisma.conversationMessage.findMany({
       where: {
         conversationId: conversationId
@@ -55,6 +72,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
     const resolvedParams = await params;
     const conversationId = resolvedParams.id;
     const body = await request.json();
@@ -85,10 +107,14 @@ export async function POST(
       );
     }
 
-    // Verify sender is part of conversation
-    if (senderId !== conversation.homeownerId && senderId !== conversation.contractorId) {
+    // Verify both the authenticated sender and the requested receiver are the
+    // two participants in this exact contractor-specific conversation.
+    if (dbUserId !== senderId ||
+        (senderId !== conversation.homeownerId && senderId !== conversation.contractorId) ||
+        (receiverId !== conversation.homeownerId && receiverId !== conversation.contractorId) ||
+        senderId === receiverId) {
       return NextResponse.json(
-        { error: "Sender not part of this conversation" },
+        { error: "Forbidden" },
         { status: 403 }
       );
     }

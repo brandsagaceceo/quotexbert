@@ -22,11 +22,29 @@ async function getThreadParticipants(threadId: string) {
             where: { status: { in: ACTIVE_APPLICATION_STATUSES } },
             select: { contractorId: true },
           },
+          conversations: { select: { id: true } },
         },
       },
     },
   });
 }
+
+async function getConversation(conversationId: string) {
+  return prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: {
+      id: true,
+      jobId: true,
+      homeownerId: true,
+      contractorId: true,
+    },
+  });
+}
+
+const conversationUserInclude = {
+  contractorProfile: { select: { companyName: true, profilePhoto: true } },
+  homeownerProfile: { select: { name: true, profilePhoto: true } },
+};
 
 function isThreadParticipant(
   thread: Awaited<ReturnType<typeof getThreadParticipants>>,
@@ -37,6 +55,10 @@ function isThreadParticipant(
   return homeownerId === userId ||
     acceptances.some((acceptance) => acceptance.contractorId === userId) ||
     applications.some((application) => application.contractorId === userId);
+}
+
+function isMigratedLegacyThread(thread: Awaited<ReturnType<typeof getThreadParticipants>>) {
+  return !!thread?.lead.conversations.length;
 }
 
 export async function GET(
@@ -51,10 +73,44 @@ export async function GET(
     const { dbUserId } = authResult.user;
     const { threadId } = await params;
 
+    const conversation = await getConversation(threadId);
+    if (conversation) {
+      if (dbUserId !== conversation.homeownerId && dbUserId !== conversation.contractorId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
+      const conversationMessages = await prisma.conversationMessage.findMany({
+        where: { conversationId: conversation.id },
+        include: {
+          sender: { include: conversationUserInclude },
+          receiver: { include: conversationUserInclude },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+
+      return NextResponse.json({
+        messages: conversationMessages.map((message) => ({
+          id: message.id,
+          body: message.content,
+          createdAt: message.createdAt,
+          readAt: message.readAt,
+          fromUser: message.sender,
+          toUser: message.receiver,
+        })),
+      });
+    }
+
     const thread = await getThreadParticipants(threadId);
 
     if (!thread) {
       return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    }
+
+    if (isMigratedLegacyThread(thread) && dbUserId !== thread.lead.homeownerId) {
+      return NextResponse.json(
+        { error: "This legacy shared thread is archived. Use your contractor-specific conversation." },
+        { status: 403 },
+      );
     }
 
     if (!isThreadParticipant(thread, dbUserId)) {
@@ -141,7 +197,94 @@ export async function POST(
     const dbFromUserId = fromUser.id;
     const dbToUserId = toUser.id;
 
+    const conversation = await getConversation(threadId);
+    if (conversation) {
+      if (
+        callerDbId !== dbFromUserId ||
+        (callerDbId !== conversation.homeownerId && callerDbId !== conversation.contractorId) ||
+        (dbToUserId !== conversation.homeownerId && dbToUserId !== conversation.contractorId) ||
+        dbFromUserId === dbToUserId
+      ) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
+      const newConversationMessage = await prisma.conversationMessage.create({
+        data: {
+          conversationId: conversation.id,
+          senderId: dbFromUserId,
+          senderRole: dbFromUserId === conversation.homeownerId ? "homeowner" : "contractor",
+          receiverId: dbToUserId,
+          receiverRole: dbToUserId === conversation.homeownerId ? "homeowner" : "contractor",
+          content: message,
+          type: "text",
+        },
+        include: {
+          sender: { include: conversationUserInclude },
+          receiver: { include: conversationUserInclude },
+        },
+      });
+
+      await prisma.conversation.update({
+        where: { id: conversation.id },
+        data: { lastMessageAt: new Date() },
+      });
+
+      await prisma.notification.create({
+        data: {
+          userId: dbToUserId,
+          type: "NEW_MESSAGE",
+          title: `New message from ${fromUser.contractorProfile?.companyName || fromUser.homeownerProfile?.name || fromUser.name || fromUser.email}`,
+          message: message.substring(0, 100) + (message.length > 100 ? "..." : ""),
+          payload: {
+            messageId: newConversationMessage.id,
+            conversationId: conversation.id,
+            fromUserId: dbFromUserId,
+            contractorId: conversation.contractorId,
+          },
+          read: false,
+        },
+      });
+
+      if (toUser.notifyMessageEmail !== false) {
+        try {
+          const { sendNewMessageEmail } = await import("@/lib/email");
+          await sendNewMessageEmail(
+            {
+              id: newConversationMessage.receiver.id,
+              email: newConversationMessage.receiver.email,
+              name: newConversationMessage.receiver.contractorProfile?.companyName || newConversationMessage.receiver.homeownerProfile?.name || newConversationMessage.receiver.name,
+            },
+            {
+              id: dbFromUserId,
+              name: fromUser.contractorProfile?.companyName || fromUser.homeownerProfile?.name || fromUser.name || fromUser.email,
+            },
+            message.substring(0, 100),
+            conversation.id,
+          );
+        } catch (emailError) {
+          console.error("Failed to send conversation message email:", emailError);
+        }
+      }
+
+      return NextResponse.json({
+        message: {
+          id: newConversationMessage.id,
+          body: newConversationMessage.content,
+          createdAt: newConversationMessage.createdAt,
+          readAt: newConversationMessage.readAt,
+          fromUser: newConversationMessage.sender,
+          toUser: newConversationMessage.receiver,
+        },
+      });
+    }
+
     const thread = await getThreadParticipants(threadId);
+    if (isMigratedLegacyThread(thread)) {
+      return NextResponse.json(
+        { error: "This legacy shared thread is archived. Select a contractor-specific conversation." },
+        { status: 409 },
+      );
+    }
     if (!thread || !isThreadParticipant(thread, callerDbId) || !isThreadParticipant(thread, dbToUserId)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -311,6 +454,23 @@ export async function PATCH(
         console.log('[API/messages][PATCH] 403 FORBIDDEN mark-read', { callerDbId, dbViewerId, clientViewerUserId: viewerUserId });
       }
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const conversation = await getConversation(threadId);
+    if (conversation) {
+      if (dbViewerId !== conversation.homeownerId && dbViewerId !== conversation.contractorId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      await prisma.conversationMessage.updateMany({
+        where: { conversationId: conversation.id, receiverId: dbViewerId, readAt: null },
+        data: { readAt: new Date() },
+      });
+      return NextResponse.json({ success: true });
+    }
+
+    const legacyThread = await getThreadParticipants(threadId);
+    if (legacyThread && isMigratedLegacyThread(legacyThread) && dbViewerId !== legacyThread.lead.homeownerId) {
+      return NextResponse.json({ error: "Legacy shared thread access is archived" }, { status: 403 });
     }
 
     const now = new Date();
