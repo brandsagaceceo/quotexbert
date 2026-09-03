@@ -195,10 +195,11 @@ export async function GET(request: NextRequest) {
       return new Date(bTime).getTime() - new Date(aTime).getTime();
     });
 
-    // Attach unreadCount as a top-level field for convenience
+    // Conversation rows already expose unreadCount directly; legacy Thread
+    // rows keep the count in _count. Normalize both shapes before responding.
     const threadsWithUnread = sorted.map((t) => ({
       ...t,
-      unreadCount: t._count.messages,
+      unreadCount: t.unreadCount ?? t._count?.messages ?? 0,
       _count: undefined,
     }));
 
