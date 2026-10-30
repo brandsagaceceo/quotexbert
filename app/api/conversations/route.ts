@@ -1,26 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId, clerkUserId } = authResult.user;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const requestedUserId = searchParams.get("userId");
 
-    if (!userId) {
+    if (!requestedUserId) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
+    }
+    if (requestedUserId !== dbUserId && requestedUserId !== clerkUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Get conversations where user is either homeowner or contractor
     const conversations = await prisma.conversation.findMany({
       where: {
         OR: [
-          { homeownerId: userId },
-          { contractorId: userId }
+          { homeownerId: dbUserId },
+          { contractorId: dbUserId }
         ]
       },
       include: {
@@ -79,7 +88,7 @@ export async function GET(request: NextRequest) {
         const unreadCount = await prisma.conversationMessage.count({
           where: {
             conversationId: conversation.id,
-            receiverId: userId,
+            receiverId: dbUserId,
             readAt: null
           }
         });
@@ -95,7 +104,7 @@ export async function GET(request: NextRequest) {
           lastMessageAt: conversation.lastMessageAt,
           unreadCount,
           // Determine other participant for current user
-          otherParticipant: userId === conversation.homeownerId ? conversation.contractor : conversation.homeowner
+          otherParticipant: dbUserId === conversation.homeownerId ? conversation.contractor : conversation.homeowner
         };
       })
     );
@@ -113,13 +122,26 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
     const { conversationId, message, senderId } = await request.json();
 
-    if (!conversationId || !message || !senderId) {
+    if (!conversationId || typeof message !== "string" || !message || !senderId) {
       return NextResponse.json(
         { error: "Conversation ID, message, and sender ID are required" },
         { status: 400 }
       );
+    }
+
+    const requestedSender = await prisma.user.findFirst({
+      where: { OR: [{ id: senderId }, { clerkUserId: senderId }] },
+      select: { id: true },
+    });
+    if (!requestedSender || requestedSender.id !== dbUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Get conversation details
@@ -139,17 +161,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine receiver
-    const receiverId = senderId === conversation.homeownerId ? 
+    if (dbUserId !== conversation.homeownerId && dbUserId !== conversation.contractorId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const receiverId = dbUserId === conversation.homeownerId ?
       conversation.contractorId : conversation.homeownerId;
     
-    const senderRole = senderId === conversation.homeownerId ? "homeowner" : "contractor";
+    const senderRole = dbUserId === conversation.homeownerId ? "homeowner" : "contractor";
     const receiverRole = receiverId === conversation.homeownerId ? "homeowner" : "contractor";
 
     // Create message
     const newMessage = await prisma.conversationMessage.create({
       data: {
         conversationId: conversationId,
-        senderId: senderId,
+        senderId: dbUserId,
         senderRole: senderRole,
         receiverId: receiverId,
         receiverRole: receiverRole,

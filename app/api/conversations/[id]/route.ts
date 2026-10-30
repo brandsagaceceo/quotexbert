@@ -52,8 +52,24 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    const { dbUserId } = authResult.user;
     const resolvedParams = await params;
     const conversationId = resolvedParams.id;
+
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { id: true, homeownerId: true, contractorId: true },
+    });
+    if (!conversation) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+    }
+    if (dbUserId !== conversation.homeownerId && dbUserId !== conversation.contractorId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // First delete all messages in the conversation
     await prisma.conversationMessage.deleteMany({
