@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
-export async function GET(req: NextRequest) {
+async function getActiveContractorId() {
+  const authResult = await resolveAuthUser();
+  if ("error" in authResult) {
+    return { response: NextResponse.json({ error: authResult.error }, { status: authResult.status }) };
+  }
+
+  const contractor = await prisma.user.findUnique({
+    where: { id: authResult.user.dbUserId },
+    select: { id: true, role: true, isActive: true },
+  });
+  if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+    return { response: NextResponse.json({ error: "Active contractor access required" }, { status: 403 }) };
+  }
+  return { contractorId: contractor.id };
+}
+
+export async function GET(_req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+    const access = await getActiveContractorId();
+    if ("response" in access) {
+      return access.response;
     }
 
     // Get contractor billing info
     const billing = await prisma.contractorBilling.findUnique({
-      where: { userId },
+      where: { userId: access.contractorId },
     });
 
     if (!billing) {
@@ -42,47 +54,17 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
-    const { userId } = await req.json();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+    const access = await getActiveContractorId();
+    if ("response" in access) {
+      return access.response;
     }
 
-    // Get contractor billing
-    const billing = await prisma.contractorBilling.findUnique({
-      where: { userId },
-    });
-
-    if (!billing || billing.spendThisMonthCents <= 0) {
-      return NextResponse.json(
-        { error: "No available balance to withdraw" },
-        { status: 400 }
-      );
-    }
-
-    // In a real app, you would integrate with Stripe Connect or similar
-    // to transfer funds to the contractor's bank account
-    // For now, we'll just reset the balance and log the payout
-
-    await prisma.contractorBilling.update({
-      where: { userId },
-      data: {
-        spendThisMonthCents: 0,
-      },
-    });
-
-    // TODO: Create a payout record in a separate table for tracking
-    // TODO: Integrate with Stripe Connect for actual bank transfers
-
-    return NextResponse.json({
-      success: true,
-      message: "Payout request submitted successfully",
-    });
+    return NextResponse.json(
+      { error: "Payout processing is not available." },
+      { status: 501 },
+    );
   } catch (error) {
     console.error("Error processing payout:", error);
     return NextResponse.json(
