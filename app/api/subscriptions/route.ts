@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { getCategoryById, ALL_CATEGORIES } from "@/lib/categories";
-import { resolveContractorDbId } from "@/lib/subscription-access";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +13,16 @@ function getStripePriceId(categoryId: string, price: number): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
     console.log('Subscription API called');
-    const { contractorId, category } = await request.json();
+    const { category } = await request.json();
 
-    if (!contractorId || !category) {
+    if (!category) {
       return NextResponse.json(
-        { error: "Contractor ID and category are required" },
+        { error: "Category is required" },
         { status: 400 }
       );
     }
@@ -32,27 +36,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get contractor (try DB id first, fallback to clerkUserId)
-    let contractor = await prisma.user.findUnique({
-      where: { id: contractorId },
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
       include: {
         contractorProfile: true
       }
     });
 
-    if (!contractor) {
-      contractor = await prisma.user.findUnique({
-        where: { clerkUserId: contractorId },
-        include: {
-          contractorProfile: true
-        }
-      });
-    }
-
-    if (!contractor || contractor.role !== "contractor") {
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
       return NextResponse.json(
-        { error: "Contractor not found" },
-        { status: 404 }
+        { error: "An authenticated contractor account is required" },
+        { status: 403 }
       );
     }
 
@@ -83,6 +77,13 @@ export async function POST(request: NextRequest) {
 
     if (!isValidStripeKey) {
       console.log('Using demo mode - no valid Stripe key found');
+
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { error: "Subscription checkout is unavailable. Please try again later." },
+          { status: 503 }
+        );
+      }
       
       // Create subscription record directly for demo
       const now = new Date();
@@ -158,27 +159,25 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const contractorId = searchParams.get('contractorId');
-
-    if (!contractorId) {
-      return NextResponse.json(
-        { error: "Contractor ID is required" },
-        { status: 400 }
-      );
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    const dbContractorId = await resolveContractorDbId(contractorId);
-    if (!dbContractorId) {
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true, isActive: true },
+    });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
       return NextResponse.json(
-        { error: "Contractor not found" },
-        { status: 404 }
+        { error: "An authenticated contractor account is required" },
+        { status: 403 }
       );
     }
 
     // Get contractor's subscriptions
     const subscriptions = await prisma.contractorSubscription.findMany({
-      where: { contractorId: dbContractorId },
+      where: { contractorId: contractor.id },
       include: {
         transactions: {
           orderBy: { createdAt: 'desc' },
@@ -231,9 +230,30 @@ export async function GET(request: NextRequest) {
 // Cancel subscription
 export async function DELETE(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true },
+    });
+    if (!contractor || contractor.role !== "contractor") {
+      return NextResponse.json(
+        { error: "An authenticated contractor account is required" },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const subscriptionId = searchParams.get('subscriptionId');
-    const immediate = searchParams.get('immediate') === 'true';
+    const body: { subscriptionId?: unknown; immediate?: unknown } =
+      await request.json().catch(() => ({}));
+    const subscriptionId =
+      searchParams.get('subscriptionId') ??
+      (typeof body.subscriptionId === "string" ? body.subscriptionId : null);
+    const immediate =
+      searchParams.get('immediate') === 'true' || body.immediate === true;
 
     if (!subscriptionId) {
       return NextResponse.json(
@@ -243,8 +263,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get subscription from database
-    const subscription = await prisma.contractorSubscription.findUnique({
-      where: { id: subscriptionId }
+    const subscription = await prisma.contractorSubscription.findFirst({
+      where: { id: subscriptionId, contractorId: contractor.id }
     });
 
     if (!subscription) {
