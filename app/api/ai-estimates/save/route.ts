@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
 
 interface SaveEstimateItem {
   category: string;
@@ -32,9 +31,16 @@ interface SaveEstimateBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const identity = await resolveHomeownerIdentity();
+    if (!identity.success) {
+      return NextResponse.json(
+        { success: false, error: identity.error },
+        { status: identity.status },
+      );
+    }
+
     const body = (await request.json()) as SaveEstimateBody;
     const {
-      homeownerId,
       description,
       minCost,
       maxCost,
@@ -52,16 +58,12 @@ export async function POST(request: NextRequest) {
     // Create the AI estimate
     const estimate = await prisma.aIEstimate.create({
       data: {
-        homeownerId: homeownerId ?? null,
+        homeownerId: identity.user.dbUserId,
         description,
-        minCost:
-          typeof minCost === 'number' ? minCost : parseFloat(minCost),
-        maxCost:
-          typeof maxCost === 'number' ? maxCost : parseFloat(maxCost),
+        minCost: typeof minCost === "number" ? minCost : parseFloat(minCost),
+        maxCost: typeof maxCost === "number" ? maxCost : parseFloat(maxCost),
         confidence:
-          typeof confidence === 'number'
-            ? confidence
-            : parseFloat(confidence),
+          typeof confidence === "number" ? confidence : parseFloat(confidence),
         aiPowered: aiPowered !== undefined ? aiPowered : true,
         enhancedDescription: enhancedDescription ?? null,
         factors: JSON.stringify(factors || []),
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
         hasVoice: hasVoice ?? false,
         imageCount: imageCount ?? 0,
         images: JSON.stringify(images ?? []),
-        status: 'saved',
+        status: "saved",
         isPublic: false,
         ...(items
           ? {
@@ -78,20 +80,20 @@ export async function POST(request: NextRequest) {
                   category: item.category,
                   description: item.description,
                   minCost:
-                    typeof item.minCost === 'number'
+                    typeof item.minCost === "number"
                       ? item.minCost
                       : parseFloat(item.minCost),
                   maxCost:
-                    typeof item.maxCost === 'number'
+                    typeof item.maxCost === "number"
                       ? item.maxCost
                       : parseFloat(item.maxCost),
                   selected: item.selected !== undefined ? item.selected : true,
                   quantity:
                     item.quantity === undefined || item.quantity === null
                       ? null
-                      : typeof item.quantity === 'number'
-                      ? item.quantity
-                      : parseFloat(item.quantity),
+                      : typeof item.quantity === "number"
+                        ? item.quantity
+                        : parseFloat(item.quantity),
                   unit: item.unit ?? null,
                   notes: item.notes ?? null,
                 })),
@@ -109,10 +111,10 @@ export async function POST(request: NextRequest) {
       estimate,
     });
   } catch (error: any) {
-    console.error('Error saving AI estimate:', error);
+    console.error("Error saving AI estimate:", error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to save estimate' },
-      { status: 500 }
+      { success: false, error: error.message || "Failed to save estimate" },
+      { status: 500 },
     );
   }
 }
