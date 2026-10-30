@@ -16,13 +16,13 @@ interface PortfolioItem {
 export default function PortfolioManagementPage() {
   const { authUser: user, authLoading } = useAuth();
   const router = useRouter();
-  
+
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     caption: "",
@@ -46,16 +46,22 @@ export default function PortfolioManagementPage() {
     try {
       setLoading(true);
       // Get contractor profile first to get the contractor ID
-      const profileResponse = await fetch(`/api/contractors/profile?userId=${user?.id}`);
+      const profileResponse = await fetch(
+        `/api/contractors/profile?userId=${user?.id}`,
+      );
       if (!profileResponse.ok) {
         throw new Error("Profile not found");
       }
-      
-      const profileData = await profileResponse.json();
-      const contractorId = profileData.profile.id;
-      
+
+      const contractorId = user?.id;
+      if (!contractorId) {
+        throw new Error("Contractor identity is unavailable");
+      }
+
       // Fetch portfolio items
-      const portfolioResponse = await fetch(`/api/contractors/portfolio?contractorId=${contractorId}`);
+      const portfolioResponse = await fetch(
+        `/api/contractors/portfolio?contractorId=${contractorId}`,
+      );
       if (portfolioResponse.ok) {
         const portfolioData = await portfolioResponse.json();
         setPortfolioItems(portfolioData.portfolioItems || []);
@@ -75,21 +81,23 @@ export default function PortfolioManagementPage() {
         setError("Please select an image file");
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError("Image must be less than 5MB");
         return;
       }
-      
-      setFormData(prev => ({ ...prev, file }));
+
+      setFormData((prev) => ({ ...prev, file }));
       setError(null);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
@@ -98,26 +106,26 @@ export default function PortfolioManagementPage() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "portfolio_uploads"); // Configure in Cloudinary
-    
+
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
-    
+
     if (!response.ok) {
       throw new Error("Failed to upload image");
     }
-    
+
     const data = await response.json();
     return data.secure_url;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.file || !formData.title) {
       setError("Please provide a title and select an image");
       return;
@@ -131,7 +139,7 @@ export default function PortfolioManagementPage() {
       // For demo purposes, we'll use a placeholder URL
       // In production, integrate with your S3 upload utility
       const imageUrl = `https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400&h=300&fit=crop`;
-      
+
       // Create portfolio item
       const response = await fetch("/api/contractors/portfolio", {
         method: "POST",
@@ -151,8 +159,8 @@ export default function PortfolioManagementPage() {
       }
 
       const data = await response.json();
-      setPortfolioItems(prev => [data.portfolioItem, ...prev]);
-      
+      setPortfolioItems((prev) => [data.portfolioItem, ...prev]);
+
       // Reset form
       setFormData({
         title: "",
@@ -160,13 +168,14 @@ export default function PortfolioManagementPage() {
         file: null,
       });
       setShowForm(false);
-      
+
       // Reset file input
       const fileInput = document.getElementById("file") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
-      
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add portfolio item");
+      setError(
+        err instanceof Error ? err.message : "Failed to add portfolio item",
+      );
     } finally {
       setUploading(false);
     }
@@ -185,7 +194,10 @@ export default function PortfolioManagementPage() {
               <div className="h-8 bg-slate-200 rounded w-1/3 mb-8"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-slate-100 rounded-lg overflow-hidden">
+                  <div
+                    key={i}
+                    className="bg-slate-100 rounded-lg overflow-hidden"
+                  >
                     <div className="h-48 bg-slate-200"></div>
                     <div className="p-4">
                       <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
@@ -206,7 +218,9 @@ export default function PortfolioManagementPage() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="bg-white rounded-lg p-8 shadow-sm border border-slate-200">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Portfolio Management</h1>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Portfolio Management
+            </h1>
             <button
               onClick={() => setShowForm(!showForm)}
               className="bg-rose-700 hover:bg-rose-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
@@ -224,11 +238,16 @@ export default function PortfolioManagementPage() {
           {/* Add New Item Form */}
           {showForm && (
             <div className="bg-slate-50 rounded-lg p-6 mb-8 border border-slate-200">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">Add Portfolio Item</h2>
-              
+              <h2 className="text-xl font-bold text-slate-900 mb-6">
+                Add Portfolio Item
+              </h2>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-slate-700 mb-2"
+                  >
                     Title *
                   </label>
                   <input
@@ -244,7 +263,10 @@ export default function PortfolioManagementPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="caption" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label
+                    htmlFor="caption"
+                    className="block text-sm font-medium text-slate-700 mb-2"
+                  >
                     Description
                   </label>
                   <textarea
@@ -259,7 +281,10 @@ export default function PortfolioManagementPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="file" className="block text-sm font-medium text-slate-700 mb-2">
+                  <label
+                    htmlFor="file"
+                    className="block text-sm font-medium text-slate-700 mb-2"
+                  >
                     Image *
                   </label>
                   <input
@@ -283,7 +308,7 @@ export default function PortfolioManagementPage() {
                   >
                     {uploading ? "Uploading..." : "Add to Portfolio"}
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
@@ -300,13 +325,26 @@ export default function PortfolioManagementPage() {
           {portfolioItems.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-slate-400 mb-4">
-                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="mx-auto h-12 w-12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No portfolio items yet</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">
+                No portfolio items yet
+              </h3>
               <p className="text-slate-500 mb-6">
-                Start building your portfolio by adding photos of your best work.
+                Start building your portfolio by adding photos of your best
+                work.
               </p>
               <button
                 onClick={() => setShowForm(true)}
@@ -318,7 +356,10 @@ export default function PortfolioManagementPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg overflow-hidden group border border-slate-200 shadow-sm">
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg overflow-hidden group border border-slate-200 shadow-sm"
+                >
                   <div className="relative h-48">
                     <Image
                       src={item.imageUrl}

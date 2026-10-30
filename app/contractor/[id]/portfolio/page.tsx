@@ -1,11 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { ReviewDisplay } from '@/components/ReviewDisplay';
-import { ArrowLeft, Calendar, MapPin, DollarSign, Clock, Star, Phone, Mail, Globe } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { ReviewDisplay } from "@/components/ReviewDisplay";
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  DollarSign,
+  Clock,
+  Star,
+  Phone,
+  Mail,
+  Globe,
+} from "lucide-react";
 
 interface PortfolioItem {
   id: string;
@@ -27,7 +37,6 @@ interface PortfolioItem {
 }
 
 interface ContractorProfile {
-  id: string;
   companyName: string;
   trade: string;
   bio: string;
@@ -37,17 +46,19 @@ interface ContractorProfile {
   avgRating: number;
   reviewCount: number;
   verified: boolean;
-  user: {
-    name: string;
-    email: string;
-  };
 }
 
-export default function PublicContractorPortfolioPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PublicContractorPortfolioPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const [contractor, setContractor] = useState<ContractorProfile | null>(null);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null,
+  );
 
   useEffect(() => {
     params.then(setResolvedParams);
@@ -61,24 +72,30 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
 
   const fetchContractorData = async () => {
     if (!resolvedParams) return;
-    
+
     try {
       // Fetch contractor profile
-      const profileResponse = await fetch(`/api/contractors/profile?userId=${resolvedParams.id}`);
+      const profileResponse = await fetch(
+        `/api/contractors/profile?userId=${resolvedParams.id}`,
+      );
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
-        setContractor(profileData);
+        setContractor(profileData.profile);
       }
 
       // Fetch public portfolio items
-      const portfolioResponse = await fetch(`/api/contractors/portfolio?contractorId=${resolvedParams.id}`);
+      const portfolioResponse = await fetch(
+        `/api/contractors/portfolio?contractorId=${resolvedParams.id}`,
+      );
       if (portfolioResponse.ok) {
         const portfolioData = await portfolioResponse.json();
         // Filter for public items only
-        setPortfolioItems(portfolioData.filter((item: PortfolioItem) => item.isPublic));
+        setPortfolioItems(
+          portfolioData.filter((item: PortfolioItem) => item.isPublic),
+        );
       }
     } catch (error) {
-      console.error('Error fetching contractor data:', error);
+      console.error("Error fetching contractor data:", error);
     } finally {
       setLoading(false);
     }
@@ -86,18 +103,18 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
 
   const getRatingStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <Star 
-        key={i} 
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+      <Star
+        key={i}
+        className={`w-4 h-4 ${i < rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
       />
     ));
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -116,7 +133,9 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Contractor Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Contractor Not Found
+          </h1>
           <Button onClick={() => window.history.back()}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Back
@@ -129,7 +148,11 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-6">
-        <Button variant="secondary" size="sm" onClick={() => window.history.back()}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => window.history.back()}
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
@@ -141,14 +164,20 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-4 md:mb-0">
               <div className="flex items-center space-x-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{contractor.companyName}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {contractor.companyName}
+                </h1>
                 {contractor.verified && (
-                  <Badge variant="success" size="sm">Verified</Badge>
+                  <Badge variant="success" size="sm">
+                    Verified
+                  </Badge>
                 )}
               </div>
-              
-              <p className="text-xl text-gray-600 mb-2">{contractor.trade} • {contractor.city}</p>
-              
+
+              <p className="text-xl text-gray-600 mb-2">
+                {contractor.trade} • {contractor.city}
+              </p>
+
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
                   {getRatingStars(contractor.avgRating)}
@@ -199,7 +228,9 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
             <div className="text-gray-400 mb-4">
               <Calendar className="w-16 h-16 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No public portfolio yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No public portfolio yet
+            </h3>
             <p className="text-gray-600">
               This contractor hasn't shared any portfolio items yet.
             </p>
@@ -212,8 +243,12 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <Badge variant="secondary" size="sm" className="mb-2">{item.projectType}</Badge>
-                    <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
+                    <Badge variant="secondary" size="sm" className="mb-2">
+                      {item.projectType}
+                    </Badge>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {item.title}
+                    </h3>
                     {item.caption && (
                       <p className="text-gray-600 mt-1">{item.caption}</p>
                     )}
@@ -264,7 +299,10 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
                 {item.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {item.tags.map((tag, index) => (
-                      <span key={index} className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                      <span
+                        key={index}
+                        className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
+                      >
                         #{tag}
                       </span>
                     ))}
@@ -274,8 +312,12 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
                 {/* Client Story */}
                 {item.clientStory && (
                   <div className="bg-gray-50 rounded-lg p-3">
-                    <h4 className="font-medium text-gray-900 mb-1 text-sm">Client Feedback</h4>
-                    <p className="text-gray-700 text-sm italic">"{item.clientStory}"</p>
+                    <h4 className="font-medium text-gray-900 mb-1 text-sm">
+                      Client Feedback
+                    </h4>
+                    <p className="text-gray-700 text-sm italic">
+                      "{item.clientStory}"
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -285,9 +327,11 @@ export default function PublicContractorPortfolioPage({ params }: { params: Prom
       )}
 
       {/* Reviews Section */}
-      <div className="mt-12">
-        <ReviewDisplay contractorId={contractor.id} maxReviews={5} />
-      </div>
+      {resolvedParams && (
+        <div className="mt-12">
+          <ReviewDisplay contractorId={resolvedParams.id} maxReviews={5} />
+        </div>
+      )}
     </div>
   );
 }
