@@ -1,6 +1,7 @@
 ﻿import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -38,15 +39,19 @@ function sanitizePhotoUrl(url: string | null | undefined): string | null {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
-  if (!userId) {
-    return NextResponse.json({ error: "User ID required" }, { status: 400 });
-  }
-
   try {
-    const user = await findUserById(userId, true) as any;
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
+    const requestedUserId = new URL(request.url).searchParams.get("userId");
+    const { dbUserId, clerkUserId } = authResult.user;
+    if (requestedUserId && ![dbUserId, clerkUserId].includes(requestedUserId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const user = await findUserById(dbUserId, true) as any;
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -112,18 +117,28 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId, ...updateData } = body;
-
-    if (!userId) {
-      return NextResponse.json({ error: "User ID required" }, { status: 400 });
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    // Robust lookup with clerkUserId fallback
-    const user = await findUserById(userId) as any;
+    const body = await request.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Invalid profile data" }, { status: 400 });
+    }
+    const { userId, ...updateData } = body;
+    const { dbUserId, clerkUserId } = authResult.user;
+    if (userId !== undefined && (
+      typeof userId !== "string" ||
+      ![dbUserId, clerkUserId].includes(userId)
+    )) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Resolve the account only from the authenticated session; the body ID is compatibility-only.
+    const user = await findUserById(dbUserId) as any;
 
     if (!user) {
-      console.error("[API/profile] PUT: user not found for userId:", userId);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -138,7 +153,7 @@ export async function PUT(request: NextRequest) {
       || (user.homeownerProfile ? "homeowner" : null);
 
     if (!effectiveRole) {
-      console.error("[API/profile PUT] Cannot determine role for userId:", userId, "user.role:", user.role);
+      console.error("[API/profile PUT] Cannot determine role for authenticated user:", dbUserId, "user.role:", user.role);
       return NextResponse.json({ error: "User role could not be determined. Please log out and log back in." }, { status: 400 });
     }
 
