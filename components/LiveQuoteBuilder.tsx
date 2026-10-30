@@ -179,13 +179,12 @@ export default function LiveQuoteBuilder({
   // Fetch price suggestion once on mount
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/quotes/price-suggestion?jobId=${encodeURIComponent(jobId)}&contractorId=${encodeURIComponent(contractorId)}`)
+    fetch(`/api/quotes/price-suggestion?jobId=${encodeURIComponent(jobId)}`)
       .then((r) => r.json())
       .then((data) => { if (!cancelled && data?.suggestion) setPriceSuggestion(data.suggestion); })
       .catch(() => { /* non-critical */ });
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jobId, contractorId]);
+  }, [jobId]);
 
   const createRevision = async () => {
     setGenerating(true);
@@ -476,7 +475,7 @@ export default function LiveQuoteBuilder({
                       Suggested range: ${priceSuggestion.low.toLocaleString()}–${priceSuggestion.high.toLocaleString()}
                     </p>
                     <p className="text-[10px] text-blue-500 leading-snug">
-                      Based on {priceSuggestion.count} accepted {priceSuggestion.scope === 'city' ? 'local ' : ''}quotes
+                      Based on at least {priceSuggestion.count} accepted {priceSuggestion.scope === 'city' ? 'local ' : ''}quotes
                     </p>
                   </div>
                 </div>
@@ -659,7 +658,7 @@ export default function LiveQuoteBuilder({
                       Suggested range: ${priceSuggestion.low.toLocaleString()}–${priceSuggestion.high.toLocaleString()}
                     </p>
                     <p className="text-[10px] text-blue-500 leading-snug">
-                      Based on {priceSuggestion.count} accepted {priceSuggestion.scope === 'city' ? 'local ' : ''}quotes
+                      Based on at least {priceSuggestion.count} accepted {priceSuggestion.scope === 'city' ? 'local ' : ''}quotes
                     </p>
                   </div>
                 </div>
