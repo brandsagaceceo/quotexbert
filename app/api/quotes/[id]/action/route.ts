@@ -7,27 +7,34 @@
  * Body:
  *   action   "accept" | "request_changes"  (required)
  *   note     string                        (required when action = "request_changes")
- *   userId   string                        (required — homeowner's DB id or Clerk id)
+ *   userId   string                        (legacy caller field; ignored)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { emitQuoteSignal } from '@/lib/quote-signals';
+import { resolveAuthUser } from '@/lib/server-auth';
+import { acceptQuoteForHomeowner } from '@/lib/quote-lifecycle';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
 
     const body = await request.json();
-    const { action, note, userId } = body;
+    const { action, note } = body;
 
-    if (!action || !userId) {
+    if (!action) {
       return NextResponse.json(
-        { error: 'action and userId are required' },
+        { error: 'action is required' },
         { status: 400 }
       );
     }
@@ -39,20 +46,19 @@ export async function POST(
       );
     }
 
-    if (action === 'request_changes' && (!note || !note.trim())) {
+    if (action === 'request_changes' && (typeof note !== "string" || !note.trim())) {
       return NextResponse.json(
         { error: 'note is required when action is request_changes' },
         { status: 400 }
       );
     }
 
-    // Resolve homeowner — support Clerk id and DB id
-    const homeowner = await prisma.user.findFirst({
-      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
-      select: { id: true },
+    const homeowner = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true, isActive: true },
     });
-    if (!homeowner) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!homeowner || homeowner.role !== "homeowner" || !homeowner.isActive) {
+      return NextResponse.json({ error: 'Active homeowner access required' }, { status: 403 });
     }
 
     // Load quote and verify the caller is the homeowner for this conversation
@@ -64,7 +70,7 @@ export async function POST(
             id: true,
             homeownerId: true,
             contractorId: true,
-            job: { select: { id: true, title: true } },
+            job: { select: { id: true, title: true, homeownerId: true } },
           },
         },
         contractor: { select: { id: true, name: true, email: true } },
@@ -75,19 +81,32 @@ export async function POST(
       return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
     }
 
-    if (quote.conversation.homeownerId !== homeowner.id) {
+    if (
+      quote.conversation.homeownerId !== homeowner.id ||
+      quote.conversation.job.homeownerId !== homeowner.id ||
+      quote.contractorId !== quote.conversation.contractorId ||
+      quote.jobId !== quote.conversation.job.id
+    ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (quote.status !== "sent") {
+      return NextResponse.json({ error: "Only a sent quote can be actioned." }, { status: 409 });
     }
 
     if (action === 'accept') {
-      // Mark quote accepted
-      const updated = await prisma.quote.update({
-        where: { id: quoteId },
-        data: {
-          status: 'accepted',
-          acceptedAt: new Date(),
-        },
+      const updated = await acceptQuoteForHomeowner({
+        quoteId,
+        jobId: quote.jobId,
+        conversationId: quote.conversation.id,
+        homeownerId: homeowner.id,
+        contractorId: quote.conversation.contractorId,
       });
+      if (!updated) {
+        return NextResponse.json(
+          { error: "This quote or project has already been updated." },
+          { status: 409 }
+        );
+      }
 
       // Notify the contractor
       await prisma.notification.create({
@@ -161,13 +180,29 @@ export async function POST(
     // action === 'request_changes'
     // Store the homeowner's note on the quote (revisionNote) so the contractor
     // can read it when the LiveQuoteBuilder opens in revision mode.
-    const updated = await prisma.quote.update({
-      where: { id: quoteId },
+    const transition = await prisma.quote.updateMany({
+      where: {
+        id: quoteId,
+        jobId: quote.jobId,
+        contractorId: quote.conversation.contractorId,
+        conversationId: quote.conversation.id,
+        status: "sent",
+      },
       data: {
         status: 'revision_requested',
         revisionNote: note.trim(),
       },
     });
+    if (transition.count !== 1) {
+      return NextResponse.json(
+        { error: "This quote has already been updated." },
+        { status: 409 }
+      );
+    }
+    const updated = await prisma.quote.findUnique({ where: { id: quoteId } });
+    if (!updated) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+    }
 
     // Look up homeowner details for the thread message body
     const homeownerUser = await prisma.user.findUnique({

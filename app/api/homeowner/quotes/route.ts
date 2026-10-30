@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthUser } from "@/lib/server-auth";
+import { HOMEOWNER_VISIBLE_QUOTE_STATUSES } from "@/lib/quote-lifecycle";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +15,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
     const { dbUserId } = authResult.user;
+    const homeowner = await prisma.user.findUnique({
+      where: { id: dbUserId },
+      select: { role: true, isActive: true },
+    });
+    if (!homeowner || homeowner.role !== "homeowner" || !homeowner.isActive) {
+      return NextResponse.json({ error: "Active homeowner access required" }, { status: 403 });
+    }
 
     // Get quotes for jobs owned by this homeowner
     const quotes = await prisma.quote.findMany({
       where: {
+        status: { in: HOMEOWNER_VISIBLE_QUOTE_STATUSES },
         job: {
           homeownerId: dbUserId
-        }
+        },
+        conversation: { homeownerId: dbUserId },
       },
       include: {
         job: {

@@ -127,6 +127,7 @@ export async function POST(
           claimedBy: true,
           claimedAt: true,
           contractorId: true,
+          maxContractors: true,
         },
       });
 
@@ -137,6 +138,26 @@ export async function POST(
       const acceptedContractors = parseAcceptedContractors(latestLead.acceptedContractors);
       if (acceptedContractors.includes(dbContractorId)) {
         return { ok: false as const, error: "You have already accepted this job", status: 400 as const };
+      }
+      if (acceptedContractors.length >= latestLead.maxContractors) {
+        return {
+          ok: false as const,
+          error: "This job has reached its contractor limit.",
+          status: 409 as const,
+        };
+      }
+      const activeAcceptanceCount = await tx.jobAcceptance.count({
+        where: {
+          leadId: jobId,
+          status: { in: ["accepted", "quoted", "selected"] },
+        },
+      });
+      if (Math.max(acceptedContractors.length, activeAcceptanceCount) >= latestLead.maxContractors) {
+        return {
+          ok: false as const,
+          error: "This job has reached its contractor limit.",
+          status: 409 as const,
+        };
       }
 
       const existingAcceptance = await tx.jobAcceptance.findUnique({
