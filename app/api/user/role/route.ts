@@ -3,6 +3,13 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const SELF_SERVICE_ROLES = new Set(["homeowner", "contractor"]);
+const ADMIN_EMAILS = (
+  process.env.ADMIN_EMAILS || "brandsagaceo@gmail.com,quotexbert@gmail.com"
+)
+  .split(",")
+  .map((email) => email.trim().toLowerCase());
+
 export async function GET() {
   try {
     const { userId } = await auth();
@@ -75,7 +82,7 @@ export async function GET() {
         user = { id: userId, role: null, contractorProfile: null, homeownerProfile: null };
       }
     }
-    
+
     const profilePhoto = (user as any)?.contractorProfile?.profilePhoto || (user as any)?.homeownerProfile?.profilePhoto || null;
     return NextResponse.json({ 
       role: user?.role || null,
@@ -98,15 +105,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { role } = await req.json();
-
-    if (!["homeowner", "contractor", "admin"].includes(role)) {
+    const body: unknown = await req.json();
+    if (typeof body !== "object" || body === null || Array.isArray(body)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+    const role = (body as { role?: unknown }).role;
+    if (typeof role !== "string" || !SELF_SERVICE_ROLES.has(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
     // Get user info from Clerk
     const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
+    const email =
+      clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
+
+    // Administrator status is provisioned outside self-service onboarding.
+    // Keep existing DB, Clerk-metadata, and allowlisted admins unchanged.
+    const [existingIdentityUser, existingUser] = await Promise.all([
+      prisma.user.findFirst({
+        where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+        select: { role: true },
+      }),
+      prisma.user.findUnique({ where: { email } }),
+    ]);
+    const isProvisionedAdmin =
+      existingIdentityUser?.role === "admin" ||
+      existingUser?.role === "admin" ||
+      clerkUser.publicMetadata?.role === "admin" ||
+      ADMIN_EMAILS.includes(email.toLowerCase());
+
+    if (isProvisionedAdmin) {
+      return NextResponse.json(
+        { error: "Administrator roles cannot be changed through self-service" },
+        { status: 403 },
+      );
+    }
 
     // Update user metadata in Clerk
     await client.users.updateUserMetadata(userId, {
@@ -116,8 +150,6 @@ export async function POST(req: NextRequest) {
     });
 
     // Create or update user in database
-    const email = clerkUser.emailAddresses[0]?.emailAddress || `${userId}@clerk.user`;
-    
     // Generate proper name with fallback logic
     let userName = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim();
     if (!userName) {
@@ -135,10 +167,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if a user already exists by email to avoid duplicate email constraint errors
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
     let resolvedUserId: string;
 
     if (existingUser) {
