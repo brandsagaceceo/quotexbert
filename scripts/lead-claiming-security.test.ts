@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import { NextRequest } from "next/server";
+import { POST as postLegacyClaim } from "../app/api/claim-lead/route";
 import { hasClaimableCategoryEntitlement } from "../lib/subscription-access";
 
 const source = (path: string) => fs.readFileSync(path, "utf8");
@@ -8,6 +10,7 @@ const homeownerAccept = source("app/api/leads/[id]/accept/route.ts");
 const legacyClaim = source("app/api/claim-lead/route.ts");
 const deprecatedPaymentClaim = source("app/api/payments/claim-lead/route.ts");
 const payout = source("app/api/contractor/payout/route.ts");
+const billingToggle = source("app/api/billing/toggle/route.ts");
 
 assert.match(
   contractorAccept,
@@ -116,6 +119,11 @@ assert.doesNotMatch(
   /createPaymentIntent|createCharge|contractorBilling\.update/,
   "legacy endpoint cannot charge or mutate billing",
 );
+assert.doesNotMatch(
+  legacyClaim,
+  /@\/lib\/stripe|@\/lib\/prisma|createPaymentIntent|paymentIntents\.create|chargeLead|createCharge/,
+  "legacy endpoint does not import Stripe or database mutation helpers",
+);
 assert.match(
   deprecatedPaymentClaim,
   /status: 410/,
@@ -142,6 +150,27 @@ assert.doesNotMatch(
   payout,
   /spendThisMonthCents:\s*0|contractorBilling\.update/,
   "payout request cannot erase the monthly spend counter",
+);
+
+assert.match(
+  billingToggle,
+  /resolveAuthUser\(\)/,
+  "billing pause changes require a verified session",
+);
+assert.match(
+  billingToggle,
+  /where: \{ id: authResult\.user\.dbUserId \}/,
+  "billing pause uses the session-resolved user",
+);
+assert.match(
+  billingToggle,
+  /contractor\.role !== "contractor"[\s\S]*!contractor\.isActive/,
+  "only active contractors can toggle their billing pause state",
+);
+assert.doesNotMatch(
+  billingToggle,
+  /const \{ userId \} = await request\.json\(\)/,
+  "billing toggle ignores client-supplied identity",
 );
 
 const future = new Date(Date.now() + 86_400_000);
@@ -176,4 +205,29 @@ assert.equal(
   "a different category remains unavailable",
 );
 
-console.log("lead-claiming security tests passed");
+async function verifyLegacyClaimEndpointIsGone() {
+  const response = await postLegacyClaim(
+    new NextRequest("https://example.com/api/claim-lead", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ leadId: "test-lead", userId: "test-user" }),
+    }),
+  );
+  assert.equal(
+    response.status,
+    410,
+    "legacy direct-charge claims must return Gone",
+  );
+  assert.deepEqual(await response.json(), {
+    error:
+      "Per-lead payment claims are no longer supported. Use the category subscription-based jobs workflow.",
+    redirectTo: "/contractor/jobs",
+  });
+}
+
+verifyLegacyClaimEndpointIsGone()
+  .then(() => console.log("lead-claiming security tests passed"))
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
