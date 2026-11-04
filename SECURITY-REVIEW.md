@@ -36,8 +36,9 @@ The following security-fix commits are present in order after `origin/main`:
 | `52d0631` | Secure homeowner estimates and project publishing (08A) |
 | `5d017c1` | Contain homeowner draft photos (08B) |
 
-These commits are pushed: `HEAD` and `origin/security/quotexbert-hardening`
-both resolve to `5d017c1897096a3f1e1895869e1b08ce8f74bede`.
+All listed security-fix commits are pushed; the latest security-fix commit is
+`5d017c1897096a3f1e1895869e1b08ce8f74bede`. Findings-summary commits created
+for this closeout are local and have not been pushed.
 
 ## Remaining finding
 
