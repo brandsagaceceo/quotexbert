@@ -32,18 +32,27 @@ export default function PhotoUploadFixed({
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [initializedFromProps, setInitializedFromProps] = useState(false);
 
-  // Initialize from photos prop (for base64 images from home page estimate)
+  // Only treat server-backed URLs as uploaded; local data and blob URLs are not durable.
   useEffect(() => {
     if (!initializedFromProps && photos && photos.length > 0) {
-      
-      // Convert base64/URL photos to PhotoItem format
-      const items: PhotoItem[] = photos.map((photoUrl, index) => ({
-        id: `loaded-${index}-${Date.now()}`,
-        file: new File([], `loaded-photo-${index}.jpg`, { type: 'image/jpeg' }), // Dummy file
-        previewUrl: photoUrl, // Use the base64 or URL directly
-        uploadedUrl: photoUrl, // Already uploaded (or base64 to be saved)
-        uploading: false
-      }));
+      const items: PhotoItem[] = photos.map((photoUrl, index) => {
+        const isPrivatePhoto = photoUrl.startsWith("/api/private-photo?");
+        const isLegacyBlob =
+          /^https:\/\/[a-z0-9.-]+\.public\.blob\.vercel-storage\.com\//i.test(
+            photoUrl,
+          );
+        const isUploaded = isPrivatePhoto || isLegacyBlob;
+        return {
+          id: `loaded-${index}-${Date.now()}`,
+          file: new File([], `loaded-photo-${index}.jpg`, { type: "image/jpeg" }),
+          previewUrl: photoUrl,
+          ...(isUploaded ? { uploadedUrl: photoUrl } : {}),
+          uploading: false,
+          ...(!isUploaded
+            ? { error: "Please sign in and re-upload this photo to store it securely." }
+            : {}),
+        };
+      });
       
       setPhotoItems(items);
       setInitializedFromProps(true);
@@ -194,12 +203,11 @@ export default function PhotoUploadFixed({
         // Mark as error but keep local preview
         setPhotoItems(prev => prev.map(p => 
           p.id === item.id 
-            ? { 
-                ...p, 
-                uploading: false, 
-                error: error instanceof Error ? error.message : "Upload failed",
-                uploadedUrl: p.previewUrl // Fallback to local preview if upload fails
-              } 
+            ? {
+              ...p,
+              uploading: false,
+              error: error instanceof Error ? error.message : "Upload failed",
+            }
             : p
         ));
       }
@@ -396,15 +404,17 @@ export default function PhotoUploadFixed({
                   <div className="absolute inset-0 bg-red-500 bg-opacity-90 flex items-center justify-center p-2">
                     <div className="text-center text-white">
                       <p className="text-xs mb-2">Upload failed</p>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          retryUpload(item.id);
-                        }}
-                        className="text-xs underline hover:no-underline"
-                      >
-                        Retry
-                      </button>
+                      {item.file.size > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            retryUpload(item.id);
+                          }}
+                          className="text-xs underline hover:no-underline"
+                        >
+                          Retry
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}

@@ -1,13 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
-import { uploadImage } from "@/lib/upload";
+import { randomUUID } from "node:crypto";
+import {
+  deletePrivateImage,
+  privatePhotoPath,
+  uploadImage,
+  uploadPrivateImage,
+} from "@/lib/upload";
+import { resolveAuthUser } from "@/lib/server-auth";
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import { privatePhotoIsReferenced } from "@/lib/private-photo-records";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  let isPrivatePhotoUpload = false;
   try {
     const data = await request.formData();
-    const userId = data.get('userId') as string;
-    const uploadType = data.get('type') as string; // 'profile', 'portfolio', or 'leads'
+    const suppliedUserId = data.get("userId");
+    const rawUploadType = data.get("type");
+    const uploadType = typeof rawUploadType === "string" ? rawUploadType : "leads";
+    isPrivatePhotoUpload = uploadType === "leads";
+
+    if (!["profile", "logo", "portfolio", "leads"].includes(uploadType)) {
+      return NextResponse.json({ error: "Unsupported upload type" }, { status: 400 });
+    }
+
+    let resolvedUserId: string;
+    let clerkUserId: string;
+    if (uploadType === "leads") {
+      const identity = await resolveHomeownerIdentity();
+      if (!identity.success) {
+        return NextResponse.json(
+          { error: identity.error },
+          { status: identity.status },
+        );
+      }
+      resolvedUserId = identity.user.dbUserId;
+      clerkUserId = identity.user.clerkUserId;
+    } else {
+      const authResult = await resolveAuthUser();
+      if ("error" in authResult) {
+        return NextResponse.json(
+          { error: authResult.error },
+          { status: authResult.status },
+        );
+      }
+      resolvedUserId = authResult.user.dbUserId;
+      clerkUserId = authResult.user.clerkUserId;
+    }
+
+    if (
+      suppliedUserId !== null &&
+      (typeof suppliedUserId !== "string" ||
+        ![resolvedUserId, clerkUserId].includes(suppliedUserId))
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     
     // Extract all files from FormData
     const files: File[] = [];
@@ -26,13 +74,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log(`[UPLOAD] Processing ${files.length} file(s), type=${uploadType}, userId=${userId}`);
+    console.log(`[UPLOAD] Processing ${files.length} file(s), type=${uploadType}`);
 
 
     // Validate file types and sizes
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
-    const maxFiles = uploadType === 'profile' ? 1 : 10;
+    const maxFiles = uploadType === "profile" || uploadType === "logo" ? 1 : 10;
 
     if (files.length > maxFiles) {
       return NextResponse.json({ 
@@ -64,19 +112,28 @@ export async function POST(request: NextRequest) {
       const bytes = await fileItem.arrayBuffer();
       const buffer = Buffer.from(bytes);
       
-      // Determine the folder path based on upload type
-      let folderPath = 'leads';
-      if (uploadType === 'profile' && userId) {
-        folderPath = `profiles/${userId}`;
-      } else if (uploadType === 'portfolio' && userId) {
-        folderPath = `portfolio/${userId}`;
+      if (uploadType === "leads") {
+        uploadedFiles.push(
+          await uploadPrivateImage(buffer, resolvedUserId, fileItem.type),
+        );
+        continue;
       }
+
+      const folderByType: Record<string, string> = {
+        profile: `profiles/${resolvedUserId}`,
+        logo: `logos/${resolvedUserId}`,
+        portfolio: `portfolio/${resolvedUserId}`,
+      };
+      const folderPath = folderByType[uploadType];
       
       // Generate unique filename with folder path
-      const timestamp = Date.now();
-      const randomStr = Math.random().toString(36).substring(2);
-      const extension = fileItem.name.split('.').pop();
-      const filename = `${folderPath}/${uploadType || 'file'}_${timestamp}_${randomStr}.${extension}`;
+      const extensionByType: Record<string, string> = {
+        "image/jpeg": "jpg",
+        "image/jpg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+      };
+      const filename = `${folderPath}/${uploadType}_${randomUUID()}.${extensionByType[fileItem.type]}`;
       
       console.log(`[UPLOAD] Uploading to Vercel Blob: ${filename} (${buffer.length} bytes)`);
       
@@ -91,11 +148,13 @@ export async function POST(request: NextRequest) {
     console.log(`[UPLOAD] Successfully uploaded ${uploadedFiles.length} file(s)`);
 
     // Return appropriate response based on upload type
-    if (uploadType === 'profile') {
+    if (uploadType === "profile" || uploadType === "logo") {
       return NextResponse.json({ 
         success: true, 
         url: uploadedFiles[0],
-        message: "Profile picture uploaded successfully"
+        message: uploadType === "profile"
+          ? "Profile picture uploaded successfully"
+          : "Business logo uploaded successfully"
       });
     } else {
       return NextResponse.json({ 
@@ -109,13 +168,24 @@ export async function POST(request: NextRequest) {
     console.error("[UPLOAD] Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ 
-      error: `Failed to upload files: ${errorMessage}` 
+      error:
+        isPrivatePhotoUpload
+          ? "Failed to securely upload homeowner photos. Please try again."
+          : `Failed to upload files: ${errorMessage}`,
     }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status },
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const fileUrl = searchParams.get('file');
     
@@ -123,13 +193,25 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "File URL required" }, { status: 400 });
     }
 
-    // For S3 files, we'll just return success
-    // In production, you might want to implement S3 deletion using DeleteObjectCommand
+    const privatePath = privatePhotoPath(fileUrl);
+    if (privatePath) {
+      if (!privatePath.startsWith(`homeowner-photos/${authResult.user.dbUserId}/`)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      if (await privatePhotoIsReferenced(fileUrl)) {
+        return NextResponse.json(
+          { error: "Remove the photo from its saved project or job first" },
+          { status: 409 },
+        );
+      }
+      await deletePrivateImage(privatePath);
+      return NextResponse.json({ success: true, message: "Photo deleted" });
+    }
+
     console.log(`[Upload] Delete requested for: ${fileUrl}`);
-    
     return NextResponse.json({ 
       success: true, 
-      message: "File deletion logged (S3 cleanup can be implemented separately)" 
+      message: "File deletion logged (existing public storage objects are not deleted)"
     });
 
   } catch (error) {

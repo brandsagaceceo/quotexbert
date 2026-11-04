@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
-import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import { getOpenAIClient, OPENAI_MODELS } from "@/lib/openai-client";
 import {
   generateAstraEstimate,
   generateEstimateWithAstraFallback,
@@ -14,11 +14,7 @@ import {
 // Tell Vercel this function can run for up to 60 seconds (GPT-4o + vision is slow)
 export const maxDuration = 60;
 
-// Initialize OpenAI client with a 25-second timeout so hung requests don't block forever
-const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('demo') ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  timeout: 25_000,
-}) : null;
+const openai = getOpenAIClient();
 
 interface EstimateRequest {
   description?: string;
@@ -454,7 +450,7 @@ ESTIMATION GUIDELINES:
   while (attempt < maxAttempts) {
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o", // GPT-4 with vision support
+        model: OPENAI_MODELS.quickEstimator,
         messages: [
           {
             role: "system",
@@ -468,7 +464,7 @@ ESTIMATION GUIDELINES:
         temperature: 0.4, // lower temperature → more consistent, realistic estimates
         max_tokens: 2500,
         response_format: { type: "json_object" },
-      }).catch((err) => {
+      }, { timeout: 25_000 }).catch((err) => {
         console.error(
           "[ESTIMATE] OpenAI chat completion failed",
           getSanitizedErrorDetails(err),
@@ -542,7 +538,7 @@ Be realistic and conservative. Return ONLY the JSON, no other text.`;
   }
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: OPENAI_MODELS.costEffective,
     messages: [
       {
         role: "system",

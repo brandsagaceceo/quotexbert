@@ -153,10 +153,15 @@ export default function AdminBlogPage() {
               Create and manage blog posts for SEO and customer engagement
             </p>
           </div>
-          <button className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center">
-            <PlusIcon className="h-5 w-5 mr-2" />
-            New Post
-          </button>
+          <div className="flex gap-3">
+            <Link href="/admin/blog/seo" className="bg-white hover:bg-orange-50 text-[#800020] border border-[#800020] px-5 py-3 rounded-lg font-semibold transition-colors">
+              Review SEO drafts
+            </Link>
+            <button className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center">
+              <PlusIcon className="h-5 w-5 mr-2" />
+              New Post
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -332,4 +337,3 @@ export default function AdminBlogPage() {
     </div>
   );
 }
-

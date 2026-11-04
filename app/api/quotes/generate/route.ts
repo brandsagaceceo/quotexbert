@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Your session expired. Please sign in again." }, { status: authResult.status });
     }
 
-    const { conversationId, contractorId: bodyContractorId } = await request.json();
+    const { conversationId } = await request.json();
 
-    if (!conversationId || !bodyContractorId) {
+    if (!conversationId) {
       return NextResponse.json(
-        { error: "Conversation ID and contractor ID are required" },
+        { error: "Conversation ID is required" },
         { status: 400 }
       );
     }
@@ -23,10 +23,24 @@ export async function POST(request: NextRequest) {
     // Get conversation with job details
     const conversation = await prisma.conversation.findUnique({
       where: { id: conversationId },
-      include: {
-        job: true,
-        homeowner: true,
-        contractor: true,
+      select: {
+        id: true,
+        jobId: true,
+        homeownerId: true,
+        contractorId: true,
+        job: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            category: true,
+            budget: true,
+            zipCode: true,
+            homeownerId: true,
+          },
+        },
+        homeowner: { select: { id: true, name: true, email: true } },
+        contractor: { select: { id: true, name: true, email: true, role: true, isActive: true } },
       }
     });
 
@@ -39,8 +53,15 @@ export async function POST(request: NextRequest) {
 
     // The browser-supplied contractorId is never trusted on its own — the
     // authenticated caller must actually be the contractor on this conversation.
-    if (authResult.user.dbUserId !== conversation.contractorId) {
+    if (
+      authResult.user.dbUserId !== conversation.contractorId ||
+      conversation.contractor?.id !== conversation.contractorId ||
+      conversation.job.homeownerId !== conversation.homeownerId
+    ) {
       return NextResponse.json({ error: "You do not have access to this conversation." }, { status: 403 });
+    }
+    if (conversation.contractor?.role !== "contractor" || !conversation.contractor.isActive) {
+      return NextResponse.json({ error: "Active contractor access required" }, { status: 403 });
     }
     const contractorId = conversation.contractorId;
 
@@ -51,6 +72,12 @@ export async function POST(request: NextRequest) {
       where: { leadId: conversation.jobId },
       include: {
         messages: {
+          where: {
+            OR: [
+              { fromUserId: contractorId, toUserId: conversation.homeownerId },
+              { fromUserId: conversation.homeownerId, toUserId: contractorId },
+            ],
+          },
           orderBy: { createdAt: 'asc' },
           take: 100,
           include: { fromUser: { select: { id: true, role: true } } },
@@ -297,11 +324,26 @@ Respond in JSON format:
         include: {
           items: true,
           conversation: {
-            include: {
-              job: true,
-              homeowner: true,
-              contractor: true
-            }
+            select: {
+              id: true,
+              jobId: true,
+              homeownerId: true,
+              contractorId: true,
+              status: true,
+              job: {
+                select: {
+                  id: true,
+                  title: true,
+                  description: true,
+                  budget: true,
+                  category: true,
+                  zipCode: true,
+                  status: true,
+                },
+              },
+              homeowner: { select: { id: true, name: true, email: true } },
+              contractor: { select: { id: true, name: true, email: true } },
+            },
           }
         }
       });

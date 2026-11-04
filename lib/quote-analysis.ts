@@ -14,12 +14,10 @@
  *   safe output.
  */
 
-import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import { getOpenAIClient, OPENAI_MODELS } from "@/lib/openai-client";
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+const openai = getOpenAIClient();
 
 // ─── Public types ────────────────────────────────────────────────────────────
 
@@ -265,7 +263,7 @@ export async function analyzeQuote(quoteId: string): Promise<QuoteAnalysisResult
     const prompt = buildPrompt(data);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODELS.quickEstimator,
       temperature: 0.3,
       max_tokens: 400,
       messages: [

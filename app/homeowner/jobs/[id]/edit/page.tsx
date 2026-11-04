@@ -309,6 +309,7 @@ export default function EditJobPage() {
                 onPhotosChange={setPhotos}
                 maxPhotos={5}
                 disabled={readOnly}
+                deleteOnRemove={false}
               />
             </div>
 

@@ -1,28 +1,25 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const homeownerId = searchParams.get('homeownerId');
-
-    if (!homeownerId) {
+    const identity = await resolveHomeownerIdentity();
+    if (!identity.success) {
       return NextResponse.json(
-        { error: 'Homeowner ID is required' },
-        { status: 400 }
+        { error: identity.error },
+        { status: identity.status },
       );
     }
 
     // Fetch all estimates for this homeowner
     const estimates = await prisma.aIEstimate.findMany({
       where: {
-        homeownerId: homeownerId,
+        homeownerId: { in: identity.homeownerIds },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       include: {
         items: true,
@@ -33,7 +30,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform the estimates to include parsed factors
-    const transformedEstimates = estimates.map(estimate => ({
+    const transformedEstimates = estimates.map((estimate) => ({
       id: estimate.id,
       description: estimate.description,
       minCost: estimate.minCost,
@@ -53,64 +50,60 @@ export async function GET(request: NextRequest) {
       items: estimate.items,
     }));
 
-    return NextResponse.json({ 
-      estimates: transformedEstimates 
+    return NextResponse.json({
+      estimates: transformedEstimates,
     });
-
   } catch (error) {
-    console.error('Error fetching estimates:', error);
+    console.error("Error fetching estimates:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch estimates' },
-      { status: 500 }
+      { error: "Failed to fetch estimates" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
+    const identity = await resolveHomeownerIdentity();
+    if (!identity.success) {
+      return NextResponse.json(
+        { error: identity.error },
+        { status: identity.status },
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
-    const estimateId = searchParams.get('id');
-    const homeownerId = searchParams.get('homeownerId');
+    const estimateId = searchParams.get("id");
 
-    if (!estimateId || !homeownerId) {
+    if (!estimateId) {
       return NextResponse.json(
-        { error: 'Estimate ID and Homeowner ID are required' },
-        { status: 400 }
+        { error: "Estimate ID is required" },
+        { status: 400 },
       );
     }
 
-    // Verify the estimate belongs to this homeowner
-    const estimate = await prisma.aIEstimate.findFirst({
+    const deleted = await prisma.aIEstimate.deleteMany({
       where: {
         id: estimateId,
-        homeownerId: homeownerId,
+        homeownerId: { in: identity.homeownerIds },
       },
     });
-
-    if (!estimate) {
+    if (deleted.count !== 1) {
       return NextResponse.json(
-        { error: 'Estimate not found or does not belong to this user' },
-        { status: 404 }
+        { error: "Estimate not found or does not belong to this user" },
+        { status: 404 },
       );
     }
 
-    // Delete the estimate (items will be cascade deleted)
-    await prisma.aIEstimate.delete({
-      where: {
-        id: estimateId,
-      },
-    });
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: 'Estimate deleted successfully'
+      message: "Estimate deleted successfully",
     });
-
   } catch (error) {
-    console.error('Error deleting estimate:', error);
+    console.error("Error deleting estimate:", error);
     return NextResponse.json(
-      { error: 'Failed to delete estimate' },
-      { status: 500 }
+      { error: "Failed to delete estimate" },
+      { status: 500 },
     );
   }
 }

@@ -52,6 +52,7 @@ export default function HomeownerDashboard() {
       // Fetch posted jobs
       const jobsRes = await fetch("/api/homeowner/jobs");
       const jobsData = await jobsRes.json();
+      const homeownerJobs = Array.isArray(jobsData) ? jobsData : [];
 
       // Fetch real unread message count from notifications
       const notifRes = await fetch(`/api/notifications?userId=${authUser?.id}`);
@@ -62,8 +63,8 @@ export default function HomeownerDashboard() {
 
       setStats({
         savedEstimates: estimatesData.savedProjects?.length || 0,
-        postedJobs: jobsData.jobs?.length || 0,
-        activeProjects: jobsData.jobs?.filter((j: any) => j.status === 'open').length || 0,
+        postedJobs: homeownerJobs.length,
+        activeProjects: homeownerJobs.filter((j: any) => j.status === 'open').length,
         unreadMessages: unreadMsgCount
       });
       setStatsLoaded(true);

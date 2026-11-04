@@ -1,82 +1,110 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import {
+  approvedProjectPhotos,
+  parseApprovedPhotoSelection,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
+import {
+  publishSavedProject,
+  SavedProjectPublishConflictError,
+  SavedProjectPublishValidationError,
+} from "@/lib/saved-project-publishing";
 import { NotificationService } from "@/lib/notifications";
 
-// POST - Convert a saved project to a job board listing
 export async function POST(request: NextRequest) {
   try {
+    const identity = await resolveHomeownerIdentity();
+    if (!identity.success) {
+      return NextResponse.json(
+        { error: identity.error },
+        { status: identity.status },
+      );
+    }
+
     const body = await request.json();
     const { savedProjectId } = body;
-
-    if (!savedProjectId) {
-      return NextResponse.json({ 
-        error: "savedProjectId is required" 
-      }, { status: 400 });
+    if (typeof savedProjectId !== "string" || !savedProjectId) {
+      return NextResponse.json(
+        { error: "savedProjectId is required" },
+        { status: 400 },
+      );
+    }
+    const approvedPhotos = parseApprovedPhotoSelection(body);
+    if (
+      approvedPhotos === null ||
+      !privatePhotosBelongTo(approvedPhotos, identity.user.dbUserId)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or unauthorized photo selection" },
+        { status: 400 },
+      );
     }
 
-    // Get the saved project
-    const savedProject = await prisma.savedProject.findUnique({
-      where: { id: savedProjectId },
-      include: {
-        aiEstimate: {
-          include: {
-            items: true
-          }
+    const result = await publishSavedProject(
+      savedProjectId,
+      identity.homeownerIds,
+      (project) => {
+        const photos = approvedProjectPhotos(project.photos, approvedPhotos);
+        if (!photos) {
+          throw new SavedProjectPublishValidationError(
+            "Only photos attached to this project can be approved for publication.",
+          );
         }
-      }
-    });
-
-    if (!savedProject) {
-      return NextResponse.json({ 
-        error: "Saved project not found" 
-      }, { status: 404 });
-    }
-
-    // Check if already posted
-    if (savedProject.postedAsLeadId) {
-      return NextResponse.json({ 
-        error: "This project has already been posted to the job board",
-        leadId: savedProject.postedAsLeadId
-      }, { status: 400 });
-    }
-
-    // Create a Lead from the saved project
-    const lead = await prisma.lead.create({
-      data: {
-        title: savedProject.title,
-        description: savedProject.description,
-        category: savedProject.category,
-        budget: savedProject.budget || '$5,000 - $10,000',
-        zipCode: savedProject.location || 'M5A 1A1', // Default Toronto postal code
-        photos: savedProject.photos || '[]',
-        homeownerId: savedProject.homeownerId,
-        status: 'open',
-        published: true,
-        claimed: false,
-        maxContractors: 3
-      }
-    });
-
-    // Update the saved project to link to the lead
-    const updatedProject = await prisma.savedProject.update({
-      where: { id: savedProjectId },
-      data: {
-        status: 'posted',
-        postedAsLeadId: lead.id
+        return {
+          title: project.title,
+          description: project.description,
+          category: project.category,
+          budget: project.budget || "$5,000 - $10,000",
+          zipCode: project.location || "M5A 1A1",
+          photos: JSON.stringify(photos),
+          homeownerId: project.homeownerId,
+          status: "open",
+          published: true,
+          claimed: false,
+          maxContractors: 3,
+        };
       },
-      include: {
-        postedAsLead: true,
-        aiEstimate: {
-          include: {
-            items: true
-          }
-        }
-      }
-    });
+    );
 
-    // Notify all active contractors about the new job (fire-and-forget — don't block the response).
-    // Previously this path created a published lead but never notified contractors, so jobs
-    // posted from the project page silently reached no one.
+    if (result.kind === "forbidden") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (result.kind === "not_found") {
+      return NextResponse.json(
+        { error: "Saved project not found" },
+        { status: 404 },
+      );
+    }
+    if (result.kind === "conflict") {
+      return NextResponse.json({ error: result.error }, { status: 409 });
+    }
+
+    if (result.kind === "already_published") {
+      if (!result.lead || !result.savedProject) {
+        return NextResponse.json(
+          { error: "Published project is missing its job-board record" },
+          { status: 409 },
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        lead: result.lead,
+        savedProject: result.savedProject,
+        message: "Project posted to job board successfully",
+        alreadyPublished: true,
+      });
+    }
+
+    if (!result.lead || !result.savedProject) {
+      return NextResponse.json(
+        { error: "Published project is missing its job-board record" },
+        { status: 409 },
+      );
+    }
+
+    const { lead, savedProject } = result;
     NotificationService.notifyAllContractors({
       leadId: lead.id,
       title: lead.title,
@@ -87,31 +115,27 @@ export async function POST(request: NextRequest) {
       budget: null,
       createdAt: lead.createdAt.toISOString(),
       isSeeded: lead.isSeeded,
-    }).catch((err) => console.error("[post-to-board] notifyAllContractors error:", err));
+    }).catch((err) =>
+      console.error("[post-to-board] notifyAllContractors error:", err),
+    );
 
-    // Also update the AI estimate if it exists
-    if (savedProject.aiEstimateId) {
-      await prisma.aIEstimate.update({
-        where: { id: savedProject.aiEstimateId },
-        data: {
-          status: 'posted',
-          isPublic: true,
-          leadId: lead.id
-        }
-      });
-    }
-
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       lead,
-      savedProject: updatedProject,
-      message: "Project posted to job board successfully"
+      savedProject,
+      message: "Project posted to job board successfully",
     });
-
   } catch (error) {
+    if (error instanceof SavedProjectPublishConflictError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+    if (error instanceof SavedProjectPublishValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 422 });
+    }
     console.error("[SavedProjects Post to Board] Error:", error);
-    return NextResponse.json({ 
-      error: "Failed to post project to job board" 
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to post project to job board" },
+      { status: 500 },
+    );
   }
 }

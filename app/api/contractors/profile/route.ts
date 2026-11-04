@@ -14,44 +14,56 @@ export async function GET(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const profile = await prisma.contractorProfile.findUnique({
-      where: { userId },
-      include: {
-        user: {
+    const user = await prisma.user.findFirst({
+      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
+      select: {
+        id: true,
+        contractorProfile: {
           select: {
-            email: true,
-            createdAt: true,
-          },
-        },
-        portfolio: {
-          where: { isPublic: true },
-          orderBy: { createdAt: 'desc' },
-          take: 12,
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            projectType: true,
-            imageUrl: true,
-            createdAt: true,
+            companyName: true,
+            trade: true,
+            bio: true,
+            city: true,
+            serviceRadiusKm: true,
+            website: true,
+            phone: true,
+            verified: true,
+            avgRating: true,
+            reviewCount: true,
+            completedJobs: true,
+            categories: true,
+            profilePhoto: true,
+            avgResponseTimeMinutes: true,
+            responseTimeLabel: true,
+            portfolio: {
+              where: { isPublic: true },
+              orderBy: { createdAt: "desc" },
+              take: 12,
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                projectType: true,
+                imageUrl: true,
+                createdAt: true,
+              },
+            },
           },
         },
       },
     });
+    const profile = user?.contractorProfile;
 
     if (!profile) {
-      return NextResponse.json(
-        { error: "Profile not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     // Compute metrics from the shared utility (single source of truth)
-    const metrics = await getContractorMetrics(userId);
+    const metrics = await getContractorMetrics(user.id);
 
     return NextResponse.json({
       profile: {
@@ -65,7 +77,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching contractor profile:", error);
     return NextResponse.json(
       { error: "Failed to fetch profile" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -74,12 +86,9 @@ export async function PUT(request: NextRequest) {
   try {
     const authResult = await auth();
     const userId = authResult.userId;
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -95,7 +104,7 @@ export async function PUT(request: NextRequest) {
     if (!user || user.role !== "contractor") {
       return NextResponse.json(
         { error: "Only contractors can update contractor profiles" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -148,10 +157,10 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ profile });
   } catch (error) {
     console.error("Error updating contractor profile:", error);
-    
+
     return NextResponse.json(
       { error: "Failed to update profile" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

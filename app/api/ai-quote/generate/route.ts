@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
-
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-}) : null;
+import { getOpenAIClient, OPENAI_MODELS } from '@/lib/openai-client';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const openai = getOpenAIClient();
     const { 
       projectType, 
       description, 
@@ -181,7 +178,7 @@ IMPORTANT:
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODELS.quickEstimator,
       messages: [
         {
           role: "system",
