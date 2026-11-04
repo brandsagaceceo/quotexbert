@@ -134,6 +134,7 @@ export default function EnhancedPortfolioForm({
             onPhotosChange={setBeforeImages}
             maxPhotos={6}
             disabled={isSubmitting}
+            type="portfolio"
           />
           <p className="text-xs text-gray-400 mt-1">
             Show the condition before your work began
@@ -150,6 +151,7 @@ export default function EnhancedPortfolioForm({
             onPhotosChange={setAfterImages}
             maxPhotos={6}
             disabled={isSubmitting}
+            type="portfolio"
           />
           <p className="text-xs text-gray-400 mt-1">
             Showcase your completed work and craftsmanship

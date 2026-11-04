@@ -5,6 +5,10 @@ import { postalCodeToCity } from "@/lib/postal-to-city";
 import { normalizeCategory } from "@/lib/categories";
 import { prisma } from "@/lib/prisma";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import {
+  deleteUnreferencedPrivatePhotos,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
 
 class EstimatePublishConflictError extends Error {}
 
@@ -124,35 +128,79 @@ export async function POST(
     // category, and never matched any contractor's entitlement.
     const primaryCategory = normalizeCategory(categories[0] || "");
 
-    // Get visualization URL + reviewed photo list from the request body, if provided.
-    const body = await request.json().catch(() => ({}));
-    const visualizationUrl = body.visualizationUrl || null;
-
-    // Photo carryover: the AI estimate's own uploaded photos (estimate.images, persisted
-    // server-side at estimate-save time — see app/api/ai-estimates/save/route.ts) are the
-    // default source of truth. The homeowner may review/edit that set client-side before
-    // posting (add/remove) and send the final list back as `photos` — if present, that
-    // list wins since it reflects the homeowner's edits. Either way we never rely on
-    // localStorage or client-only state for the final job's photos.
-    let finalPhotos: string[];
-    if (Array.isArray(body.photos)) {
-      finalPhotos = body.photos
-        .filter((p: unknown): p is string => typeof p === "string")
-        .slice(0, 10);
-    } else {
-      try {
-        const estimateImages = JSON.parse(estimate.images || "[]");
-        finalPhotos = Array.isArray(estimateImages)
-          ? estimateImages.filter(
-              (p: unknown): p is string => typeof p === "string",
-            )
-          : [];
-      } catch {
-        finalPhotos = [];
+    let body: Record<string, unknown>;
+    try {
+      const parsedBody: unknown = await request.json();
+      if (
+        typeof parsedBody !== "object" ||
+        parsedBody === null ||
+        Array.isArray(parsedBody)
+      ) {
+        return NextResponse.json(
+          { success: false, error: "Invalid request body" },
+          { status: 400 },
+        );
       }
+      body = parsedBody as Record<string, unknown>;
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Invalid request body" },
+        { status: 400 },
+      );
     }
-    if (visualizationUrl && !finalPhotos.includes(visualizationUrl)) {
-      finalPhotos = [...finalPhotos, visualizationUrl];
+
+    const submittedPhotos = body.photos === undefined ? [] : body.photos;
+    const visualizationUrl = body.visualizationUrl;
+    if (
+      !Array.isArray(submittedPhotos) ||
+      submittedPhotos.length > 10 ||
+      !submittedPhotos.every(
+        (photo): photo is string => typeof photo === "string",
+      ) ||
+      (visualizationUrl !== undefined &&
+        visualizationUrl !== null &&
+        typeof visualizationUrl !== "string")
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Invalid photo selection" },
+        { status: 400 },
+      );
+    }
+    const finalPhotos = Array.from(
+      new Set(
+        submittedPhotos.filter(
+          (photo): photo is string => typeof photo === "string",
+        ),
+      ),
+    );
+    if (
+      typeof visualizationUrl === "string" &&
+      !finalPhotos.includes(visualizationUrl)
+    ) {
+      finalPhotos.push(visualizationUrl);
+    }
+    if (
+      finalPhotos.length > 10 ||
+      !privatePhotosBelongTo(finalPhotos, identity.user.dbUserId)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Photo selection exceeds the limit or contains an unauthorized photo",
+        },
+        { status: 400 },
+      );
+    }
+
+    let previousEstimatePhotos: string[] = [];
+    try {
+      const parsed = JSON.parse(estimate.images || "[]");
+      previousEstimatePhotos = Array.isArray(parsed)
+        ? parsed.filter((photo: unknown): photo is string => typeof photo === "string")
+        : [];
+    } catch {
+      previousEstimatePhotos = [];
     }
 
     // Price consistency: the saved AIEstimate row (estimate.minCost/maxCost) is the single
@@ -164,7 +212,11 @@ export async function POST(
     // fall back to the same `recommended` value the review page displayed by default.
     const pricing = normalizeEstimatePricing(estimate);
     const submittedBudget =
-      typeof body.budget === "number" ? body.budget : parseFloat(body.budget);
+      typeof body.budget === "number"
+        ? body.budget
+        : typeof body.budget === "string"
+          ? parseFloat(body.budget)
+          : Number.NaN;
     const finalBudget =
       Number.isFinite(submittedBudget) && submittedBudget > 0
         ? Math.round(submittedBudget)
@@ -207,6 +259,7 @@ export async function POST(
           leadId: lead.id,
           status: "posted",
           isPublic: true,
+          images: JSON.stringify(finalPhotos),
         },
       });
       if (claimed.count !== 1) {
@@ -218,6 +271,9 @@ export async function POST(
       });
       return { lead, updatedEstimate };
     });
+    await deleteUnreferencedPrivatePhotos(
+      previousEstimatePhotos.filter((photo) => !finalPhotos.includes(photo)),
+    );
 
     // 🚀 NOTIFY ALL CONTRACTORS IMMEDIATELY about this new job
     try {

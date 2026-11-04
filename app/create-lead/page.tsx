@@ -26,6 +26,8 @@ export default function CreateLeadPage() {
     zipCode: ""
   });
   const [photos, setPhotos] = useState<string[]>([]);
+  const [approvePhotosForPublication, setApprovePhotosForPublication] =
+    useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -77,6 +79,10 @@ export default function CreateLeadPage() {
         console.error('Error loading saved photos:', error);
       }
     }
+    if (savedFormData) {
+      localStorage.removeItem('estimate_data');
+      localStorage.removeItem('estimate_photos');
+    }
     
     // Then check for estimate data from the AI estimator (only if no saved form data)
     const estimateData = localStorage.getItem('estimate_data');
@@ -103,26 +109,41 @@ export default function CreateLeadPage() {
           }));
         }
         
-        // Load and upload photos if available
-        if (estimatePhotos) {
-          try {
-            const photosArray = JSON.parse(estimatePhotos);
-            
-            // Upload base64 photos to storage
-            uploadBase64Photos(photosArray);
-          } catch (photoError) {
-            console.error('Error loading photos:', photoError);
-          }
+        if (!estimatePhotos) {
+          localStorage.removeItem('estimate_data');
         }
-        
-        // Clear both estimate data AND photos from localStorage after loading
-        localStorage.removeItem('estimate_data');
-        localStorage.removeItem('estimate_photos');
       } catch (error) {
         console.error('Error loading estimate data:', error);
       }
     }
   }, [hasLoadedSavedData]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const estimateData = localStorage.getItem('estimate_data');
+    const estimatePhotos = localStorage.getItem('estimate_photos');
+    if (!estimateData || !estimatePhotos) return;
+
+    try {
+      const photosArray = JSON.parse(estimatePhotos);
+      if (!Array.isArray(photosArray) || photosArray.some((photo) => typeof photo !== 'string')) {
+        throw new Error('Invalid saved estimate photos');
+      }
+
+      uploadBase64Photos(photosArray)
+        .then(() => {
+          localStorage.removeItem('estimate_data');
+          localStorage.removeItem('estimate_photos');
+        })
+        .catch((error) => {
+          console.error('Error uploading estimate photos:', error);
+          setError('Sign in and retry to securely attach your estimate photos.');
+        });
+    } catch (error) {
+      console.error('Error loading estimate photos:', error);
+      setError('Saved estimate photos could not be loaded.');
+    }
+  }, [user?.id]);
 
   // Auto-save form data to localStorage whenever it changes (for session recovery)
   useEffect(() => {
@@ -143,52 +164,44 @@ export default function CreateLeadPage() {
 
   // Function to upload base64 photos to storage
   const uploadBase64Photos = async (base64Photos: string[]) => {
-    try {
-      const uploadPromises = base64Photos.map(async (base64, index) => {
-        try {
-          // Convert base64 to Blob
-          const response = await fetch(base64);
-          const blob = await response.blob();
-          
-          // Create File from Blob
-          const file = new File([blob], `estimate-photo-${index + 1}.jpg`, { type: blob.type || 'image/jpeg' });
-          
-          // Upload to server
-          const formData = new FormData();
-          formData.append('photos', file);
-          formData.append('type', 'leads');
-          
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-          });
-          
-          if (!uploadResponse.ok) {
-            console.error('Failed to upload photo', index + 1);
-            return base64; // Fallback to base64 if upload fails
-          }
-          
-          const result = await uploadResponse.json();
-          const uploadedUrl = result.files?.[0] || result.url;
-          
-          return uploadedUrl || base64;
-        } catch (error) {
-          console.error('Error uploading photo', index + 1, error);
-          return base64; // Fallback to base64 if upload fails
-        }
+    if (!user?.id) throw new Error('Authentication required to upload estimate photos');
+
+    const uploadedUrls = await Promise.all(base64Photos.map(async (base64, index) => {
+      const response = await fetch(base64);
+      const blob = await response.blob();
+      const file = new File([blob], `estimate-photo-${index + 1}.jpg`, {
+        type: blob.type || 'image/jpeg',
       });
-      
-      const uploadedUrls = await Promise.all(uploadPromises);
-      setPhotos(uploadedUrls);
-    } catch (error) {
-      console.error('Error uploading base64 photos:', error);
-      // Fallback: use base64 photos as-is
-      setPhotos(base64Photos);
-    }
+      const formData = new FormData();
+      formData.append('photos', file);
+      formData.append('type', 'leads');
+
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await uploadResponse.json();
+      if (!uploadResponse.ok) {
+        throw new Error(result.error || `Failed to upload photo ${index + 1}`);
+      }
+
+      const uploadedUrl = result.files?.[0] || result.url;
+      if (!uploadedUrl) {
+        throw new Error(`Upload returned no URL for photo ${index + 1}`);
+      }
+      return uploadedUrl as string;
+    }));
+
+    setPhotos(uploadedUrls);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (photos.length > 0 && !approvePhotosForPublication) {
+      setError("Approve sharing the attached photos with contractors, or remove them before posting.");
+      return;
+    }
+
     
     if (!user) {
       setError("You must be signed in to create a lead");
@@ -231,6 +244,10 @@ export default function CreateLeadPage() {
       submitFormData.append("province", formData.province);
       submitFormData.append("postalCode", normalizedZipCode);
       submitFormData.append("photos", JSON.stringify(photos));
+      submitFormData.append(
+        "approvePhotosForPublication",
+        approvePhotosForPublication ? "true" : "false",
+      );
       // Pass the user ID to ensure server action has it
       submitFormData.append("userId", user.id);
       
@@ -268,6 +285,7 @@ export default function CreateLeadPage() {
           zipCode: ""
         });
         setPhotos([]);
+        setApprovePhotosForPublication(false);
         
         // Clear saved draft from localStorage
         localStorage.removeItem('create_lead_draft');
@@ -758,10 +776,28 @@ export default function CreateLeadPage() {
               </label>
               <PhotoUploadFixed
                 photos={photos}
-                onPhotosChange={setPhotos}
+                onPhotosChange={(nextPhotos) => {
+                  setPhotos(nextPhotos);
+                  setApprovePhotosForPublication(false);
+                }}
                 maxPhotos={8}
                 disabled={isSubmitting}
               />
+              {photos.length > 0 && (
+                <label className="mt-3 flex items-start gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={approvePhotosForPublication}
+                    onChange={(event) =>
+                      setApprovePhotosForPublication(event.target.checked)
+                    }
+                    className="mt-0.5"
+                  />
+                  <span>
+                    I approve sharing these {photos.length} photo(s) with contractors on the job board.
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* Success Message */}

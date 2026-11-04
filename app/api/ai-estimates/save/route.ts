@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import { privatePhotosBelongTo } from "@/lib/private-photo-records";
 
 interface SaveEstimateItem {
   category: string;
@@ -54,6 +55,13 @@ export async function POST(request: NextRequest) {
       images,
       items,
     } = body;
+
+    if (!privatePhotosBelongTo(images, identity.user.dbUserId)) {
+      return NextResponse.json(
+        { success: false, error: "Photos must belong to this homeowner" },
+        { status: 400 },
+      );
+    }
 
     // Create the AI estimate
     const estimate = await prisma.aIEstimate.create({

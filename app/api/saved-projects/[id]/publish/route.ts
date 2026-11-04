@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
 import {
+  approvedProjectPhotos,
+  parseApprovedPhotoSelection,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
+import {
   publishSavedProject,
   SavedProjectPublishConflictError,
   SavedProjectPublishValidationError,
@@ -11,7 +16,7 @@ import { sendJobPostedEmail } from "@/lib/email";
 export const dynamic = "force-dynamic";
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -20,6 +25,26 @@ export async function POST(
       return NextResponse.json(
         { error: identity.error },
         { status: identity.status },
+      );
+    }
+
+    let body: unknown = {};
+    const rawBody = await request.text();
+    if (rawBody.trim()) {
+      try {
+        body = JSON.parse(rawBody);
+      } catch {
+        return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      }
+    }
+    const approvedPhotos = parseApprovedPhotoSelection(body);
+    if (
+      approvedPhotos === null ||
+      !privatePhotosBelongTo(approvedPhotos, identity.user.dbUserId)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or unauthorized photo selection" },
+        { status: 400 },
       );
     }
 
@@ -46,6 +71,13 @@ export async function POST(
           );
         }
 
+        const photos = approvedProjectPhotos(project.photos, approvedPhotos);
+        if (!photos) {
+          throw new SavedProjectPublishValidationError(
+            "Only photos attached to this project can be approved for publication.",
+          );
+        }
+
         return {
           homeownerId: project.homeownerId,
           title: project.title,
@@ -55,7 +87,7 @@ export async function POST(
           province,
           zipCode: project.zipCode || null,
           budget: project.budget || null,
-          photos: project.photos || "[]",
+          photos: JSON.stringify(photos),
           status: "open",
           published: true,
         };

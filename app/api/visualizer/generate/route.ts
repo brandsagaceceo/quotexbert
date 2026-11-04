@@ -1,27 +1,41 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
-import { put } from "@vercel/blob";
+import {
+  deletePrivateImage,
+  privatePhotoPath,
+  uploadPrivateImage,
+} from "@/lib/upload";
+import { resolveAuthUser } from "@/lib/server-auth";
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: authResult.error },
+        { status: authResult.status },
       );
     }
+    const userId = authResult.user.clerkUserId;
+    const homeownerId = authResult.user.dbUserId;
 
     const formData = await req.formData();
-    const beforeImage = formData.get("beforeImage") as File;
+    const beforeImage = formData.get("beforeImage");
     const description = formData.get("description") as string;
 
-    if (!beforeImage) {
+    if (!(beforeImage instanceof File)) {
       return NextResponse.json(
         { success: false, error: "Before image is required" },
         { status: 400 }
+      );
+    }
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(beforeImage.type) ||
+      beforeImage.size > 5 * 1024 * 1024
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Upload a JPEG, PNG, or WebP image up to 5MB" },
+        { status: 400 },
       );
     }
 
@@ -69,10 +83,11 @@ export async function POST(req: Request) {
     // Only track usage for analytics, don't enforce limits for homeowners
 
     // Upload before image to blob storage
-    const beforeImageBuffer = await beforeImage.arrayBuffer();
-    const beforeBlob = await put(`visualizer/${userId}/${Date.now()}-before.${beforeImage.name.split('.').pop()}`, beforeImageBuffer, {
-      access: "public",
-    });
+    const beforeImageUrl = await uploadPrivateImage(
+      Buffer.from(await beforeImage.arrayBuffer()),
+      homeownerId,
+      beforeImage.type,
+    );
 
     // Build AI prompt from description
     const prompt = `Transform this room image based on the following vision: ${description}. 
@@ -110,6 +125,10 @@ Maintain the room's layout, lighting, and perspective. Make it photorealistic an
       if (!response.ok) {
         const errorData = await response.json();
         console.error("OpenAI API error:", errorData);
+        const privatePath = privatePhotoPath(beforeImageUrl);
+        if (privatePath) {
+          await deletePrivateImage(privatePath);
+        }
         
         // Return error explaining that image editing requires specific format
         return NextResponse.json(
@@ -121,11 +140,42 @@ Maintain the room's layout, lighting, and perspective. Make it photorealistic an
         );
       } else {
         const aiResult = await response.json();
-        afterImageUrl = aiResult.data[0].url;
+        const generatedImageUrl = aiResult.data?.[0]?.url;
+        if (typeof generatedImageUrl !== "string") {
+          throw new Error("Image provider returned no generated image URL");
+        }
+        const generatedImageResponse = await fetch(generatedImageUrl);
+        if (!generatedImageResponse.ok) {
+          throw new Error("Failed to retrieve the generated image");
+        }
+        const generatedContentType = generatedImageResponse.headers
+          .get("content-type")
+          ?.split(";")[0];
+        if (
+          !generatedContentType ||
+          !["image/jpeg", "image/png", "image/webp"].includes(generatedContentType)
+        ) {
+          throw new Error("Image provider returned an unsupported image type");
+        }
+        const generatedImage = Buffer.from(
+          await generatedImageResponse.arrayBuffer(),
+        );
+        if (generatedImage.length > 10 * 1024 * 1024) {
+          throw new Error("Generated image exceeds the storage size limit");
+        }
+        afterImageUrl = await uploadPrivateImage(
+          generatedImage,
+          homeownerId,
+          generatedContentType,
+        );
       }
 
     } catch (error) {
       console.error("AI generation error:", error);
+      const privatePath = privatePhotoPath(beforeImageUrl);
+      if (privatePath) {
+        await deletePrivateImage(privatePath);
+      }
       // Return error to user instead of using fallback
       return NextResponse.json(
         { 
@@ -142,7 +192,7 @@ Maintain the room's layout, lighting, and perspective. Make it photorealistic an
     const generation = await prisma.visualizerGeneration.create({
       data: {
         userId,
-        beforeImageUrl: beforeBlob.url,
+        beforeImageUrl,
         afterImageUrl,
         customRequest: description, // Store user's description
         aiModel,

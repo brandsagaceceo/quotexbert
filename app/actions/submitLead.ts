@@ -8,6 +8,7 @@ import { NotificationService } from "@/lib/notifications";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { CANADIAN_POSTAL_CODE_REGEX } from "@/lib/validation/schemas";
 import { postalCodeToCity } from "@/lib/postal-to-city";
+import { privatePhotosBelongTo } from "@/lib/private-photo-records";
 
 const leadSchema = z.object({
   city: z
@@ -340,6 +341,28 @@ export async function submitLead(formData: FormData) {
         error: "Only homeowners can create project leads. Please switch to a homeowner account.",
         blocked: true,
         reason: "invalid_role",
+      };
+    }
+
+    if (!privatePhotosBelongTo(data.photos, user.id)) {
+      return {
+        success: false,
+        error: "Photos must belong to this homeowner.",
+        blocked: true,
+        reason: "invalid_photo_ownership",
+        requestId,
+      };
+    }
+    if (
+      data.photos.length > 0 &&
+      formData.get("approvePhotosForPublication") !== "true"
+    ) {
+      return {
+        success: false,
+        error: "Please approve sharing these photos before posting.",
+        blocked: true,
+        reason: "photo_publication_not_approved",
+        requestId,
       };
     }
 

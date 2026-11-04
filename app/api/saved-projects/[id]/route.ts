@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import {
+  deleteUnreferencedPrivatePhotos,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
 
 export async function GET(
   request: NextRequest,
@@ -66,6 +70,24 @@ export async function PUT(
       photos,
       status,
     } = body;
+    const submittedPhotos = photos === null ? [] : photos;
+
+    if (!privatePhotosBelongTo(submittedPhotos, resolved.user.dbUserId)) {
+      return NextResponse.json(
+        { error: "Photos must belong to this homeowner" },
+        { status: 400 },
+      );
+    }
+
+    const previousProject = await prisma.savedProject.findFirst({
+      where: {
+        id: projectId,
+        homeownerId: { in: resolved.homeownerIds },
+      },
+      select: { photos: true },
+    });
+    if (!previousProject)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
@@ -77,7 +99,8 @@ export async function PUT(
     if (location !== undefined) updateData.location = location;
     if (budget !== undefined) updateData.budget = budget;
     if (status !== undefined) updateData.status = status;
-    if (photos !== undefined) updateData.photos = JSON.stringify(photos);
+    if (photos !== undefined)
+      updateData.photos = JSON.stringify(submittedPhotos);
 
     const updated = await prisma.savedProject.updateMany({
       where: {
@@ -98,6 +121,14 @@ export async function PUT(
     });
     if (!updatedProject)
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+
+    if (photos !== undefined) {
+      await deleteUnreferencedPrivatePhotos(
+        parsePhotoUrls(previousProject.photos).filter(
+          (url) => !submittedPhotos.includes(url),
+        ),
+      );
+    }
 
     return NextResponse.json({ success: true, savedProject: updatedProject });
   } catch (error) {
@@ -125,7 +156,7 @@ export async function DELETE(
 
     const existing = await prisma.savedProject.findFirst({
       where: { id: projectId, homeownerId: { in: resolved.homeownerIds } },
-      select: { homeownerId: true },
+      select: { homeownerId: true, photos: true, visualizerImages: true },
     });
     if (!existing)
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -133,6 +164,10 @@ export async function DELETE(
     await prisma.savedProject.deleteMany({
       where: { id: projectId, homeownerId: { in: resolved.homeownerIds } },
     });
+    await deleteUnreferencedPrivatePhotos([
+      ...parsePhotoUrls(existing.photos),
+      ...parsePhotoUrls(existing.visualizerImages),
+    ]);
 
     return NextResponse.json({
       success: true,
@@ -144,5 +179,16 @@ export async function DELETE(
       { error: "Failed to delete project" },
       { status: 500 },
     );
+  }
+}
+
+function parsePhotoUrls(value: string | null | undefined): string[] {
+  try {
+    const parsed: unknown = JSON.parse(value || "[]");
+    return Array.isArray(parsed)
+      ? parsed.filter((url): url is string => typeof url === "string")
+      : [];
+  } catch {
+    return [];
   }
 }

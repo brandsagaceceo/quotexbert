@@ -52,7 +52,7 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 20+
 - npm or yarn
 - Git
 
@@ -89,6 +89,12 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
 6. **Open your browser**
    - Production: Navigate to [https://www.quotexbert.com](https://www.quotexbert.com)
    - Local Dev: Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Private homeowner photo storage
+
+Create and connect a **private** Vercel Blob store before enabling homeowner photo uploads. Set that store's read-write token as `PRIVATE_BLOB_READ_WRITE_TOKEN` in local and deployment environment settings; do not reuse the public-store token. Keep `BLOB_READ_WRITE_TOKEN` configured for intentionally public profile, logo, and portfolio images. If the private token is missing, homeowner photo uploads fail rather than falling back to public storage. The private-photo API checks the signed-in owner and grants contractors access only when a published lead is visible to them.
+
+Existing public Blob URLs are not changed by this code and remain publicly accessible until they are separately migrated and revoked.
 
 ## 🏗️ System Architecture
 

@@ -8,13 +8,17 @@ interface PhotoUploadProps {
   onPhotosChange: (photos: string[]) => void;
   maxPhotos?: number;
   disabled?: boolean;
+  type?: "leads" | "portfolio";
+  deleteOnRemove?: boolean;
 }
 
 export default function PhotoUpload({ 
   photos, 
   onPhotosChange, 
   maxPhotos = 10,
-  disabled = false 
+  disabled = false,
+  type = "leads",
+  deleteOnRemove = true,
 }: PhotoUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -41,6 +45,7 @@ export default function PhotoUpload({
       files.forEach((file, index) => {
         formData.append(`photos`, file); // Changed to match API expectation
       });
+      formData.append("type", type);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -76,12 +81,14 @@ export default function PhotoUpload({
       onPhotosChange(newPhotos);
 
       // Delete from server
-      const response = await fetch(`/api/upload?file=${encodeURIComponent(photoUrl)}`, {
-        method: "DELETE",
-      });
+      if (deleteOnRemove) {
+        const response = await fetch(`/api/upload?file=${encodeURIComponent(photoUrl)}`, {
+          method: "DELETE",
+        });
 
-      if (!response.ok) {
-        console.error("Failed to delete photo from server");
+        if (!response.ok) {
+          console.error("Failed to delete photo from server");
+        }
       }
     } catch (error) {
       console.error("Error removing photo:", error);
@@ -188,6 +195,7 @@ export default function PhotoUpload({
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  unoptimized
                 />
               </div>
               

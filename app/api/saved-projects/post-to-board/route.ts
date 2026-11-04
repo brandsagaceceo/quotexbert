@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
 import {
+  approvedProjectPhotos,
+  parseApprovedPhotoSelection,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
+import {
   publishSavedProject,
   SavedProjectPublishConflictError,
+  SavedProjectPublishValidationError,
 } from "@/lib/saved-project-publishing";
 import { NotificationService } from "@/lib/notifications";
 
@@ -24,23 +30,41 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+    const approvedPhotos = parseApprovedPhotoSelection(body);
+    if (
+      approvedPhotos === null ||
+      !privatePhotosBelongTo(approvedPhotos, identity.user.dbUserId)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid or unauthorized photo selection" },
+        { status: 400 },
+      );
+    }
 
     const result = await publishSavedProject(
       savedProjectId,
       identity.homeownerIds,
-      (project) => ({
-        title: project.title,
-        description: project.description,
-        category: project.category,
-        budget: project.budget || "$5,000 - $10,000",
-        zipCode: project.location || "M5A 1A1",
-        photos: project.photos || "[]",
-        homeownerId: project.homeownerId,
-        status: "open",
-        published: true,
-        claimed: false,
-        maxContractors: 3,
-      }),
+      (project) => {
+        const photos = approvedProjectPhotos(project.photos, approvedPhotos);
+        if (!photos) {
+          throw new SavedProjectPublishValidationError(
+            "Only photos attached to this project can be approved for publication.",
+          );
+        }
+        return {
+          title: project.title,
+          description: project.description,
+          category: project.category,
+          budget: project.budget || "$5,000 - $10,000",
+          zipCode: project.location || "M5A 1A1",
+          photos: JSON.stringify(photos),
+          homeownerId: project.homeownerId,
+          status: "open",
+          published: true,
+          claimed: false,
+          maxContractors: 3,
+        };
+      },
     );
 
     if (result.kind === "forbidden") {
@@ -104,6 +128,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof SavedProjectPublishConflictError) {
       return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+    if (error instanceof SavedProjectPublishValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 422 });
     }
     console.error("[SavedProjects Post to Board] Error:", error);
     return NextResponse.json(

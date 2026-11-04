@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { PrismaClient } from '@prisma/client';
+import { resolveHomeownerIdentity } from '@/lib/homeowner-auth';
 
 const prisma = new PrismaClient();
 
@@ -268,7 +269,25 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string;
     const hasVoice = formData.get('hasVoice') === 'true';
     const imageCount = parseInt(formData.get('imageCount') as string) || 0;
-    const homeownerId = formData.get('homeownerId') as string | null;
+    const requestedHomeownerId = formData.get('homeownerId');
+    let resolvedHomeownerId: string | null = null;
+    if (requestedHomeownerId !== null) {
+      if (typeof requestedHomeownerId !== 'string' || !requestedHomeownerId) {
+        return NextResponse.json({ error: 'Invalid homeowner ID' }, { status: 400 });
+      }
+
+      const identity = await resolveHomeownerIdentity();
+      if (!identity.success) {
+        return NextResponse.json(
+          { error: identity.error },
+          { status: identity.status },
+        );
+      }
+      if (!identity.homeownerIds.includes(requestedHomeownerId)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      resolvedHomeownerId = identity.user.dbUserId;
+    }
     
     // Extract images
     const images: File[] = [];
@@ -283,7 +302,7 @@ export async function POST(request: NextRequest) {
       description: description?.substring(0, 100),
       hasVoice,
       imageCount: images.length,
-      homeownerId: homeownerId?.substring(0, 10),
+      homeownerId: resolvedHomeownerId?.substring(0, 10),
       aiEnabled: !!openai
     });
 
@@ -322,9 +341,15 @@ export async function POST(request: NextRequest) {
     estimateResult.bestTimeToRenovate = determineBestTimeToRenovate(projectCategory);
 
     // Auto-save estimate to database if homeownerId provided
-    if (homeownerId && estimateResult) {
+    if (resolvedHomeownerId && estimateResult) {
       try {
-        await saveEstimateToDatabase(homeownerId, description, estimateResult, hasVoice, imageCount);
+        await saveEstimateToDatabase(
+          resolvedHomeownerId,
+          description,
+          estimateResult,
+          hasVoice,
+          images.length,
+        );
         console.log('Estimate auto-saved to database');
       } catch (error) {
         console.error('Failed to auto-save estimate:', error);

@@ -95,11 +95,33 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
   };
 
   const handlePostToBoard = async (project: SavedProject) => {
-    if (!confirm(`Post "${project.title}" to the QuoteXbert Job Board?`)) return;
+    let projectPhotos: unknown;
+    try {
+      projectPhotos = JSON.parse(project.photos || "[]");
+    } catch {
+      setErrorMsg("This project's photo list is invalid. Edit the project before posting.");
+      return;
+    }
+    if (
+      !Array.isArray(projectPhotos) ||
+      !projectPhotos.every((photo): photo is string => typeof photo === "string")
+    ) {
+      setErrorMsg("This project's photo list is invalid. Edit the project before posting.");
+      return;
+    }
+
+    const photoApproval = projectPhotos.length
+      ? `Share all ${projectPhotos.length} attached project photo(s) with contractors when posting "${project.title}"?`
+      : `Post "${project.title}" to the QuoteXbert Job Board?`;
+    if (!confirm(photoApproval)) return;
     setErrorMsg('');
     setIsPosting(project.id);
     try {
-      const response = await fetch(`/api/saved-projects/${project.id}/publish`, { method: 'POST' });
+      const response = await fetch(`/api/saved-projects/${project.id}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photos: projectPhotos }),
+      });
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -255,7 +277,7 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
                 {/* Image */}
                 <div className="relative h-48 bg-rose-50">
                   {allImages.length > 0 ? (
-                    <Image src={allImages[0]} alt={project.title} fill className="object-cover" />
+                    <Image src={allImages[0]} alt={project.title} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-5xl">🏠</div>
                   )}
@@ -337,5 +359,4 @@ export default function SavedProjectsList({ homeownerId }: SavedProjectsProps) {
     </>
   );
 }
-
 
