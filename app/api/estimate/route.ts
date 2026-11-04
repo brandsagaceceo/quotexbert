@@ -5,6 +5,11 @@ import { logEventServer } from "@/lib/analytics";
 import { emitQuoteSignal } from "@/lib/quote-signals";
 import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import {
+  generateAstraEstimate,
+  generateEstimateWithAstraFallback,
+  normalizeEstimateTotals,
+} from "@/lib/astra-estimate";
 
 // Tell Vercel this function can run for up to 60 seconds (GPT-4o + vision is slow)
 export const maxDuration = 60;
@@ -23,10 +28,33 @@ interface EstimateRequest {
   userId?: string;
 }
 
+function getSanitizedErrorDetails(error: unknown) {
+  if (!(error instanceof Error)) {
+    return { errorType: "UnknownError" };
+  }
+
+  const errorType = /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)
+    ? error.name
+    : "Error";
+  const candidate = error as Error & {
+    status?: unknown;
+    statusCode?: unknown;
+  };
+  const statusCode = candidate.status ?? candidate.statusCode;
+
+  return {
+    errorType,
+    ...(typeof statusCode === "number" &&
+    Number.isInteger(statusCode) &&
+    statusCode >= 100 &&
+    statusCode <= 599
+      ? { status: statusCode }
+      : {}),
+  };
+}
+
 // AI estimate using real OpenAI API with multimodal support
 export async function POST(req: NextRequest) {
-  // Hoist parsed body so catch block can reference it without re-consuming the stream
-  let requestBody: EstimateRequest | null = null;
   let description: string | undefined;
   let photos: string[] | undefined;
   let projectType: string = '';
@@ -38,20 +66,16 @@ export async function POST(req: NextRequest) {
     try {
       body = await req.json();
     } catch (parseErr) {
-      console.error("❌ JSON parse failed (likely payload too large)", parseErr);
+      console.error("[ESTIMATE] JSON parse failed", getSanitizedErrorDetails(parseErr));
       return NextResponse.json({
         success: true,
         ...buildStaticFallbackEstimateResponse("Payload too large or malformed"),
         warning: "Estimate based on typical pricing (photo upload too large — please use smaller images)",
       });
     }
-    requestBody = body;
     console.log("📩 ESTIMATE REQUEST", {
-      userId: body.userId || "anonymous",
-      projectType: body.projectType,
       photoCount: body.photos?.length ?? 0,
       hasDescription: !!(body.description?.trim()),
-      postalCode: body.postalCode || "not_provided",
     });
 
     description = body.description;
@@ -62,11 +86,8 @@ export async function POST(req: NextRequest) {
 
     if (process.env.NODE_ENV === 'development') {
       console.debug('[ESTIMATE][request]', {
-        userId: userId || 'anonymous',
-        projectType,
         photoCount: photos?.length ?? 0,
         hasDescription: !!description?.trim(),
-        postalCode: postalCode || 'not_provided',
       });
     }
 
@@ -105,14 +126,35 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Generate AI-powered estimate using OpenAI (multimodal)
-    const estimate = await generateAIEstimateMultimodal({
+    // Astra is opt-in; the established GPT-4o estimator remains the default and fallback.
+    const estimateInput = {
       description: description || "",
       photos: photos || [],
       projectType,
       postalCode: postalCode || "",
+    };
+    const estimate = await generateEstimateWithAstraFallback({
+      enabled: process.env.ASTRA_ESTIMATOR_ENABLED === "true",
+      generateAstra: async () =>
+        normalizeEstimateTotals(
+          await generateAstraEstimate(estimateInput, (request, options) =>
+            openai.responses.create(request, options),
+          ),
+        ),
+      generateExisting: () =>
+        generateAIEstimateMultimodal(estimateInput),
+      generateAstraFallback: () =>
+        generateAIEstimateMultimodal(estimateInput, 1),
+      onAstraError: (error) => {
+        console.error("[ESTIMATE] Astra failed; using the existing estimator", {
+          ...getSanitizedErrorDetails(error),
+        });
+      },
     }).catch((err) => {
-      console.error("Service failed: OpenAI estimate generation", err);
+      console.error(
+        "[ESTIMATE] OpenAI estimate generation failed",
+        getSanitizedErrorDetails(err),
+      );
       throw err;
     });
 
@@ -142,9 +184,9 @@ export async function POST(req: NextRequest) {
           });
 
           if (recentDuplicate) {
-            console.log("⚠️ Skipping duplicate estimate save for user:", dbUser.id);
+            console.log("⚠️ Skipping duplicate estimate save.");
           } else {
-            const createdEstimate = await prisma.aIEstimate.create({
+            await prisma.aIEstimate.create({
               data: {
                 homeownerId: dbUser.id,
                 description: description || "AI-generated estimate",
@@ -172,16 +214,19 @@ export async function POST(req: NextRequest) {
                 },
               },
             });
-            console.log("✅ Estimate saved for user:", dbUser.id, "Estimate ID:", createdEstimate.id);
+            console.log("✅ Estimate saved.");
           }
         } else {
-          console.warn("⚠️ Clerk user found but no DB user record — estimate not saved. clerkUserId:", clerkUserId);
+          console.warn("⚠️ Clerk user found but no DB user record — estimate not saved.");
           estimateProfileWarning = "Your estimate was created, but we couldn't save it to your profile. Please try again.";
         }
       }
     } catch (dbError) {
-      // Log the real error server-side only — never expose raw DB errors to the client
-      console.error("❌ Failed to auto-save estimate to DB:", dbError instanceof Error ? dbError.message : String(dbError));
+      // Keep database details server-side and sanitized.
+      console.error(
+        "[ESTIMATE] Failed to auto-save estimate to DB",
+        getSanitizedErrorDetails(dbError),
+      );
       estimateProfileWarning = "Your estimate was created, but we couldn't save it to your profile. Please try again.";
     }
 
@@ -199,7 +244,10 @@ export async function POST(req: NextRequest) {
         aiPowered: true,
       }
     ).catch((err) => {
-      console.error("Service failed: analytics logging (non-fatal)", err);
+      console.error(
+        "[ESTIMATE] Analytics logging failed",
+        getSanitizedErrorDetails(err),
+      );
     });
 
     // Phase 6: structured learning signal
@@ -211,7 +259,10 @@ export async function POST(req: NextRequest) {
       aiEstimateHigh: estimate.totals?.total_high,
       createdByRole: 'system',
     }).catch((err) => {
-      console.error("Service failed: quote signal emission", err);
+      console.error(
+        "[ESTIMATE] Quote signal emission failed",
+        getSanitizedErrorDetails(err),
+      );
     });
 
     return NextResponse.json({
@@ -219,40 +270,38 @@ export async function POST(req: NextRequest) {
       ...estimate,
       ...(estimateProfileWarning ? { profileSaveWarning: estimateProfileWarning } : {}),
     });
-  } catch (error: any) {
-    console.error("❌ ESTIMATE ERROR:", error);
-    console.error("[ESTIMATE][request-body]", requestBody);
+  } catch (error: unknown) {
+    console.error("[ESTIMATE] Request failed", getSanitizedErrorDetails(error));
     
     // Dev logging for diagnosing estimate failures
     if (process.env.NODE_ENV === 'development') {
       console.debug('[ESTIMATE][error]', {
-        userId,
-        projectType,
-        photoCount: photos?.length ?? 0,
-        error: error?.message,
-        code: error?.code,
-        status: error?.status,
+        ...getSanitizedErrorDetails(error),
       });
     }
 
     // Fallback to basic estimate if any service fails. Keep 200 so user never hits a dead-end.
     try {
+      const errorType = getSanitizedErrorDetails(error).errorType;
       return NextResponse.json({
         success: true,
         ...buildFallbackEstimateResponse(
-          description?.toLowerCase() || projectType?.toLowerCase() ||
-          requestBody?.description?.toLowerCase() || requestBody?.projectType?.toLowerCase() ||
-          "home repair",
-          error?.message || "Unknown error",
+          description?.toLowerCase() || projectType.toLowerCase() || "home repair",
+          errorType,
         ),
         warning: "Estimate generation failed. Returned fallback estimate.",
       });
     } catch (fallbackError: any) {
-      console.error("Service failed: fallback estimate generation", fallbackError);
+      console.error(
+        "[ESTIMATE] Fallback estimate generation failed",
+        getSanitizedErrorDetails(fallbackError),
+      );
       return NextResponse.json(
         {
           success: true,
-          ...buildStaticFallbackEstimateResponse(error?.message || "Unknown error"),
+          ...buildStaticFallbackEstimateResponse(
+            getSanitizedErrorDetails(error).errorType,
+          ),
           warning: "Estimate generation failed. Returned static fallback estimate.",
         },
         { status: 200 },
@@ -261,12 +310,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function generateAIEstimateMultimodal(params: {
-  description: string;
-  photos: string[];
-  projectType: string;
-  postalCode: string;
-}): Promise<{
+async function generateAIEstimateMultimodal(
+  params: {
+    description: string;
+    photos: string[];
+    projectType: string;
+    postalCode: string;
+  },
+  attemptLimit = 2,
+): Promise<{
   summary: string;
   scope: string[];
   assumptions: string[];
@@ -392,7 +444,7 @@ ESTIMATION GUIDELINES:
 
   // Make API call with retry logic
   let attempt = 0;
-  const maxAttempts = 2;
+  const maxAttempts = attemptLimit;
   let lastError: Error | null = null;
 
   if (!openai) {
@@ -417,7 +469,10 @@ ESTIMATION GUIDELINES:
         max_tokens: 2500,
         response_format: { type: "json_object" },
       }).catch((err) => {
-        console.error("Service failed: OpenAI chat completion", err);
+        console.error(
+          "[ESTIMATE] OpenAI chat completion failed",
+          getSanitizedErrorDetails(err),
+        );
         throw err;
       });
 
@@ -435,33 +490,14 @@ ESTIMATION GUIDELINES:
         throw new Error("Invalid estimate format from AI");
       }
 
-      // Calculate totals if not properly set
-      const materialsTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.material_cost || 0), 0);
-      const laborTotal = estimate.line_items.reduce((sum: number, item: any) => sum + (item.labor_cost || 0), 0);
-      const subtotal = materialsTotal + laborTotal;
-      const overheadProfit = Math.round(subtotal * 0.175); // 17.5% average
-      const beforeTax = subtotal + overheadProfit + (estimate.totals.permit_or_fees || 0);
-      const taxEstimate = Math.round(beforeTax * 0.13); // Ontario HST
-      const totalLow = beforeTax + taxEstimate;
-      const totalHigh = Math.round(totalLow * 1.15); // 15% range for uncertainty
-
-      // Ensure totals are calculated correctly
-      estimate.totals = {
-        materials: Math.round(materialsTotal),
-        labor: Math.round(laborTotal),
-        permit_or_fees: estimate.totals.permit_or_fees || 0,
-        overhead_profit: overheadProfit,
-        subtotal: Math.round(subtotal),
-        tax_estimate: taxEstimate,
-        total_low: totalLow,
-        total_high: totalHigh,
-      };
-
-      return estimate;
+      return normalizeEstimateTotals(estimate);
     } catch (error) {
       lastError = error as Error;
       attempt++;
-      console.error(`Attempt ${attempt} failed:`, error);
+      console.error(
+        `[ESTIMATE] OpenAI attempt ${attempt} failed`,
+        getSanitizedErrorDetails(error),
+      );
       
       if (attempt >= maxAttempts) {
         throw lastError;
