@@ -4,8 +4,11 @@ import { TORONTO_NEIGHBOURHOODS, TORONTO_SERVICES } from '@/lib/seo/toronto-pinp
 import { ALL_CONTRACTOR_CITY_SLUGS } from '@/lib/seo/contractor-city-data'
 import { ALL_CITY_SLUGS, ALL_TRADE_SLUGS, ALL_COMBO_PARAMS } from '@/lib/seo/contractor-acquisition-data'
 import { blogPostMetadata } from '@/app/blog/blog-metadata'
+import { prisma } from '@/lib/prisma'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = 'force-dynamic'
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://www.quotexbert.com'
   
   // Location pages (NEW - highest priority for local SEO)
@@ -185,6 +188,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
+  const publishedSeoArticles = await prisma.seoArticle.findMany({
+    where: { status: 'published', publishedAt: { not: null } },
+    select: { slug: true, publishedAt: true },
+  })
+  const generatedBlogSitemapEntries: MetadataRoute.Sitemap = publishedSeoArticles.map((article) => ({
+    url: `${baseUrl}/blog/${article.slug}`,
+    lastModified: article.publishedAt ?? new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.75,
+  }))
+
   // Renovation cost pages (programmatic SEO)
   const renovationCostSlugs = [
     'bathroom-renovation-cost-toronto',
@@ -309,6 +323,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...contractorLeadPages,
     ...tradeJobPages,
     ...blogSitemapEntries,
+    ...generatedBlogSitemapEntries,
     // Programmatic city × renovation type pages (112 pages)
     ...GTA_CITIES.flatMap(city =>
       RENOVATION_TYPES.map(reno => ({

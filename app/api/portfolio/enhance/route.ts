@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
-
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-}) : null;
+import { getOpenAIClient, OPENAI_MODELS } from '@/lib/openai-client';
 
 interface PortfolioEnhancementResult {
   title: string;
@@ -19,6 +15,7 @@ interface PortfolioEnhancementResult {
 
 export async function POST(request: NextRequest) {
   try {
+    const openai = getOpenAIClient();
     const formData = await request.formData();
     const projectType = formData.get('projectType') as string;
     const existingDescription = formData.get('existingDescription') as string || '';
@@ -47,7 +44,7 @@ Make it professional, specific to Toronto/GTA market, and highlight value delive
 
       try {
         const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: OPENAI_MODELS.costEffective,
           messages: [
             {
               role: "system",

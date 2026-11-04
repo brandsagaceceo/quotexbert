@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { PrismaClient } from '@prisma/client';
 import { resolveHomeownerIdentity } from '@/lib/homeowner-auth';
+import { getOpenAIClient, OPENAI_MODELS } from '@/lib/openai-client';
 
 const prisma = new PrismaClient();
 
@@ -29,9 +29,7 @@ interface EstimateResult {
 }
 
 // Initialize OpenAI client
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-}) : null;
+const openai = getOpenAIClient();
 
 // Helper to calculate confidence metrics
 async function calculateConfidenceMetrics(
@@ -400,7 +398,7 @@ Be realistic and conservative. Include factors like permits, cleanup, and potent
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Using the cost-effective model
+      model: OPENAI_MODELS.costEffective,
       messages: [
         {
           role: "system",

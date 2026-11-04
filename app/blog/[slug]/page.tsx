@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Head from "next/head";
+import SeoArticleMarkdown from "@/components/blog/SeoArticleMarkdown";
 import { 
   CalendarDaysIcon, 
   ClockIcon, 
@@ -26,6 +27,8 @@ interface BlogPost {
   imageUrl: string;
   seoTitle?: string;
   seoDescription?: string;
+  canonicalUrl?: string;
+  isSeoGenerated?: boolean;
 }
 
 export default function BlogPostPage() {
@@ -33,6 +36,32 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [publishedSeoPosts, setPublishedSeoPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/blog/seo-articles", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Published articles are unavailable");
+        const data = await response.json();
+        if (!Array.isArray(data.articles)) throw new Error("Invalid published article response");
+        if (active) {
+          setPublishedSeoPosts(
+            data.articles.map((article: BlogPost) => ({
+              ...article,
+              imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop&q=80",
+              isSeoGenerated: true,
+            })),
+          );
+        }
+      })
+      .catch(() => {
+        if (active) setPublishedSeoPosts([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Complete blog posts with full content
   const blogPosts: BlogPost[] = [
@@ -14189,22 +14218,63 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     const slug = params.slug as string;
-    
-    // Find the post by slug
+    setLoading(true);
     const foundPost = blogPosts.find(p => p.slug === slug);
-    
+
     if (foundPost) {
       setPost(foundPost);
-      
-      // Get related posts from same category
-      const related = blogPosts
+      const related = [...blogPosts, ...publishedSeoPosts]
         .filter(p => p.category === foundPost.category && p.id !== foundPost.id)
         .slice(0, 2);
       setRelatedPosts(related);
+      setLoading(false);
+      return;
     }
-    
-    setLoading(false);
-  }, [params.slug]);
+
+    const publishedPost = publishedSeoPosts.find((item) => item.slug === slug);
+    if (publishedPost) {
+      setPost(publishedPost);
+      setRelatedPosts(
+        [...blogPosts, ...publishedSeoPosts]
+          .filter((item) => item.category === publishedPost.category && item.id !== publishedPost.id)
+          .slice(0, 2),
+      );
+      setLoading(false);
+      return;
+    }
+
+    let active = true;
+    fetch(`/api/blog/seo-articles/${encodeURIComponent(slug)}`, { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.article as BlogPost | undefined;
+      })
+      .then((article) => {
+        if (!active) return;
+        if (article) {
+          const generatedPost = {
+            ...article,
+            imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=500&fit=crop&q=80",
+            isSeoGenerated: true,
+          };
+          setPost(generatedPost);
+          setRelatedPosts([]);
+        } else {
+          setPost(null);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        if (active) {
+          setPost(null);
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [params.slug, publishedSeoPosts]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -14300,9 +14370,9 @@ export default function BlogPostPage() {
               },
               "mainEntityOfPage": {
                 "@type": "WebPage",
-                "@id": window.location.href
+                "@id": post.canonicalUrl || `https://www.quotexbert.com/blog/${post.slug}`
               }
-            })
+            }).replace(/</g, "\\u003c")
           }}
         />
       </Head>
@@ -14372,10 +14442,13 @@ export default function BlogPostPage() {
               </header>
 
               {/* Content */}
-              <div 
-                className="prose prose-lg max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-a:text-orange-600 prose-strong:text-slate-900"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
+              <div className="prose prose-lg max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-a:text-orange-600 prose-strong:text-slate-900">
+                {post.isSeoGenerated ? (
+                  <SeoArticleMarkdown content={post.content} />
+                ) : (
+                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                )}
+              </div>
 
               {/* Author Note / Human Guidance */}
               <div className="mt-10 p-5 bg-rose-50 border border-rose-200 rounded-lg">

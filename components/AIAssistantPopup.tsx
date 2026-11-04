@@ -1,14 +1,29 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { X, MessageCircle, Sparkles, Home, Briefcase, Send } from 'lucide-react';
+import { useState, useEffect, useRef, type ChangeEvent } from 'react';
+import { X, MessageCircle, Sparkles, Home, Briefcase, Send, Paperclip } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface Message {
   role: 'assistant' | 'user';
   content: string;
+  photoCount?: number;
   actions?: { label: string; href: string; variant?: 'primary' | 'secondary' }[];
+}
+
+interface GuidedJobDraft {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  city: string | null;
+  province: string | null;
+  zipCode: string | null;
+  budget: string | null;
+  timeline: string | null;
+  materials: string[];
+  photos: string[];
 }
 
 export default function AIAssistantPopup() {
@@ -24,8 +39,24 @@ export default function AIAssistantPopup() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showHelperBubble, setShowHelperBubble] = useState(false);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [guidedAiEnabled, setGuidedAiEnabled] = useState(false);
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const [photoUploadBusy, setPhotoUploadBusy] = useState(false);
+  const [assistantPhotos, setAssistantPhotos] = useState<string[]>([]);
+  const [jobDraft, setJobDraft] = useState<GuidedJobDraft | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
+  const assistantPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch('/api/ai/assistant')
+      .then(async (response) => {
+        if (!response.ok) return;
+        const result = await response.json();
+        setGuidedAiEnabled(result.enabled === true);
+      })
+      .catch(() => setGuidedAiEnabled(false));
+  }, []);
 
   // Pages where the widget should be hidden (forms, messaging, dense UIs)
   const HIDE_ON_PATHS = ['/messages', '/chat', '/create-lead', '/create-project', '/sign-in', '/sign-up', '/second-opinion', '/landing/estimate', '/profile', '/contractor/subscriptions', '/contractor/jobs', '/ai-quote', '/ai-renovation-check', '/billing'];
@@ -217,7 +248,9 @@ export default function AIAssistantPopup() {
   };
 
   const handleActionClick = (href: string, label: string) => {
-    if (href === '#homeowner') {
+    if (href.startsWith('#assistant-question:')) {
+      setInputValue(decodeURIComponent(href.slice('#assistant-question:'.length)));
+    } else if (href === '#homeowner') {
       const msg: Message = {
         role: 'assistant',
         content: "Perfect! As a homeowner, I can help you:\n\n✨ Get instant AI-powered quotes by uploading photos\n📄 Generate professional contracts instantly\n👷 Connect with verified contractors\n💰 100% free - no hidden fees!\n\nReady to get started?",
@@ -259,14 +292,154 @@ export default function AIAssistantPopup() {
     }
   };
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  const handleAssistantPhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (!files.length) return;
+    if (assistantPhotos.length + files.length > 3) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'You can attach up to three project photos to this conversation.' },
+      ]);
+      return;
+    }
+    if (files.some((file) => !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Please choose JPEG, PNG, or WebP photos up to 5 MB each.' },
+      ]);
+      return;
+    }
 
-    const userMsg: Message = { role: 'user', content: inputValue };
+    setPhotoUploadBusy(true);
+    try {
+      const formData = new FormData();
+      formData.append('type', 'leads');
+      files.forEach((file) => formData.append('photos', file));
+      const response = await fetch('/api/upload', { method: 'POST', body: formData });
+      const result = await response.json();
+      if (!response.ok || !Array.isArray(result.files) || !result.files.every((url: unknown) => typeof url === 'string')) {
+        throw new Error('Photo upload failed');
+      }
+      setAssistantPhotos((current) => [...current, ...result.files]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'I could not securely attach those photos. Please try again.' },
+      ]);
+    } finally {
+      setPhotoUploadBusy(false);
+    }
+  };
+
+  const handlePublishJobDraft = async () => {
+    if (!jobDraft) return;
+    if (!jobDraft.city?.trim() || !jobDraft.province?.trim()) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Add the project city and province before posting it.' },
+      ]);
+      return;
+    }
+    if (!window.confirm('Review this project draft, then post it to the contractor job board?')) return;
+
+    setAssistantBusy(true);
+    try {
+      const update = await fetch('/api/saved-projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: jobDraft.id,
+          title: jobDraft.title,
+          description: jobDraft.description,
+          category: jobDraft.category,
+          city: jobDraft.city,
+          province: jobDraft.province,
+          zipCode: jobDraft.zipCode,
+          budget: jobDraft.budget,
+          location: [jobDraft.city, jobDraft.province].filter(Boolean).join(', '),
+          photos: jobDraft.photos,
+        }),
+      });
+      if (!update.ok) throw new Error('Draft update failed');
+
+      const response = await fetch(`/api/saved-projects/${encodeURIComponent(jobDraft.id)}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photos: jobDraft.photos }),
+      });
+      if (!response.ok) throw new Error('Project publication failed');
+      setJobDraft(null);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Your reviewed project has been posted to the contractor job board.' },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'I could not post that project. Your private draft remains available to edit.' },
+      ]);
+    } finally {
+      setAssistantBusy(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const message = inputValue.trim();
+    if ((!message && assistantPhotos.length === 0) || assistantBusy || photoUploadBusy) return;
+
+    const userMsg: Message = {
+      role: 'user',
+      content: message || 'Please review these renovation photos.',
+      ...(assistantPhotos.length ? { photoCount: assistantPhotos.length } : {}),
+    };
     setMessages(prev => [...prev, userMsg]);
-    const lowerInput = inputValue.toLowerCase();
     setInputValue('');
 
+    if (guidedAiEnabled && isSignedIn && userType) {
+      setAssistantBusy(true);
+      try {
+        const history = [...messages, userMsg]
+          .slice(-8)
+          .map(({ role, content }) => ({ role, content }));
+        const response = await fetch('/api/ai/assistant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history, photos: assistantPhotos }),
+        });
+        const result = await response.json();
+        if (!response.ok || typeof result.reply !== 'string') {
+          throw new Error('Assistant request failed');
+        }
+
+        const responseMessage: Message = {
+          role: 'assistant',
+          content: result.reply,
+          ...(Array.isArray(result.followUpQuestions) && result.followUpQuestions.length
+            ? { actions: result.followUpQuestions.map((question: string) => ({
+                label: question,
+                href: `#assistant-question:${encodeURIComponent(question)}`,
+                variant: 'secondary' as const,
+              })) }
+            : {}),
+        };
+        setMessages((prev) => [...prev, responseMessage]);
+        if (result.jobDraft && typeof result.jobDraft.id === 'string') {
+          setJobDraft({ ...result.jobDraft, photos: assistantPhotos });
+        }
+        return;
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: 'I could not reach the guided assistant just now. Your quick estimator and saved project tools are still available.' },
+        ]);
+        return;
+      } finally {
+        setAssistantBusy(false);
+      }
+    }
+
+    const lowerInput = message.toLowerCase();
     try {
       let response: Message;
 
@@ -582,6 +755,20 @@ export default function AIAssistantPopup() {
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85vw] sm:max-w-[85%] ${msg.role === 'user' ? 'bg-[#800020] text-white' : 'bg-white border-2 border-gray-200'} rounded-2xl p-3 shadow-md`}>
                   <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                  {msg.photoCount ? (
+                    <p className="mt-2 text-xs opacity-80">Attached {msg.photoCount} private project photo{msg.photoCount === 1 ? '' : 's'}</p>
+                  ) : null}
+                  {guidedAiEnabled &&
+                  userType === 'homeowner' &&
+                  msg.role === 'assistant' &&
+                  /\b(estimate|pricing|cost)\b/i.test(msg.content) ? (
+                    <a
+                      href="/#estimator-tool"
+                      className="mt-3 inline-block text-sm font-semibold text-rose-800 underline"
+                    >
+                      Open the existing Quick Estimator
+                    </a>
+                  ) : null}
                   {msg.actions && (
                     <div className="mt-3 space-y-2">
                       {msg.actions.map((action, actionIdx) => (
@@ -602,23 +789,82 @@ export default function AIAssistantPopup() {
                 </div>
               </div>
             ))}
+            {assistantBusy && (
+              <p className="text-sm text-gray-500" role="status">QuoteXbert is thinking…</p>
+            )}
           </div>
+
+          {jobDraft && (
+            <section className="max-h-64 overflow-y-auto border-t bg-rose-50 p-3 space-y-2" aria-label="Editable private project draft">
+              <h4 className="font-semibold text-sm text-gray-900">Review your private project draft</h4>
+              <input
+                aria-label="Project title"
+                value={jobDraft.title}
+                onChange={(event) => setJobDraft({ ...jobDraft, title: event.target.value })}
+                className="w-full rounded border px-2 py-1 text-sm"
+              />
+              <textarea
+                aria-label="Project description"
+                value={jobDraft.description}
+                onChange={(event) => setJobDraft({ ...jobDraft, description: event.target.value })}
+                className="w-full rounded border px-2 py-1 text-sm"
+                rows={3}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input aria-label="Category" value={jobDraft.category} onChange={(event) => setJobDraft({ ...jobDraft, category: event.target.value })} className="rounded border px-2 py-1 text-sm" />
+                <input aria-label="City" value={jobDraft.city || ''} onChange={(event) => setJobDraft({ ...jobDraft, city: event.target.value || null })} placeholder="City" className="rounded border px-2 py-1 text-sm" />
+                <input aria-label="Province" value={jobDraft.province || ''} onChange={(event) => setJobDraft({ ...jobDraft, province: event.target.value || null })} placeholder="Province" className="rounded border px-2 py-1 text-sm" />
+                <input aria-label="Postal code" value={jobDraft.zipCode || ''} onChange={(event) => setJobDraft({ ...jobDraft, zipCode: event.target.value || null })} placeholder="Postal code (optional)" className="rounded border px-2 py-1 text-sm" />
+                <input aria-label="Budget" value={jobDraft.budget || ''} onChange={(event) => setJobDraft({ ...jobDraft, budget: event.target.value || null })} placeholder="Budget (optional)" className="rounded border px-2 py-1 text-sm" />
+              </div>
+              <p className="text-xs text-gray-600">
+                Private draft · {jobDraft.photos.length} attached photo{jobDraft.photos.length === 1 ? '' : 's'} · {jobDraft.timeline || 'Timeline not set'}
+              </p>
+              <button
+                type="button"
+                onClick={handlePublishJobDraft}
+                disabled={assistantBusy || !jobDraft.title.trim() || !jobDraft.description.trim()}
+                className="w-full rounded bg-[#800020] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                Review and post to job board
+              </button>
+            </section>
+          )}
 
           {/* Input */}
           <div className="p-4 border-t-2 border-gray-100 bg-white">
+            {guidedAiEnabled && isSignedIn && userType === 'homeowner' && (
+              <div className="mb-2 flex items-center justify-between text-xs text-gray-600">
+                <label className="inline-flex cursor-pointer items-center gap-1 rounded border px-2 py-1 hover:bg-gray-50">
+                  <Paperclip className="h-3.5 w-3.5" />
+                  {photoUploadBusy ? 'Uploading…' : `Add private photos${assistantPhotos.length ? ` (${assistantPhotos.length}/3)` : ''}`}
+                  <input
+                    ref={assistantPhotoInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    disabled={photoUploadBusy || assistantPhotos.length >= 3}
+                    onChange={handleAssistantPhotoChange}
+                    className="sr-only"
+                  />
+                </label>
+                <span>Only you can access photos until you choose to post.</span>
+              </div>
+            )}
             <div className="flex gap-2">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                placeholder="Ask me anything about QuoteXbert..."
+                placeholder={guidedAiEnabled ? "Ask about your renovation plan..." : "Ask me anything about QuoteXbert..."}
                 autoComplete="off"
                 className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all text-sm"
               />
               <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim()}
+                type="button"
+                onClick={() => void handleSendMessage()}
+                disabled={(!inputValue.trim() && assistantPhotos.length === 0) || assistantBusy || photoUploadBusy}
                 className="bg-[#800020] hover:bg-[#600018] text-white p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-5 w-5" />

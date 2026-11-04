@@ -1,21 +1,19 @@
 // NEW API ROUTE: Explains quote pricing in plain English using AI
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { getOpenAIClient, OPENAI_MODELS } from '@/lib/openai-client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
+    const openai = getOpenAIClient();
+    if (!openai) {
       return NextResponse.json(
         { success: false, error: 'AI explanation service is not configured.' },
         { status: 503 }
       );
     }
-    const openai = new OpenAI({ apiKey });
-
     const body = await request.json();
     const { description, minCost, maxCost, items } = body;
 
@@ -46,7 +44,7 @@ Please explain in 3-4 paragraphs:
 Be specific, friendly, and educational. Help homeowners understand the value. Use real numbers from their quote.`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODELS.quickEstimator,
       messages: [
         {
           role: "system",

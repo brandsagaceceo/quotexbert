@@ -10,12 +10,10 @@
  * - Degrades gracefully: if OpenAI is not configured, returns the original message.
  */
 
-import OpenAI from "openai";
 import { prisma } from "@/lib/prisma";
+import { getOpenAIClient, OPENAI_MODELS } from "@/lib/openai-client";
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+const openai = getOpenAIClient();
 
 export interface EnhanceReplyParams {
   /** The draft message the user wants to improve */
@@ -130,7 +128,7 @@ export async function enhanceReply(
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODELS.quickEstimator,
       messages: [
         { role: "system", content: buildSystemPrompt(role) },
         { role: "user", content: userPrompt },
