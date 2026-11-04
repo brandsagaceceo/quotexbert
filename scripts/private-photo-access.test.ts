@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  getPrivateBlobStoreId,
   isPrivatePhotoOwnedBy,
   privatePhotoPath,
   privatePhotoUrl,
@@ -57,23 +58,75 @@ assert.equal(privatePhotoAccessAllowed(false, true, true), true);
 assert.equal(privatePhotoAccessAllowed(false, false, true), false);
 assert.equal(privatePhotoAccessAllowed(false, true, false), false);
 
-const privateToken = process.env.PRIVATE_BLOB_READ_WRITE_TOKEN;
-delete process.env.PRIVATE_BLOB_READ_WRITE_TOKEN;
-async function verifyMissingPrivateCredentialsFailClosed() {
+function verifyPrivateBlobOidcStoreSelection() {
+  const keys = [
+    "VERCEL_OIDC_TOKEN",
+    "VERCEL_ENV",
+    "BLOB_STORE_ID",
+    "PRIVATE_BLOB_STORE_ID",
+    "BLOB_READ_WRITE_TOKEN",
+  ];
+  const originalEnvironment = new Map(
+    keys.map((key) => [key, process.env[key]]),
+  );
+
   try {
+    process.env.VERCEL_OIDC_TOKEN = "test-oidc-token";
+    process.env.VERCEL_ENV = "production";
+    process.env.BLOB_STORE_ID = "store_production_private";
+    process.env.PRIVATE_BLOB_STORE_ID = "store_preview_private";
+    assert.equal(getPrivateBlobStoreId(), "store_production_private");
+
+    process.env.VERCEL_ENV = "preview";
+    assert.equal(getPrivateBlobStoreId(), "store_preview_private");
+
+    delete process.env.VERCEL_OIDC_TOKEN;
+    process.env.BLOB_READ_WRITE_TOKEN = "test-public-token";
+    assert.throws(
+      () => getPrivateBlobStoreId(),
+      /PRIVATE_IMAGE_STORAGE_NOT_CONFIGURED/,
+    );
+  } finally {
+    for (const [key, value] of originalEnvironment) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+async function verifyMissingPrivateCredentialsFailClosed() {
+  const keys = [
+    "VERCEL_OIDC_TOKEN",
+    "BLOB_STORE_ID",
+    "PRIVATE_BLOB_STORE_ID",
+    "BLOB_READ_WRITE_TOKEN",
+  ];
+  const originalEnvironment = new Map(
+    keys.map((key) => [key, process.env[key]]),
+  );
+
+  try {
+    for (const key of keys) delete process.env[key];
+    process.env.BLOB_READ_WRITE_TOKEN = "test-public-token";
     await assert.rejects(
       uploadPrivateImage(Buffer.from("photo"), "user_123", "image/jpeg"),
       /PRIVATE_IMAGE_STORAGE_NOT_CONFIGURED/,
     );
   } finally {
-    if (privateToken === undefined) {
-      delete process.env.PRIVATE_BLOB_READ_WRITE_TOKEN;
-    } else {
-      process.env.PRIVATE_BLOB_READ_WRITE_TOKEN = privateToken;
+    for (const [key, value] of originalEnvironment) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
     }
   }
 }
 
+verifyPrivateBlobOidcStoreSelection();
 verifyMissingPrivateCredentialsFailClosed()
   .then(() => console.log("Private photo ownership checks passed"))
   .catch((error: unknown) => {

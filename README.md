@@ -92,7 +92,7 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
 
 ### Private homeowner photo storage
 
-Create and connect a **private** Vercel Blob store before enabling homeowner photo uploads. Set that store's read-write token as `PRIVATE_BLOB_READ_WRITE_TOKEN` in local and deployment environment settings; do not reuse the public-store token. Keep `BLOB_READ_WRITE_TOKEN` configured for intentionally public profile, logo, and portfolio images. If the private token is missing, homeowner photo uploads fail rather than falling back to public storage. The private-photo API checks the signed-in owner and grants contractors access only when a published lead is visible to them.
+Connect a **private** Vercel Blob store before enabling homeowner photo uploads. Private uploads, reads, and deletes use Vercel OIDC and explicitly select the connected private store; they fail closed if the OIDC token or expected store ID is unavailable. The Production connection currently exposes its private store as `BLOB_STORE_ID`; Preview uses `PRIVATE_BLOB_STORE_ID` for its separate test store. Do not pass `BLOB_READ_WRITE_TOKEN` to private operations. Keep that existing token configured for intentionally public profile, logo, and portfolio uploads. The private-photo API checks the signed-in owner and grants contractors access only when a published lead is visible to them.
 
 Existing public Blob URLs are not changed by this code and remain publicly accessible until they are separately migrated and revoked.
 

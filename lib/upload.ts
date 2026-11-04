@@ -4,12 +4,17 @@ import { nanoid } from "nanoid";
 const PRIVATE_PHOTO_ROOT = "homeowner-photos";
 const PRIVATE_PHOTO_ROUTE = "/api/private-photo";
 
-function getPrivateBlobToken(): string {
-  const token = process.env.PRIVATE_BLOB_READ_WRITE_TOKEN;
-  if (!token) {
+export function getPrivateBlobStoreId(): string {
+  const storeId =
+    process.env.VERCEL_ENV === "production"
+      ? process.env.BLOB_STORE_ID
+      : process.env.PRIVATE_BLOB_STORE_ID;
+
+  if (!process.env.VERCEL_OIDC_TOKEN?.trim() || !storeId?.trim()) {
     throw new Error("PRIVATE_IMAGE_STORAGE_NOT_CONFIGURED");
   }
-  return token;
+
+  return storeId.trim();
 }
 
 export function isPrivatePhotoPathname(pathname: string): boolean {
@@ -75,7 +80,7 @@ export async function uploadPrivateImage(
     file,
     {
       access: "private",
-      token: getPrivateBlobToken(),
+      storeId: getPrivateBlobStoreId(),
       contentType,
       cacheControlMaxAge: 60,
     },
@@ -90,7 +95,7 @@ export async function getPrivateImage(pathname: string) {
   }
   return get(pathname, {
     access: "private",
-    token: getPrivateBlobToken(),
+    storeId: getPrivateBlobStoreId(),
     useCache: false,
   });
 }
@@ -100,7 +105,7 @@ export async function deletePrivateImage(pathname: string): Promise<void> {
     throw new Error("INVALID_PRIVATE_PHOTO_PATH");
   }
   await del(pathname, {
-    token: getPrivateBlobToken(),
+    storeId: getPrivateBlobStoreId(),
   });
 }
 
@@ -110,9 +115,9 @@ export async function uploadImage(
   contentType: string
 ): Promise<string> {
   // Check if Vercel Blob token is configured
-  const hasToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+  const publicToken = process.env.BLOB_READ_WRITE_TOKEN;
   
-  if (!hasToken) {
+  if (!publicToken) {
     console.error('[UPLOAD] BLOB_READ_WRITE_TOKEN is not configured. Image upload is disabled.');
     throw new Error('IMAGE_UPLOAD_NOT_CONFIGURED');
   }
@@ -122,6 +127,7 @@ export async function uploadImage(
     const blob = await put(filename, file, {
       access: 'public',
       contentType: contentType,
+      token: publicToken,
     });
 
     console.log('[UPLOAD] Successfully uploaded to Vercel Blob:', blob.url);
