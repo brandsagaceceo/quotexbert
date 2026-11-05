@@ -17,6 +17,7 @@ interface SavedProject {
   zipCode: string | null;
   location: string | null;
   budget: string | null;
+  photos: string | null;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -80,9 +81,37 @@ export default function SavedProjectsPage() {
       return;
     }
 
+    let photos: string[] = [];
+    try {
+      const parsedPhotos: unknown = JSON.parse(project.photos || "[]");
+      if (
+        !Array.isArray(parsedPhotos) ||
+        !parsedPhotos.every((photo): photo is string => typeof photo === "string")
+      ) {
+        setError("This project has an invalid photo list. Edit the project before publishing.");
+        return;
+      }
+      photos = parsedPhotos;
+    } catch {
+      setError("This project has an invalid photo list. Edit the project before publishing.");
+      return;
+    }
+    if (
+      photos.length > 0 &&
+      !confirm(
+        `Share all ${photos.length} attached photo(s) with contractors when posting "${project.title}"?`,
+      )
+    ) {
+      return;
+    }
+
     setPublishing(project.id);
     try {
-      const res = await fetch(`/api/saved-projects/${project.id}/publish`, { method: "POST" });
+      const res = await fetch(`/api/saved-projects/${project.id}/publish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos }),
+      });
       const data = await res.json();
 
       if (res.ok && data.success) {

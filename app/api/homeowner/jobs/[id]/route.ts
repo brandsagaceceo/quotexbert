@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveAuthUser } from '@/lib/server-auth';
 import { SIMPLE_CATEGORIES, CATEGORY_TO_SIMPLE, normalizeCategory } from '@/lib/categories';
+import {
+  deleteUnreferencedPrivatePhotos,
+  privatePhotosBelongTo,
+} from '@/lib/private-photo-records';
+import { privatePhotoPath } from '@/lib/upload';
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +28,10 @@ function parsePhotoList(value: unknown): string[] {
   })() : value;
 
   return Array.isArray(raw)
-    ? raw.filter((photo): photo is string => typeof photo === 'string' && /^https?:\/\//i.test(photo)).slice(0, 10)
+    ? raw.filter((photo): photo is string =>
+        typeof photo === 'string' &&
+        (/^https?:\/\//i.test(photo) || privatePhotoPath(photo) !== null)
+      ).slice(0, 10)
     : [];
 }
 
@@ -110,6 +118,7 @@ export async function DELETE(
         id: resolvedParams.id
       }
     });
+    await deleteUnreferencedPrivatePhotos(parsePhotoList(job.photos));
 
     return NextResponse.json({ message: 'Job deleted successfully' });
   } catch (error) {
@@ -188,7 +197,18 @@ export async function PATCH(
     if (typeof body.city !== 'undefined') updateData.city = nextCity ?? job.city;
     if (typeof body.province !== 'undefined') updateData.province = nextProvince ?? job.province;
     if (typeof body.zipCode !== 'undefined') updateData.zipCode = nextZipCode ?? job.zipCode;
-    if (typeof body.photos !== 'undefined') updateData.photos = JSON.stringify(parsePhotoList(body.photos));
+    const nextPhotos =
+      typeof body.photos !== 'undefined' ? parsePhotoList(body.photos) : null;
+    if (
+      nextPhotos &&
+      !privatePhotosBelongTo(nextPhotos, authResult.user.dbUserId)
+    ) {
+      return NextResponse.json(
+        { error: 'Photos must belong to this homeowner' },
+        { status: 400 },
+      );
+    }
+    if (nextPhotos) updateData.photos = JSON.stringify(nextPhotos);
 
     const shouldNotifyApplicants = importantFieldsChanged(job, updateData) && job.applications.length > 0;
 
@@ -203,6 +223,12 @@ export async function PATCH(
         aiEstimate: { select: { id: true } },
       },
     });
+    if (nextPhotos) {
+      const retainedPhotos = new Set(nextPhotos);
+      await deleteUnreferencedPrivatePhotos(
+        parsePhotoList(job.photos).filter((photo) => !retainedPhotos.has(photo)),
+      );
+    }
 
     if (shouldNotifyApplicants) {
       const pendingApplicantIds = Array.from(new Set(

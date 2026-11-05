@@ -1,31 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
 
 export const dynamic = "force-dynamic";
 
-const prisma = new PrismaClient();
-
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const homeownerId = searchParams.get('homeownerId');
-
-    if (!homeownerId) {
+    const identity = await resolveHomeownerIdentity();
+    if (!identity.success) {
       return NextResponse.json(
-        { success: false, error: 'homeownerId is required' },
-        { status: 400 }
+        { success: false, error: identity.error },
+        { status: identity.status },
       );
     }
 
-    // Fetch all estimates for this homeowner
     const estimates = await prisma.aIEstimate.findMany({
       where: {
-        homeownerId,
+        homeownerId: { in: identity.homeownerIds },
       },
       include: {
         items: {
           orderBy: {
-            createdAt: 'asc',
+            createdAt: "asc",
           },
         },
         lead: {
@@ -50,7 +46,7 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
@@ -59,10 +55,10 @@ export async function GET(request: NextRequest) {
       estimates,
     });
   } catch (error: any) {
-    console.error('Error fetching AI estimates:', error);
+    console.error("Error fetching AI estimates:", error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch estimates' },
-      { status: 500 }
+      { success: false, error: error.message || "Failed to fetch estimates" },
+      { status: 500 },
     );
   }
 }

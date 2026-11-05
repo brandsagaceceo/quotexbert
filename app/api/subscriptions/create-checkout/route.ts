@@ -2,50 +2,44 @@ import { NextResponse } from "next/server";
 import { stripe, getOrCreateFoundingOfferCoupon, isFoundingOfferEnabled, FOUNDING_OFFER_FIRST_MONTH_CENTS } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { isGodUser } from "@/lib/god-access";
-import { ALL_CATEGORIES, SIMPLE_CATEGORIES } from "@/lib/categories";
+import { ALL_CATEGORIES } from "@/lib/categories";
 import { normalizeSubscriptionCategoryList } from "@/lib/subscription-categories";
-
-// Subscription tier pricing
-const TIER_PRICING = {
-  handyman: {
-    name: "Handyman",
-    price: 4900, // $49 in cents
-    categories: 3,
-    description: "Access to 3 job categories with unlimited applications"
-  },
-  renovation: {
-    name: "Renovation Xbert",
-    price: 9900, // $99 in cents
-    categories: 6,
-    description: "Access to 6 job categories with priority features"
-  },
-  general: {
-    name: "General Contractor",
-    price: 14900, // $149 in cents
-    categories: SIMPLE_CATEGORIES.length,
-    description: "Access to ALL categories with premium features"
-  }
-};
+import { resolveAuthUser } from "@/lib/server-auth";
+import { isSubscriptionTier } from "@/lib/subscription-entitlements";
+import { TIER_PRICING } from "@/lib/subscription-plans";
+import {
+  resolveOwnedStripeCustomerId,
+  StripeCustomerOwnershipError,
+  type StripeCustomerReference,
+} from "@/lib/stripe-customer-ownership";
 
 export async function POST(req: Request) {
   try {
-    const { contractorId, tier, email, selectedCategories } = await req.json();
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { success: false, error: authResult.error },
+        { status: authResult.status },
+      );
+    }
+
+    const { tier, selectedCategories } = await req.json();
 
     // Read affiliate referral code from cookie (set by ReferralTracker)
     const cookieHeader = req.headers.get('cookie') || '';
     const refMatch = cookieHeader.match(/qxb_ref=([^;]+)/);
     const referralCodeFromCookie = refMatch?.[1] ? decodeURIComponent(refMatch[1]) : null;
 
-    if (!contractorId || !tier || !email) {
+    if (!tier) {
       console.error('[API] Missing required fields');
       return NextResponse.json(
-        { success: false, error: "Missing required fields" },
+        { success: false, error: "Subscription tier is required" },
         { status: 400 }
       );
     }
 
     // Validate tier
-    if (!TIER_PRICING[tier as keyof typeof TIER_PRICING]) {
+    if (!isSubscriptionTier(tier)) {
       console.error('[API] Invalid tier:', tier);
       return NextResponse.json(
         { success: false, error: "Invalid subscription tier" },
@@ -53,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const tierConfig = TIER_PRICING[tier as keyof typeof TIER_PRICING];
+    const tierConfig = TIER_PRICING[tier];
     const normalizedSelectedCategories = normalizeSubscriptionCategoryList(selectedCategories);
 
     if (selectedCategories && normalizedSelectedCategories.length === 0) {
@@ -70,58 +64,37 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get or create Stripe customer (try DB id first, fallback to clerkUserId)
-    let contractor = await prisma.user.findUnique({
-      where: { id: contractorId },
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
       include: { billing: true }
     });
 
     if (!contractor) {
-      contractor = await prisma.user.findUnique({
-        where: { clerkUserId: contractorId },
-        include: { billing: true }
-      });
+      return NextResponse.json(
+        { success: false, error: "Contractor not found" },
+        { status: 404 }
+      );
     }
-
-    if (!contractor) {
-      console.error('[API] Contractor not found for id:', contractorId);
-      // Try email lookup as last resort
-      if (email) {
-        contractor = await prisma.user.findUnique({
-          where: { email },
-          include: { billing: true }
-        });
-        if (contractor) {
-          console.log('[API] Found contractor by email fallback:', contractor.id);
-        }
-      }
-    }
-
-    if (!contractor) {
-      // Auto-create DB record — user exists in Clerk but hasn't been synced to DB yet
-      console.log('[API] No DB record found — creating one for:', email);
-      try {
-        contractor = await prisma.user.create({
-          data: {
-            email,
-            clerkUserId: contractorId,
-            role: 'contractor',
-            name: email.split('@')[0],
-          },
-          include: { billing: true },
-        });
-        console.log('[API] Created DB record:', contractor.id);
-      } catch (createErr) {
-        console.error('[API] Failed to create DB record:', createErr);
-        return NextResponse.json(
-          { success: false, error: 'Account setup incomplete. Please sign out and sign back in.' },
-          { status: 404 }
-        );
-      }
+    if (contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json(
+        { success: false, error: "An active contractor account is required" },
+        { status: 403 }
+      );
     }
 
     // Use the DB primary key for all operations
     const dbUserId = contractor.id;
+
+    const existingCustomerIds = [
+      contractor.stripeCustomerId,
+      contractor.billing?.stripeCustomerId,
+    ].filter((customerId): customerId is string => Boolean(customerId));
+    if (new Set(existingCustomerIds).size > 1) {
+      return NextResponse.json(
+        { success: false, error: "Conflicting Stripe customer records require support" },
+        { status: 409 }
+      );
+    }
 
     // ── AFFILIATE ATTRIBUTION ─────────────────────────────────────────────────
     // If a referral code cookie is present and the user hasn't been attributed yet,
@@ -219,21 +192,42 @@ export async function POST(req: Request) {
     }
     // ── END FOUNDING CONTRACTOR OFFER ELIGIBILITY ──────────────────────────────
 
-    let customerId = contractor.billing?.stripeCustomerId;
-
-    // Create Stripe customer if doesn't exist
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: email,
-        ...(contractor.name && { name: contractor.name }),
-        metadata: {
-          userId: dbUserId,
-          role: "contractor"
-        }
+    let customerId: string;
+    try {
+      customerId = await resolveOwnedStripeCustomerId({
+        userId: dbUserId,
+        email: contractor.email,
+        name: contractor.name,
+        userStripeCustomerId: contractor.stripeCustomerId,
+        billingStripeCustomerId: contractor.billing?.stripeCustomerId ?? null,
+        retrieveCustomer: async (
+          id,
+        ): Promise<StripeCustomerReference> => {
+          const customer = await stripe.customers.retrieve(id);
+          if ("deleted" in customer && customer.deleted) {
+            return { id: customer.id, deleted: true, metadata: {} };
+          }
+          return { id: customer.id, metadata: customer.metadata };
+        },
+        createCustomer: async (params): Promise<StripeCustomerReference> => {
+          const customer = await stripe.customers.create({
+            ...params,
+            metadata: { ...params.metadata, role: "contractor" },
+          });
+          return { id: customer.id, metadata: customer.metadata };
+        },
       });
-      customerId = customer.id;
+    } catch (error) {
+      if (error instanceof StripeCustomerOwnershipError) {
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 409 }
+        );
+      }
+      throw error;
+    }
 
-      // Update billing record
+    if (contractor.billing?.stripeCustomerId !== customerId) {
       if (contractor.billing) {
         await prisma.contractorBilling.update({
           where: { id: contractor.billing.id },
@@ -241,10 +235,7 @@ export async function POST(req: Request) {
         });
       } else {
         await prisma.contractorBilling.create({
-          data: {
-            userId: dbUserId,
-            stripeCustomerId: customerId
-          }
+          data: { userId: dbUserId, stripeCustomerId: customerId }
         });
       }
     }

@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveAuthUser } from "@/lib/server-auth";
+import { HOMEOWNER_VISIBLE_QUOTE_STATUSES } from "@/lib/quote-lifecycle";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       // tampered conversationId can't surface a co-bidder's quotes.
       const conversation = await prisma.conversation.findUnique({
         where: { id: conversationId },
-        select: { homeownerId: true, contractorId: true },
+        select: { homeownerId: true, contractorId: true, jobId: true },
       });
       if (!conversation) return NextResponse.json({ quotes: [] });
       const isHomeowner = conversation.homeownerId === dbUserId;
@@ -57,8 +58,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       where.conversationId = conversationId;
+      where.jobId = conversation.jobId;
       // Defense in depth: a contractor is pinned to their own quotes only.
-      if (!isHomeowner) where.contractorId = dbUserId;
+      if (!isHomeowner) {
+        where.contractorId = dbUserId;
+      } else {
+        where.status = { in: HOMEOWNER_VISIBLE_QUOTE_STATUSES };
+      }
     } else if (contractorId) {
       // Contractors may only read their own quotes — pin to the authenticated
       // user and ignore the supplied id so it can't be tampered to read a rival's.
@@ -66,6 +72,8 @@ export async function GET(request: NextRequest) {
     } else if (homeownerId) {
       // Homeowners may only read quotes on their own jobs (via Conversation.homeownerId).
       where.conversation = { homeownerId: dbUserId };
+      where.job = { homeownerId: dbUserId };
+      where.status = { in: HOMEOWNER_VISIBLE_QUOTE_STATUSES };
     }
 
     const quotes = await prisma.quote.findMany({
@@ -122,17 +130,21 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/quotes
  * Creates a new quote (contractor-initiated, tied to a Conversation).
- * Required body: { conversationId, jobId, contractorId, title, description, scope, totalCost }
+ * Required body: { conversationId, jobId, title, description, scope, totalCost }
  * Optional: { laborCost, materialCost, items: QuoteItem[] }
  * Returns: { quote: Quote }
  */
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const body = await request.json();
     const {
       conversationId,
       jobId,
-      contractorId,
       title,
       description,
       scope,
@@ -145,7 +157,6 @@ export async function POST(request: NextRequest) {
     if (
       !conversationId ||
       !jobId ||
-      !contractorId ||
       !title ||
       !description ||
       !scope ||
@@ -154,26 +165,49 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Missing required fields: conversationId, jobId, contractorId, title, description, scope, totalCost",
+            "Missing required fields: conversationId, jobId, title, description, scope, totalCost",
         },
         { status: 400 }
       );
     }
 
-    // Resolve contractor — support both DB id and Clerk user id
-    const contractor = await prisma.user.findFirst({
-      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
-      select: { id: true },
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true, isActive: true },
     });
 
-    if (!contractor) {
-      return NextResponse.json({ error: "Contractor not found" }, { status: 404 });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json({ error: "An active contractor account is required" }, { status: 403 });
+    }
+
+    const conversation = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { id: true, jobId: true, homeownerId: true, contractorId: true },
+    });
+    if (!conversation) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+    if (conversation.contractorId !== contractor.id) {
+      return NextResponse.json({ error: "You do not have access to this conversation" }, { status: 403 });
+    }
+    if (conversation.jobId !== jobId) {
+      return NextResponse.json({ error: "Conversation does not belong to this project" }, { status: 400 });
+    }
+    const job = await prisma.lead.findUnique({
+      where: { id: jobId },
+      select: { id: true, homeownerId: true },
+    });
+    if (!job) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+    if (job.homeownerId !== conversation.homeownerId) {
+      return NextResponse.json({ error: "Conversation project owner mismatch" }, { status: 403 });
     }
 
     const quote = await prisma.quote.create({
       data: {
-        conversationId,
-        jobId,
+        conversationId: conversation.id,
+        jobId: job.id,
         contractorId: contractor.id,
         title,
         description,

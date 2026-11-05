@@ -4,6 +4,9 @@
 
 import type { Metadata } from "next";
 import { getBlogPostMeta } from "../blog-metadata";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: { slug: string };
@@ -11,7 +14,35 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const meta = getBlogPostMeta(params.slug);
+  const staticMeta = getBlogPostMeta(params.slug);
+  const generated = staticMeta
+    ? null
+    : await prisma.seoArticle.findFirst({
+        where: {
+          slug: params.slug,
+          status: "published",
+          publishedAt: { not: null },
+        },
+        select: {
+          title: true,
+          seoTitle: true,
+          seoDescription: true,
+          canonicalUrl: true,
+          author: true,
+          category: true,
+          tags: true,
+          publishedAt: true,
+        },
+      });
+  const meta = staticMeta ?? (generated ? {
+    title: generated.seoTitle,
+    description: generated.seoDescription,
+    imageUrl: "",
+    author: generated.author,
+    publishedAt: generated.publishedAt?.toISOString() ?? "",
+    category: generated.category,
+    tags: parseStringArray(generated.tags),
+  } : null);
 
   if (!meta) {
     return {
@@ -21,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const canonicalUrl = `https://www.quotexbert.com/blog/${params.slug}`;
+  const canonicalUrl = generated?.canonicalUrl ?? `https://www.quotexbert.com/blog/${params.slug}`;
 
   return {
     title: meta.title,
@@ -34,20 +65,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       publishedTime: meta.publishedAt,
       authors: [meta.author],
-      images: [
+      images: meta.imageUrl ? [
         {
           url: meta.imageUrl,
           width: 1200,
           height: 630,
           alt: meta.title,
         },
-      ],
+      ] : [],
     },
     twitter: {
       card: "summary_large_image",
       title: meta.title,
       description: meta.description,
-      images: [meta.imageUrl],
+      ...(meta.imageUrl ? { images: [meta.imageUrl] } : {}),
     },
     alternates: {
       canonical: canonicalUrl,
@@ -58,4 +89,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function BlogPostLayout({ children }: Props) {
   return <>{children}</>;
+}
+
+function parseStringArray(value: string) {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.every((item) => typeof item === "string")
+      ? parsed
+      : [];
+  } catch {
+    return [];
+  }
 }

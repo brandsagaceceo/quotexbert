@@ -312,6 +312,7 @@ export default function ProjectDetailPage() {
                         alt={`Project photo ${index + 1}`}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        unoptimized
                       />
                     </div>
                   ))}
@@ -331,6 +332,7 @@ export default function ProjectDetailPage() {
                         alt={`AI visualization ${index + 1}`}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        unoptimized
                       />
                     </div>
                   ))}

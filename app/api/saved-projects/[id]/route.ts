@@ -1,27 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-
-/** Resolve DB userId from Clerk session and verify homeowner role. */
-async function resolveDbUserId(): Promise<{ dbUserId: string } | { error: string; status: number }> {
-  const { userId } = await auth();
-  if (!userId) return { error: "Unauthenticated", status: 401 };
-  const user = await prisma.user.findFirst({
-    where: { OR: [{ id: userId }, { clerkUserId: userId }] },
-    select: { id: true, role: true },
-  });
-  if (!user) return { error: "User not found", status: 404 };
-  if (user.role !== "homeowner") return { error: "Homeowner access only", status: 403 };
-  return { dbUserId: user.id };
-}
+import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
+import {
+  deleteUnreferencedPrivatePhotos,
+  privatePhotosBelongTo,
+} from "@/lib/private-photo-records";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const resolved = await resolveDbUserId();
-    if ("error" in resolved) return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+    const resolved = await resolveHomeownerIdentity();
+    if (!resolved.success)
+      return NextResponse.json(
+        { error: resolved.error },
+        { status: resolved.status },
+      );
 
     const { id: projectId } = await params;
 
@@ -33,33 +28,66 @@ export async function GET(
       },
     });
 
-    if (!savedProject) return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    if (savedProject.homeownerId !== resolved.dbUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!savedProject)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    if (!resolved.homeownerIds.includes(savedProject.homeownerId))
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     return NextResponse.json({ success: true, savedProject });
   } catch (error) {
     console.error("[SavedProject GET] Error:", error);
-    return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch project" },
+      { status: 500 },
+    );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const resolved = await resolveDbUserId();
-    if ("error" in resolved) return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+    const resolved = await resolveHomeownerIdentity();
+    if (!resolved.success)
+      return NextResponse.json(
+        { error: resolved.error },
+        { status: resolved.status },
+      );
 
     const { id: projectId } = await params;
 
-    // Verify ownership
-    const existing = await prisma.savedProject.findUnique({ where: { id: projectId }, select: { homeownerId: true } });
-    if (!existing) return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    if (existing.homeownerId !== resolved.dbUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
     const body = await request.json();
-    const { title, description, category, city, province, zipCode, location, budget, photos, status } = body;
+    const {
+      title,
+      description,
+      category,
+      city,
+      province,
+      zipCode,
+      location,
+      budget,
+      photos,
+      status,
+    } = body;
+    const submittedPhotos = photos === null ? [] : photos;
+
+    if (!privatePhotosBelongTo(submittedPhotos, resolved.user.dbUserId)) {
+      return NextResponse.json(
+        { error: "Photos must belong to this homeowner" },
+        { status: 400 },
+      );
+    }
+
+    const previousProject = await prisma.savedProject.findFirst({
+      where: {
+        id: projectId,
+        homeownerId: { in: resolved.homeownerIds },
+      },
+      select: { photos: true },
+    });
+    if (!previousProject)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) updateData.title = title;
@@ -71,40 +99,96 @@ export async function PUT(
     if (location !== undefined) updateData.location = location;
     if (budget !== undefined) updateData.budget = budget;
     if (status !== undefined) updateData.status = status;
-    if (photos !== undefined) updateData.photos = JSON.stringify(photos);
+    if (photos !== undefined)
+      updateData.photos = JSON.stringify(submittedPhotos);
 
-    const updatedProject = await prisma.savedProject.update({
-      where: { id: projectId },
+    const updated = await prisma.savedProject.updateMany({
+      where: {
+        id: projectId,
+        homeownerId: { in: resolved.homeownerIds },
+      },
       data: updateData,
+    });
+    if (updated.count !== 1)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+
+    const updatedProject = await prisma.savedProject.findFirst({
+      where: {
+        id: projectId,
+        homeownerId: { in: resolved.homeownerIds },
+      },
       include: { aiEstimate: { include: { items: true } }, postedAsLead: true },
     });
+    if (!updatedProject)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+
+    if (photos !== undefined) {
+      await deleteUnreferencedPrivatePhotos(
+        parsePhotoUrls(previousProject.photos).filter(
+          (url) => !submittedPhotos.includes(url),
+        ),
+      );
+    }
 
     return NextResponse.json({ success: true, savedProject: updatedProject });
   } catch (error) {
     console.error("[SavedProject PUT] Error:", error);
-    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update project" },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const resolved = await resolveDbUserId();
-    if ("error" in resolved) return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+    const resolved = await resolveHomeownerIdentity();
+    if (!resolved.success)
+      return NextResponse.json(
+        { error: resolved.error },
+        { status: resolved.status },
+      );
 
     const { id: projectId } = await params;
 
-    const existing = await prisma.savedProject.findUnique({ where: { id: projectId }, select: { homeownerId: true } });
-    if (!existing) return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    if (existing.homeownerId !== resolved.dbUserId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const existing = await prisma.savedProject.findFirst({
+      where: { id: projectId, homeownerId: { in: resolved.homeownerIds } },
+      select: { homeownerId: true, photos: true, visualizerImages: true },
+    });
+    if (!existing)
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-    await prisma.savedProject.delete({ where: { id: projectId } });
+    await prisma.savedProject.deleteMany({
+      where: { id: projectId, homeownerId: { in: resolved.homeownerIds } },
+    });
+    await deleteUnreferencedPrivatePhotos([
+      ...parsePhotoUrls(existing.photos),
+      ...parsePhotoUrls(existing.visualizerImages),
+    ]);
 
-    return NextResponse.json({ success: true, message: "Project deleted successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "Project deleted successfully",
+    });
   } catch (error) {
     console.error("[SavedProject DELETE] Error:", error);
-    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete project" },
+      { status: 500 },
+    );
+  }
+}
+
+function parsePhotoUrls(value: string | null | undefined): string[] {
+  try {
+    const parsed: unknown = JSON.parse(value || "[]");
+    return Array.isArray(parsed)
+      ? parsed.filter((url): url is string => typeof url === "string")
+      : [];
+  } catch {
+    return [];
   }
 }

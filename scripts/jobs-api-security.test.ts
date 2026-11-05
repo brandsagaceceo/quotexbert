@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { NextRequest } from "next/server";
-import { createJobsGetHandler } from "../app/api/jobs/route";
+import { createJobsGetHandler } from "../lib/jobs-api";
 
 type AuthResult =
   | { user: { dbUserId: string; clerkUserId: string; email: string; name: string | null } }

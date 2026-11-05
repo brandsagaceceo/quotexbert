@@ -34,7 +34,7 @@ assert.match(collectionGet, /where\.conversation = \{ homeownerId: dbUserId \}/,
 // conversationId path verifies participation and 403s outsiders.
 assert.match(collectionGet, /prisma\.conversation\.findUnique/, "conversationId path must load the conversation to check participation");
 assert.match(collectionGet, /return NextResponse\.json\(\{ error: "Forbidden" \}, \{ status: 403 \}\)/, "non-participants must be denied with 403");
-assert.match(collectionGet, /if \(!isHomeowner\) where\.contractorId = dbUserId/, "a contractor on the conversation may still only see their own quotes");
+assert.match(collectionGet, /if \(!isHomeowner\) \{\s*where\.contractorId = dbUserId/, "a contractor on the conversation may still only see their own quotes");
 
 // ── 2. GET /api/quotes/[id] — ownership check before returning full detail ──
 const byIdGet = byId.slice(
@@ -42,8 +42,11 @@ const byIdGet = byId.slice(
   byId.indexOf("export async function PUT"),
 );
 assert.match(byIdGet, /await resolveAuthUser\(\)/, "GET /api/quotes/[id] must authenticate the caller");
-assert.match(byIdGet, /const ownsAsContractor = quote\.contractorId === dbUserId/, "must compute owning-contractor check");
-assert.match(byIdGet, /const ownsAsHomeowner = quote\.conversation\?\.homeownerId === dbUserId/, "must compute owning-homeowner check");
+assert.match(byIdGet, /quote\.contractorId === dbUserId/, "must compute owning-contractor check");
+assert.match(byIdGet, /quote\.conversation\?\.homeownerId === dbUserId/, "must compute owning-homeowner check");
+assert.match(byIdGet, /quote\.conversation\?\.jobId === quote\.jobId/, "must verify quote and conversation project consistency");
+assert.match(byIdGet, /isHomeownerVisibleQuoteStatus\(quote\.status\)/, "homeowners must not read draft or superseded quotes");
+assert.doesNotMatch(byIdGet, /homeowner: true|contractor: true/, "quote detail must not return all private User fields");
 assert.match(byIdGet, /if \(!ownsAsContractor && !ownsAsHomeowner\) \{\s*\n\s*return NextResponse\.json\(\{ error: "Forbidden" \}, \{ status: 403 \}\)/, "a non-owning contractor must be denied a rival quote by id (403)");
 
 // ── 3. GET /api/homeowner/quotes — pinned to authenticated homeowner ────────
@@ -51,6 +54,7 @@ assert.match(homeownerQuotes, /import \{ resolveAuthUser \} from "@\/lib\/server
 assert.match(homeownerQuotes, /await resolveAuthUser\(\)/, "GET /api/homeowner/quotes must authenticate the caller");
 assert.match(homeownerQuotes, /homeownerId: dbUserId/, "homeowner quotes must be scoped to the authenticated user, not a supplied param");
 assert.doesNotMatch(homeownerQuotes, /homeownerId: homeownerId/, "must not trust a client-supplied homeownerId param");
+assert.match(homeownerQuotes, /status: \{ in: HOMEOWNER_VISIBLE_QUOTE_STATUSES \}/, "homeowner list must explicitly allow only homeowner-visible statuses");
 
 // ── 4. Homeowner comparison capability is preserved ─────────────────────────
 // The homeowner list still includes contractor identity + full quote detail so

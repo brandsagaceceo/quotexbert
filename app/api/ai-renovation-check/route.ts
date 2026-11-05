@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import { getOpenAIClient, OPENAI_MODELS } from "@/lib/openai-client";
 
-const openai = process.env.OPENAI_API_KEY && !process.env.OPENAI_API_KEY.includes('demo') 
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+const openai = getOpenAIClient();
 
 /**
  * POST /api/ai-renovation-check
@@ -30,7 +28,7 @@ export async function POST(request: Request) {
 
     // Call OpenAI Vision API
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_MODELS.quickEstimator,
       messages: [
         {
           role: "system",

@@ -6,39 +6,37 @@
  * with: version = original.version + 1, parentQuoteId = original.id,
  * all content and items copied, status = "draft".
  *
- * Body: { contractorId }
+ * Legacy body identity fields are ignored; the session supplies the contractor.
  *
  * Guards:
  *  - Contractor must own the quote
- *  - Quote must NOT be "accepted" (accepted quotes are frozen)
+ *  - Quote must be sent or revision-requested
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { emitQuoteSignal } from '@/lib/quote-signals';
+import { resolveAuthUser } from '@/lib/server-auth';
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
 
-    const body = await request.json();
-    const { contractorId } = body;
-
-    if (!contractorId) {
-      return NextResponse.json({ error: 'contractorId is required' }, { status: 400 });
-    }
-
-    // Resolve contractor — support both DB id and Clerk id
-    const contractor = await prisma.user.findFirst({
-      where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
-      select: { id: true },
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true, isActive: true },
     });
-    if (!contractor) {
-      return NextResponse.json({ error: 'Contractor not found' }, { status: 404 });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json({ error: 'Active contractor access required' }, { status: 403 });
     }
 
     // Load the original quote with items
@@ -46,7 +44,7 @@ export async function POST(
       where: { id: quoteId },
       include: {
         items: { orderBy: { createdAt: 'asc' } },
-        conversation: { select: { id: true, homeownerId: true } },
+        conversation: { select: { id: true, homeownerId: true, contractorId: true, jobId: true } },
       },
     });
 
@@ -58,20 +56,31 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (original.status === 'accepted') {
+    if (!['sent', 'revision_requested'].includes(original.status)) {
       return NextResponse.json(
-        { error: 'Accepted quotes cannot be revised' },
+        { error: 'Only sent or revision-requested quotes can be revised' },
         { status: 403 }
       );
     }
+    if (
+      original.conversation.contractorId !== contractor.id ||
+      original.conversation.jobId !== original.jobId
+    ) {
+      return NextResponse.json({ error: 'Quote relationship mismatch' }, { status: 403 });
+    }
 
-    // Atomically: mark original superseded + create new draft version
-    const [, newQuote] = await prisma.$transaction([
-      prisma.quote.update({
-        where: { id: quoteId },
+    const completeQuote = await prisma.$transaction(async (tx) => {
+      const transition = await tx.quote.updateMany({
+        where: {
+          id: quoteId,
+          contractorId: contractor.id,
+          status: original.status,
+        },
         data: { status: 'superseded' },
-      }),
-      prisma.quote.create({
+      });
+      if (transition.count !== 1) return null;
+
+      return tx.quote.create({
         data: {
           conversationId: original.conversationId,
           jobId: original.jobId,
@@ -85,41 +94,33 @@ export async function POST(
           aiAnalysis: original.aiAnalysis,
           extractedRequirements: original.extractedRequirements,
           confidenceScore: original.confidenceScore,
-          // Versioning fields
           version: (original.version ?? 1) + 1,
           parentQuoteId: original.id,
           revisionNote: original.revisionNote ?? null,
           status: 'draft',
           isEdited: false,
+          items: {
+            create: original.items.map((item) => ({
+              category: item.category,
+              description: item.description,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPrice: item.totalPrice,
+              notes: item.notes ?? null,
+            })),
+          },
         },
-      }),
-    ]);
-
-    // Copy line items to the new quote
-    if (original.items.length > 0) {
-      await prisma.quoteItem.createMany({
-        data: original.items.map((item) => ({
-          quoteId: newQuote.id,
-          category: item.category,
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
-          notes: item.notes ?? null,
-        })),
+        include: { items: { orderBy: { createdAt: 'asc' } } },
       });
-    }
-
-    // Return the complete new draft with items
-    const completeQuote = await prisma.quote.findUnique({
-      where: { id: newQuote.id },
-      include: { items: { orderBy: { createdAt: 'asc' } } },
     });
+    if (!completeQuote) {
+      return NextResponse.json({ error: 'Quote status changed; refresh and try again.' }, { status: 409 });
+    }
 
     // Phase 6: learning signal — emitted before return (fire-and-forget)
     void emitQuoteSignal({
       event: 'quote_revision_created',
-      quoteId: newQuote.id,
+      quoteId: completeQuote.id,
       conversationId: original.conversationId,
       version: (original.version ?? 1) + 1,
       isRevision: true,

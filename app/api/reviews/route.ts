@@ -14,6 +14,10 @@ function sanitizeReviewText(input: string | undefined | null): string | null {
   return stripped.slice(0, 1000);
 }
 
+function reviewerDisplayName(name: string | null | undefined): string {
+  return name?.trim().split(/\s+/)[0] || "Homeowner";
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -21,18 +25,41 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    // If contractorId is not provided, return the most recent reviews across all contractors
-    const skip = (page - 1) * limit;
-    const where = contractorId ? { contractorId } : {};
+    let resolvedContractorId = contractorId;
+    if (contractorId) {
+      const contractor = await prisma.user.findFirst({
+        where: { OR: [{ id: contractorId }, { clerkUserId: contractorId }] },
+        select: { id: true },
+      });
+      if (contractor) resolvedContractorId = contractor.id;
+    }
 
-    const [reviews, totalCount] = await Promise.all([
+    const skip = (page - 1) * limit;
+    const where = {
+      status: "published",
+      ...(resolvedContractorId ? { contractorId: resolvedContractorId } : {}),
+    };
+
+    const [reviews, totalCount, ratingAggregate] = await Promise.all([
       prisma.review.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          rating: true,
+          title: true,
+          text: true,
+          qualityRating: true,
+          timelinessRating: true,
+          communicationRating: true,
+          cleanlinessRating: true,
+          valueRating: true,
+          projectType: true,
+          projectCost: true,
+          projectDuration: true,
+          createdAt: true,
           homeowner: {
             select: {
-              id: true,
-              email: true,
+              name: true,
             },
           },
         },
@@ -40,25 +67,33 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.review.count({
+      prisma.review.count({ where }),
+      prisma.review.aggregate({
         where,
+        _avg: { rating: true },
       }),
     ]);
 
     return NextResponse.json({
-      reviews,
+      reviews: reviews.map((review) => ({
+        ...review,
+        homeowner: {
+          name: reviewerDisplayName(review.homeowner?.name),
+        },
+      })),
       pagination: {
         page,
         limit,
         totalCount,
         totalPages: Math.ceil(totalCount / limit),
       },
+      averageRating: ratingAggregate._avg.rating ?? 0,
     });
   } catch (error) {
     console.error("Error fetching reviews:", error);
     return NextResponse.json(
       { error: "Failed to fetch reviews" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -67,7 +102,10 @@ export async function POST(request: NextRequest) {
   try {
     const authResult = await resolveAuthUser();
     if ("error" in authResult) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status },
+      );
     }
     const { dbUserId: userId } = authResult.user;
 
@@ -83,32 +121,29 @@ export async function POST(request: NextRequest) {
     if (!user || user.role !== "homeowner") {
       return NextResponse.json(
         { error: "Only homeowners can leave reviews" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Check if lead exists and is closed
     const lead = await prisma.lead.findUnique({
       where: { id: validatedData.leadId },
-      select: { 
-        status: true, 
-        homeownerId: true, 
+      select: {
+        status: true,
+        homeownerId: true,
         contractorId: true,
         isSeeded: true,
       },
     });
 
     if (!lead) {
-      return NextResponse.json(
-        { error: "Lead not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Lead not found" }, { status: 404 });
     }
 
     if (lead.homeownerId !== userId) {
       return NextResponse.json(
         { error: "You can only review your own jobs" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -116,21 +151,21 @@ export async function POST(request: NextRequest) {
       // Defensive guard — a contractor can never review "themselves"
       return NextResponse.json(
         { error: "Invalid review target" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (lead.status !== "closed" && lead.status !== "completed") {
       return NextResponse.json(
         { error: "Can only review completed jobs" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (lead.contractorId !== validatedData.contractorId) {
       return NextResponse.json(
         { error: "Contractor mismatch" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -147,7 +182,7 @@ export async function POST(request: NextRequest) {
     if (existingReview) {
       return NextResponse.json(
         { error: "Review already exists for this job" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -181,11 +216,17 @@ export async function POST(request: NextRequest) {
     try {
       const [avgRating, reviewCount] = await Promise.all([
         prisma.review.aggregate({
-          where: { contractorId: validatedData.contractorId, status: "published" },
+          where: {
+            contractorId: validatedData.contractorId,
+            status: "published",
+          },
           _avg: { rating: true },
         }),
         prisma.review.count({
-          where: { contractorId: validatedData.contractorId, status: "published" },
+          where: {
+            contractorId: validatedData.contractorId,
+            status: "published",
+          },
         }),
       ]);
 
@@ -197,56 +238,67 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (ratingUpdateError) {
-      console.error("Failed to update contractor avgRating/reviewCount:", ratingUpdateError);
+      console.error(
+        "Failed to update contractor avgRating/reviewCount:",
+        ratingUpdateError,
+      );
     }
 
     // Only notify the contractor for real (non-seeded) reviews
     if (review.status === "published") {
-    // Send email notification to contractor about new review
-    try {
-      const contractor = await prisma.user.findUnique({
-        where: { id: validatedData.contractorId },
-        select: { 
-          email: true, 
-          name: true,
-          contractorProfile: {
-            select: { companyName: true }
-          }
-        },
-      });
-
-      if (contractor?.email) {
-        // Create in-app notification for contractor
-        await prisma.notification.create({
-          data: {
-            userId: validatedData.contractorId,
-            type: "NEW_REVIEW",
-            title: `New ${validatedData.rating}-Star Review Received!`,
-            message: `You received a ${validatedData.rating}-star review${validatedData.text ? `: "${validatedData.text.substring(0, 100)}${validatedData.text.length > 100 ? '...' : ''}"` : '.'}`,
-            relatedId: review.id,
-            relatedType: "review",
-          }
-        }).catch(err => console.error('Failed to create review notification:', err));
-
-        // Send email notification
-        await sendReviewReceivedEmail(
-          {
-            id: validatedData.contractorId,
-            email: contractor.email,
-            companyName: contractor.contractorProfile?.companyName || contractor.name || 'Your Company',
+      // Send email notification to contractor about new review
+      try {
+        const contractor = await prisma.user.findUnique({
+          where: { id: validatedData.contractorId },
+          select: {
+            email: true,
+            name: true,
+            contractorProfile: {
+              select: { companyName: true },
+            },
           },
-          {
-            id: review.id,
-            rating: validatedData.rating,
-            comment: validatedData.text || null,
-            reviewerName: user.role === 'homeowner' ? 'A homeowner' : 'A client',
-          }
-        );
+        });
+
+        if (contractor?.email) {
+          // Create in-app notification for contractor
+          await prisma.notification
+            .create({
+              data: {
+                userId: validatedData.contractorId,
+                type: "NEW_REVIEW",
+                title: `New ${validatedData.rating}-Star Review Received!`,
+                message: `You received a ${validatedData.rating}-star review${validatedData.text ? `: "${validatedData.text.substring(0, 100)}${validatedData.text.length > 100 ? "..." : ""}"` : "."}`,
+                relatedId: review.id,
+                relatedType: "review",
+              },
+            })
+            .catch((err) =>
+              console.error("Failed to create review notification:", err),
+            );
+
+          // Send email notification
+          await sendReviewReceivedEmail(
+            {
+              id: validatedData.contractorId,
+              email: contractor.email,
+              companyName:
+                contractor.contractorProfile?.companyName ||
+                contractor.name ||
+                "Your Company",
+            },
+            {
+              id: review.id,
+              rating: validatedData.rating,
+              comment: validatedData.text || null,
+              reviewerName:
+                user.role === "homeowner" ? "A homeowner" : "A client",
+            },
+          );
+        }
+      } catch (emailError) {
+        console.error("Failed to send review notification:", emailError);
+        // Don't fail the request if email fails
       }
-    } catch (emailError) {
-      console.error('Failed to send review notification:', emailError);
-      // Don't fail the request if email fails
-    }
     }
 
     return NextResponse.json({ review });
@@ -254,7 +306,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating review:", error);
     return NextResponse.json(
       { error: "Failed to create review" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

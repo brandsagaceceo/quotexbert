@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifications } from "@/lib/notifications";
 import { resolveAuthUser } from "@/lib/server-auth";
+import {
+  isLegacyMessagePair,
+  isLegacyThreadParticipant,
+  legacyMessageVisibilityWhere,
+} from "@/lib/messaging-access";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +37,7 @@ export async function GET(request: NextRequest) {
           lead: {
             select: {
               homeownerId: true,
+              contractorId: true,
               acceptances: {
                 where: { status: { in: ["accepted", "quoted", "selected"] } },
                 select: { contractorId: true },
@@ -47,6 +53,7 @@ export async function GET(request: NextRequest) {
       });
       const isParticipant = thread && (
         thread.lead.homeownerId === dbUserId ||
+        thread.lead.contractorId === dbUserId ||
         thread.lead.acceptances.some(({ contractorId }) => contractorId === dbUserId) ||
         thread.lead.applications.some(({ contractorId }) => contractorId === dbUserId)
       );
@@ -59,7 +66,10 @@ export async function GET(request: NextRequest) {
 
       // Get messages for a specific thread
       const messages = await prisma.message.findMany({
-        where: { threadId },
+        where: {
+          threadId,
+          ...legacyMessageVisibilityWhere(dbUserId, thread.lead.homeownerId),
+        },
         include: {
           fromUser: {
             select: {
@@ -95,15 +105,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(messages);
     } else {
       // Get all threads for user
+      const currentUser = await prisma.user.findUnique({
+        where: { id: dbUserId },
+        select: { role: true },
+      });
       const threads = await prisma.thread.findMany({
         where: {
           lead: {
-            OR: [
-              { homeownerId: dbUserId },
-              { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
-              { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
-              { conversations: { some: { contractorId: dbUserId } } },
-            ]
+            AND: [
+              {
+                OR: [
+                  { homeownerId: dbUserId },
+                  { contractorId: dbUserId },
+                  { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
+                  { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
+                ],
+              },
+              { conversations: { none: {} } },
+            ],
           }
         },
         include: {
@@ -118,6 +137,9 @@ export async function GET(request: NextRequest) {
             }
           },
           messages: {
+            ...(currentUser?.role === "contractor"
+              ? { where: { OR: [{ fromUserId: dbUserId }, { toUserId: dbUserId }] } }
+              : {}),
             orderBy: {
               createdAt: "desc"
             },
@@ -148,66 +170,105 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { fromUserId, toUserId, leadId, threadId, content } = body;
     const authResult = await resolveAuthUser();
     if ('error' in authResult) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
-    const { dbUserId, clerkUserId } = authResult.user;
+    const { dbUserId } = authResult.user;
+    const body = await request.json();
+    const { fromUserId, toUserId, leadId, threadId, content } = body;
 
-    if (!fromUserId || !toUserId || !content) {
+    if (!fromUserId || !toUserId || typeof content !== "string" || !content) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    let actualThreadId = threadId;
-
-    // If no threadId provided, find or create thread for this lead
-    if (!actualThreadId && leadId) {
-      let thread = await prisma.thread.findUnique({
-        where: { leadId }
-      });
-
-      if (!thread) {
-        thread = await prisma.thread.create({
-          data: { leadId }
-        });
-      }
-
-      actualThreadId = thread.id;
+    const [requestedSender, requestedRecipient] = await Promise.all([
+      prisma.user.findFirst({
+        where: { OR: [{ id: fromUserId }, { clerkUserId: fromUserId }] },
+        select: { id: true },
+      }),
+      prisma.user.findFirst({
+        where: { OR: [{ id: toUserId }, { clerkUserId: toUserId }] },
+        select: { id: true },
+      }),
+    ]);
+    if (!requestedSender || requestedSender.id !== dbUserId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (!requestedRecipient) {
+      return NextResponse.json({ error: "Recipient not found" }, { status: 404 });
     }
 
-    if (!actualThreadId) {
+    if (!threadId && !leadId) {
       return NextResponse.json({ error: "Thread ID or Lead ID required" }, { status: 400 });
     }
 
-    const legacyThread = await prisma.thread.findUnique({
-      where: { id: actualThreadId },
+    const existingThread = threadId
+      ? await prisma.thread.findUnique({
+          where: { id: threadId },
+          select: { id: true, leadId: true },
+        })
+      : await prisma.thread.findUnique({
+          where: { leadId },
+          select: { id: true, leadId: true },
+        });
+    if (threadId && !existingThread) {
+      return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+    }
+    if (existingThread && leadId && existingThread.leadId !== leadId) {
+      return NextResponse.json({ error: "Thread does not match lead" }, { status: 400 });
+    }
+
+    const actualLeadId = existingThread?.leadId ?? leadId;
+    if (!actualLeadId) {
+      return NextResponse.json({ error: "Thread ID or Lead ID required" }, { status: 400 });
+    }
+    const lead = await prisma.lead.findUnique({
+      where: { id: actualLeadId },
       select: {
-        lead: {
-          select: {
-            homeownerId: true,
-            conversations: { select: { id: true } },
-          },
+        id: true,
+        homeownerId: true,
+        contractorId: true,
+        acceptances: {
+          where: { status: { in: ["accepted", "quoted", "selected"] } },
+          select: { contractorId: true },
         },
+        applications: {
+          where: { status: { in: ["accepted", "in_progress", "completed"] } },
+          select: { contractorId: true },
+        },
+        conversations: { select: { id: true } },
       },
     });
-    if (legacyThread?.lead.conversations.length) {
+    if (!lead) {
+      return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+    }
+    if (lead.conversations.length) {
       return NextResponse.json(
         { error: "This legacy shared thread is archived. Select a contractor-specific conversation." },
         { status: 409 },
       );
     }
-    if (fromUserId !== dbUserId && fromUserId !== clerkUserId) {
+    const contractorIds = [
+      ...(lead.contractorId ? [lead.contractorId] : []),
+      ...lead.acceptances.map(({ contractorId }) => contractorId),
+      ...lead.applications.map(({ contractorId }) => contractorId),
+    ];
+    if (!isLegacyThreadParticipant(dbUserId, lead.homeownerId, contractorIds) ||
+        !isLegacyMessagePair(dbUserId, requestedRecipient.id, lead.homeownerId, contractorIds)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+
+    const actualThreadId = existingThread?.id ?? (await prisma.thread.create({
+      data: { leadId: lead.id },
+    })).id;
 
     // Create the message
     const newMessage = await prisma.message.create({
       data: {
         threadId: actualThreadId,
-        fromUserId,
-        toUserId,
+        fromUserId: dbUserId,
+        toUserId: requestedRecipient.id,
         body: content
       },
       include: {
@@ -256,7 +317,7 @@ export async function POST(request: NextRequest) {
                       'User';
 
     // Create in-app and email notification
-    await notifications.newMessage(toUserId, {
+    await notifications.newMessage(requestedRecipient.id, {
       messageId: newMessage.id,
       title: newMessage.thread.lead?.title || 'Message',
       message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),

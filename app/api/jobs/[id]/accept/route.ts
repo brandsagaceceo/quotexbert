@@ -80,6 +80,12 @@ export async function POST(
         { status: 403 }
       );
     }
+    if (currentLead.homeownerId === contractorId) {
+      return NextResponse.json(
+        { error: "You cannot accept your own job" },
+        { status: 403 }
+      );
+    }
 
     // God users bypass subscription checks
     const isGod = isGodUser(contractor.email || "");
@@ -98,17 +104,6 @@ export async function POST(
       }
     }
 
-    // Check current accepted contractors
-    const currentAcceptedList = parseAcceptedContractors(currentLead.acceptedContractors);
-    
-    // Check if contractor already accepted
-    if (currentAcceptedList.includes(dbContractorId)) {
-      return NextResponse.json(
-        { error: "You have already accepted this job" },
-        { status: 400 }
-      );
-    }
-
     const pendingAcceptedLeads = await countPendingAcceptedLeads(dbContractorId);
     if (pendingAcceptedLeads >= MAX_PENDING_ACCEPTED_LEADS_PER_CONTRACTOR) {
       return NextResponse.json(
@@ -120,78 +115,134 @@ export async function POST(
       );
     }
 
-    // Check if this is the first claim
-    const isFirstClaim = !currentLead.claimed && currentAcceptedList.length === 0;
-
-    const existingAcceptance = await prisma.jobAcceptance.findUnique({
-      where: {
-        leadId_contractorId: {
-          leadId: jobId,
-          contractorId: dbContractorId,
+    const acceptanceResult = await prisma.$transaction(async (tx) => {
+      const latestLead = await tx.lead.findUnique({
+        where: { id: jobId, isSeeded: false },
+        select: {
+          id: true,
+          status: true,
+          published: true,
+          acceptedContractors: true,
+          claimed: true,
+          claimedBy: true,
+          claimedAt: true,
+          contractorId: true,
+          maxContractors: true,
         },
-      },
-      select: {
-        id: true,
-        status: true,
-      },
+      });
+
+      if (!latestLead || !acceptableStatuses.includes(latestLead.status) || !latestLead.published) {
+        return { ok: false as const, error: "This job is no longer accepting contractors", status: 409 as const };
+      }
+
+      const acceptedContractors = parseAcceptedContractors(latestLead.acceptedContractors);
+      if (acceptedContractors.includes(dbContractorId)) {
+        return { ok: false as const, error: "You have already accepted this job", status: 400 as const };
+      }
+      if (acceptedContractors.length >= latestLead.maxContractors) {
+        return {
+          ok: false as const,
+          error: "This job has reached its contractor limit.",
+          status: 409 as const,
+        };
+      }
+      const activeAcceptanceCount = await tx.jobAcceptance.count({
+        where: {
+          leadId: jobId,
+          status: { in: ["accepted", "quoted", "selected"] },
+        },
+      });
+      if (Math.max(acceptedContractors.length, activeAcceptanceCount) >= latestLead.maxContractors) {
+        return {
+          ok: false as const,
+          error: "This job has reached its contractor limit.",
+          status: 409 as const,
+        };
+      }
+
+      const existingAcceptance = await tx.jobAcceptance.findUnique({
+        where: {
+          leadId_contractorId: { leadId: jobId, contractorId: dbContractorId },
+        },
+        select: { id: true, status: true },
+      });
+      if (existingAcceptance && ['accepted', 'quoted', 'selected'].includes((existingAcceptance.status || '').toLowerCase())) {
+        return { ok: false as const, error: "You have already accepted this job", status: 400 as const };
+      }
+
+      const isFirstClaim = !latestLead.claimed && acceptedContractors.length === 0;
+      const newStatus = latestLead.status === 'open' || latestLead.status === 'claimed'
+        ? 'reviewing'
+        : latestLead.status;
+      const leadUpdate: {
+        acceptedContractors: string;
+        claimed: boolean;
+        status: string;
+        claimedBy?: string;
+        claimedAt?: Date;
+        contractorId?: string;
+      } = {
+        acceptedContractors: JSON.stringify([...acceptedContractors, dbContractorId]),
+        claimed: true,
+        status: newStatus,
+      };
+
+      if (isFirstClaim) {
+        leadUpdate.claimedBy = dbContractorId;
+        leadUpdate.claimedAt = new Date();
+        leadUpdate.contractorId = dbContractorId;
+      }
+
+      // Compare-and-set the observed lead state so concurrent accepts cannot
+      // overwrite each other's acceptedContractors JSON or first-claim owner.
+      const claimed = await tx.lead.updateMany({
+        where: {
+          id: jobId,
+          status: latestLead.status,
+          published: true,
+          isSeeded: false,
+          acceptedContractors: latestLead.acceptedContractors,
+          claimed: latestLead.claimed,
+          claimedBy: latestLead.claimedBy,
+          claimedAt: latestLead.claimedAt,
+          contractorId: latestLead.contractorId,
+        },
+        data: leadUpdate,
+      });
+      if (claimed.count !== 1) {
+        return { ok: false as const, error: "This job was updated by another request. Refresh and try again.", status: 409 as const };
+      }
+
+      const acceptance = existingAcceptance
+        ? await tx.jobAcceptance.update({
+            where: { id: existingAcceptance.id },
+            data: {
+              message: message || null,
+              status: 'accepted',
+              quoteAmount: null,
+              estimatedDays: null,
+            },
+          })
+        : await tx.jobAcceptance.create({
+            data: {
+              leadId: jobId,
+              contractorId: dbContractorId,
+              message: message || null,
+              status: "accepted",
+            },
+          });
+
+      return { ok: true as const, acceptance, isFirstClaim };
     });
 
-    if (existingAcceptance && ['accepted', 'quoted', 'selected'].includes((existingAcceptance.status || '').toLowerCase())) {
+    if (!acceptanceResult.ok) {
       return NextResponse.json(
-        { error: 'You have already accepted this job' },
-        { status: 400 }
+        { error: acceptanceResult.error },
+        { status: acceptanceResult.status }
       );
     }
 
-    // Create job acceptance record (contractor already verified above)
-    const acceptance = existingAcceptance
-      ? await prisma.jobAcceptance.update({
-          where: { id: existingAcceptance.id },
-          data: {
-            message: message || null,
-            status: 'accepted',
-            quoteAmount: null,
-            estimatedDays: null,
-          },
-        })
-      : await prisma.jobAcceptance.create({
-          data: {
-            leadId: jobId,
-            contractorId: dbContractorId,
-            message: message || null,
-            status: "accepted"
-          }
-        });
-
-    // Update acceptedContractors array
-    const updatedAccepted = [...currentAcceptedList, dbContractorId];
-    
-    // Accepting interest should never close the board listing.
-    let newStatus = currentLead.status;
-    if (newStatus === 'open' || newStatus === 'claimed') {
-      newStatus = 'reviewing';
-    }
-    
-    // Prepare update data
-    const leadUpdateData: any = {
-      acceptedContractors: JSON.stringify(updatedAccepted),
-      claimed: true,
-      status: newStatus
-    };
-
-    // If this is the first claim, set claiming fields
-    if (isFirstClaim) {
-      leadUpdateData.claimedBy = dbContractorId;
-      leadUpdateData.claimedAt = new Date();
-      // Also set contractorId so the Thread's lead.contractor relation is populated,
-      // which lets the homeowner see who accepted their job in Messages.
-      leadUpdateData.contractorId = dbContractorId;
-    }
-    
-    await prisma.lead.update({
-      where: { id: jobId },
-      data: leadUpdateData
-    });
+    const { acceptance, isFirstClaim } = acceptanceResult;
 
     // Conversation identity is homeowner + job + authenticated contractor.
     // The compound unique key makes retries idempotent while allowing another

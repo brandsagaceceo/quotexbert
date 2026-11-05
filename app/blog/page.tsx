@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
@@ -23,10 +23,13 @@ interface BlogPost {
   seoTitle: string;
   seoDescription: string;
   isDIY?: boolean;
+  isSeoGenerated?: boolean;
 }
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [publishedSeoPosts, setPublishedSeoPosts] = useState<BlogPost[]>([]);
+  const [blogLoadError, setBlogLoadError] = useState(false);
 
   const blogPosts: BlogPost[] = [
     {
@@ -654,13 +657,60 @@ export default function BlogPage() {
     }
   ];
 
-  const categories = ["all", "Durham Region", "Basement", "Kitchen", "Bathroom", "Roofing", "Contractor Tips", "Flooring", "HVAC", "Outdoor", "Energy", "Windows", "Insurance", "Permits", "Landscaping", "Painting"];
+  useEffect(() => {
+    let active = true;
+    fetch("/api/blog/seo-articles", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Published SEO articles are unavailable");
+        const data = await response.json();
+        if (!Array.isArray(data.articles)) throw new Error("Invalid published article response");
+        if (active) {
+          const existingSlugs = new Set(blogPosts.map((post) => post.slug));
+          setPublishedSeoPosts(
+            data.articles
+              .filter((article: BlogPost) => !existingSlugs.has(article.slug))
+              .map((article: BlogPost) => ({
+                ...article,
+                imageUrl: DEFAULT_BLOG_IMAGE,
+                isSeoGenerated: true,
+              })),
+          );
+        }
+      })
+      .catch(() => {
+        if (active) setBlogLoadError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const allPosts = [...blogPosts, ...publishedSeoPosts];
+  const categories = Array.from(new Set([
+    "all",
+    "Durham Region",
+    "Basement",
+    "Kitchen",
+    "Bathroom",
+    "Roofing",
+    "Contractor Tips",
+    "Flooring",
+    "HVAC",
+    "Outdoor",
+    "Energy",
+    "Windows",
+    "Insurance",
+    "Permits",
+    "Landscaping",
+    "Painting",
+    ...publishedSeoPosts.map((post) => post.category),
+  ]));
 
   const filteredPosts = selectedCategory === "all"
-    ? blogPosts
-    : blogPosts.filter(post => post.category === selectedCategory);
+    ? allPosts
+    : allPosts.filter(post => post.category === selectedCategory);
 
-  const diyPosts = blogPosts.filter((post) => post.isDIY);
+  const diyPosts = allPosts.filter((post) => post.isDIY);
 
   return (
     <>
@@ -747,6 +797,11 @@ export default function BlogPage() {
 
         {/* Blog Grid */}
         <section className="max-w-6xl mx-auto px-4 py-12">
+          {blogLoadError && (
+            <p role="status" className="mb-5 rounded-lg bg-amber-50 p-3 text-amber-900">
+              Newly published articles could not be loaded right now. Existing blog articles remain available.
+            </p>
+          )}
           {filteredPosts.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">📝</div>

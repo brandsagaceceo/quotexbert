@@ -36,17 +36,6 @@ export async function DELETE(
       return NextResponse.json({ success: true });
     }
 
-    const migratedConversation = await prisma.conversation.findFirst({
-      where: { job: { id: threadId } },
-      select: { id: true },
-    });
-    if (migratedConversation) {
-      return NextResponse.json(
-        { error: 'Legacy shared threads with isolated conversations are read-only' },
-        { status: 409 },
-      );
-    }
-
     // 2. Load thread with participant IDs for ownership check
     const thread = await prisma.thread.findUnique({
       where: { id: threadId },
@@ -55,10 +44,16 @@ export async function DELETE(
           select: {
             homeownerId: true,
             contractorId: true,
+            conversations: { select: { id: true } },
+            acceptances: {
+              where: { status: { in: ['accepted', 'quoted', 'selected'] } },
+              select: { contractorId: true },
+            },
+            applications: {
+              where: { status: { in: ['accepted', 'in_progress', 'completed'] } },
+              select: { contractorId: true },
+            },
           },
-        },
-        messages: {
-          select: { fromUserId: true, toUserId: true },
         },
       },
     });
@@ -67,19 +62,20 @@ export async function DELETE(
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
-    // 3. Collect all known participant DB user IDs for this thread
+    if (thread.lead.conversations.length > 0) {
+      return NextResponse.json(
+        { error: 'Legacy shared threads with isolated conversations are read-only' },
+        { status: 409 },
+      );
+    }
+
+    // 3. Resolve participants from the lead relationship, not message content.
     const participantIds = new Set<string>();
     if (thread.lead.homeownerId) participantIds.add(thread.lead.homeownerId);
     if (thread.lead.contractorId) participantIds.add(thread.lead.contractorId);
-    // Also include any message sender/recipient in case lead references differ
-    thread.messages.forEach((m) => {
-      participantIds.add(m.fromUserId);
-      participantIds.add(m.toUserId);
-    });
+    thread.lead.acceptances.forEach(({ contractorId }) => participantIds.add(contractorId));
+    thread.lead.applications.forEach(({ contractorId }) => participantIds.add(contractorId));
 
-    // Allow the authenticated user to delete if they are a participant by DB id.
-    // Also check if any DB record with clerkUserId=caller exists among participants
-    // (covers webhook-created users where the caller may still pass a Clerk ID).
     const isParticipant = participantIds.has(dbUserId);
 
     if (!isParticipant) {

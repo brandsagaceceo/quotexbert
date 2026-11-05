@@ -3,16 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string } },
 ) {
   try {
     const { slug } = params;
 
     if (!slug) {
-      return NextResponse.json(
-        { error: "Slug is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Slug is required" }, { status: 400 });
     }
 
     // Find contractor by slug
@@ -21,21 +18,33 @@ export async function GET(
         slug: slug,
       },
       include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
         portfolio: {
           where: {
             isPublic: true,
           },
           orderBy: {
-            isPinned: 'desc',
+            isPinned: "desc",
           },
           take: 12,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            caption: true,
+            projectType: true,
+            beforeImages: true,
+            afterImages: true,
+            imageUrl: true,
+            projectCost: true,
+            duration: true,
+            materials: true,
+            location: true,
+            clientStory: true,
+            isPublic: true,
+            isPinned: true,
+            tags: true,
+            createdAt: true,
+          },
         },
       },
     });
@@ -43,7 +52,7 @@ export async function GET(
     if (!contractor) {
       return NextResponse.json(
         { error: "Contractor not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -51,8 +60,6 @@ export async function GET(
     return NextResponse.json({
       success: true,
       contractor: {
-        id: contractor.id,
-        userId: contractor.userId,
         companyName: contractor.companyName,
         slug: contractor.slug,
         trade: contractor.trade,
@@ -68,15 +75,13 @@ export async function GET(
         profilePhoto: contractor.profilePhoto,
         coverPhoto: contractor.coverPhoto,
         portfolio: contractor.portfolio,
-        userName: contractor.user.name,
-        userEmail: contractor.user.email,
       },
     });
   } catch (error) {
     console.error("Error fetching contractor by slug:", error);
     return NextResponse.json(
       { error: "Failed to fetch contractor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

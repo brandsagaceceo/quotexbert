@@ -66,6 +66,8 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
   // Photo carryover: the AI estimate's uploaded photos, prefilled from estimate.images.
   // The homeowner can review/add/remove before posting to the job board.
   const [photos, setPhotos] = useState<string[]>([]);
+  const [approvePhotosForPublication, setApprovePhotosForPublication] =
+    useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   // Price consistency: the posting budget always starts as the AI estimate's own
@@ -108,6 +110,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
           try {
             const parsedImages = JSON.parse(foundEstimate.images || '[]');
             setPhotos(Array.isArray(parsedImages) ? parsedImages.filter((p: unknown) => typeof p === 'string') : []);
+            setApprovePhotosForPublication(false);
           } catch {
             setPhotos([]);
           }
@@ -190,6 +193,10 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
   const postToJobBoard = async () => {
     if (!estimate || selectedItems.size === 0) return;
+    if (photos.length > 0 && !approvePhotosForPublication) {
+      setError("Approve sharing the attached photos with contractors, or remove them before posting.");
+      return;
+    }
 
     setPosting(true);
     setError(null);
@@ -217,7 +224,10 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ photos, budget: postingBudget }),
+        body: JSON.stringify({
+          photos: approvePhotosForPublication ? photos : [],
+          budget: postingBudget,
+        }),
       });
 
       const data = await response.json();
@@ -247,6 +257,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
   const removePhoto = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setApprovePhotosForPublication(false);
   };
 
   const handleAddPhotos = async (files: FileList | null) => {
@@ -274,6 +285,7 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
 
       const uploadedUrls: string[] = Array.isArray(data.files) ? data.files : [];
       setPhotos((prev) => [...prev, ...uploadedUrls]);
+      setApprovePhotosForPublication(false);
     } catch (err) {
       console.error('Error uploading photos:', err);
       setPhotoError(err instanceof Error ? err.message : 'Failed to upload photos');
@@ -535,6 +547,21 @@ export default function EstimateDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 {photos.length === 0 && (
                   <p className="text-sm text-gray-500">No photos yet — this is optional and posting will work fine without any.</p>
+                )}
+                {!isPosted && photos.length > 0 && (
+                  <label className="mt-2 flex items-start gap-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={approvePhotosForPublication}
+                      onChange={(event) =>
+                        setApprovePhotosForPublication(event.target.checked)
+                      }
+                      className="mt-0.5"
+                    />
+                    <span>
+                      I approve sharing these {photos.length} photo(s) with contractors on the job board.
+                    </span>
+                  </label>
                 )}
                 {photoError && <p className="text-sm text-red-600 mt-1">{photoError}</p>}
               </>

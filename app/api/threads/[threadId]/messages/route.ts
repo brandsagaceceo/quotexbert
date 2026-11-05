@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logEventServer } from "@/lib/analytics";
 import { resolveAuthUser } from "@/lib/server-auth";
+import {
+  isLegacyMessagePair,
+  isLegacyThreadParticipant,
+  legacyMessageVisibilityWhere,
+} from "@/lib/messaging-access";
 
 const ACTIVE_ACCEPTANCE_STATUSES = ['accepted', 'quoted', 'selected'];
 const ACTIVE_APPLICATION_STATUSES = ['accepted', 'in_progress', 'completed'];
@@ -14,6 +19,7 @@ async function getThreadParticipants(threadId: string) {
       lead: {
         select: {
           homeownerId: true,
+          contractorId: true,
           acceptances: {
             where: { status: { in: ACTIVE_ACCEPTANCE_STATUSES } },
             select: { contractorId: true },
@@ -51,10 +57,13 @@ function isThreadParticipant(
   userId: string,
 ) {
   if (!thread) return false;
-  const { homeownerId, acceptances, applications } = thread.lead;
-  return homeownerId === userId ||
-    acceptances.some((acceptance) => acceptance.contractorId === userId) ||
-    applications.some((application) => application.contractorId === userId);
+  const { homeownerId, contractorId, acceptances, applications } = thread.lead;
+  const contractorIds = [
+    ...(contractorId ? [contractorId] : []),
+    ...acceptances.map(({ contractorId: acceptedId }) => acceptedId),
+    ...applications.map(({ contractorId: applicationId }) => applicationId),
+  ];
+  return isLegacyThreadParticipant(userId, homeownerId, contractorIds);
 }
 
 function isMigratedLegacyThread(thread: Awaited<ReturnType<typeof getThreadParticipants>>) {
@@ -118,7 +127,10 @@ export async function GET(
     }
 
     const messages = await prisma.message.findMany({
-      where: { threadId },
+      where: {
+        threadId,
+        ...legacyMessageVisibilityWhere(dbUserId, thread.lead.homeownerId),
+      },
       include: {
         fromUser: {
           include: {
@@ -162,7 +174,7 @@ export async function POST(
     const body = await request.json();
     const { fromUserId, toUserId, message } = body;
 
-    if (!fromUserId || !toUserId || !message) {
+    if (!fromUserId || !toUserId || typeof message !== "string" || !message) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -285,7 +297,15 @@ export async function POST(
         { status: 409 },
       );
     }
-    if (!thread || !isThreadParticipant(thread, callerDbId) || !isThreadParticipant(thread, dbToUserId)) {
+    if (!thread || !isThreadParticipant(thread, callerDbId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const contractorIds = [
+      ...(thread.lead.contractorId ? [thread.lead.contractorId] : []),
+      ...thread.lead.acceptances.map(({ contractorId }) => contractorId),
+      ...thread.lead.applications.map(({ contractorId }) => contractorId),
+    ];
+    if (!isLegacyMessagePair(callerDbId, dbToUserId, thread.lead.homeownerId, contractorIds)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -469,7 +489,10 @@ export async function PATCH(
     }
 
     const legacyThread = await getThreadParticipants(threadId);
-    if (legacyThread && isMigratedLegacyThread(legacyThread) && dbViewerId !== legacyThread.lead.homeownerId) {
+    if (!legacyThread || !isThreadParticipant(legacyThread, dbViewerId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (isMigratedLegacyThread(legacyThread) && dbViewerId !== legacyThread.lead.homeownerId) {
       return NextResponse.json({ error: "Legacy shared thread access is archived" }, { status: 403 });
     }
 

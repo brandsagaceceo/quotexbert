@@ -885,6 +885,36 @@ model Analytics {
   @@map("analytics")
 }
 
+model SeoArticle {
+  id                  String   @id @default(cuid())
+  slotKey             String?  @unique
+  topicId             String
+  title               String
+  slug                String   @unique
+  excerpt             String
+  content             String   @db.Text
+  author              String   @default("QuoteXbert Editorial Team")
+  category            String
+  tags                String   @default("[]") @db.Text
+  seoTitle            String
+  seoDescription      String
+  canonicalUrl        String
+  affiliateProductIds String   @default("[]") @db.Text
+  sourceNotes         String   @default("[]") @db.Text
+  status              String   @default("draft")
+  scheduledFor        DateTime?
+  approvedAt          DateTime?
+  publishedAt         DateTime?
+  generationError     String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([status, scheduledFor])
+  @@index([topicId, status])
+  @@index([createdAt])
+  @@map("seo_articles")
+}
+
 // AI Estimate Model - Stores all AI-generated estimates for homeowners
 model AIEstimate {
   id                String           @id @default(cuid())

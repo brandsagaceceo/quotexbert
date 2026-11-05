@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     const leadAccess = currentUser?.role === "contractor"
       ? {
           OR: [
+            { contractorId: dbUserId },
             { acceptances: { some: { contractorId: dbUserId, status: { in: ["accepted", "quoted", "selected"] } } } },
             { applications: { some: { contractorId: dbUserId, status: { in: ["accepted", "in_progress", "completed"] } } } },
           ],
@@ -63,6 +64,9 @@ export async function GET(request: NextRequest) {
           },
         },
         messages: {
+          ...(currentUser?.role === "contractor"
+            ? { where: { OR: [{ senderId: dbUserId }, { receiverId: dbUserId }] } }
+            : {}),
           take: 1,
           orderBy: { createdAt: "desc" },
           include: {

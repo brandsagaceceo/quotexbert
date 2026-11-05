@@ -1,31 +1,27 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { sendQuoteReceivedEmail } from '@/lib/email';
 import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from '@/lib/quote-limits';
 import { markAcceptanceQuoted } from '@/lib/job-acceptance';
+import { resolveAuthUser } from '@/lib/server-auth';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await resolveAuthUser();
+    if ("error" in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
-    // Resolve the Clerk session to the DB user id — Quote.contractorId stores
-    // the DB primary key, which differs from the Clerk user id for
-    // webhook-created accounts. Comparing against the raw Clerk id caused
-    // every send to 404 as "Quote not found" for those contractors.
-    const caller = await prisma.user.findFirst({
-      where: { OR: [{ id: userId }, { clerkUserId: userId }] },
-      select: { id: true },
+    const caller = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { id: true, role: true, isActive: true },
     });
-    if (!caller) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!caller || caller.role !== 'contractor' || !caller.isActive) {
+      return NextResponse.json({ error: 'Active contractor access required' }, { status: 403 });
     }
     const dbContractorId = caller.id;
 
@@ -41,8 +37,19 @@ export async function POST(
       include: {
         contractor: { select: { name: true, email: true } },
         job: {
-          include: {
-            homeowner: true,
+          select: {
+            id: true,
+            title: true,
+            homeownerId: true,
+            homeowner: { select: { id: true, email: true, name: true } },
+          },
+        },
+        conversation: {
+          select: {
+            id: true,
+            jobId: true,
+            homeownerId: true,
+            contractorId: true,
           },
         },
       },
@@ -51,11 +58,22 @@ export async function POST(
     if (!quote) {
       return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
     }
+    if (
+      quote.conversation.contractorId !== dbContractorId ||
+      quote.conversation.jobId !== quote.jobId ||
+      quote.conversation.homeownerId !== quote.job.homeownerId
+    ) {
+      return NextResponse.json({ error: 'Quote relationship mismatch' }, { status: 403 });
+    }
+    if (!['draft', 'revision_requested'].includes(quote.status)) {
+      return NextResponse.json(
+        { error: 'Only draft or revision-requested quotes can be sent.' },
+        { status: 409 }
+      );
+    }
 
-    // Enforce the max active-quote cap. A contractor re-sending their own
-    // already-active quote is never blocked; a new contractor is blocked once
-    // the job already has MAX_ACTIVE_QUOTES_PER_JOB active quotes.
-    const alreadyActive = ['sent', 'revision_requested', 'accepted'].includes((quote.status || '').toLowerCase());
+    // Revisions of an already-active quote retain their existing slot.
+    const alreadyActive = quote.status === 'revision_requested';
     if (!alreadyActive) {
       const { allowed, activeCount } = await canSubmitQuote(quote.jobId, quote.contractorId);
       if (!allowed) {
@@ -70,13 +88,23 @@ export async function POST(
     // NOTE: lowercase 'sent' — every other status check/comparison in the app
     // (LiveQuoteBuilder UI, canSubmitQuote, isActiveQuoteStatus) is lowercase.
     // The previous 'SENT' here caused this quote to look un-sent in the UI.
-    const updatedQuote = await prisma.quote.update({
-      where: { id: quoteId },
+    const transition = await prisma.quote.updateMany({
+      where: { id: quoteId, contractorId: dbContractorId, status: quote.status },
       data: {
         status: 'sent',
         sentAt: new Date(),
       },
     });
+    if (transition.count !== 1) {
+      return NextResponse.json(
+        { error: 'Quote status changed; refresh and try again.' },
+        { status: 409 }
+      );
+    }
+    const updatedQuote = await prisma.quote.findUnique({ where: { id: quoteId } });
+    if (!updatedQuote) {
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    }
 
     await markAcceptanceQuoted(quote.jobId, quote.contractorId);
 

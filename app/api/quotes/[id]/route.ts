@@ -5,6 +5,9 @@ import { sendQuoteReceivedEmail } from "@/lib/email";
 import { canSubmitQuote, MAX_ACTIVE_QUOTES_PER_JOB } from "@/lib/quote-limits";
 import { markAcceptanceQuoted } from "@/lib/job-acceptance";
 import { resolveAuthUser } from "@/lib/server-auth";
+import { isHomeownerVisibleQuoteStatus } from "@/lib/quote-lifecycle";
+
+class QuoteDeletionConflictError extends Error {}
 
 export async function GET(
   request: NextRequest,
@@ -25,11 +28,26 @@ export async function GET(
       include: {
         items: true,
         conversation: {
-          include: {
-            job: true,
-            homeowner: true,
-            contractor: true
-          }
+          select: {
+            id: true,
+            jobId: true,
+            homeownerId: true,
+            contractorId: true,
+            status: true,
+            job: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                budget: true,
+                category: true,
+                zipCode: true,
+                status: true,
+              },
+            },
+            homeowner: { select: { id: true, name: true, email: true } },
+            contractor: { select: { id: true, name: true, email: true } },
+          },
         },
         contractor: {
           select: {
@@ -50,10 +68,23 @@ export async function GET(
 
     // PRIVACY: only the owning contractor or the job's homeowner may read a
     // quote's full details — a competing contractor cannot fetch it by id.
-    const ownsAsContractor = quote.contractorId === dbUserId;
-    const ownsAsHomeowner = quote.conversation?.homeownerId === dbUserId;
+    const relationshipsMatch =
+      quote.conversation?.jobId === quote.jobId &&
+      quote.conversation?.contractorId === quote.contractorId;
+    const ownsAsContractor =
+      relationshipsMatch &&
+      quote.contractorId === dbUserId;
+    const ownsAsHomeowner =
+      relationshipsMatch &&
+      quote.conversation?.homeownerId === dbUserId;
     if (!ownsAsContractor && !ownsAsHomeowner) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (
+      ownsAsHomeowner &&
+      !isHomeownerVisibleQuoteStatus(quote.status)
+    ) {
+      return NextResponse.json({ error: "Quote not found" }, { status: 404 });
     }
 
     return NextResponse.json(quote);
@@ -76,6 +107,13 @@ export async function PUT(
     if ("error" in authResult) {
       return NextResponse.json({ error: "Your session expired. Please sign in again." }, { status: authResult.status });
     }
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { role: true, isActive: true },
+    });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json({ error: "Active contractor access required" }, { status: 403 });
+    }
 
     const resolvedParams = await params;
     const quoteId = resolvedParams.id;
@@ -91,28 +129,52 @@ export async function PUT(
       items,
       status
     } = body;
+    const requestedStatus =
+      typeof status === "string" ? status.toLowerCase() : undefined;
 
-    // Guard: accepted quotes are frozen — prevent accidental overwrites
+    // Only drafts and homeowner-requested revisions may be edited or sent.
     const existing = await prisma.quote.findUnique({
       where: { id: quoteId },
-      select: { status: true, jobId: true, contractorId: true },
+      select: {
+        status: true,
+        jobId: true,
+        contractorId: true,
+        conversation: {
+          select: { jobId: true, contractorId: true },
+        },
+      },
     });
     if (!existing) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 });
     }
     // Only the owning contractor may edit/send their own quote.
-    if (existing.contractorId !== authResult.user.dbUserId) {
+    if (
+      existing.contractorId !== authResult.user.dbUserId ||
+      existing.conversation.contractorId !== existing.contractorId ||
+      existing.conversation.jobId !== existing.jobId
+    ) {
       return NextResponse.json({ error: "You do not have access to this quote." }, { status: 403 });
     }
-    if (existing.status === 'accepted') {
+    if (!["draft", "revision_requested"].includes(existing.status)) {
       return NextResponse.json(
-        { error: 'Accepted quotes cannot be modified. Create a revision instead.' },
+        { error: 'Only draft or revision-requested quotes can be edited. Create a revision instead.' },
+        { status: 403 }
+      );
+    }
+    if (!requestedStatus) {
+      return NextResponse.json({ error: "A valid quote status is required" }, { status: 400 });
+    }
+    const allowedStatuses =
+      existing.status === "draft" ? ["draft", "sent"] : ["sent"];
+    if (!allowedStatuses.includes(requestedStatus)) {
+      return NextResponse.json(
+        { error: "This quote cannot transition to the requested status" },
         { status: 403 }
       );
     }
 
     // Require a real amount before a quote can be sent to the homeowner.
-    if (typeof status === 'string' && status.toLowerCase() === 'sent') {
+    if (requestedStatus === 'sent') {
       const amount = Number(totalCost);
       if (!Number.isFinite(amount) || amount <= 0) {
         return NextResponse.json(
@@ -124,8 +186,8 @@ export async function PUT(
 
     // Enforce the max active-quote cap when a quote is being submitted to the homeowner.
     // A contractor re-submitting their own already-active quote is never blocked.
-    if (typeof status === 'string' && status.toLowerCase() === 'sent') {
-      const wasActive = ['sent', 'revision_requested', 'accepted'].includes((existing?.status || '').toLowerCase());
+    if (requestedStatus === 'sent') {
+      const wasActive = existing.status === 'revision_requested';
       if (!wasActive && existing?.jobId && existing?.contractorId) {
         const { allowed, activeCount } = await canSubmitQuote(existing.jobId, existing.contractorId);
         if (!allowed) {
@@ -137,59 +199,70 @@ export async function PUT(
       }
     }
 
-    // Update the quote
-    const updatedQuote = await prisma.quote.update({
-      where: { id: quoteId },
-      data: {
-        title,
-        description,
-        scope,
-        laborCost: parseFloat(laborCost || 0),
-        materialCost: parseFloat(materialCost || 0),
-        totalCost: parseFloat(totalCost || 0),
-        status,
-        isEdited: true,
-        ...(status === "sent" && { sentAt: new Date() }),
-        ...(status === "accepted" && { acceptedAt: new Date() }),
-        ...(status === "rejected" && { rejectedAt: new Date() })
-      },
-      include: {
-        items: true,
-        conversation: {
-          include: {
-            job: true,
-            homeowner: true,
-            contractor: true
-          }
+    const updatedQuote = await prisma.$transaction(async (tx) => {
+      const transition = await tx.quote.updateMany({
+        where: { id: quoteId, contractorId: authResult.user.dbUserId, status: existing.status },
+        data: {
+          title,
+          description,
+          scope,
+          laborCost: parseFloat(laborCost || 0),
+          materialCost: parseFloat(materialCost || 0),
+          totalCost: parseFloat(totalCost || 0),
+          status: requestedStatus,
+          isEdited: true,
+          ...(requestedStatus === "sent" && { sentAt: new Date() }),
+        },
+      });
+      if (transition.count !== 1) return null;
+
+      if (items && Array.isArray(items)) {
+        await tx.quoteItem.deleteMany({ where: { quoteId } });
+        if (items.length > 0) {
+          await tx.quoteItem.createMany({
+            data: items.map((item: any) => ({
+              quoteId,
+              category: item.category || "other",
+              description: item.description,
+              quantity: parseFloat(item.quantity || 1),
+              unitPrice: parseFloat(item.unitPrice || 0),
+              totalPrice: parseFloat(item.totalPrice || 0),
+              notes: item.notes,
+            })),
+          });
         }
       }
-    });
 
-    // Update quote items if provided
-    if (items && Array.isArray(items)) {
-      // Delete existing items
-      await prisma.quoteItem.deleteMany({
-        where: { quoteId }
+      return tx.quote.findUnique({
+        where: { id: quoteId },
+        include: {
+          items: true,
+          conversation: {
+            include: {
+              job: {
+                select: {
+                  id: true,
+                  title: true,
+                  description: true,
+                  budget: true,
+                  category: true,
+                  zipCode: true,
+                  status: true,
+                },
+              },
+              homeowner: { select: { id: true, name: true, email: true } },
+              contractor: { select: { id: true, name: true, email: true } },
+            },
+          },
+        },
       });
-
-      // Create new items
-      if (items.length > 0) {
-        await prisma.quoteItem.createMany({
-          data: items.map((item: any) => ({
-            quoteId,
-            category: item.category || "other",
-            description: item.description,
-            quantity: parseFloat(item.quantity || 1),
-            unitPrice: parseFloat(item.unitPrice || 0),
-            totalPrice: parseFloat(item.totalPrice || 0),
-            notes: item.notes
-          }))
-        });
-      }
+    });
+    if (!updatedQuote) {
+      return NextResponse.json({ error: "Quote status changed; refresh and try again." }, { status: 409 });
     }
 
     // Send notification to homeowner if quote was sent
-    if (status === "sent") {
+    if (requestedStatus === "sent") {
       await markAcceptanceQuoted(updatedQuote.jobId, updatedQuote.contractorId);
 
       await prisma.notification.create({
@@ -255,13 +328,12 @@ export async function PUT(
         console.error('[QUOTE] Failed to send quote-received email (non-fatal):', emailErr);
       }
     }
-    // Phase 6: learning signal for sent/rejected transitions
-    if (status === 'sent' || status === 'rejected') {
+    // Phase 6: learning signal for sent quotes
+    if (requestedStatus === 'sent') {
       void emitQuoteSignal({
-        event: status === 'sent' ? 'quote_sent' : 'quote_rejected',
+        event: 'quote_sent',
         quoteId,
-        ...(status === 'rejected' ? { outcome: 'rejected' } : {}),
-        createdByRole: status === 'sent' ? 'contractor' : 'homeowner',
+        createdByRole: 'contractor',
       }).catch(() => {});
     }
     return NextResponse.json({ success: true, quote: updatedQuote });
@@ -288,6 +360,13 @@ export async function DELETE(
     const { id: quoteId } = await params;
 
     // Only allow deleting draft quotes — never delete sent/accepted quotes
+    const contractor = await prisma.user.findUnique({
+      where: { id: authResult.user.dbUserId },
+      select: { role: true, isActive: true },
+    });
+    if (!contractor || contractor.role !== "contractor" || !contractor.isActive) {
+      return NextResponse.json({ error: "Active contractor access required" }, { status: 403 });
+    }
     const existing = await prisma.quote.findUnique({
       where: { id: quoteId },
       select: { status: true, contractorId: true },
@@ -305,11 +384,40 @@ export async function DELETE(
       );
     }
 
-    await prisma.quoteItem.deleteMany({ where: { quoteId } });
-    await prisma.quote.delete({ where: { id: quoteId } });
+    await prisma.$transaction(async (tx) => {
+      const current = await tx.quote.updateMany({
+        where: {
+          id: quoteId,
+          contractorId: authResult.user.dbUserId,
+          status: existing.status,
+        },
+        data: { status: existing.status },
+      });
+      if (current.count !== 1) {
+        throw new QuoteDeletionConflictError();
+      }
+
+      await tx.quoteItem.deleteMany({ where: { quoteId } });
+      const deleted = await tx.quote.deleteMany({
+        where: {
+          id: quoteId,
+          contractorId: authResult.user.dbUserId,
+          status: existing.status,
+        },
+      });
+      if (deleted.count !== 1) {
+        throw new QuoteDeletionConflictError();
+      }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (error instanceof QuoteDeletionConflictError) {
+      return NextResponse.json(
+        { error: "Quote status changed; refresh and try again." },
+        { status: 409 }
+      );
+    }
     console.error("Error deleting quote:", error);
     return NextResponse.json({ error: "Failed to delete quote" }, { status: 500 });
   }

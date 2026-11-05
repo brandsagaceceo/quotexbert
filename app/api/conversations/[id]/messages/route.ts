@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendEmailNotification } from "@/lib/email-notifications";
 import { updateContractorResponseTime } from "@/lib/responseTime";
 import { resolveAuthUser } from "@/lib/server-auth";
+import { isConversationMessagePair } from "@/lib/messaging-access";
 
 export async function GET(
   request: NextRequest,
@@ -83,7 +84,7 @@ export async function POST(
     
     const { senderId, receiverId, content, type = 'text' } = body;
 
-    if (!senderId || !receiverId || !content) {
+    if (!senderId || !receiverId || typeof content !== "string" || !content) {
       return NextResponse.json(
         { error: "Missing required fields: senderId, receiverId, content" },
         { status: 400 }
@@ -107,12 +108,21 @@ export async function POST(
       );
     }
 
-    // Verify both the authenticated sender and the requested receiver are the
-    // two participants in this exact contractor-specific conversation.
-    if (dbUserId !== senderId ||
-        (senderId !== conversation.homeownerId && senderId !== conversation.contractorId) ||
-        (receiverId !== conversation.homeownerId && receiverId !== conversation.contractorId) ||
-        senderId === receiverId) {
+    const [requestedSender, requestedReceiver] = await Promise.all([
+      prisma.user.findFirst({
+        where: { OR: [{ id: senderId }, { clerkUserId: senderId }] },
+        select: { id: true },
+      }),
+      prisma.user.findFirst({
+        where: { OR: [{ id: receiverId }, { clerkUserId: receiverId }] },
+        select: { id: true },
+      }),
+    ]);
+
+    // Verify the requested sender maps to the session identity and both
+    // participants belong to this exact contractor-specific conversation.
+    if (!requestedSender || requestedSender.id !== dbUserId || !requestedReceiver ||
+        !isConversationMessagePair(dbUserId, requestedReceiver.id, conversation)) {
       return NextResponse.json(
         { error: "Forbidden" },
         { status: 403 }
@@ -120,16 +130,16 @@ export async function POST(
     }
 
     // Determine roles
-    const senderRole = senderId === conversation.homeownerId ? 'homeowner' : 'contractor';
-    const receiverRole = receiverId === conversation.homeownerId ? 'homeowner' : 'contractor';
+    const senderRole = dbUserId === conversation.homeownerId ? 'homeowner' : 'contractor';
+    const receiverRole = requestedReceiver.id === conversation.homeownerId ? 'homeowner' : 'contractor';
 
     // Create message
     const message = await prisma.conversationMessage.create({
       data: {
         conversationId,
-        senderId,
+        senderId: dbUserId,
         senderRole,
-        receiverId,
+        receiverId: requestedReceiver.id,
         receiverRole,
         content,
         type
@@ -162,7 +172,7 @@ export async function POST(
 
     // Fetch receiver notification preferences (default true if not found)
     const receiverPrefs = await prisma.user.findUnique({
-      where: { id: receiverId },
+      where: { id: requestedReceiver.id },
       select: { notifyMessageInApp: true, notifyMessageEmail: true }
     }).catch(() => null);
 
@@ -171,14 +181,14 @@ export async function POST(
       try {
         await prisma.notification.create({
           data: {
-            userId: receiverId,
+            userId: requestedReceiver.id,
             type: 'NEW_MESSAGE',
             title: `New message from ${message.sender.name || 'User'}`,
             message: content.substring(0, 100) + (content.length > 100 ? '...' : ''),
             payload: {
               conversationId,
               messageId: message.id,
-              senderId,
+              senderId: dbUserId,
               senderName: message.sender.name || message.sender.email
             },
             read: false
@@ -198,7 +208,7 @@ export async function POST(
           type: 'message_received',
           toEmail: message.receiver.email || '',
           data: {
-            recipientId: receiverId,
+            recipientId: requestedReceiver.id,
             recipientName: message.receiver.name || null,
             senderName: message.sender.name || message.sender.email,
             jobTitle: conversation.job?.title || 'Job Conversation',
@@ -218,7 +228,7 @@ export async function POST(
     if (senderRole === 'contractor') {
       try {
         // Run asynchronously without blocking the response
-        updateContractorResponseTime(senderId).catch(err => {
+        updateContractorResponseTime(dbUserId).catch(err => {
           console.error('Error updating contractor response time:', err);
         });
       } catch (responseTimeError) {
