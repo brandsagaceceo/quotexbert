@@ -10,6 +10,7 @@ import { ToastProvider } from "@/components/ToastProvider";
 import dynamicImport from "next/dynamic";
 import "./globals.css";
 import "../styles/mobile.css";
+import "../styles/branding.css";
 import ReferralTracker from "@/components/ReferralTracker";
 
 export const dynamic = 'force-dynamic';

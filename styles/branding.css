@@ -1,0 +1,11 @@
+/* Supplied PNG artwork stays unchanged; these viewports remove transparent
+   margins visually and preserve the original artwork's proportions. */
+.qx-logo{display:inline-flex;align-items:center;gap:10px;vertical-align:middle;max-width:100%}
+.qx-logo-icon{position:relative;display:block;width:var(--qx-logo-size,36px);aspect-ratio:556/538;overflow:hidden;flex-shrink:0}
+.qx-logo-icon img{position:absolute;width:111.5108%;max-width:none;height:auto;left:-5.7554%;top:-7.6208%}
+.qx-logo-wordmark{position:relative;display:block;width:calc(var(--qx-logo-size,36px)*5.5);aspect-ratio:2025/294;overflow:hidden;flex-shrink:0}
+.qx-logo-wordmark img{position:absolute;width:107.2593%;max-width:none;height:auto;left:-3.6543%;top:-71.7687%}
+.qx-logo-link{display:inline-flex;border-radius:6px;text-decoration:none}
+.qx-logo-link:focus-visible{outline:3px solid #800020;outline-offset:5px}
+@media(max-width:640px){.qx-logo-header{--qx-logo-size:28px!important;gap:8px}}
+@media(max-width:380px){.qx-logo-header{--qx-logo-size:25px!important;gap:6px}}
