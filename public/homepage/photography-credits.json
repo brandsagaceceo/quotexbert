@@ -1,0 +1,76 @@
+{
+  "verifiedOn": "2026-11-19",
+  "license": {
+    "name": "Pexels License",
+    "url": "https://www.pexels.com/license/",
+    "commercialUseConfirmation": "https://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project",
+    "permissions": "Free commercial website use and modification; attribution is optional.",
+    "restrictions": "Do not imply endorsement, use as a trademark, resell unaltered stock, redistribute as stock, or portray identifiable people offensively. Third-party rights still apply."
+  },
+  "usage": "Illustrative licensed stock photography, not QuoteXbert customers, completed customer projects, testimonials or endorsements. No AI-generated images.",
+  "processing": "Downloaded from images.pexels.com/photos/{id}/pexels-photo-{id}.jpeg?auto=compress&cs=tinysrgb&w=1800; orientation normalized, converted to sRGB WebP at quality 80 using Sharp. No enlargement. Existing company artwork and original masters are unchanged. Next.js serves responsive optimized derivatives.",
+  "photos": [
+    {
+      "file": "photo-estimate.webp",
+      "pexelsId": 7414962,
+      "photographer": "MART PRODUCTION",
+      "source": "https://www.pexels.com/photo/woman-taking-photos-using-her-cellphone-7414962/",
+      "license": "Pexels License",
+      "width": 1800,
+      "height": 1200,
+      "bytes": 104574
+    },
+    {
+      "file": "contractor-flooring.webp",
+      "pexelsId": 4263067,
+      "photographer": "K",
+      "photographerProfile": "https://www.pexels.com/@kelly/",
+      "source": "https://www.pexels.com/photo/crop-man-installing-laminate-flooring-4263067/",
+      "license": "Pexels License",
+      "width": 1800,
+      "height": 1200,
+      "bytes": 103500
+    },
+    {
+      "file": "project-consultation.webp",
+      "pexelsId": 6474486,
+      "photographer": "Tima Miroshnichenko",
+      "source": "https://www.pexels.com/photo/a-couple-discussing-their-home-under-construction-6474486/",
+      "license": "Pexels License",
+      "width": 1420,
+      "crop": "380 pixels removed from the right edge to omit product packaging and keep people clear of desktop headlines.",
+      "height": 1200,
+      "bytes": 100786
+    },
+    {
+      "file": "renovation-planning.webp",
+      "pexelsId": 8485587,
+      "photographer": "Thirdman",
+      "source": "https://www.pexels.com/photo/women-looking-through-fabric-samples-8485587/",
+      "license": "Pexels License",
+      "width": 1800,
+      "height": 2700,
+      "bytes": 272256
+    },
+    {
+      "file": "finished-kitchen.webp",
+      "pexelsId": 1080721,
+      "photographer": "Mark McCammon",
+      "source": "https://www.pexels.com/photo/kitchen-and-dining-area-1080721/",
+      "license": "Pexels License",
+      "width": 1800,
+      "height": 1200,
+      "bytes": 123946
+    },
+    {
+      "file": "finished-living-room.webp",
+      "pexelsId": 1571460,
+      "photographer": "Viaceslav Kat",
+      "source": "https://www.pexels.com/photo/interior-design-of-a-house-1571460/",
+      "license": "Pexels License",
+      "width": 1800,
+      "height": 1157,
+      "bytes": 206710
+    }
+  ]
+}

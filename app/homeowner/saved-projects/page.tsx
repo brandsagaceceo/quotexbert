@@ -30,7 +30,7 @@ interface SavedProject {
 }
 
 export default function SavedProjectsPage() {
-  const { authUser: user, isSignedIn } = useAuth();
+  const { authUser: user, isSignedIn, authLoading } = useAuth();
   const router = useRouter();
   const [projects, setProjects] = useState<SavedProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,8 +40,9 @@ export default function SavedProjectsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isSignedIn) {
-      router.push("/sign-in");
+      router.push("/sign-in?redirect_url=%2Fhomeowner%2Fsaved-projects");
       return;
     }
     if (user && user.role !== "homeowner") {
@@ -50,7 +51,7 @@ export default function SavedProjectsPage() {
     }
     if (user) fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isSignedIn]);
+  }, [authLoading, user, isSignedIn]);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -263,6 +264,14 @@ export default function SavedProjectsPage() {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 flex-shrink-0">
+                    {project.status !== "posted" && !project.postedAsLeadId && (
+                      <Link
+                        href={`/create-lead?savedProjectId=${encodeURIComponent(project.id)}`}
+                        className="inline-flex items-center justify-center bg-gray-100 text-[#800020] text-xs font-semibold px-3 py-2 rounded-lg hover:bg-rose-50"
+                      >
+                        Edit project
+                      </Link>
+                    )}
                     {project.status !== "posted" && (
                       <button
                         onClick={() => handlePublish(project)}

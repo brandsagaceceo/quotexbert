@@ -4,6 +4,16 @@ import {
 } from "@/lib/seo/affiliate-products";
 import type { SeoTopic } from "@/lib/seo/topics";
 
+export const SEO_ARTICLE_STATUSES = [
+  "draft",
+  "approved",
+  "published",
+  "generating",
+  "failed",
+  "rejected",
+] as const;
+export type SeoArticleStatus = (typeof SEO_ARTICLE_STATUSES)[number];
+
 export interface GeneratedSeoArticle {
   title: string;
   excerpt: string;

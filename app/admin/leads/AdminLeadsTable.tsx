@@ -9,8 +9,8 @@ interface Lead {
   createdAt: Date;
   title: string;
   description: string;
-  budget: string; // Changed from number to string to match updated schema
-  zipCode: string;
+  budget: string | null;
+  zipCode: string | null;
   category: string;
   status: string;
   claimed: boolean;

@@ -8,11 +8,11 @@ const activeAcceptanceStatuses = ["accepted", "quoted", "selected"];
 const activeApplicationStatuses = ["accepted", "in_progress", "completed"];
 
 function parsePairKey(key: string): [string, string, string] {
-  const parts = key.split("|");
-  if (parts.length !== 3 || parts.some((part) => !part)) {
+  const [leadId, homeownerId, contractorId, ...extra] = key.split("|");
+  if (!leadId || !homeownerId || !contractorId || extra.length > 0) {
     throw new Error(`Invalid contractor conversation identity: ${key}`);
   }
-  return [parts[0], parts[1], parts[2]];
+  return [leadId, homeownerId, contractorId];
 }
 
 async function main() {

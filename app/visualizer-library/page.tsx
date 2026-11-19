@@ -152,10 +152,11 @@ export default function VisualizerLibrary() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-[#800020] mb-4">
-            ✨ AI Visualizer Library
+            Renovation Design Example Gallery
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Browse real transformation examples powered by QuoteXbert AI. See what's possible for your home.
+            Illustrative stock-image examples, not customer projects or actual before-and-after transformations.
+            The social inspiration feed is still in development. Listed costs are examples, not verified quotes.
           </p>
         </div>
 

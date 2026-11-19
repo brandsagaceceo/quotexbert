@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![QuoteXbert Logo](public/logo.svg)
+![QuoteXbert Logo](public/branding/quotexbert-qx-icon-display.webp)
 
 **AI-Powered Home Repair Estimates & Contractor Matching Platform**
 
@@ -50,6 +50,111 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
 
 ## 🚀 Quick Start
 
+### Approved QX branding
+
+The original PNG artwork in [public/branding](./public/branding/) is preserved.
+The shared header and footer use lossless WebP display copies, with only transparent
+margins trimmed and a one-pixel transparent border added. There is no resizing,
+lettering reconstruction, or lossy compression.
+
+Regenerate only these display copies with `node scripts/optimize-branding.mjs`.
+Validate pixel preservation and download savings with
+`node --test scripts/branding-assets.test.mjs`.
+Convert browser favicons and web app icons directly from the approved square PNG
+with `node scripts/generate-favicons.mjs`; the same focused test verifies all
+output pixels against direct master resizes, including embedded PNGs in the
+legacy SVG URLs and ICO frames. Existing icon URLs remain compatible; versioned
+metadata/manifest references refresh older browser caches. Manifest icons use
+`purpose: any`: a maskable redesign is deliberately not claimed.
+Social exports and native App Store assets remain outside this update.
+
+### Existing AI Blog Studio
+
+`/admin/blog` now uses the existing database-backed SEO editor; `/admin/blog/seo`
+redirects there for compatibility. Counts and status filters use `SeoArticle`,
+not sample posts or invented analytics. The existing list API is paginated
+(25 records per page); response summaries cover all records.
+
+All generation stays private. Manual generation uses the same generator, approved
+topics, shared one-attempt-per-UTC-day reservation, and global AI request budget
+as scheduled drafting. It requires `SEO_MANUAL_DRAFT_ENABLED=true`; this package
+does not enable the flag or make paid AI requests. Non-production writes also
+require `SEO_PREVIEW_WRITES_ENABLED=true`, **only after** an authorized isolated
+database is configured with the existing migration. Preview publication remains
+blocked. No migration or environment change is performed by this package.
+
+Approval never publishes, and editing an approved article clears its approval.
+Cron can draft when explicitly enabled but cannot publish, even if the old
+`SEO_AUTO_PUBLISH_ENABLED` variable remains configured. Publication is only
+through the existing, explicitly confirmed administrator publish action.
+
+The Search Console panel links to the existing sitemap and reports setup status.
+`GOOGLE_SITE_VERIFICATION` optionally supplies the existing layout's HTML
+verification tag. The administrator Insights page can retrieve read-only Search
+Console and GA4 metrics when all of these server-only values are configured:
+
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- `GOOGLE_SEARCH_CONSOLE_PROPERTY_URL` (the exact URL-prefix or `sc-domain:`
+  property)
+- `GOOGLE_ANALYTICS_PROPERTY_ID` (the numeric GA4 property ID)
+
+Enable the Search Console API and Google Analytics Data API in the service
+account's Google Cloud project. Add the service-account email as a read-only user
+of the Search Console property and as a Viewer on the GA4 property. Keep
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` for the existing website tag. Credentials remain
+server-side and are never returned by the administrator APIs.
+
+Reuse the existing QuoteXbert GA4 property: set its existing `G-` Measurement ID
+and numeric Property ID; do not create another property. Direct GA4 mode owns one
+explicit pageview per route and suppresses GTM loading when both environment
+variables are present. If the existing property is intentionally installed only
+through GTM, leave `NEXT_PUBLIC_GA_MEASUREMENT_ID` unset and configure
+`NEXT_PUBLIC_GTM_ID` instead. Do not install the same GA4 Configuration tag in
+both places.
+
+Current conversion audit:
+
+- successful estimates emit events, but older flows use both
+  `estimate_complete` and `estimate_completed`; standardize on one confirmed
+  success event before marking it as a GA4 key event
+- job-post success has no authoritative GA4 success event
+- contractor registration currently tracks CTA intent, not confirmed account
+  creation
+- subscription helpers exist, but no confirmed checkout/webhook success event is
+  wired to GA4
+
+Future conversion work should emit browser events only after the corresponding
+authenticated success response, use a stable non-sensitive transaction ID for
+deduplication, and mark those confirmed events as GA4 key events. Never treat CTA
+clicks as completed registrations or purchases.
+
+For one low-cost, manually approved Blog Studio test in an isolated Preview
+environment, configure:
+
+- `OPENAI_API_KEY` as a sensitive server-only value
+- `SEO_MANUAL_DRAFT_ENABLED=true`
+- `SEO_PREVIEW_WRITES_ENABLED=true` only after the Preview deployment uses an
+  isolated, migrated database
+- `AI_GLOBAL_DAILY_REQUEST_LIMIT=1`
+- `SEO_DRAFT_AUTOMATION_ENABLED=false`
+
+The existing generator uses `gpt-4o-mini`, creates a private draft, and never
+publishes automatically. To display an estimated USD cost from the provider's
+real token counts, copy the current rates for the configured model from the
+official OpenAI pricing page into:
+
+- `AI_SEO_INPUT_COST_PER_MILLION_USD`
+- `AI_SEO_CACHED_INPUT_COST_PER_MILLION_USD` (optional; input rate is used when
+  omitted)
+- `AI_SEO_OUTPUT_COST_PER_MILLION_USD`
+
+No default prices are embedded. If rates are absent, the dashboard displays real
+token usage and a pricing-required status instead of inventing a cost.
+
+Focused, isolated tests (no real database, email or AI calls):
+`npx tsx --test scripts/seo-admin-authorization.test.ts scripts/seo-content-validation.test.ts scripts/seo-cron-safety.test.ts scripts/seo-manual-generation.test.ts`.
+
 ### Prerequisites
 
 - Node.js 20+
@@ -59,29 +164,34 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/quotexbert.git
    cd quotexbert
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration
    ```
 
 4. **Initialize the database**
+
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
 5. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -131,52 +241,120 @@ quotexbert/
 ## 📖 Core Features Documentation
 
 ### 1. User Management & Authentication
-- Demo authentication system
+
+- Existing Clerk sign-in and sign-up
 - Role-based access (homeowner/contractor)
 - Profile management with image uploads
-- Ready for Clerk integration
+- Existing database-backed account and role resolution
 
 ### 2. Job & Quote Management
+
 - Job posting with AI estimate generation
 - Quote submission and comparison
 - Status tracking and updates
 - File attachments support
 
+#### Estimate authentication handoff
+
+The existing homepage and estimate landing page retain `/create-lead` as the
+sign-up/sign-in return destination. Browser storage failures are reported before
+navigation rather than claiming that an estimate was preserved.
+
+The existing `pending_save_estimate` cache is cleared only after the existing
+save API confirms a saved record. Failed requests, malformed responses and newer
+queued estimates are retained. The client shares in-flight resume requests and
+adds a durable `clientRequestId` before posting, including for legacy caches.
+The existing save API uses that optional UUID as the existing `AIEstimate.id`:
+retries return the same owner-checked record without updating it; concurrent
+creation is handled. Callers without this optional field keep their previous
+create behavior. No new model, migration, API or authentication flow is added.
+
+Focused tests: `npx tsx --test scripts/estimate-handoff.test.ts scripts/homeowner-estimate-project-security.test.ts`.
+They exercise the client-to-existing-API retry workflow with in-memory records
+only, including a response lost after commit. Real Clerk/database/photo-upload
+acceptance still requires an authorized isolated environment.
+
 ### 3. Messaging System
+
 - Real-time conversations
 - File sharing capabilities
 - Read receipts and notifications
 - Mobile-optimized chat interface
 
 ### 4. Subscription Billing
+
 - Stripe integration for contractor subscription billing
 - Plan management for contractor access
 - Billing status and renewal tracking
 - Subscription lifecycle webhooks
 
 ### 5. Portfolio Management
+
 - Contractor portfolio uploads
 - Image management and optimization
 - Project showcases
 - Performance analytics
 
 ### 6. Search & Discovery
+
 - Advanced contractor search
 - Filter by location, trade, rating
 - Verified contractor badges
 - Review-based ranking
 
 ### 7. Mobile Experience
+
 - Progressive Web App features
 - Bottom navigation for mobile
 - Touch-optimized interfaces
 - Swipe gestures and interactions
 
+#### Homepage banner motion
+
+The existing homepage banners reuse the shared `gradient`/`blob` animations and
+the existing burgundy CSS brand tokens. `.homepage-banner` slows the decorative
+gradient to 12 seconds without moving text or controls. Existing reduced-motion
+rules disable these loops; the estimate CTA also uses the shared scroll-motion
+preference. Routes, role visibility, offer flags and pricing behavior are
+unchanged. No new banners, assets, animation library or paid service were added.
+
 ### 8. Notification System
+
 - Email notifications with templates
 - In-app notification center
 - Preference management
 - Multi-channel delivery
+
+### Job-board loading and recovery
+
+The existing `/contractor/jobs` page reports service failures separately from empty or filtered results. Retry uses the existing `/api/jobs`; stale responses cannot replace a newer request or a signed-out state. Current `{ jobs, message }` and legacy array responses remain supported. Empty results do not claim unverified daily activity, and failures do not suggest buying more categories.
+
+Focused validation: `.\node_modules\.bin\tsx.cmd --test scripts\contractor-job-board-loading.test.ts scripts\jobs-api-security.test.ts`.
+Real signed-in browsing and acceptance still require an authorized isolated account/database. This package changes no access rules, subscriptions, billing, API routes or models.
+
+### Integrated homepage journeys
+
+The existing homepage hero uses one wide, photographic six-journey carousel, not a second homepage: photo estimate, photo project posting, existing job form, existing QuoteXbert assistant, existing visualizer and the existing design example library. The unchanged estimator sits immediately below the banner. Guided planning/visualization are labelled previews; the social inspiration feed is not advertised as released. The library explicitly identifies stock examples rather than claiming real transformations.
+
+Automatic rotation is six seconds with a 500ms fade. Hover, keyboard focus and hidden tabs pause it; users have previous/next, direct selection, pause/start, arrow/Home/End and horizontal touch controls. Reduced motion disables autoplay and decorative transitions. The estimator, estimate handoff, role-aware assistant and manual job submission remain authoritative.
+
+All six scenes use different, locally stored real photographs with commercial-use permission under the Pexels License. Sources, artists, license links and derivative details are recorded in [the photography credits](public/homepage/photography-credits.json), with voluntary on-slide source credits. These are illustrative stock scenes, not customer endorsements or project results. No AI imagery or company artwork changes are included.
+
+WebP assets use responsive Next.js Image optimization and per-scene focal positions. Only the first photo has high priority; after it loads, one subsequent photo is warmed. Later images mount on demand, and the previous scene remains visible until its replacement loads. Failed media is reported explicitly. Reserved slide dimensions prevent rotation layout shift. The focused browser suite enforces no more than two initial full-size photo requests and a combined encoded photo-response budget below 350 KB at a 1440px viewport.
+
+Unverified static testimonials/stock-profile endorsements are not rendered on the homepage. The existing public activity component uses only validated API records, converts ISO timestamps, and reports empty/error/retry states rather than inventing activity.
+
+With the isolated app running at port 3102 without production credentials, run `.\node_modules\.bin\playwright.cmd test homepage-carousel.spec.ts --workers=1 --reporter=line --output=.next\playwright-results`. Fixtures are isolated inside browser tests and never represent production activity. Real authenticated/provider-backed journeys remain a separate acceptance gate.
+
+### Integration release checks
+
+The staging integration resolves the existing 26 TypeScript diagnostics without relaxing strict types. Optional email/analytics properties are omitted when absent, Lead-derived fields accept the database's nulls, and test fixtures match existing Prisma records. Build-time type checking is enabled again. Run `npm.cmd run typecheck` and `npm.cmd run build`; stop the local Next server before building against the same `.next` directory. Existing lint disabling is unchanged, so build success is not a lint pass.
+
+The existing homeowner bid page now accepts Next 14's plain route params and handles Prisma's nullable string prices rather than inventing zero-priced bids. The old subscription-success screen shows verification failures explicitly and no longer tracks guessed purchase prices or claims an email was sent. **Release blocker:** its referenced `/api/contractor/verify-subscription` endpoint does not exist. Reconcile this legacy checkout flow with the existing subscription/webhook/activation implementation using an authorized Stripe-test account; no parallel verifier, price change or live billing operation was added.
+
+The existing `/api/stats` is now dynamic and uncached. It counts only published non-seeded jobs, uses real review aggregates, returns `avgRating: null` when there are no reviews, and returns HTTP 503 rather than fabricated counts when storage is unavailable. Consumers must handle the null/unavailable states; no frontend consumer was found in the scoped page/component search.
+
+Focused state regressions: `.\node_modules\.bin\tsx.cmd --test scripts\client-release-states.test.ts scripts\public-stats.test.ts`. These execute actual handlers/client functions with isolated dependencies, not authenticated browser sessions. A credential-free production build passes; production-mode middleware still requires legitimate Clerk configuration and was not bypassed to manufacture a runtime pass. The local review uses development mode with all paid/database/SEO-write settings absent or disabled.
 
 ## 🔧 Configuration
 
@@ -252,6 +430,7 @@ netlify deploy --prod
 ### Complete Deployment Guide
 
 See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed deployment instructions including:
+
 - Environment variable setup
 - Database configuration
 - Security settings
@@ -340,6 +519,7 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 ### Core Endpoints
 
 #### Jobs API
+
 ```typescript
 GET    /api/jobs              # List jobs
 POST   /api/jobs              # Create job
@@ -349,6 +529,7 @@ DELETE /api/jobs/[id]         # Delete job
 ```
 
 #### Quotes API
+
 ```typescript
 GET    /api/quotes            # List quotes
 POST   /api/quotes            # Submit quote
@@ -357,6 +538,7 @@ POST   /api/quotes/[id]/accept # Accept quote
 ```
 
 #### Messages API
+
 ```typescript
 GET    /api/conversations     # List conversations
 POST   /api/conversations     # Create conversation
@@ -416,6 +598,7 @@ import { Button } from '@/components/ui/Button';
 ### Common Issues
 
 1. **Build Failures**
+
    ```bash
    rm -rf .next node_modules
    npm install
@@ -423,6 +606,7 @@ import { Button } from '@/components/ui/Button';
    ```
 
 2. **Database Issues**
+
    ```bash
    npx prisma generate
    npx prisma db push

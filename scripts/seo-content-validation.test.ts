@@ -4,6 +4,7 @@ import {
   parseSeoArticleEdits,
 } from "../lib/seo/article-validation";
 import {
+  describeGenerationFailure,
   getNextPublicationSlot,
   isSeoDraftAutomationEnabled,
 } from "../lib/seo/article-generation";
@@ -75,6 +76,16 @@ const mondayAfterSlot = getNextPublicationSlot(
   new Date("2026-03-02T15:00:00.000Z"),
 );
 assert.equal(mondayAfterSlot.toISOString(), "2026-03-04T14:00:00.000Z");
+
+assert.equal(describeGenerationFailure({ status: 429 }), "OpenAIRateLimited");
+assert.equal(
+  describeGenerationFailure({ status: 401 }),
+  "OpenAIAuthenticationFailed",
+);
+assert.equal(
+  describeGenerationFailure(new Error("Request timed out")),
+  "OpenAITimeout",
+);
 
 const originalFlag = process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 delete process.env.SEO_DRAFT_AUTOMATION_ENABLED;

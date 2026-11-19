@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
 
       await Promise.allSettled(
         batch.map(async (contractor) => {
-          const firstName = (contractor.name || '').split(' ')[0];
+          const firstName = (contractor.name || '').split(' ')[0] || 'there';
           try {
             await resend.emails.send({
               from: fromEmail,

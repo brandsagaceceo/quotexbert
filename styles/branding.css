@@ -1,0 +1,9 @@
+/* Block-level flex avoids the inline baseline space that raised the header logo. */
+.qx-logo{display:flex;align-items:center;gap:10px;width:fit-content;max-width:100%;min-width:0}
+.qx-logo-icon{display:block;width:var(--qx-logo-size,36px);flex-shrink:0}
+.qx-logo-wordmark{display:block;width:calc(var(--qx-logo-size,36px)*5.5);min-width:0;flex-shrink:1}
+.qx-logo-icon img,.qx-logo-wordmark img{display:block;width:100%;height:auto}
+.qx-logo-link{display:flex;width:fit-content;max-width:100%;border-radius:6px;text-decoration:none}
+.qx-logo-link:focus-visible{outline:3px solid #800020;outline-offset:5px}
+@media(max-width:640px){.qx-logo-header{--qx-logo-size:28px!important;gap:8px}}
+@media(max-width:380px){.qx-logo-header{--qx-logo-size:24px!important;gap:6px}}

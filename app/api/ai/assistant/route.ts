@@ -5,14 +5,18 @@ import {
   parseAssistantChatInput,
   parseAssistantResponse,
 } from "@/lib/ai-assistant";
+import { getOpenAIClient, OPENAI_MODELS } from "@/lib/openai-client";
 import {
-  getOpenAIClient,
-  OPENAI_MODELS,
-} from "@/lib/openai-client";
-import { reserveGlobalAiRequest } from "@/lib/ai-usage-budget";
+  recordGlobalAiUsage,
+  reserveGlobalAiRequest,
+} from "@/lib/ai-usage-budget";
 import { resolveAuthUser } from "@/lib/server-auth";
 import { resolveHomeownerIdentity } from "@/lib/homeowner-auth";
-import { getPrivateImage, isPrivatePhotoOwnedBy, privatePhotoPath } from "@/lib/upload";
+import {
+  getPrivateImage,
+  isPrivatePhotoOwnedBy,
+  privatePhotoPath,
+} from "@/lib/upload";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -65,12 +69,18 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   if (!isQuoteXbertAiEnabled()) {
-    return NextResponse.json({ error: "AI assistant is disabled" }, { status: 404 });
+    return NextResponse.json(
+      { error: "AI assistant is disabled" },
+      { status: 404 },
+    );
   }
 
   const identity = await resolveAuthUser();
   if ("error" in identity) {
-    return NextResponse.json({ error: identity.error }, { status: identity.status });
+    return NextResponse.json(
+      { error: identity.error },
+      { status: identity.status },
+    );
   }
 
   const user = await prisma.user.findFirst({
@@ -84,10 +94,15 @@ export async function POST(request: NextRequest) {
   });
   const role = user?.role;
   if (role !== "homeowner" && role !== "contractor") {
-    return NextResponse.json({ error: "Homeowner or contractor account required" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Homeowner or contractor account required" },
+      { status: 403 },
+    );
   }
 
-  let homeownerIdentity: Awaited<ReturnType<typeof resolveHomeownerIdentity>> | null = null;
+  let homeownerIdentity: Awaited<
+    ReturnType<typeof resolveHomeownerIdentity>
+  > | null = null;
   if (role === "homeowner") {
     homeownerIdentity = await resolveHomeownerIdentity();
     if (!homeownerIdentity.success) {
@@ -100,23 +115,35 @@ export async function POST(request: NextRequest) {
 
   const bodyText = await request.text();
   if (bodyText.length > 32_000) {
-    return NextResponse.json({ error: "Request is too large" }, { status: 413 });
+    return NextResponse.json(
+      { error: "Request is too large" },
+      { status: 413 },
+    );
   }
 
   let body: unknown;
   try {
     body = JSON.parse(bodyText);
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
 
   const chat = parseAssistantChatInput(body);
   if (!chat || chat.messages[chat.messages.length - 1]?.role !== "user") {
-    return NextResponse.json({ error: "Invalid assistant request" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid assistant request" },
+      { status: 400 },
+    );
   }
 
   if (role !== "homeowner" && chat.photos.length > 0) {
-    return NextResponse.json({ error: "Photo analysis is available to homeowners only" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Photo analysis is available to homeowners only" },
+      { status: 403 },
+    );
   }
 
   if (
@@ -126,17 +153,26 @@ export async function POST(request: NextRequest) {
         !privatePhotoPath(photo),
     )
   ) {
-    return NextResponse.json({ error: "Photos must belong to this homeowner" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Photos must belong to this homeowner" },
+      { status: 400 },
+    );
   }
 
   const client = getOpenAIClient();
   if (!client) {
-    return NextResponse.json({ error: "AI service is not configured" }, { status: 503 });
+    return NextResponse.json(
+      { error: "AI service is not configured" },
+      { status: 503 },
+    );
   }
 
   const withinLimit = await consumeAssistantAllowance(identity.user.dbUserId);
   if (!withinLimit) {
-    return NextResponse.json({ error: "Assistant usage limit reached. Try again later." }, { status: 429 });
+    return NextResponse.json(
+      { error: "Assistant usage limit reached. Try again later." },
+      { status: 429 },
+    );
   }
 
   try {
@@ -154,8 +190,11 @@ export async function POST(request: NextRequest) {
           throw new Error("UNSUPPORTED_PRIVATE_PHOTO");
         }
 
-        const bytes = Buffer.from(await new Response(image.stream).arrayBuffer());
-        if (bytes.length > MAX_IMAGE_BYTES) throw new Error("PRIVATE_PHOTO_TOO_LARGE");
+        const bytes = Buffer.from(
+          await new Response(image.stream).arrayBuffer(),
+        );
+        if (bytes.length > MAX_IMAGE_BYTES)
+          throw new Error("PRIVATE_PHOTO_TOO_LARGE");
         return {
           type: "input_image" as const,
           image_url: `data:${contentType};base64,${bytes.toString("base64")}`,
@@ -170,7 +209,10 @@ export async function POST(request: NextRequest) {
     }));
     const latestMessage = chat.messages[chat.messages.length - 1];
     if (!latestMessage) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message is required" },
+        { status: 400 },
+      );
     }
 
     if (!(await reserveGlobalAiRequest("homeowner_assistant"))) {
@@ -208,6 +250,11 @@ export async function POST(request: NextRequest) {
       },
       { timeout: 30_000 },
     );
+    await recordGlobalAiUsage(
+      "homeowner_assistant",
+      OPENAI_MODELS.homeownerAssistant,
+      response,
+    );
 
     let parsed: ReturnType<typeof parseAssistantResponse> = null;
     try {
@@ -217,7 +264,10 @@ export async function POST(request: NextRequest) {
     }
     if (!parsed) {
       console.error("[AI Assistant] Invalid structured response");
-      return NextResponse.json({ error: "Assistant response could not be validated" }, { status: 502 });
+      return NextResponse.json(
+        { error: "Assistant response could not be validated" },
+        { status: 502 },
+      );
     }
 
     if (role === "contractor") parsed.jobDraft = null;
@@ -234,7 +284,8 @@ export async function POST(request: NextRequest) {
           city: draft.city,
           province: draft.province,
           zipCode: draft.zipCode?.toUpperCase() ?? null,
-          location: [draft.city, draft.province].filter(Boolean).join(", ") || null,
+          location:
+            [draft.city, draft.province].filter(Boolean).join(", ") || null,
           budget: draft.budget,
           photos: JSON.stringify(chat.photos),
           visualizerImages: "[]",
@@ -255,18 +306,23 @@ export async function POST(request: NextRequest) {
       success: true,
       reply: parsed.reply,
       followUpQuestions: parsed.followUpQuestions,
-      jobDraft: parsed.jobDraft && savedProjectId
-        ? { ...parsed.jobDraft, id: savedProjectId }
-        : null,
+      jobDraft:
+        parsed.jobDraft && savedProjectId
+          ? { ...parsed.jobDraft, id: savedProjectId }
+          : null,
     });
   } catch (error) {
     console.error("[AI Assistant] Request failed", {
       errorType:
-        error instanceof Error && /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)
+        error instanceof Error &&
+        /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)
           ? error.name
           : "UnknownError",
     });
-    return NextResponse.json({ error: "AI assistant request failed" }, { status: 503 });
+    return NextResponse.json(
+      { error: "AI assistant request failed" },
+      { status: 503 },
+    );
   }
 }
 
@@ -297,7 +353,10 @@ async function consumeAssistantAllowance(userId: string) {
 }
 
 function normalizeProjectCategory(category: string) {
-  const normalized = category.toLowerCase().replace(/[^a-z0-9 -]/g, "").trim();
+  const normalized = category
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, "")
+    .trim();
   const supported = new Set([
     "bathroom",
     "basement",

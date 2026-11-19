@@ -54,9 +54,9 @@ interface QuoteForAnalysis {
   job: {
     title: string;
     description: string;
-    budget: string;
+    budget: string | null;
     category: string;
-    zipCode: string;
+    zipCode: string | null;
   } | null;
   aiEstimate: {
     minCost: number;
@@ -143,9 +143,9 @@ function buildPrompt(q: QuoteForAnalysis): string {
     : "No prior AI estimate available for this job.";
 
   const budgetBlock = q.job
-    ? `Job budget (homeowner's stated budget): ${q.job.budget}
+    ? `Job budget (homeowner's stated budget): ${q.job.budget ?? "Not specified"}
 Job category: ${q.job.category}
-Location (zip): ${q.job.zipCode}`
+Location (zip): ${q.job.zipCode ?? "Not specified"}`
     : "Job details unavailable.";
 
   return `You are an expert home renovation cost analyst.

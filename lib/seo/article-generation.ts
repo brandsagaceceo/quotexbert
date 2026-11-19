@@ -4,7 +4,10 @@ import {
   isAiFeatureEnabled,
   OPENAI_MODELS,
 } from "@/lib/openai-client";
-import { reserveGlobalAiRequest } from "@/lib/ai-usage-budget";
+import {
+  recordGlobalAiUsage,
+  reserveGlobalAiRequest,
+} from "@/lib/ai-usage-budget";
 import { prisma } from "@/lib/prisma";
 import { parseGeneratedSeoArticle } from "@/lib/seo/article-validation";
 import {
@@ -13,6 +16,7 @@ import {
   getApprovedAffiliateProducts,
 } from "@/lib/seo/affiliate-products";
 import { APPROVED_SEO_TOPICS, type SeoTopic } from "@/lib/seo/topics";
+import { areSeoAdminWritesEnabled } from "@/lib/seo/admin-auth";
 
 const articleSchema = {
   type: "object",
@@ -45,8 +49,20 @@ Write 800-1,200 words with a clear introduction, at least five useful H2/H3 head
 Recommend only products whose IDs appear in the approved catalog. The catalog is empty unless supplied; never invent products, merchants, tracking IDs, product URLs, or prices. Return no more than three catalog IDs.
 Do not claim that keyword metrics or Search Console research were used.`;
 
-export async function generateNextSeoDraft() {
-  if (!isSeoDraftAutomationEnabled()) return { kind: "disabled" as const };
+export async function generateNextSeoDraft(
+  options: { trigger?: "manual" | "scheduled" } = {},
+) {
+  const enabled =
+    options.trigger === "manual"
+      ? isAiFeatureEnabled("SEO_MANUAL_DRAFT_ENABLED")
+      : isSeoDraftAutomationEnabled();
+  if (!enabled) return { kind: "disabled" as const };
+  if (!areSeoAdminWritesEnabled()) {
+    return {
+      kind: "blocked" as const,
+      error: "Preview database writes are disabled",
+    };
+  }
 
   const createdAtSlot = new Date();
   const slotKey = getSlotKey(createdAtSlot);
@@ -96,7 +112,11 @@ export async function generateNextSeoDraft() {
     if (!client)
       return recordFailure(reservation.id, slotKey, "OpenAIUnavailable");
     if (!(await reserveGlobalAiRequest("seo_drafting"))) {
-      return recordFailure(reservation.id, slotKey, "GlobalAiUsageBudgetReached");
+      return recordFailure(
+        reservation.id,
+        slotKey,
+        "GlobalAiUsageBudgetReached",
+      );
     }
 
     const response = await client.responses.create(
@@ -135,6 +155,11 @@ export async function generateNextSeoDraft() {
         },
       },
       { timeout: 45_000 },
+    );
+    await recordGlobalAiUsage(
+      "seo_drafting",
+      OPENAI_MODELS.seoDrafting,
+      response,
     );
 
     let generated: ReturnType<typeof parseGeneratedSeoArticle> = null;
@@ -181,48 +206,16 @@ export async function generateNextSeoDraft() {
 
     return { kind: "created" as const, article };
   } catch (error) {
-    const errorType =
-      error instanceof Error && /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)
-        ? error.name
-        : "GenerationError";
-    return recordFailure(reservation.id, slotKey, errorType);
+    return recordFailure(
+      reservation.id,
+      slotKey,
+      describeGenerationFailure(error),
+    );
   }
 }
 
 export function isSeoDraftAutomationEnabled() {
   return isAiFeatureEnabled("SEO_DRAFT_AUTOMATION_ENABLED");
-}
-
-export function isSeoAutoPublishEnabled() {
-  return process.env.SEO_AUTO_PUBLISH_ENABLED === "true";
-}
-
-export async function publishScheduledSeoArticles(now = new Date()) {
-  const scheduled = await prisma.seoArticle.findMany({
-    where: {
-      status: "approved",
-      approvedAt: { not: null },
-      scheduledFor: { lte: now },
-    },
-    orderBy: { scheduledFor: "asc" },
-    take: 3,
-    select: { id: true },
-  });
-
-  let publishedCount = 0;
-  for (const article of scheduled) {
-    const updated = await prisma.seoArticle.updateMany({
-      where: {
-        id: article.id,
-        status: "approved",
-        approvedAt: { not: null },
-        scheduledFor: { lte: now },
-      },
-      data: { status: "published", publishedAt: now },
-    });
-    publishedCount += updated.count;
-  }
-  return publishedCount;
 }
 
 export function getNextPublicationSlot(now = new Date()) {
@@ -328,6 +321,28 @@ function isUniqueConstraintError(error: unknown) {
     "code" in error &&
     (error as { code?: unknown }).code === "P2002"
   );
+}
+
+export function describeGenerationFailure(error: unknown) {
+  if (error && typeof error === "object" && "status" in error) {
+    const status = Number((error as { status?: unknown }).status);
+    if (status === 400) return "OpenAIRequestRejected";
+    if (status === 401 || status === 403) return "OpenAIAuthenticationFailed";
+    if (status === 429) return "OpenAIRateLimited";
+    if (status >= 500 && status <= 599) return "OpenAIServiceUnavailable";
+  }
+  if (error instanceof Error) {
+    if (
+      error.name === "AbortError" ||
+      /timeout|timed out/i.test(error.message)
+    ) {
+      return "OpenAITimeout";
+    }
+    if (/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)) {
+      return error.name;
+    }
+  }
+  return "GenerationError";
 }
 
 function appendAffiliateRecommendations(

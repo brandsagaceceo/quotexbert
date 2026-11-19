@@ -7,7 +7,6 @@ import Link from "next/link";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
-import { ReviewsSection, Review } from "@/components/ReviewsSection";
 import { LocalBusinessSchema } from "@/components/LocalBusinessSchema";
 import { TrustSignals } from "@/components/TrustSignals";
 import { StickyCTA } from "@/components/StickyCTA";
@@ -21,15 +20,13 @@ import {
 } from "@/lib/tracking";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { useToast } from "@/components/ToastProvider";
+import { queueEstimateForSignIn, resumePendingEstimate } from "@/lib/estimate-handoff";
+import HomepageJourneyCarousel from "@/components/HomepageJourneyCarousel";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
 import {
   Sparkles,
   Gift,
-  MapPin,
-  Bookmark,
-  Users,
-  Star,
   CheckCircle2,
   Tag,
   Map,
@@ -48,7 +45,6 @@ import {
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
-const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection").then(mod => ({ default: mod.TestimonialsSection })));
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(mod => ({ default: mod.ExitIntentModal })));
 const ExampleEstimates = lazy(() => import("@/components/ExampleEstimates"));
 const TrustFAQ = lazy(() => import("@/components/TrustFAQ"));
@@ -60,6 +56,20 @@ export default function Home() {
   const [savingEstimate, setSavingEstimate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const toast = useToast();
+
+  const handleOpenPlanning = () => {
+    const panel = document.getElementById('quotexbert-ai-panel');
+    if (panel) {
+      panel.focus();
+      return;
+    }
+    const launcher = document.getElementById('quotexbert-ai-launcher');
+    if (!launcher) {
+      toast.error('The assistant is still loading. Please try again in a moment.');
+      return;
+    }
+    launcher.click();
+  };
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
@@ -80,30 +90,21 @@ export default function Home() {
   // the estimate or click Save again.
   useEffect(() => {
     if (!isSignedIn || !user?.id) return;
-    const pendingRaw = localStorage.getItem('pending_save_estimate');
-    if (!pendingRaw) return;
-    let pending: any = null;
-    try { pending = JSON.parse(pendingRaw); } catch { pending = null; }
-    localStorage.removeItem('pending_save_estimate');
-    if (!pending) return;
-
-    (async () => {
-      try {
-        const response = await fetch('/api/ai-estimates/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...pending, homeownerId: user.id }),
-        });
-        const data = await response.json();
-        if (data.success) {
+    let active = true;
+    resumePendingEstimate(user.id)
+      .then((saved) => {
+        if (active && saved) {
           toast.success('Your estimate was saved to Profile > AI Estimates.');
-        } else {
-          toast.error(data.error || 'Failed to save your estimate. Please try again from Profile.');
         }
-      } catch {
-        toast.error('Failed to save your estimate. Please try again from Profile.');
-      }
-    })();
+      })
+      .catch((cause: unknown) => {
+        if (active) {
+          toast.error(cause instanceof Error
+            ? cause.message
+            : 'Your estimate was not cleared. Refresh to retry saving.');
+        }
+      });
+    return () => { active = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSignedIn, user?.id]);
 
@@ -114,9 +115,6 @@ export default function Home() {
     setShowSignUpGate(true);
     trackSignUpModalShown('estimator_gate');
   };
-
-  // In production, fetch real reviews from API
-  const realReviews: Review[] = []; // Empty for now - will show examples
 
   const handleGetContractorBids = () => {
     trackCTAClick('estimate_results', 'Get Contractor Bids');
@@ -132,13 +130,18 @@ export default function Home() {
         scope: estimateResult.scope || [],
         lineItems: estimateResult.line_items || [],
       };
-      localStorage.setItem('estimate_data', JSON.stringify(estimateData));
+      try {
+        localStorage.setItem('estimate_data', JSON.stringify(estimateData));
+      } catch {
+        toast.error('Your browser could not preserve this estimate for your project. Keep this page open and allow browser storage before continuing.');
+        return;
+      }
     }
     
     if (isSignedIn) {
       window.location.href = '/create-lead';
     } else {
-      window.location.href = '/sign-up';
+      window.location.href = '/sign-up?redirect_url=%2Fcreate-lead';
     }
   };
 
@@ -170,9 +173,10 @@ export default function Home() {
       // Preserve the estimate so it isn't lost — attach it automatically once
       // the homeowner finishes signing in/up (see the effect above).
       try {
-        localStorage.setItem('pending_save_estimate', JSON.stringify(buildSaveEstimatePayload()));
+        queueEstimateForSignIn(buildSaveEstimatePayload());
       } catch {
-        // localStorage unavailable/full — non-fatal, sign-in flow still works
+        toast.error('Your browser could not preserve this estimate. Keep this page open and allow browser storage before signing in.');
+        return;
       }
       toast.error('Please sign in to save your estimate — we\'ll save it automatically once you\'re signed in.');
       setTimeout(() => { window.location.href = '/sign-in?redirect_url=%2F'; }, 1200);
@@ -303,131 +307,30 @@ export default function Home() {
       {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorBanner />}
 
 
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
-        {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-rose-50 pb-safe md:pb-0">
         {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
         <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
-        <section id="get-estimate" className="relative py-3 md:py-16 lg:py-24 overflow-hidden">
+        <section id="get-estimate" className="relative overflow-hidden py-3 md:py-6 lg:py-8">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
 
-          <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
-              {/* Left Column - Headline & Benefits - Mobile-Optimized */}
-              <div className="text-center lg:text-left space-y-2 md:space-y-6">
-                <div className="inline-flex items-center gap-2 mb-2 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-600" strokeWidth={2} />
-                  <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Estimates · Free to Start</span>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-3 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
-                  <span className="text-[#800020]">
-                    Get an AI Renovation
-                  </span>
-                  <br />
-                  <span className="text-[#800020]">
-                    Estimate Before You Hire
-                  </span>
-                </h1>
+          <div className="relative z-10 mx-auto max-w-[1600px] sm:px-6 lg:px-8">
+            <div className="min-w-0">
+              <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
+              <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
+            </div>
 
-                <p className="text-sm md:text-xl lg:text-2xl text-slate-600 mb-4 md:mb-10 leading-relaxed">
-                  <span className="text-rose-700 font-semibold">Describe your project or upload photos</span> to get a
-                  detailed renovation cost range based on <span className="text-rose-700 font-semibold">Ontario pricing</span>.
-                  Free for homeowners — quick free account required.
-                </p>
-
-                {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
-                <a
-                  href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-1.5 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-sm py-2.5 px-5 rounded-xl shadow-md active:scale-[0.98] transition-colors mb-3"
-                >
-                  <Camera className="w-4 h-4" strokeWidth={2} />
-                  Upload Photos — Free AI Estimate
-                </a>
-
-                {/* Mobile-only compact benefits (desktop shows full cards below) */}
-                <div className="lg:hidden flex flex-wrap gap-1.5 mb-2">
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
-                </div>
-
-                {/* Trust Points - Desktop only */}
-                <div className="hidden lg:block space-y-2.5 md:space-y-3 mb-6 md:mb-10">
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center ring-1 ring-emerald-100">
-                      <Gift className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Free for Homeowners</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No cost to get your estimate</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-rose-50 rounded-xl flex items-center justify-center ring-1 ring-rose-100">
-                      <MapPin className="w-5 h-5 md:w-6 md:h-6 text-rose-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Ontario-Focused Pricing</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Real Toronto, Durham &amp; GTA rates</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-orange-50 rounded-xl flex items-center justify-center ring-1 ring-orange-100">
-                      <Bookmark className="w-5 h-5 md:w-6 md:h-6 text-orange-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Save Estimates to Your Account</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Revisit anytime after signing up</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center ring-1 ring-blue-100">
-                      <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Connect With Contractors When Ready</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No pressure — you&apos;re always in control</div>
-                    </div>
-                  </Link>
-                </div>
-
-                {/* Social Proof - Real faces + badges */}
-                <div className="flex flex-wrap gap-2.5 md:gap-3 justify-center lg:justify-start items-center">
-                  {/* Stacked real homeowner faces */}
-                  <div className="flex items-center gap-2 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                    </div>
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA homeowners</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">Top Rated GTA</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA Verified</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - iPhone Estimator */}
-              <div className="relative lg:pl-8">
-                <div className="hidden lg:block absolute -inset-6 bg-gradient-to-br from-rose-200/40 via-orange-200/30 to-transparent rounded-[2rem] blur-2xl -z-10" aria-hidden="true" />
-                <div id="estimator-tool" data-estimator>
-                  <EstimatorMain 
-                    onEstimateComplete={handleEstimateComplete}
-                    userId={user?.id || undefined}
-                    isBlocked={isEstimatorBlocked}
-                    onBlocked={handleShowSignUpGate}
-                  />
-                </div>
+            <div className="relative mx-auto mt-8 w-full max-w-3xl px-4 sm:px-0">
+              <p className="mb-5 text-center text-sm text-slate-600">
+                Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
+              </p>
+              <div id="estimator-tool" data-estimator>
+                <EstimatorMain
+                  onEstimateComplete={handleEstimateComplete}
+                  userId={user?.id || undefined}
+                  isBlocked={isEstimatorBlocked}
+                  onBlocked={handleShowSignUpGate}
+                />
               </div>
             </div>
           </div>
@@ -541,8 +444,8 @@ export default function Home() {
 
         {/* Contractor CTA Banner - shown only to signed-in contractors, below trust strip */}
         {user?.role === 'contractor' && (
-          <section className="relative bg-[#800020] text-white py-4 md:py-5 overflow-hidden">
-            <div className="absolute inset-0 bg-black/10"></div>
+          <section className="homepage-banner animate-gradient relative text-white py-4 md:py-5 overflow-hidden">
+            <div className="absolute inset-0 bg-black/10" aria-hidden="true"></div>
             <div className="max-w-7xl mx-auto px-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-center sm:text-left">
@@ -832,30 +735,25 @@ export default function Home() {
           <TrustFAQ />
         </Suspense>
 
-        {/* Testimonials with Social Proof */}
-        <Suspense fallback={<div className="py-12" />}>
-          <TestimonialsSection />
-        </Suspense>
-
         {/* Service Area Cities */}
         <Suspense fallback={<div className="py-12" />}>
           <ServiceAreaCities />
         </Suspense>
 
         {/* Free for Homeowners Banner */}
-        <section className="py-8 bg-gradient-to-r from-green-50 to-emerald-50">
+        <section className="homepage-banner animate-gradient py-8">
           <div className="max-w-5xl mx-auto px-4">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-rose-200 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4 text-center sm:text-left">
                 <span className="text-4xl">🎉</span>
                 <div>
-                  <h3 className="text-xl font-black text-green-800">100% FREE for Homeowners</h3>
-                  <p className="text-sm text-green-700">No hidden fees · No commissions · Forever free</p>
+                  <h3 className="text-xl font-black text-[#800020]">100% FREE for Homeowners</h3>
+                  <p className="text-sm text-rose-800">No hidden fees · No commissions · Forever free</p>
                 </div>
               </div>
-              <div className="bg-green-100 rounded-xl px-6 py-3 border border-green-300 text-center">
-                <div className="text-3xl font-black text-green-800">$0</div>
-                <div className="text-xs font-semibold text-green-700">Always</div>
+              <div className="bg-rose-50 rounded-xl px-6 py-3 border border-rose-200 text-center">
+                <div className="text-3xl font-black text-[#800020]">$0</div>
+                <div className="text-xs font-semibold text-rose-800">Always</div>
               </div>
             </div>
           </div>
@@ -863,48 +761,48 @@ export default function Home() {
 
         {/* Contractor Lead Generation Banner - Hidden from signed-in homeowners */}
         {!(isSignedIn && user?.role === 'homeowner') && (
-        <section className="py-8 md:py-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        <section className="homepage-banner py-8 md:py-12 relative overflow-hidden">
           {/* Animated background elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-600 rounded-full filter blur-3xl animate-blob"></div>
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-600 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute inset-0 opacity-10" aria-hidden="true">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob"></div>
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-200 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
           </div>
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               {/* Left: Value Prop */}
               <div className="text-center md:text-left">
-                <div className="inline-block bg-rose-600/20 border border-rose-500/30 rounded-full px-4 py-2 mb-4">
-                  <span className="text-rose-400 font-semibold text-sm">FOR CONTRACTORS</span>
+                <div className="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-2 mb-4">
+                  <span className="text-rose-100 font-semibold text-sm">FOR CONTRACTORS</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
                   Get Local Renovation<br />Opportunities Across Ontario
                 </h2>
-                <p className="text-base md:text-lg text-slate-300 mb-4 md:mb-6">
+                <p className="text-base md:text-lg text-rose-100 mb-4 md:mb-6">
                   Create your contractor profile, choose your trades and service areas, and discover
                   relevant homeowner opportunities across Durham Region, Toronto, Clarington, and the GTA.
                 </p>
                 
                 {/* Quick Stats */}
                 <div className="flex gap-3 mb-6 justify-center md:justify-start">
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-rose-500">GTA</div>
-                    <div className="text-slate-400 text-xs">Coverage</div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20 text-center">
+                    <div className="text-2xl font-black text-white">GTA</div>
+                    <div className="text-rose-100 text-xs">Coverage</div>
                   </div>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-orange-500">11</div>
-                    <div className="text-slate-400 text-xs">Categories</div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20 text-center">
+                    <div className="text-2xl font-black text-white">11</div>
+                    <div className="text-rose-100 text-xs">Categories</div>
                   </div>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-amber-500">$0</div>
-                    <div className="text-slate-400 text-xs">Commission</div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20 text-center">
+                    <div className="text-2xl font-black text-white">$0</div>
+                    <div className="text-rose-100 text-xs">Commission</div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link
                     href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/contractors/join"}
-                    className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#600018] transition-all transform hover:scale-105 shadow-xl"
+                    className="inline-flex items-center justify-center gap-2 bg-white text-[#800020] font-bold px-6 py-3 rounded-xl hover:bg-rose-50 transition-colors shadow-xl"
                   >
                     {isSignedIn && user?.role === 'contractor' ? "Browse Leads Now" : "Join as Contractor"}
                   </Link>
@@ -913,36 +811,36 @@ export default function Home() {
 
               {/* Right: Key Benefits - desktop only to save mobile space */}
               <div className="hidden md:space-y-4 md:block">
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-white mb-0.5">Real Project Leads</h3>
-                      <p className="text-slate-300 text-sm">Homeowners post jobs with project details and budgets</p>
+                      <p className="text-rose-100 text-sm">Homeowners post jobs with project details and budgets</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-white mb-0.5">Zero Commission</h3>
-                      <p className="text-slate-300 text-sm">Keep 100% of what you earn. Pay one flat monthly fee.</p>
+                      <p className="text-rose-100 text-sm">Keep 100% of what you earn. Pay one flat monthly fee.</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-5 border border-slate-700/50">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-10 h-10 bg-[#800020] rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-white mb-0.5">Toronto &amp; GTA Projects</h3>
-                      <p className="text-slate-300 text-sm">All projects are in your service area</p>
+                      <p className="text-rose-100 text-sm">All projects are in your service area</p>
                     </div>
                   </div>
                 </div>
@@ -956,7 +854,7 @@ export default function Home() {
         {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorSection />}
 
         {/* Final CTA */}
-        <section className="py-16 md:py-20 bg-[#800020] text-white relative overflow-hidden">
+        <section className="homepage-banner animate-gradient py-16 md:py-20 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_50%)]" aria-hidden="true" />
           <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
             <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-white/15 flex items-center justify-center ring-1 ring-white/20">
@@ -972,7 +870,7 @@ export default function Home() {
               onClick={() => {
                 const estimatorElement = document.querySelector('[data-estimator]');
                 if (estimatorElement) {
-                  estimatorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  estimatorElement.scrollIntoView({ block: 'center' });
                 }
               }}
               className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl hover:shadow-2xl text-lg"

@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PhotoUploadFixed from "@/components/PhotoUploadFixed";
 import { submitLead } from "@/app/actions/submitLead";
@@ -16,6 +16,8 @@ import { HOMEOWNER_TRUST_SIGNAL } from "@/lib/founding-contractor-config";
 export default function CreateLeadPage() {
   const { authUser: user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const savedProjectId = searchParams.get("savedProjectId");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -34,6 +36,66 @@ export default function CreateLeadPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [hasLoadedSavedData, setHasLoadedSavedData] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(Boolean(savedProjectId));
+  const [projectLoadError, setProjectLoadError] = useState("");
+  const [loadedProjectKey, setLoadedProjectKey] = useState("");
+  const [projectLoadAttempt, setProjectLoadAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!savedProjectId || !user?.id || user.role !== "homeowner") return;
+    const controller = new AbortController();
+    setProjectLoading(true);
+    setProjectLoadError("");
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/saved-projects/${encodeURIComponent(savedProjectId)}`, { signal: controller.signal });
+        const data: unknown = await response.json();
+        if (!response.ok || !data || typeof data !== "object" || !("success" in data) || data.success !== true ||
+            !("savedProject" in data) || !data.savedProject || typeof data.savedProject !== "object") {
+          throw new Error("Could not load this saved project. Check your account and retry.");
+        }
+        const project = data.savedProject;
+        if (!("title" in project) || typeof project.title !== "string" ||
+            !("description" in project) || typeof project.description !== "string" ||
+            !("category" in project) || typeof project.category !== "string") {
+          throw new Error("This saved project has invalid details. Contact support before posting.");
+        }
+        if (("status" in project && project.status === "posted") ||
+            ("postedAsLeadId" in project && project.postedAsLeadId)) {
+          throw new Error("This project is already posted. Manage its existing job instead of creating another.");
+        }
+        const city = "city" in project ? project.city : null;
+        const province = "province" in project ? project.province : null;
+        const zipCode = "zipCode" in project ? project.zipCode : null;
+        const budget = "budget" in project ? project.budget : null;
+        const rawPhotos = "photos" in project ? project.photos : null;
+        if ([city, province, zipCode, budget, rawPhotos].some(value => value !== null && typeof value !== "string")) {
+          throw new Error("This saved project has invalid location or photo details.");
+        }
+        const attachedPhotos: unknown = JSON.parse(typeof rawPhotos === "string" ? rawPhotos : "[]");
+        if (!Array.isArray(attachedPhotos) || !attachedPhotos.every((photo): photo is string => typeof photo === "string")) {
+          throw new Error("This saved project has an invalid photo list.");
+        }
+        if (controller.signal.aborted) return;
+        setFormData({
+          title: project.title, description: project.description, category: project.category,
+          city: typeof city === "string" ? city : "", province: typeof province === "string" ? province : "",
+          zipCode: typeof zipCode === "string" ? zipCode : "", budget: typeof budget === "string" ? budget : "",
+        });
+        setPhotos(attachedPhotos);
+        setApprovePhotosForPublication(false);
+        setLoadedProjectKey(`${user.id}:${savedProjectId}`);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("[Saved project edit] Could not load draft:", error);
+        setProjectLoadError(error instanceof Error ? error.message : "Could not load this saved project.");
+      } finally {
+        if (!controller.signal.aborted) setProjectLoading(false);
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [savedProjectId, user?.id, user?.role, projectLoadAttempt]);
 
   // Function to determine category from description
   const detectCategoryFromDescription = (description: string): string => {
@@ -53,6 +115,7 @@ export default function CreateLeadPage() {
 
   // Load estimate data on component mount
   useEffect(() => {
+    if (savedProjectId) return;
     // First, try to restore any previously saved form data (from interrupted session)
     const savedFormData = localStorage.getItem('create_lead_draft');
     const savedPhotos = localStorage.getItem('create_lead_draft_photos');
@@ -116,10 +179,10 @@ export default function CreateLeadPage() {
         console.error('Error loading estimate data:', error);
       }
     }
-  }, [hasLoadedSavedData]);
+  }, [hasLoadedSavedData, savedProjectId]);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || savedProjectId) return;
     const estimateData = localStorage.getItem('estimate_data');
     const estimatePhotos = localStorage.getItem('estimate_photos');
     if (!estimateData || !estimatePhotos) return;
@@ -143,24 +206,26 @@ export default function CreateLeadPage() {
       console.error('Error loading estimate photos:', error);
       setError('Saved estimate photos could not be loaded.');
     }
-  }, [user?.id]);
+  }, [user?.id, savedProjectId]);
 
   // Auto-save form data to localStorage whenever it changes (for session recovery)
   useEffect(() => {
+    if (savedProjectId) return;
     // Only save if user has started filling out the form
     const hasData = formData.title || formData.description || formData.category || formData.budget || formData.zipCode;
     
     if (hasData) {
       localStorage.setItem('create_lead_draft', JSON.stringify(formData));
     }
-  }, [formData]);
+  }, [formData, savedProjectId]);
 
   // Auto-save photos to localStorage
   useEffect(() => {
+    if (savedProjectId) return;
     if (photos.length > 0) {
       localStorage.setItem('create_lead_draft_photos', JSON.stringify(photos));
     }
-  }, [photos]);
+  }, [photos, savedProjectId]);
 
   // Function to upload base64 photos to storage
   const uploadBase64Photos = async (base64Photos: string[]) => {
@@ -197,6 +262,10 @@ export default function CreateLeadPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (savedProjectId) {
+      setError("Save your changes, then use Post to Board in Saved Projects. Your existing draft will be reused.");
+      return;
+    }
     if (photos.length > 0 && !approvePhotosForPublication) {
       setError("Approve sharing the attached photos with contractors, or remove them before posting.");
       return;
@@ -394,6 +463,10 @@ export default function CreateLeadPage() {
       setError("You must be signed in to save a project.");
       return;
     }
+    if (savedProjectId && loadedProjectKey !== `${user.id}:${savedProjectId}`) {
+      setError("Wait for your saved project to load before saving.");
+      return;
+    }
 
     setError("");
     setFieldErrors({});
@@ -410,8 +483,8 @@ export default function CreateLeadPage() {
 
     setIsSaving(true);
     try {
-      const res = await fetch("/api/saved-projects", {
-        method: "POST",
+      const res = await fetch(savedProjectId ? `/api/saved-projects/${encodeURIComponent(savedProjectId)}` : "/api/saved-projects", {
+        method: savedProjectId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: formData.title.trim(),
@@ -429,9 +502,11 @@ export default function CreateLeadPage() {
 
       if (res.ok && data.success) {
         // Clear draft
-        localStorage.removeItem("create_lead_draft");
-        localStorage.removeItem("create_lead_draft_photos");
-        setSuccessMessage("Project saved to your profile! Redirecting...");
+        if (!savedProjectId) {
+          localStorage.removeItem("create_lead_draft");
+          localStorage.removeItem("create_lead_draft_photos");
+        }
+        setSuccessMessage("Project saved privately! Review it in Saved Projects before posting.");
         setTimeout(() => {
           router.push("/homeowner/saved-projects");
         }, 1200);
@@ -452,7 +527,7 @@ export default function CreateLeadPage() {
           <h1 className="text-2xl font-bold text-center mb-4">Sign In Required</h1>
           <p className="text-center mb-6">You need to sign in to create a lead.</p>
           <div className="text-center">
-            <a href="/sign-in" className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
+            <a href={`/sign-in?redirect_url=${encodeURIComponent(savedProjectId ? `/create-lead?savedProjectId=${encodeURIComponent(savedProjectId)}` : "/create-lead")}`} className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
               Sign In
             </a>
           </div>
@@ -477,6 +552,19 @@ export default function CreateLeadPage() {
     );
   }
 
+  if (savedProjectId && projectLoadError) {
+    return (
+      <div className="max-w-xl mx-auto p-6">
+        <p role="alert" className="text-red-700">{projectLoadError}</p>
+        <button type="button" onClick={() => setProjectLoadAttempt(attempt => attempt + 1)} className="mt-4 rounded-lg bg-[#800020] px-4 py-2 text-white">Retry</button>
+        <Link href="/homeowner/saved-projects" className="ml-4 underline">Back to Saved Projects</Link>
+      </div>
+    );
+  }
+  if (savedProjectId && (projectLoading || loadedProjectKey !== `${user.id}:${savedProjectId}`)) {
+    return <p role="status" className="p-6 text-center">Loading your saved project...</p>;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-100 via-orange-50 to-amber-50 pb-safe">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -488,10 +576,10 @@ export default function CreateLeadPage() {
             </div>
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-[#800020]">
-                Post Your Project
+                {savedProjectId ? "Edit Your Saved Project" : "Post Your Project"}
               </h1>
               <p className="text-sm sm:text-base text-rose-800 font-medium mt-1">
-                Get matched with verified contractors
+                {savedProjectId ? "Save privately, then review and post from Saved Projects." : "Get matched with verified contractors"}
               </p>
             </div>
           </div>
@@ -513,7 +601,7 @@ export default function CreateLeadPage() {
           </div>
           
           {/* Auto-save indicator */}
-          {(formData.title || formData.description || photos.length > 0) && (
+          {!savedProjectId && (formData.title || formData.description || photos.length > 0) && (
             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
@@ -783,7 +871,7 @@ export default function CreateLeadPage() {
                 maxPhotos={8}
                 disabled={isSubmitting}
               />
-              {photos.length > 0 && (
+              {!savedProjectId && photos.length > 0 && (
                 <label className="mt-3 flex items-start gap-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
@@ -831,7 +919,7 @@ export default function CreateLeadPage() {
                           Refresh Page
                         </button>
                         <Link 
-                          href="/sign-in" 
+                          href="/sign-in?redirect_url=%2Fcreate-lead"
                           className="text-sm text-red-700 bg-white border border-red-300 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors inline-block"
                         >
                           Sign In Again
@@ -839,7 +927,7 @@ export default function CreateLeadPage() {
                       </div>
                     )}
                     {error.includes("sign in") && !error.includes("session") && !error.includes("Session") && (
-                      <Link href="/sign-in" className="text-sm text-red-700 underline hover:no-underline mt-2 inline-block">
+                      <Link href="/sign-in?redirect_url=%2Fcreate-lead" className="text-sm text-red-700 underline hover:no-underline mt-2 inline-block">
                         Sign in now
                       </Link>
                     )}
@@ -871,11 +959,11 @@ export default function CreateLeadPage() {
                   </>
                 ) : (
                   <>
-                    <span>Save to Profile</span>
+                    <span>{savedProjectId ? "Save Changes Privately" : "Save to Profile"}</span>
                   </>
                 )}
               </button>
-              <button
+              {!savedProjectId && <button
                 type="submit"
                 disabled={isSubmitting || isSaving || successMessage !== ""}
                 className="flex-1 bg-[#800020] text-white py-3 sm:py-4 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-[#600018] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -891,7 +979,7 @@ export default function CreateLeadPage() {
                     <span>Post to Job Board</span>
                   </>
                 )}
-              </button>
+              </button>}
             </div>
 
             {/* Homeowner trust signal — contractor availability */}

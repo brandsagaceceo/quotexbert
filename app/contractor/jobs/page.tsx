@@ -31,6 +31,8 @@ function ContractorJobsContent() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const jobsRequestId = useRef(0);
   const [message, setMessage] = useState<string>('');
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [accepting, setAccepting] = useState<string | null>(null);
@@ -244,28 +246,46 @@ function ContractorJobsContent() {
   };
 
   const fetchJobs = async () => {
+    const requestId = ++jobsRequestId.current;
+    setLoading(true);
+    setLoadError(null);
+    setMessage('');
     try {
-      setLoading(true);
-      
       if (!user?.id) {
+        setJobs([]);
         setMessage("Please sign in to view jobs.");
-        setLoading(false);
         return;
       }
       
       const contractorId = user.id;
       const response = await fetch(`/api/jobs?contractorId=${contractorId}`);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setJobs(data.jobs || data); // Handle both old and new response formats
-        setMessage(data.message || '');
+      if (!response.ok) {
+        throw new Error(`Unable to load jobs (HTTP ${response.status}). Please try again.`);
+      }
+
+      const data: unknown = await response.json();
+      if (requestId !== jobsRequestId.current) return;
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else if (data && typeof data === 'object' && 'jobs' in data && Array.isArray(data.jobs)) {
+        setJobs(data.jobs);
+        setMessage('message' in data && typeof data.message === 'string' ? data.message : '');
+      } else {
+        throw new Error("The job service returned an invalid response. Please try again.");
       }
     } catch (error) {
+      if (requestId !== jobsRequestId.current) return;
       console.error("Error fetching jobs:", error);
-      setMessage("Error loading jobs. Please try again.");
+      setJobs([]);
+      setLoadError(
+        error instanceof SyntaxError
+          ? "The job service returned an unreadable response. Please try again."
+          : error instanceof Error && error.message.trim()
+          ? error.message
+          : "Error loading jobs. Please try again."
+      );
     } finally {
-      setLoading(false);
+      if (requestId === jobsRequestId.current) setLoading(false);
     }
   };
 
@@ -744,7 +764,11 @@ function ContractorJobsContent() {
                   Clear Filters
                 </button>
                 <div className="text-sm text-gray-600 flex items-center sm:justify-end">
-                  {filteredJobs.length === jobs.length
+                  {loading
+                    ? 'Loading jobs...'
+                    : loadError
+                    ? 'Job count unavailable'
+                    : filteredJobs.length === jobs.length
                     ? `${filteredJobs.length} visible jobs`
                     : `Showing ${filteredJobs.length} of ${jobs.length} visible jobs`}
                 </div>
@@ -758,6 +782,17 @@ function ContractorJobsContent() {
             title="Loading available jobs"
             subtitle="Finding projects that match your categories"
           />
+        ) : loadError ? (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
+            <h3 className="text-xl font-semibold text-red-900 mb-2">Unable to load jobs</h3>
+            <p className="text-red-800 mb-4">{loadError}</p>
+            <button
+              onClick={fetchJobs}
+              className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold"
+            >
+              Try again
+            </button>
+          </div>
         ) : filteredJobs.length === 0 ? (
           <div className="text-center py-16 px-4">
             {jobs.length === 0 ? (
@@ -767,12 +802,12 @@ function ContractorJobsContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">New jobs are coming in — check back soon</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">No jobs are available right now</h3>
                 <p className="text-gray-500 text-sm max-w-xs mx-auto mb-5 leading-relaxed">
-                  Homeowner projects are posted daily. You&apos;ll be notified instantly when a matching job appears, or try expanding your subscribed categories to see more.
+                  There are no projects visible to your account right now. Check back later or review your subscribed categories.
                 </p>
                 <Link href="/contractor/subscriptions" className="inline-block bg-[#800020] text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow hover:shadow-md transition-all">
-                  Expand My Categories
+                  Review My Categories
                 </Link>
               </>
             ) : (
