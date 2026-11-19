@@ -47,3 +47,48 @@ test('lossless display downloads are at least 40 percent smaller than the PNG ma
   }
   assert.ok(displayBytes <= masterBytes * 0.6, `${displayBytes} / ${masterBytes} bytes`);
 });
+
+async function assertResizedMaster(actualPng, size) {
+  const expected = await sharp(fileURLToPath(new URL('quotexbert-qx-icon.png', branding)))
+    .resize(size, size).ensureAlpha().raw().toBuffer();
+  const actual = await sharp(actualPng).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  assert.equal(actual.info.width, size);
+  assert.equal(actual.info.height, size);
+  assert.deepEqual(actual.data, expected);
+}
+
+test('all browser and web app icons are direct resizes of the approved square PNG', async () => {
+  const publicDir = new URL('../public/', import.meta.url);
+  for (const [name, size] of [
+    ['favicon-16x16.png', 16], ['favicon-32x32.png', 32],
+    ['favicon-192x192.png', 192], ['favicon-512x512.png', 512],
+    ['apple-touch-icon.png', 180], ['favicon.png', 32],
+  ]) {
+    await assertResizedMaster(await readFile(new URL(name, publicDir)), size);
+  }
+  for (const name of ['favicon.svg', 'icon.svg']) {
+    const svg = await readFile(new URL(name, publicDir), 'utf8');
+    const embedded = svg.match(/data:image\/png;base64,([^"]+)/);
+    assert.ok(embedded, name);
+    assert.equal(svg.includes('<path'), false, 'No reconstructed lettering');
+    await assertResizedMaster(Buffer.from(embedded[1], 'base64'), 64);
+  }
+  const ico = await readFile(new URL('../app/favicon.ico', import.meta.url));
+  assert.equal(ico.readUInt16LE(2), 1);
+  assert.equal(ico.readUInt16LE(4), 3);
+  for (let index = 0; index < 3; index++) {
+    const entry = 6 + index * 16;
+    const length = ico.readUInt32LE(entry + 8);
+    const offset = ico.readUInt32LE(entry + 12);
+    await assertResizedMaster(ico.subarray(offset, offset + length), [16, 32, 48][index]);
+  }
+});
+
+test('manifest points to the converted QX icons without claiming unprepared maskable assets', async () => {
+  const manifest = JSON.parse(await readFile(new URL('../public/manifest.json', import.meta.url), 'utf8'));
+  assert.equal(manifest.theme_color, '#800020');
+  assert.deepEqual(manifest.icons.map(icon => [icon.src, icon.sizes, icon.purpose]), [
+    ['/favicon-192x192.png?v=qx', '192x192', 'any'],
+    ['/favicon-512x512.png?v=qx', '512x512', 'any'],
+  ]);
+});

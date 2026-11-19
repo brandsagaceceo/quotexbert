@@ -60,7 +60,13 @@ lettering reconstruction, or lossy compression.
 Regenerate only these display copies with `node scripts/optimize-branding.mjs`.
 Validate pixel preservation and download savings with
 `node --test scripts/branding-assets.test.mjs`.
-Favicons, social exports, and native app icons are outside this branding update.
+Convert browser favicons and web app icons directly from the approved square PNG
+with `node scripts/generate-favicons.mjs`; the same focused test verifies all
+output pixels against direct master resizes, including embedded PNGs in the
+legacy SVG URLs and ICO frames. Existing icon URLs remain compatible; versioned
+metadata/manifest references refresh older browser caches. Manifest icons use
+`purpose: any`: a maskable redesign is deliberately not claimed.
+Social exports and native App Store assets remain outside this update.
 
 ### Prerequisites
 
