@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/ToastProvider";
-import { CATEGORY_GROUPS, type CategoryConfig } from "@/lib/categories";
+import { CATEGORY_GROUPS, SIMPLE_CATEGORIES, type CategoryConfig } from "@/lib/categories";
 import { isUnlimitedTestContractor } from "@/lib/god-access";
 import SavedProjectsList from "@/components/SavedProjectsList";
 import AcceptedJobsList from "@/components/profile/AcceptedJobsList";
@@ -151,6 +151,7 @@ export default function UnifiedProfilePage() {
   const [editingPortfolioItem, setEditingPortfolioItem] = useState<PortfolioItem | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [maxCategories, setMaxCategories] = useState<number>(0);
+  const [isGeneralSyncing, setIsGeneralSyncing] = useState(false);
   // Saved project drafts for homeowner overview
   const [savedProjectsList, setSavedProjectsList] = useState<Array<{
     id: string; title: string; status: string; city?: string | null; province?: string | null;
@@ -273,20 +274,27 @@ export default function UnifiedProfilePage() {
               
               // Check if user is god/admin user
               const godUser = isUnlimitedTestContractor(authUser.email);
+              const normalizedTier = String(subscriptionData.subscriptionPlan || '').toLowerCase();
+              const activeSubscription = ['active', 'trialing'].includes(
+                String(subscriptionData.subscriptionStatus || '').toLowerCase()
+              );
               
               // Set max categories based on tier (or unlimited for god users)
               const tierLimits: Record<string, number> = {
                 'handyman': 3,
                 'renovation': 6,
-                'general': 10
+                'general': SIMPLE_CATEGORIES.length
               };
-              const limit = godUser ? 999 : (tierLimits[subscriptionData.subscriptionPlan || ''] || 0);
+              const limit = godUser ? SIMPLE_CATEGORIES.length : (tierLimits[normalizedTier] || 0);
               setMaxCategories(limit);
               
-              // For god users, auto-select all categories
-              if (godUser && (!subscriptionData.selectedCategories || subscriptionData.selectedCategories === '[]')) {
-                const allCategoryIds = CATEGORY_GROUPS.flatMap(g => g.categories.map(c => c.id));
-                setSelectedCategories(allCategoryIds);
+              // Display active paid entitlement, not editable profile preferences.
+              if (Array.isArray(subscriptionData.activeCategories)) {
+                setSelectedCategories(subscriptionData.activeCategories);
+                setIsGeneralSyncing(
+                  normalizedTier === 'general' && activeSubscription &&
+                  subscriptionData.activeCategories.length < SIMPLE_CATEGORIES.length
+                );
               } else if (subscriptionData.selectedCategories) {
                 // Load selected categories
                 try {
@@ -1317,7 +1325,7 @@ export default function UnifiedProfilePage() {
                   </p>
                 </div>
 
-                {maxCategories === 0 ? (
+                {maxCategories === 0 && !isGeneralSyncing ? (
                   <div className="text-center py-8 md:py-12">
                     <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl md:rounded-2xl p-6 md:p-8 max-w-md mx-auto">
                       <div className="w-12 h-12 md:w-16 md:h-16 bg-[#800020] rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
@@ -1336,6 +1344,27 @@ export default function UnifiedProfilePage() {
                       </Link>
                     </div>
                   </div>
+                ) : isGeneralSyncing ? (
+                  <>
+                    {selectedCategories.length > 0 && (
+                      <div className="mb-8 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-green-600" />
+                          Active Categories ({selectedCategories.length})
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedCategories.map((category) => (
+                            <span key={category} className="bg-white px-4 py-2 rounded-lg shadow-sm border border-green-200 font-medium text-slate-900">
+                              {category}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
+                      Your General Contractor category access is still syncing. Please refresh shortly or contact QuoteXbert support if this continues.
+                    </div>
+                  </>
                 ) : (
                   <>
                     {/* Selected Categories */}
@@ -1347,9 +1376,7 @@ export default function UnifiedProfilePage() {
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {selectedCategories.map((catId) => {
-                            const category = CATEGORY_GROUPS
-                              .flatMap(g => g.categories)
-                              .find(c => c.id === catId);
+                            const category = SIMPLE_CATEGORIES.find(c => c === catId);
                             return category ? (
                               <div
                                 key={catId}
@@ -1368,7 +1395,7 @@ export default function UnifiedProfilePage() {
                                   }
                                 }}
                               >
-                                <span className="font-medium text-slate-900">{category.name}</span>
+                                <span className="font-medium text-slate-900">{category}</span>
                                 <X className="h-4 w-4 text-slate-400 group-hover:text-red-600" />
                               </div>
                             ) : null;
@@ -1384,24 +1411,15 @@ export default function UnifiedProfilePage() {
                           Available Categories ({maxCategories - selectedCategories.length} slots remaining)
                         </h3>
                         <div className="space-y-6">
-                          {CATEGORY_GROUPS.map((group) => {
-                            const availableCategories = group.categories.filter(
-                              cat => !selectedCategories.includes(cat.id)
-                            );
-                            
-                            if (availableCategories.length === 0) return null;
-                            
-                            return (
-                              <div key={group.id} className="border border-slate-200 rounded-xl p-6">
-                                <h4 className="font-bold text-slate-900 mb-2">{group.name}</h4>
-                                <p className="text-sm text-slate-600 mb-4">{group.description}</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                  {availableCategories.map((category) => (
+                          <div className="border border-slate-200 rounded-xl p-6">
+                            <h4 className="font-bold text-slate-900 mb-2">QuoteXbert categories</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {SIMPLE_CATEGORIES.filter((category) => !selectedCategories.includes(category)).map((category) => (
                                     <button
-                                      key={category.id}
+                                      key={category}
                                       onClick={async () => {
                                         if (selectedCategories.length >= maxCategories) return;
-                                        const newCategories = [...selectedCategories, category.id];
+                                        const newCategories = [...selectedCategories, category];
                                         setSelectedCategories(newCategories);
                                         try {
                                           await fetch('/api/user/subscription', {
@@ -1417,17 +1435,15 @@ export default function UnifiedProfilePage() {
                                       className="text-left p-4 border-2 border-slate-200 rounded-lg hover:border-rose-500 hover:bg-rose-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                                     >
                                       <div className="font-medium text-slate-900 group-hover:text-rose-700">
-                                        {category.name}
+                                        {category}
                                       </div>
                                       <div className="text-sm text-slate-500 mt-1">
                                         Click to add
                                       </div>
                                     </button>
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })}
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}

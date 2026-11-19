@@ -1106,7 +1106,7 @@ model EmailEvent {
   userId           String?  // Related user ID if applicable
   relatedJobId     String?  // Related job ID if applicable
   relatedMessageId String?  // Related message ID if applicable
-  status           String   // 'sent' | 'failed'
+  status           String   // 'sent' | 'failed' | 'skipped'
   error            String?  // Error message if failed
   createdAt        DateTime @default(now())
   
