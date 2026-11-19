@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveSeoAdmin } from "@/lib/seo/admin-auth";
+import {
+  resolveSeoAdmin,
+  areSeoAdminWritesEnabled,
+} from "@/lib/seo/admin-auth";
 import { parseSeoArticleEdits } from "@/lib/seo/article-validation";
 import { APPROVED_SEO_TOPICS } from "@/lib/seo/topics";
 
@@ -15,16 +18,27 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!areSeoAdminWritesEnabled())
+      return NextResponse.json(
+        {
+          error:
+            "Preview writes are disabled until an isolated database is authorized",
+        },
+        { status: 403 },
+      );
 
     const article = await prisma.seoArticle.findUnique({
       where: { id: params.id },
-      select: { id: true, topicId: true, status: true },
+      select: { id: true, topicId: true, status: true, updatedAt: true },
     });
     if (!article)
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    if (article.status === "published") {
+    if (!["draft", "approved", "rejected"].includes(article.status)) {
       return NextResponse.json(
-        { error: "Published articles cannot be edited here" },
+        {
+          error:
+            "Only drafts, approved or rejected articles can be edited here",
+        },
         { status: 409 },
       );
     }
@@ -59,16 +73,26 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
         { status: 400 },
       );
 
-    const updated = await prisma.seoArticle.update({
-      where: { id: article.id },
+    const updated = await prisma.seoArticle.updateMany({
+      where: {
+        id: article.id,
+        status: article.status,
+        updatedAt: article.updatedAt,
+      },
       data: {
         ...edits,
         tags: JSON.stringify(edits.tags),
         affiliateProductIds: JSON.stringify(edits.affiliateProductIds),
+        status: "draft",
+        approvedAt: null,
       },
-      select: { id: true, updatedAt: true },
     });
-    return NextResponse.json({ success: true, article: updated });
+    if (updated.count !== 1)
+      return NextResponse.json(
+        { error: "Article changed while saving. Refresh and review it again." },
+        { status: 409 },
+      );
+    return NextResponse.json({ success: true, article: { id: article.id } });
   } catch (error) {
     console.error("[SEO_ADMIN] Failed to update article", safeErrorType(error));
     return NextResponse.json(
