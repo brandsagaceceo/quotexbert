@@ -4,6 +4,21 @@ This is the single tracking view for the platform workstreams. Statuses reflect 
 
 ## Current isolated development checkpoint
 
+### Spring 2027 staging integration
+
+The active development view is now `integration/spring-2027-staging`, based on latest `origin/main` (`706fb7a`). All five PR heads (#20-24) are preserved as merge ancestors; none was merged into main or closed. The only content conflict was in README documentation, resolved by retaining both sections. Combined layout metadata keeps both QX icons and optional genuine Google verification; combined homepage code retains motion and estimate handoff.
+
+| State | Evidence |
+| --- | --- |
+| Code integrated | All five full PR heads retained; existing Prisma schema unchanged; no duplicate implementation added. |
+| Tests passed | Nine relevant regression files run together: 16 runner tests pass. Deliberate isolated error fixtures log expected failures; no live provider/database calls. |
+| Local preview verified | Existing app returns HTTP 200 on port 3102 without loading database/paid-service credentials. At 320, 375, 390, 768, 1024, 1280 and 1440px: no banner clipping/overflow; both header logos load with equal centre coordinates. Normal gradients are 12 seconds; reduced motion disables decoration. Anonymous SEO API request returns 403. |
+| Remote preview verified | Not yet; one canonical staging Preview is being prepared using the existing Vercel integration. |
+| Production enabled | No. No main merge, production deployment, paid AI activation or live data writes. |
+| Release readiness | Initial integrated typecheck exactly matches the existing 26 diagnostics. These now require scoped release-readiness assessment rather than being assumed resolved. |
+
+The requested six-journey rotating homepage carousel does not currently exist in the relevant homepage/components. Existing banners are not a carousel. Existing estimator, create-lead, assistant and visualizer must be reused. No inspiration route was found in the scoped page/component search; the existing visualizer library contains explicitly coded demo data and must not be presented as a released social feed or real transformations.
+
 - **Existing work preserved:** the original working directory's 83 modified/untracked files remain unchanged. This tracked roadmap starts from the existing untracked roadmap, copied into the isolated Blog Studio worktree rather than overwriting the original.
 - **QX branding / PR #20:** existing header/footer and lossless display improvements are already implemented; do not repeat them. Commit `bdff6f0` additionally converts only the approved square PNG into existing favicon/ICO/SVG/Apple-touch/web-app outputs. Four focused asset tests pass, including pixel-for-pixel comparison against direct resizes. Both PNG masters and display derivatives remain unchanged. The updated Preview serves byte-identical converted icons; header centring is within 0.51px with no overflow at all seven previously tested widths (320-1440px). Signed-in header acceptance remains unverified without an authorized account. User visual approval remains required; no merge or production promotion is authorized.
 - **AI Blog Studio / draft PR #21:** isolated from origin/main, commit `d041259`. The existing SEO editor is now canonical at `/admin/blog`; the old `/admin/blog/seo` URL redirects there. Sample posts/authors/views and simulated loading are removed. Existing APIs provide real status totals, filters and pagination. Existing generator, topic queue, daily reservation and global budget are reused for separately gated manual generation.
