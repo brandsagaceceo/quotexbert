@@ -218,6 +218,15 @@ quotexbert/
 - Touch-optimized interfaces
 - Swipe gestures and interactions
 
+#### Homepage banner motion
+
+The existing homepage banners reuse the shared `gradient`/`blob` animations and
+the existing burgundy CSS brand tokens. `.homepage-banner` slows the decorative
+gradient to 12 seconds without moving text or controls. Existing reduced-motion
+rules disable these loops; the estimate CTA also uses the shared scroll-motion
+preference. Routes, role visibility, offer flags and pricing behavior are
+unchanged. No new banners, assets, animation library or paid service were added.
+
 ### 8. Notification System
 - Email notifications with templates
 - In-app notification center

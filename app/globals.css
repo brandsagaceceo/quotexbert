@@ -391,6 +391,12 @@ textarea:focus-visible,
   animation: gradient 3s ease infinite;
 }
 
+.homepage-banner {
+  background-image: linear-gradient(110deg, var(--brand-dark), var(--brand), var(--brand-light));
+  background-size: 200% 200%;
+  animation-duration: 12s;
+}
+
 /* Gradient Shift Animation for Estimate Button */
 @keyframes gradient-shift {
   0%, 100% {
