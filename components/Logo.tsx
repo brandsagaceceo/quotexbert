@@ -14,12 +14,12 @@ export default function Logo({ size = "md", showText = true, href = "/", classNa
     <span className={`qx-logo ${size === "responsive-header" ? "qx-logo-header" : ""} ${className}`}
       style={{ "--qx-logo-size": `${iconSizes[size]}px` } as CSSProperties}>
       <span className="qx-logo-icon">
-        <Image src="/branding/quotexbert-qx-icon.png" alt={showText ? "" : "QuoteXbert"}
-          width={620} height={620} unoptimized priority />
+        <Image src="/branding/quotexbert-qx-icon-display.webp" alt={showText ? "" : "QuoteXbert"}
+          width={558} height={540} unoptimized priority={size === "responsive-header"} />
       </span>
       {showText && <span className="qx-logo-wordmark">
-        <Image src="/branding/quotexbert-wordmark.png" alt="QuoteXbert"
-          width={2172} height={724} unoptimized priority />
+        <Image src="/branding/quotexbert-wordmark-display.webp" alt="QuoteXbert"
+          width={2036} height={353} unoptimized priority={size === "responsive-header"} />
       </span>}
     </span>
   );

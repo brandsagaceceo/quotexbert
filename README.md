@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![QuoteXbert Logo](public/logo.svg)
+![QuoteXbert Logo](public/branding/quotexbert-qx-icon-display.webp)
 
 **AI-Powered Home Repair Estimates & Contractor Matching Platform**
 
@@ -49,6 +49,18 @@ QuoteXbert is a comprehensive home improvement platform that connects homeowners
   - Demo mode for testing
 
 ## 🚀 Quick Start
+
+### Approved QX branding
+
+The original PNG artwork in [public/branding](./public/branding/) is preserved.
+The shared header and footer use lossless WebP display copies, with only transparent
+margins trimmed and a one-pixel transparent border added. There is no resizing,
+lettering reconstruction, or lossy compression.
+
+Regenerate only these display copies with `node scripts/optimize-branding.mjs`.
+Validate pixel preservation and download savings with
+`node --test scripts/branding-assets.test.mjs`.
+Favicons, social exports, and native app icons are outside this branding update.
 
 ### Prerequisites
 
