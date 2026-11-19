@@ -308,35 +308,29 @@ export default function Home() {
 
 
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-rose-50 pb-safe md:pb-0">
-        {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
         {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
         <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
-        <section id="get-estimate" className="relative py-3 md:py-16 lg:py-24 overflow-hidden">
+        <section id="get-estimate" className="relative overflow-hidden py-3 md:py-6 lg:py-8">
           {/* Enhanced Background Elements */}
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
 
-          <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
-              {/* Left Column - Headline & Benefits - Mobile-Optimized */}
-              <div className="min-w-0">
-                <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
-                <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
-                <p className="mt-4 text-center text-sm text-slate-600 lg:text-left">
-                  Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
-                </p>
-              </div>
+          <div className="relative z-10 mx-auto max-w-[1600px] sm:px-6 lg:px-8">
+            <div className="min-w-0">
+              <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
+              <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
+            </div>
 
-              {/* Right Column - iPhone Estimator */}
-              <div className="relative lg:pl-8">
-                <div className="hidden lg:block absolute -inset-6 bg-gradient-to-br from-rose-200/40 via-rose-100/30 to-transparent rounded-[2rem] blur-2xl -z-10" aria-hidden="true" />
-                <div id="estimator-tool" data-estimator>
-                  <EstimatorMain 
-                    onEstimateComplete={handleEstimateComplete}
-                    userId={user?.id || undefined}
-                    isBlocked={isEstimatorBlocked}
-                    onBlocked={handleShowSignUpGate}
-                  />
-                </div>
+            <div className="relative mx-auto mt-8 w-full max-w-3xl px-4 sm:px-0">
+              <p className="mb-5 text-center text-sm text-slate-600">
+                Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
+              </p>
+              <div id="estimator-tool" data-estimator>
+                <EstimatorMain
+                  onEstimateComplete={handleEstimateComplete}
+                  userId={user?.id || undefined}
+                  isBlocked={isEstimatorBlocked}
+                  onBlocked={handleShowSignUpGate}
+                />
               </div>
             </div>
           </div>

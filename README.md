@@ -262,9 +262,13 @@ Real signed-in browsing and acceptance still require an authorized isolated acco
 
 ### Integrated homepage journeys
 
-The existing homepage hero now uses one six-journey carousel, not a second homepage: photo estimate, photo-to-project preparation, existing job form, existing QuoteXbert assistant, existing visualizer and the existing design example library. Guided planning/visualization are labelled previews; the social inspiration feed is not advertised as released. The library explicitly identifies stock examples rather than claiming real transformations.
+The existing homepage hero uses one wide, photographic six-journey carousel, not a second homepage: photo estimate, photo project posting, existing job form, existing QuoteXbert assistant, existing visualizer and the existing design example library. The unchanged estimator sits immediately below the banner. Guided planning/visualization are labelled previews; the social inspiration feed is not advertised as released. The library explicitly identifies stock examples rather than claiming real transformations.
 
 Automatic rotation is six seconds with a 500ms fade. Hover, keyboard focus and hidden tabs pause it; users have previous/next, direct selection, pause/start, arrow/Home/End and horizontal touch controls. Reduced motion disables autoplay and decorative transitions. The estimator, estimate handoff, role-aware assistant and manual job submission remain authoritative.
+
+All six scenes use different, locally stored real photographs with commercial-use permission under the Pexels License. Sources, artists, license links and derivative details are recorded in [the photography credits](public/homepage/photography-credits.json), with voluntary on-slide source credits. These are illustrative stock scenes, not customer endorsements or project results. No AI imagery or company artwork changes are included.
+
+WebP assets use responsive Next.js Image optimization and per-scene focal positions. Only the first photo has high priority; after it loads, one subsequent photo is warmed. Later images mount on demand, and the previous scene remains visible until its replacement loads. Failed media is reported explicitly. Reserved slide dimensions prevent rotation layout shift. The focused browser suite enforces no more than two initial full-size photo requests and a combined encoded photo-response budget below 350 KB at a 1440px viewport.
 
 Unverified static testimonials/stock-profile endorsements are not rendered on the homepage. The existing public activity component uses only validated API records, converts ISO timestamps, and reports empty/error/retry states rather than inventing activity.
 
