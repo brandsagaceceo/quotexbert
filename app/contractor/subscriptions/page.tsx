@@ -61,9 +61,8 @@ export default function SubscriptionsPage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showCancelMessage, setShowCancelMessage] = useState(false);
   const [activatingCategories, setActivatingCategories] = useState(false);
-  const [activationTimedOut, setActivationTimedOut] = useState(false);
-  const [successFoundingOffer, setSuccessFoundingOffer] = useState(false);
-  const [successTier, setSuccessTier] = useState<'handyman' | 'renovation' | 'general' | null>(null);
+  const [activationError, setActivationError] = useState<string | null>(null);
+  const [activationAttempt, setActivationAttempt] = useState(0);
   
   // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -84,96 +83,53 @@ export default function SubscriptionsPage() {
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
-    const tier = searchParams.get('tier');
     const sessionId = searchParams.get('session_id');
-    const founding = searchParams.get('founding');
-
-    if (success === 'true') {
-      setShowSuccessMessage(true);
-      setActivationTimedOut(false);
-      setSuccessFoundingOffer(founding === '1');
-      setSuccessTier(tier === 'handyman' || tier === 'renovation' || tier === 'general' ? tier : null);
-      setTimeout(() => setShowSuccessMessage(false), 10000);
-
-      // Activate selected categories stored before Stripe redirect
-      const pendingKey = `pending_categories_${tier}`;
-      const pendingCategories = (() => {
-        try { return JSON.parse(localStorage.getItem(pendingKey) || '[]'); } catch { return []; }
-      })();
-
-      if (sessionId && pendingCategories.length > 0) {
-        setActivatingCategories(true);
-        // Wait for authUser to be available
-        const activate = async (userId: string) => {
-          // Track purchase in Meta Pixel if we have tier pricing
-          try {
-            const { trackPurchase } = await import("@/lib/metaPixel");
-            const tierPricing: Record<string, number> = {
-              handyman: 49,
-              renovation: 99,
-              general: 149
-            };
-            const price = tierPricing[tier || ""] || 49;
-            trackPurchase(price, sessionId);
-          } catch (trackErr) {
-            console.error("Meta Pixel Purchase tracking failed on subscriptions page:", trackErr);
-          }
-
-          fetch('/api/subscriptions/activate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId, contractorId: userId, selectedCategories: pendingCategories }),
-          })
-            .then((r) => r.json())
-            .then((data) => {
-              if (data.success) {
-                localStorage.removeItem(pendingKey);
-                fetchSubscriptions();
-                setActivatingCategories(false);
-              } else {
-                setActivationTimedOut(true);
-                setActivatingCategories(false);
-              }
-            })
-            .catch((err) => {
-              console.error('[Activate] Error:', err);
-              setActivationTimedOut(true);
-              setActivatingCategories(false);
-            });
-        };
-
-        // authUser may not be loaded yet — poll briefly.
-        // getUser() is a stable getter that captures authUser without triggering
-        // TypeScript's `else`-branch narrowing to `null | never` inside closures.
-        const getUser = (): typeof authUser => authUser;
-        if (authUser) {
-          activate(authUser.id);
-        } else {
-          const poll = setInterval(() => {
-            // Re-read authUser each tick to detect when it loads
-            void (function check() {
-              const u = getUser();
-              if (u) { clearInterval(poll); activate(u.id); }
-            }());
-          }, 300);
-          setTimeout(() => {
-            clearInterval(poll);
-            setActivationTimedOut(true);
-            setActivatingCategories(false);
-          }, 5000);
-        }
-      }
-
-      window.history.replaceState({}, '', '/contractor/subscriptions');
-    }
-
     if (canceled === 'true') {
       setShowCancelMessage(true);
-      setTimeout(() => setShowCancelMessage(false), 8000);
-      window.history.replaceState({}, '', '/contractor/subscriptions');
+      return;
     }
+    if (success !== 'true' || authLoading) return;
+    setShowSuccessMessage(false);
+    setActivationError(null);
+    if (!sessionId) {
+      setActivationError("No checkout session was provided. Your subscription has not been verified.");
+      return;
+    }
+    if (!authUser || authUser.role !== 'contractor') return;
+    const controller = new AbortController();
+    setActivatingCategories(true);
+    const activate = async () => {
+      try {
+        const response = await fetch('/api/subscriptions/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+          signal: controller.signal,
+        });
+        const data: unknown = await response.json();
+        if (!response.ok || !data || typeof data !== 'object' || !('success' in data) || data.success !== true ||
+            !('activated' in data) || !Array.isArray(data.activated) || data.activated.length === 0 ||
+            ('skipped' in data && (!Array.isArray(data.skipped) || data.skipped.length > 0))) {
+          const message = data && typeof data === 'object' && 'error' in data && typeof data.error === 'string'
+            ? data.error : "Could not confirm all subscription categories. Review billing before paying again.";
+          throw new Error(message);
+        }
+        if (controller.signal.aborted) return;
+        setShowSuccessMessage(true);
+        void fetchSubscriptions();
+        window.history.replaceState({}, '', '/contractor/subscriptions');
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        console.error('[Activate] Confirmation failed:', err);
+        setActivationError(err instanceof Error ? err.message : "Could not confirm your subscription. Review billing before paying again.");
+      } finally {
+        if (!controller.signal.aborted) setActivatingCategories(false);
+      }
+    };
+    void activate();
+    return () => controller.abort();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, authUser?.id, authUser?.role, authLoading, activationAttempt]);
 
   // Fetch subscription data
   const fetchSubscriptions = async () => {
@@ -214,6 +170,10 @@ export default function SubscriptionsPage() {
   };
 
   useEffect(() => {
+    if (!authLoading && !authUser) {
+      setLoading(false);
+      return;
+    }
     if (authUser && !authLoading) {
       fetchSubscriptions();
       fetchBillingHistory();
@@ -455,7 +415,23 @@ export default function SubscriptionsPage() {
         )}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12">
 
-          {/* Success Message */}
+          {activatingCategories && (
+            <p role="status" className="mb-6 rounded-md border border-rose-200 bg-rose-50 p-4 text-[#800020]">
+              Confirming checkout and activating your categories...
+            </p>
+          )}
+          {activationError && (
+            <div role="alert" className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-red-800">
+              <h3 className="font-semibold">Subscription not confirmed</h3>
+              <p className="mt-1">{activationError}</p>
+              {searchParams.get('session_id') && (
+                <button type="button" className="mt-3 font-semibold underline" onClick={() => setActivationAttempt(value => value + 1)}>
+                  Retry confirmation
+                </button>
+              )}
+            </div>
+          )}
+
           {showSuccessMessage && (
             <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4 flex items-start">
               <svg className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -463,27 +439,11 @@ export default function SubscriptionsPage() {
               </svg>
               <div className="flex-1">
                 <h3 className="text-green-800 font-medium">
-                  {activatingCategories ? 'Activating your categories...' : 'Subscription Activated!'}
+                  Subscription Activated!
                 </h3>
-                {successFoundingOffer && successTier ? (
-                  <p className="text-green-700 mt-1">
-                    New Contractor Offer applied — you were charged <strong>$0.99</strong> for your first month.
-                    Your subscription renews at the regular <strong>{TIER_REGULAR_PRICE_LABEL[successTier]}/month</strong> starting
-                    next billing cycle. Cancel anytime. Your paid categories are being activated now.
-                  </p>
-                ) : (
-                  <p className="text-green-700 mt-1">
-                    Your subscription payment was successful. Your paid categories are being activated now.
-                  </p>
-                )}
-                {activatingCategories && (
-                  <p className="text-green-700 text-sm mt-2">Activating your categories...</p>
-                )}
-                {activationTimedOut && (
-                  <p className="text-amber-700 text-sm mt-2">
-                    Payment succeeded, but category activation is still syncing. Refresh this page in a moment if your categories do not appear.
-                  </p>
-                )}
+                <p className="text-green-700 mt-1">
+                  Your subscription categories are confirmed and active. Review billing history for charges and renewal details.
+                </p>
                 <button
                   onClick={() => setShowSuccessMessage(false)}
                   className="text-green-600 hover:text-green-800 text-sm font-medium mt-2"
@@ -503,7 +463,7 @@ export default function SubscriptionsPage() {
               <div className="flex-1">
                 <h3 className="text-yellow-800 font-medium">Checkout Canceled</h3>
                 <p className="text-yellow-700 mt-1">
-                  No payment was processed. You can try again anytime by selecting a subscription tier below.
+                  Checkout was canceled or closed. Review billing before starting another checkout.
                 </p>
                 <button
                   onClick={() => setShowCancelMessage(false)}

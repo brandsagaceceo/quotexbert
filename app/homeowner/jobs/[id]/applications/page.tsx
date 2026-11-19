@@ -58,33 +58,42 @@ function proposedAmount(raw: string | null): number | null {
 }
 
 export default function JobApplicationsPage({ params }: { params: { id: string } }) {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const router = useRouter();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [processingApplicationId, setProcessingApplicationId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('price');
+  const [error, setError] = useState('');
   const jobId = params.id;
 
   useEffect(() => {
-    if (user) {
+    if (authLoading) return;
+    if (user?.role === 'homeowner') {
       fetchJob();
+    } else {
+      setLoading(false);
     }
-  }, [user, jobId]);
+  }, [authLoading, user, jobId]);
 
   const fetchJob = async () => {
     if (!user) return;
-    
+    setLoading(true);
+    setError('');
     try {
       const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${user.id}`);
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
+        if (!data || typeof data.id !== 'string' || !Array.isArray(data.applications)) {
+          throw new Error('The job response is incomplete. Please retry.');
+        }
         setJob(data);
       } else {
-        console.error('Failed to fetch job');
+        throw new Error(data.error || 'Could not load this job. Check your account and retry.');
       }
     } catch (error) {
       console.error('Error fetching job:', error);
+      setError(error instanceof Error ? error.message : 'Could not load this job. Please retry.');
     } finally {
       setLoading(false);
     }
@@ -94,6 +103,7 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
     if (!user || !job) return;
     
     setProcessingApplicationId(applicationId);
+    setError('');
     
     try {
       const response = await fetch('/api/applications/manage', {
@@ -108,21 +118,30 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      const data = await response.json();
+      if (response.ok && data.success === true) {
         // Refresh the job data
         await fetchJob();
         
         if (action === 'accept') {
           // Redirect to the messaging thread (API creates one on accept)
-          const redirectUrl = data.redirectUrl || `/messages?threadId=${data.threadId}`;
-          router.push(redirectUrl);
+          if (typeof data.threadId !== 'string' || !data.threadId.trim()) {
+            setError('Your selection was saved, but its conversation could not be opened. Use Chat with Contractor below.');
+            return;
+          }
+          const contractorId = job.applications.find(application => application.id === applicationId)?.contractor.id;
+          if (!contractorId) {
+            setError('Your selection was saved. Reload the job before opening its conversation.');
+            return;
+          }
+          router.push(`/messages?threadId=${encodeURIComponent(data.threadId)}&contractorId=${encodeURIComponent(contractorId)}`);
         }
       } else {
-        console.error(`Failed to ${action} application`);
+        throw new Error(data.error || `Could not ${action} this application. Please retry.`);
       }
     } catch (error) {
       console.error(`Error ${action}ing application:`, error);
+      setError(error instanceof Error ? error.message : 'Could not update this application. Please retry.');
     } finally {
       setProcessingApplicationId(null);
     }
@@ -134,7 +153,13 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
     ))
   );
 
-  if (loading) {
+  if (!authLoading && !user) {
+    return <div className="p-6 text-center"><h1>Sign in to compare your contractor bids</h1><Link href={`/sign-in?redirect_url=${encodeURIComponent(`/homeowner/jobs/${jobId}/applications`)}`}>Sign In</Link></div>;
+  }
+  if (!authLoading && user?.role !== 'homeowner') {
+    return <p role="alert" className="p-6 text-center">Homeowner access is required to manage this job.</p>;
+  }
+  if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
@@ -145,7 +170,8 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
   if (!job) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Job Not Found</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">{error ? 'Could not load job' : 'Job Not Found'}</h1>
+        {error && <><p role="alert" className="text-red-700">{error}</p><button type="button" onClick={fetchJob} className="m-4 underline">Retry</button></>}
         <Link href="/homeowner/jobs"><Button variant="secondary"><ArrowLeft className="w-4 h-4 mr-2" />Back to Jobs</Button></Link>
       </div>
     );
@@ -183,6 +209,7 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="max-w-5xl mx-auto px-4 py-8">
+        {error && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-4 text-red-700">{error}</p>}
         {/* Back */}
         <Link href="/homeowner/jobs" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-rose-600 mb-6 transition-colors">
           <ArrowLeft className="w-4 h-4" />
@@ -214,7 +241,7 @@ export default function JobApplicationsPage({ params }: { params: { id: string }
                 <p className="text-sm text-green-600">{accepted.contractor.contractorProfile?.companyName || accepted.contractor.name}</p>
               </div>
               <div className="ml-auto flex gap-2">
-                <Link href={`/messages?leadId=${job.id}`}>
+                <Link href={`/messages?leadId=${encodeURIComponent(job.id)}&contractorId=${encodeURIComponent(accepted.contractor.id)}`}>
                   <Button size="sm">
                     <MessageCircle className="w-4 h-4 mr-1.5" />
                     Chat

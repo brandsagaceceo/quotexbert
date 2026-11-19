@@ -282,9 +282,17 @@ export default function AIAssistantPopup() {
       window.location.href = href;
     } else if (href.startsWith('/#')) {
       setIsOpen(false);
+      if (pathname !== '/') {
+        router.push(href);
+        return;
+      }
       setTimeout(() => {
         const element = document.querySelector(href.substring(1));
-        element?.scrollIntoView({ behavior: 'smooth' });
+        if (element) {
+          element.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        } else {
+          router.push(href);
+        }
       }, 300);
     } else {
       router.push(href);
