@@ -21,6 +21,7 @@ import {
 } from "@/lib/tracking";
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { useToast } from "@/components/ToastProvider";
+import { queueEstimateForSignIn, resumePendingEstimate } from "@/lib/estimate-handoff";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
 import {
@@ -80,30 +81,21 @@ export default function Home() {
   // the estimate or click Save again.
   useEffect(() => {
     if (!isSignedIn || !user?.id) return;
-    const pendingRaw = localStorage.getItem('pending_save_estimate');
-    if (!pendingRaw) return;
-    let pending: any = null;
-    try { pending = JSON.parse(pendingRaw); } catch { pending = null; }
-    localStorage.removeItem('pending_save_estimate');
-    if (!pending) return;
-
-    (async () => {
-      try {
-        const response = await fetch('/api/ai-estimates/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...pending, homeownerId: user.id }),
-        });
-        const data = await response.json();
-        if (data.success) {
+    let active = true;
+    resumePendingEstimate(user.id)
+      .then((saved) => {
+        if (active && saved) {
           toast.success('Your estimate was saved to Profile > AI Estimates.');
-        } else {
-          toast.error(data.error || 'Failed to save your estimate. Please try again from Profile.');
         }
-      } catch {
-        toast.error('Failed to save your estimate. Please try again from Profile.');
-      }
-    })();
+      })
+      .catch((cause: unknown) => {
+        if (active) {
+          toast.error(cause instanceof Error
+            ? cause.message
+            : 'Your estimate was not cleared. Refresh to retry saving.');
+        }
+      });
+    return () => { active = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSignedIn, user?.id]);
 
@@ -132,13 +124,18 @@ export default function Home() {
         scope: estimateResult.scope || [],
         lineItems: estimateResult.line_items || [],
       };
-      localStorage.setItem('estimate_data', JSON.stringify(estimateData));
+      try {
+        localStorage.setItem('estimate_data', JSON.stringify(estimateData));
+      } catch {
+        toast.error('Your browser could not preserve this estimate for your project. Keep this page open and allow browser storage before continuing.');
+        return;
+      }
     }
     
     if (isSignedIn) {
       window.location.href = '/create-lead';
     } else {
-      window.location.href = '/sign-up';
+      window.location.href = '/sign-up?redirect_url=%2Fcreate-lead';
     }
   };
 
@@ -170,9 +167,10 @@ export default function Home() {
       // Preserve the estimate so it isn't lost — attach it automatically once
       // the homeowner finishes signing in/up (see the effect above).
       try {
-        localStorage.setItem('pending_save_estimate', JSON.stringify(buildSaveEstimatePayload()));
+        queueEstimateForSignIn(buildSaveEstimatePayload());
       } catch {
-        // localStorage unavailable/full — non-fatal, sign-in flow still works
+        toast.error('Your browser could not preserve this estimate. Keep this page open and allow browser storage before signing in.');
+        return;
       }
       toast.error('Please sign in to save your estimate — we\'ll save it automatically once you\'re signed in.');
       setTimeout(() => { window.location.href = '/sign-in?redirect_url=%2F'; }, 1200);

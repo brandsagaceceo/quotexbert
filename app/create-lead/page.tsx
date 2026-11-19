@@ -452,7 +452,7 @@ export default function CreateLeadPage() {
           <h1 className="text-2xl font-bold text-center mb-4">Sign In Required</h1>
           <p className="text-center mb-6">You need to sign in to create a lead.</p>
           <div className="text-center">
-            <a href="/sign-in" className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
+            <a href="/sign-in?redirect_url=%2Fcreate-lead" className="block bg-gradient-to-r from-burgundy-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold">
               Sign In
             </a>
           </div>
@@ -831,7 +831,7 @@ export default function CreateLeadPage() {
                           Refresh Page
                         </button>
                         <Link 
-                          href="/sign-in" 
+                          href="/sign-in?redirect_url=%2Fcreate-lead"
                           className="text-sm text-red-700 bg-white border border-red-300 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors inline-block"
                         >
                           Sign In Again
@@ -839,7 +839,7 @@ export default function CreateLeadPage() {
                       </div>
                     )}
                     {error.includes("sign in") && !error.includes("session") && !error.includes("Session") && (
-                      <Link href="/sign-in" className="text-sm text-red-700 underline hover:no-underline mt-2 inline-block">
+                      <Link href="/sign-in?redirect_url=%2Fcreate-lead" className="text-sm text-red-700 underline hover:no-underline mt-2 inline-block">
                         Sign in now
                       </Link>
                     )}
