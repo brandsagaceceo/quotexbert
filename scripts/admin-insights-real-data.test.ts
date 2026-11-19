@@ -3,17 +3,15 @@ import fs from "node:fs";
 
 const route = fs.readFileSync("app/api/admin/analytics/route.ts", "utf8");
 const page = fs.readFileSync("app/admin/insights/page.tsx", "utf8");
+const usageRoute = fs.readFileSync("app/api/admin/usage/route.ts", "utf8");
+const dashboard = fs.readFileSync("app/admin/page.tsx", "utf8");
 
 assert.match(
   route,
   /prisma\.analytics\.findMany/,
   "administrator insights query the existing analytics table",
 );
-assert.match(
-  route,
-  /take: 500/,
-  "the analytics query is bounded",
-);
+assert.match(route, /take: 500/, "the analytics query is bounded");
 assert.doesNotMatch(
   route,
   /mockEvents|Math\.random|new PostHog/,
@@ -21,18 +19,45 @@ assert.doesNotMatch(
 );
 assert.match(
   route,
-  /metricsConnected: false/g,
-  "Google Analytics and Search Console metrics remain explicitly disconnected",
+  /fetchGoogleAdminMetrics/,
+  "the API uses the shared read-only Google metrics integration",
 );
 assert.match(
   page,
-  /No Google API request is made by this page/,
-  "the UI states the connection boundary",
+  /API requests are read-only/,
+  "the UI states the read-only connection boundary",
 );
+assert.match(page, /Search queries/, "Search Console queries are visible");
+assert.match(page, /GA4 key events/, "GA4 conversions are visible");
 assert.doesNotMatch(
   page,
   /amountCents|Estimates → Payments|Total payments/,
   "the dashboard does not derive revenue or conversions from fabricated events",
 );
+for (const model of [
+  "user",
+  "lead",
+  "quote",
+  "contractorSubscription",
+  "transaction",
+  "seoArticle",
+]) {
+  assert.match(
+    usageRoute,
+    new RegExp(`prisma\\.${model}`),
+    `administrator overview queries the existing ${model} model`,
+  );
+}
+for (const label of [
+  "Homeowners",
+  "Contractors",
+  "Quotes",
+  "Subscriptions",
+  "Credit transactions",
+  "Pending actions",
+  "SEO activity",
+]) {
+  assert.match(dashboard, new RegExp(label), `dashboard shows ${label}`);
+}
 
 console.log("admin insights real-data tests passed");

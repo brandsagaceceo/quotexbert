@@ -198,11 +198,11 @@ export async function generateNextSeoDraft(
 
     return { kind: "created" as const, article };
   } catch (error) {
-    const errorType =
-      error instanceof Error && /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)
-        ? error.name
-        : "GenerationError";
-    return recordFailure(reservation.id, slotKey, errorType);
+    return recordFailure(
+      reservation.id,
+      slotKey,
+      describeGenerationFailure(error),
+    );
   }
 }
 
@@ -313,6 +313,28 @@ function isUniqueConstraintError(error: unknown) {
     "code" in error &&
     (error as { code?: unknown }).code === "P2002"
   );
+}
+
+export function describeGenerationFailure(error: unknown) {
+  if (error && typeof error === "object" && "status" in error) {
+    const status = Number((error as { status?: unknown }).status);
+    if (status === 400) return "OpenAIRequestRejected";
+    if (status === 401 || status === 403) return "OpenAIAuthenticationFailed";
+    if (status === 429) return "OpenAIRateLimited";
+    if (status >= 500 && status <= 599) return "OpenAIServiceUnavailable";
+  }
+  if (error instanceof Error) {
+    if (
+      error.name === "AbortError" ||
+      /timeout|timed out/i.test(error.message)
+    ) {
+      return "OpenAITimeout";
+    }
+    if (/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)) {
+      return error.name;
+    }
+  }
+  return "GenerationError";
 }
 
 function appendAffiliateRecommendations(

@@ -46,6 +46,8 @@ interface StudioData {
   searchConsole: {
     verificationTokenConfigured: boolean;
     metricsConnected: boolean;
+    credentialsConfigured: boolean;
+    propertyConfigured: boolean;
     propertyUrl: string;
     sitemapUrl: string;
   };
@@ -679,8 +681,9 @@ export default function BlogStudioPage() {
               Google Search Console
             </h2>
             <p className="mt-2">
-              Metrics are not connected. No impressions, clicks, rankings or
-              keyword data are fabricated.
+              Search metrics are shown in Analytics &amp; Insights after the
+              read-only Google connection is authorized. No impressions, clicks,
+              rankings or keyword data are fabricated.
             </p>
             <p>Site: {studio.searchConsole.propertyUrl}</p>
             <p>
@@ -693,6 +696,17 @@ export default function BlogStudioPage() {
             <p className="mt-2">
               The existing sitemap includes eligible published content only.
               Submit it after verifying the property.
+            </p>
+            <p className="mt-2">
+              Read-only API credentials:{" "}
+              {studio.searchConsole.credentialsConfigured
+                ? "configured"
+                : "not configured"}
+              . Search Console property:{" "}
+              {studio.searchConsole.propertyConfigured
+                ? "configured"
+                : "not configured"}
+              .
             </p>
             <div className="mt-3 flex flex-wrap gap-4">
               <a
@@ -713,8 +727,8 @@ export default function BlogStudioPage() {
               </a>
             </div>
             <p className="mt-3">
-              API metrics require separately authorized Google access. This
-              package does not request credentials or activate a new service.
+              Grant the configured service account read access to the Search
+              Console property; credentials are never returned to this page.
             </p>
           </section>
         )}

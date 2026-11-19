@@ -2,12 +2,12 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { fetchGoogleAdminMetrics } from "@/lib/google-admin-metrics";
 
 export const dynamic = "force-dynamic";
 
 const ADMIN_EMAILS = (
-  process.env.ADMIN_EMAILS ||
-  "brandsagaceo@gmail.com,quotexbert@gmail.com"
+  process.env.ADMIN_EMAILS || "brandsagaceo@gmail.com,quotexbert@gmail.com"
 )
   .split(",")
   .map((email) => email.trim().toLowerCase())
@@ -39,23 +39,30 @@ export async function GET(request: NextRequest) {
 
     const range = request.nextUrl.searchParams.get("range") || "7d";
     if (!Object.prototype.hasOwnProperty.call(RANGE_DAYS, range)) {
-      return NextResponse.json({ error: "Invalid analytics range" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid analytics range" },
+        { status: 400 },
+      );
     }
     const startDate = new Date(
-      Date.now() - RANGE_DAYS[range as keyof typeof RANGE_DAYS] * 24 * 60 * 60 * 1000,
+      Date.now() -
+        RANGE_DAYS[range as keyof typeof RANGE_DAYS] * 24 * 60 * 60 * 1000,
     );
-    const rows = await prisma.analytics.findMany({
-      where: { timestamp: { gte: startDate } },
-      orderBy: [{ timestamp: "desc" }, { id: "desc" }],
-      take: 500,
-      select: {
-        id: true,
-        eventName: true,
-        eventData: true,
-        timestamp: true,
-        userId: true,
-      },
-    });
+    const [rows, google] = await Promise.all([
+      prisma.analytics.findMany({
+        where: { timestamp: { gte: startDate } },
+        orderBy: [{ timestamp: "desc" }, { id: "desc" }],
+        take: 500,
+        select: {
+          id: true,
+          eventName: true,
+          eventData: true,
+          timestamp: true,
+          userId: true,
+        },
+      }),
+      fetchGoogleAdminMetrics(RANGE_DAYS[range as keyof typeof RANGE_DAYS]),
+    ]);
 
     const eventCounts: Record<string, number> = {};
     const identifiedUsers = new Set<string>();
@@ -88,15 +95,34 @@ export async function GET(request: NextRequest) {
           tagConfigured: Boolean(
             process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim(),
           ),
-          metricsConnected: false,
+          propertyConfigured: google.status.analyticsPropertyConfigured,
+          credentialsConfigured: google.status.serviceAccountConfigured,
+          metricsConnected: google.analytics.connected,
+          error: google.analytics.error,
+          metrics: {
+            activeUsers: google.analytics.activeUsers,
+            sessions: google.analytics.sessions,
+            pageViews: google.analytics.pageViews,
+            conversions: google.analytics.conversions,
+          },
         },
         searchConsole: {
           verificationTokenConfigured: Boolean(
             process.env.GOOGLE_SITE_VERIFICATION?.trim(),
           ),
-          metricsConnected: false,
+          propertyConfigured: google.status.searchConsolePropertyConfigured,
+          credentialsConfigured: google.status.serviceAccountConfigured,
+          metricsConnected: google.searchConsole.connected,
+          error: google.searchConsole.error,
           propertyUrl: site.origin,
           sitemapUrl: new URL("/sitemap.xml", site).href,
+          metrics: {
+            clicks: google.searchConsole.clicks,
+            impressions: google.searchConsole.impressions,
+            ctr: google.searchConsole.ctr,
+            position: google.searchConsole.position,
+            queries: google.searchConsole.queries,
+          },
         },
       },
     });

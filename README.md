@@ -88,10 +88,22 @@ Cron can draft when explicitly enabled but cannot publish, even if the old
 `SEO_AUTO_PUBLISH_ENABLED` variable remains configured. Publication is only
 through the existing, explicitly confirmed administrator publish action.
 
-The Search Console panel links to the existing sitemap and reports setup status,
-not search metrics. `GOOGLE_SITE_VERIFICATION` optionally supplies the existing
-layout's HTML verification tag; the placeholder token was removed. Google
-ownership verification and separately authorized API access are still required.
+The Search Console panel links to the existing sitemap and reports setup status.
+`GOOGLE_SITE_VERIFICATION` optionally supplies the existing layout's HTML
+verification tag. The administrator Insights page can retrieve read-only Search
+Console and GA4 metrics when all of these server-only values are configured:
+
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- `GOOGLE_SEARCH_CONSOLE_PROPERTY_URL` (the exact URL-prefix or `sc-domain:`
+  property)
+- `GOOGLE_ANALYTICS_PROPERTY_ID` (the numeric GA4 property ID)
+
+Enable the Search Console API and Google Analytics Data API in the service
+account's Google Cloud project. Add the service-account email as a read-only user
+of the Search Console property and as a Viewer on the GA4 property. Keep
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` for the existing website tag. Credentials remain
+server-side and are never returned by the administrator APIs.
 
 Focused, isolated tests (no real database, email or AI calls):
 `npx tsx --test scripts/seo-admin-authorization.test.ts scripts/seo-content-validation.test.ts scripts/seo-cron-safety.test.ts scripts/seo-manual-generation.test.ts`.
@@ -105,29 +117,34 @@ Focused, isolated tests (no real database, email or AI calls):
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/quotexbert.git
    cd quotexbert
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration
    ```
 
 4. **Initialize the database**
+
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
 5. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -177,12 +194,14 @@ quotexbert/
 ## 📖 Core Features Documentation
 
 ### 1. User Management & Authentication
+
 - Existing Clerk sign-in and sign-up
 - Role-based access (homeowner/contractor)
 - Profile management with image uploads
 - Existing database-backed account and role resolution
 
 ### 2. Job & Quote Management
+
 - Job posting with AI estimate generation
 - Quote submission and comparison
 - Status tracking and updates
@@ -209,30 +228,35 @@ only, including a response lost after commit. Real Clerk/database/photo-upload
 acceptance still requires an authorized isolated environment.
 
 ### 3. Messaging System
+
 - Real-time conversations
 - File sharing capabilities
 - Read receipts and notifications
 - Mobile-optimized chat interface
 
 ### 4. Subscription Billing
+
 - Stripe integration for contractor subscription billing
 - Plan management for contractor access
 - Billing status and renewal tracking
 - Subscription lifecycle webhooks
 
 ### 5. Portfolio Management
+
 - Contractor portfolio uploads
 - Image management and optimization
 - Project showcases
 - Performance analytics
 
 ### 6. Search & Discovery
+
 - Advanced contractor search
 - Filter by location, trade, rating
 - Verified contractor badges
 - Review-based ranking
 
 ### 7. Mobile Experience
+
 - Progressive Web App features
 - Bottom navigation for mobile
 - Touch-optimized interfaces
@@ -248,6 +272,7 @@ preference. Routes, role visibility, offer flags and pricing behavior are
 unchanged. No new banners, assets, animation library or paid service were added.
 
 ### 8. Notification System
+
 - Email notifications with templates
 - In-app notification center
 - Preference management
@@ -358,6 +383,7 @@ netlify deploy --prod
 ### Complete Deployment Guide
 
 See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed deployment instructions including:
+
 - Environment variable setup
 - Database configuration
 - Security settings
@@ -446,6 +472,7 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 ### Core Endpoints
 
 #### Jobs API
+
 ```typescript
 GET    /api/jobs              # List jobs
 POST   /api/jobs              # Create job
@@ -455,6 +482,7 @@ DELETE /api/jobs/[id]         # Delete job
 ```
 
 #### Quotes API
+
 ```typescript
 GET    /api/quotes            # List quotes
 POST   /api/quotes            # Submit quote
@@ -463,6 +491,7 @@ POST   /api/quotes/[id]/accept # Accept quote
 ```
 
 #### Messages API
+
 ```typescript
 GET    /api/conversations     # List conversations
 POST   /api/conversations     # Create conversation
@@ -522,6 +551,7 @@ import { Button } from '@/components/ui/Button';
 ### Common Issues
 
 1. **Build Failures**
+
    ```bash
    rm -rf .next node_modules
    npm install
@@ -529,6 +559,7 @@ import { Button } from '@/components/ui/Button';
    ```
 
 2. **Database Issues**
+
    ```bash
    npx prisma generate
    npx prisma db push
