@@ -482,62 +482,61 @@ export default function InsightsPage() {
                             </tr>
                           ),
                         )}
-
-                        {analyticsData.integrations.googleAnalytics
-                          .metricsConnected && (
-                          <section
-                            aria-label="Google Analytics detail"
-                            className="mb-8 grid gap-6 xl:grid-cols-3"
-                          >
-                            <AnalyticsDimensionTable
-                              title="Traffic sources"
-                              dimensionLabel="Source / medium"
-                              rows={analyticsData.integrations.googleAnalytics.metrics.trafficSources.map(
-                                (row) => ({
-                                  label: row.sourceMedium,
-                                  primary: row.sessions,
-                                  secondary: row.activeUsers,
-                                  conversions: row.conversions,
-                                }),
-                              )}
-                              primaryLabel="Sessions"
-                              secondaryLabel="Users"
-                            />
-                            <AnalyticsDimensionTable
-                              title="Top landing pages"
-                              dimensionLabel="Landing page"
-                              rows={analyticsData.integrations.googleAnalytics.metrics.landingPages.map(
-                                (row) => ({
-                                  label: row.path,
-                                  primary: row.sessions,
-                                  secondary: row.activeUsers,
-                                  conversions: row.conversions,
-                                }),
-                              )}
-                              primaryLabel="Sessions"
-                              secondaryLabel="Users"
-                            />
-                            <AnalyticsDimensionTable
-                              title="Blog performance"
-                              dimensionLabel="Blog page"
-                              rows={analyticsData.integrations.googleAnalytics.metrics.blogPages.map(
-                                (row) => ({
-                                  label: row.path,
-                                  primary: row.pageViews,
-                                  secondary: row.activeUsers,
-                                  conversions: row.conversions,
-                                }),
-                              )}
-                              primaryLabel="Views"
-                              secondaryLabel="Users"
-                            />
-                          </section>
-                        )}
                       </tbody>
                     </table>
                   </div>
                 </section>
               )}
+
+            {analyticsData.integrations.googleAnalytics.metricsConnected && (
+              <section
+                aria-label="Google Analytics detail"
+                className="mb-8 grid gap-6 xl:grid-cols-3"
+              >
+                <AnalyticsDimensionTable
+                  title="Traffic sources"
+                  dimensionLabel="Source / medium"
+                  rows={analyticsData.integrations.googleAnalytics.metrics.trafficSources.map(
+                    (row) => ({
+                      label: row.sourceMedium,
+                      primary: row.sessions,
+                      secondary: row.activeUsers,
+                      conversions: row.conversions,
+                    }),
+                  )}
+                  primaryLabel="Sessions"
+                  secondaryLabel="Users"
+                />
+                <AnalyticsDimensionTable
+                  title="Top landing pages"
+                  dimensionLabel="Landing page"
+                  rows={analyticsData.integrations.googleAnalytics.metrics.landingPages.map(
+                    (row) => ({
+                      label: row.path,
+                      primary: row.sessions,
+                      secondary: row.activeUsers,
+                      conversions: row.conversions,
+                    }),
+                  )}
+                  primaryLabel="Sessions"
+                  secondaryLabel="Users"
+                />
+                <AnalyticsDimensionTable
+                  title="Blog performance"
+                  dimensionLabel="Blog page"
+                  rows={analyticsData.integrations.googleAnalytics.metrics.blogPages.map(
+                    (row) => ({
+                      label: row.path,
+                      primary: row.pageViews,
+                      secondary: row.activeUsers,
+                      conversions: row.conversions,
+                    }),
+                  )}
+                  primaryLabel="Views"
+                  secondaryLabel="Users"
+                />
+              </section>
+            )}
 
             <div className="grid gap-6 lg:grid-cols-2">
               <section className="rounded-xl border border-slate-200 bg-white p-6">
