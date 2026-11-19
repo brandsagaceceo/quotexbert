@@ -178,6 +178,13 @@ quotexbert/
 - Preference management
 - Multi-channel delivery
 
+### Job-board loading and recovery
+
+The existing `/contractor/jobs` page reports service failures separately from empty or filtered results. Retry uses the existing `/api/jobs`; stale responses cannot replace a newer request or a signed-out state. Current `{ jobs, message }` and legacy array responses remain supported. Empty results do not claim unverified daily activity, and failures do not suggest buying more categories.
+
+Focused validation: `.\node_modules\.bin\tsx.cmd --test scripts\contractor-job-board-loading.test.ts scripts\jobs-api-security.test.ts`.
+Real signed-in browsing and acceptance still require an authorized isolated account/database. This package changes no access rules, subscriptions, billing, API routes or models.
+
 ## 🔧 Configuration
 
 ### Environment Variables
