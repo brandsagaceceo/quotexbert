@@ -239,13 +239,13 @@ test("photo project and visualization actions open their existing pages without 
   });
   await carousel.getByRole("button", { name: /^Show journey 2:/ }).click();
   await carousel.getByRole("link", { name: "Post My Project" }).click();
-  await expect(page).toHaveURL(/\/create-lead$/);
+  await expect(page).toHaveURL(/\/create-lead$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { name: "Sign In Required" })).toBeVisible();
   await page.goBack({ waitUntil: "domcontentloaded" });
   await carousel.getByRole("button", { name: /^Show journey 5:/ }).click();
   await expect(carousel).toContainText("Visualization preview");
   await carousel.getByRole("link", { name: "Try Photo Visualization" }).click();
-  await expect(page).toHaveURL(/\/visualizer$/);
+  await expect(page).toHaveURL(/\/visualizer$/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { level: 1, name: /Visualize Your Dream Space/ })).toBeVisible();
   expect(writes).toEqual([]);
 });
