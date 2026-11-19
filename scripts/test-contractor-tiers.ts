@@ -160,7 +160,7 @@ async function assertJobBoard(contractorId: string, includedJobIds: string[], lo
   }
 }
 
-async function assertNotifications(contractorId: string, jobs: Array<{ id: string; title: string; description: string; budget: string; category: string }>, categories: string[]) {
+async function assertNotifications(contractorId: string, jobs: Array<{ id: string; title: string; description: string; budget: string | null; category: string }>, categories: string[]) {
   for (const job of jobs) {
     assert.equal(
       categories.some((category) => categoryMatchesEntitlement(job.category, category)),

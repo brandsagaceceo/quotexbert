@@ -11,9 +11,9 @@ import { ArrowLeft, Star, CheckCircle, X, DollarSign, Clock, TrendingUp, Award, 
 
 interface JobApplication {
   id: string;
-  message: string;
-  proposedPrice: number;
-  estimatedDays: number;
+  message: string | null;
+  proposedPrice: string | null;
+  estimatedDays: number | null;
   status: string;
   createdAt: string;
   contractor: {
@@ -50,30 +50,33 @@ interface Job {
 
 type SortKey = 'price' | 'rating' | 'speed';
 
-export default function JobApplicationsPage({ params }: { params: Promise<{ id: string }> }) {
+function proposedAmount(raw: string | null): number | null {
+  const numeric = raw?.replace(/[$,]/g, '').trim();
+  if (!numeric) return null;
+  const amount = Number(numeric);
+  return Number.isFinite(amount) && amount >= 0 ? amount : null;
+}
+
+export default function JobApplicationsPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
   const router = useRouter();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [processingApplicationId, setProcessingApplicationId] = useState<string | null>(null);
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('price');
+  const jobId = params.id;
 
   useEffect(() => {
-    params.then(setResolvedParams);
-  }, [params]);
-
-  useEffect(() => {
-    if (user && resolvedParams) {
+    if (user) {
       fetchJob();
     }
-  }, [user, resolvedParams]);
+  }, [user, jobId]);
 
   const fetchJob = async () => {
-    if (!user || !resolvedParams) return;
+    if (!user) return;
     
     try {
-      const response = await fetch(`/api/homeowner/jobs/${resolvedParams.id}?homeownerId=${user.id}`);
+      const response = await fetch(`/api/homeowner/jobs/${jobId}?homeownerId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         setJob(data);
@@ -150,9 +153,10 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
 
   const pending = job.applications.filter(app => app.status === 'pending');
   const accepted = job.applications.find(app => app.status === 'accepted');
+  const acceptedAmount = accepted ? proposedAmount(accepted.proposedPrice) : null;
 
   // Compute best bids for badges
-  const prices = pending.map(a => parseFloat(a.proposedPrice) || 0).filter(p => p > 0);
+  const prices = pending.map(a => proposedAmount(a.proposedPrice)).filter((price): price is number => price !== null);
   const lowestPrice = prices.length > 0 ? Math.min(...prices) : null;
   const highestRating = pending.reduce((best, a) => {
     const r = a.contractor.contractorProfile?.avgRating || 0;
@@ -164,7 +168,13 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
   }, 999);
 
   const sorted = [...pending].sort((a, b) => {
-    if (sortKey === 'price') return (parseFloat(a.proposedPrice) || 0) - (parseFloat(b.proposedPrice) || 0);
+    if (sortKey === 'price') {
+      const left = proposedAmount(a.proposedPrice);
+      const right = proposedAmount(b.proposedPrice);
+      if (left === null) return right === null ? 0 : 1;
+      if (right === null) return -1;
+      return left - right;
+    }
     if (sortKey === 'rating') return (b.contractor.contractorProfile?.avgRating || 0) - (a.contractor.contractorProfile?.avgRating || 0);
     if (sortKey === 'speed') return (a.estimatedDays || 999) - (b.estimatedDays || 999);
     return 0;
@@ -213,7 +223,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
               </div>
             </div>
             <div className="flex gap-6 text-sm text-green-700">
-              <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> ${accepted.proposedPrice}</span>
+              <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {acceptedAmount !== null ? `$${acceptedAmount.toLocaleString()}` : accepted.proposedPrice || 'Price not provided'}</span>
               {accepted.estimatedDays && <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {accepted.estimatedDays} days</span>}
             </div>
           </div>
@@ -253,7 +263,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
             <div className="space-y-4">
               {sorted.map((app) => {
                 const cp = app.contractor.contractorProfile;
-                const price = parseFloat(app.proposedPrice) || 0;
+                const price = proposedAmount(app.proposedPrice);
                 const isBestPrice = lowestPrice !== null && price === lowestPrice;
                 const isTopRated = highestRating > 0 && cp?.avgRating === highestRating;
                 const isFastest = fastestDays < 999 && app.estimatedDays === fastestDays;
@@ -323,7 +333,7 @@ export default function JobApplicationsPage({ params }: { params: Promise<{ id: 
                           </div>
                           {/* Price */}
                           <div className="text-right flex-shrink-0">
-                            <p className="text-2xl font-black text-gray-900">${parseFloat(app.proposedPrice).toLocaleString()}</p>
+                            <p className="text-2xl font-black text-gray-900">{price !== null ? `$${price.toLocaleString()}` : app.proposedPrice || 'Price not provided'}</p>
                             {app.estimatedDays && (
                               <p className="text-xs text-gray-500 flex items-center gap-1 justify-end mt-0.5">
                                 <Clock className="w-3 h-3" /> {app.estimatedDays} days

@@ -897,7 +897,7 @@ export async function sendContractorJobBoardOfferEmail(contractor: {
       subject: CONTRACTOR_JOB_BOARD_OFFER_SUBJECT,
       html: buildContractorJobBoardOfferHtml({
         firstName,
-        availableJobCount: options.availableJobCount,
+        ...options,
         unsubscribeUserId: contractor.id,
       }),
     });
@@ -914,9 +914,7 @@ export async function sendContractorJobBoardOfferEmail(contractor: {
 
 export async function sendContractorJobBoardOfferTestEmail({
   testEmail,
-  firstName,
-  availableJobCount,
-  unsubscribeUserId,
+  ...options
 }: {
   testEmail: string;
   firstName?: string | null;
@@ -928,11 +926,7 @@ export async function sendContractorJobBoardOfferTestEmail({
   return sendSharedEmail({
     to: testEmail,
     subject,
-    html: buildContractorJobBoardOfferHtml({
-      firstName,
-      availableJobCount,
-      unsubscribeUserId,
-    }),
+    html: buildContractorJobBoardOfferHtml(options),
   });
 }
 
@@ -1356,8 +1350,7 @@ export function buildContractorAccountWelcomeHtml(params: {
 
 export async function sendContractorAccountWelcomeTestEmail({
   testEmail,
-  firstName,
-  unsubscribeUserId,
+  ...options
 }: {
   testEmail: string;
   firstName?: string | null;
@@ -1366,7 +1359,7 @@ export async function sendContractorAccountWelcomeTestEmail({
   return sendSharedEmail({
     to: testEmail,
     subject: `[TEST] ${CONTRACTOR_ACCOUNT_WELCOME_SUBJECT}`,
-    html: buildContractorAccountWelcomeHtml({ firstName, unsubscribeUserId }),
+    html: buildContractorAccountWelcomeHtml(options),
   });
 }
 

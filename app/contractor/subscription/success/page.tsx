@@ -1,63 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 
 export default function SubscriptionSuccess() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const [loading, setLoading] = useState(true);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (sessionId) {
-      // Verify the session and update user's subscription
-      verifySession();
-    } else {
+    const controller = new AbortController();
+    setLoading(true);
+    setVerificationError(null);
+    if (!sessionId) {
+      setVerificationError("No checkout session was provided. Your subscription has not been verified.");
       setLoading(false);
+      return;
     }
-  }, [sessionId]);
 
-  const verifySession = async () => {
-    try {
-      const response = await fetch(`/api/contractor/verify-subscription?session_id=${sessionId}`);
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Track visualizer/standard contractor subscription Purchase event in Meta Pixel on client-side
-        try {
-          const { trackPurchase } = await import("@/lib/metaPixel");
-          // Default price or visualizer subscription price ($6.99) or regular tiered subscription.
-          // Let's inspect session/metadata or contract value. We default to 49 CAD for Handyman if not found.
-          const tierPricing: Record<string, number> = {
-            handyman: 49,
-            renovation: 99,
-            general: 149
-          };
-          
-          let amount = 49;
-          if (data?.tier) {
-            amount = tierPricing[data.tier.toLowerCase()] || 49;
-          } else if (sessionId) {
-            // Visualizer subscription or similar checks
-            if (window.location.search.includes("visualizer")) {
-              amount = 6.99;
-            }
-          }
-          
-          trackPurchase(amount, sessionId);
-        } catch (trackErr) {
-          console.error("Meta Pixel Purchase tracking failed in verification success screen:", trackErr);
+    const verifySession = async () => {
+      try {
+        const response = await fetch(`/api/contractor/verify-subscription?session_id=${encodeURIComponent(sessionId)}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`Subscription verification returned HTTP ${response.status}`);
+        const data: unknown = await response.json();
+        if (!data || typeof data !== "object" || !("success" in data) || data.success !== true) {
+          throw new Error("Subscription verification was not confirmed");
         }
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Error verifying subscription:", error);
+        setVerificationError("We could not confirm your subscription. Review your subscriptions before starting another checkout.");
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
-    } catch (error) {
-      console.error("Error verifying subscription:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    void verifySession();
+    return () => controller.abort();
+  }, [sessionId, attempt]);
 
   if (loading) {
     return (
@@ -65,6 +50,19 @@ export default function SubscriptionSuccess() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-rose-600 mx-auto mb-4"></div>
           <p className="text-slate-600 text-lg">Verifying your subscription...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (verificationError) {
+    return (
+      <div className="min-h-screen bg-rose-50 px-4 py-12">
+        <div role="alert" className="mx-auto max-w-xl rounded-2xl bg-white p-8 text-center shadow">
+          <h1 className="mb-4 text-2xl font-bold text-[#800020]">Subscription not confirmed</h1>
+          <p className="mb-6 text-slate-700">{verificationError}</p>
+          <Link href="/contractor/subscriptions" className="font-semibold text-[#800020] underline">Review subscriptions</Link>
+          {sessionId && <button className="ml-4 font-semibold text-[#800020] underline" onClick={() => setAttempt(value => value + 1)}>Retry verification</button>}
         </div>
       </div>
     );
@@ -86,7 +84,7 @@ export default function SubscriptionSuccess() {
           </h1>
           
           <p className="text-xl text-slate-600 mb-8">
-            Your payment was successful and your contractor subscription is now active.
+            Your contractor subscription has been confirmed.
           </p>
 
           {/* Benefits */}
@@ -153,9 +151,8 @@ export default function SubscriptionSuccess() {
             </Link>
           </div>
 
-          {/* Confirmation Email Notice */}
           <p className="mt-8 text-sm text-slate-500">
-            A confirmation email has been sent to your inbox with your subscription details.
+            Review your current subscription details on the <Link href="/contractor/subscriptions" className="underline">subscriptions page</Link>.
           </p>
         </div>
       </div>

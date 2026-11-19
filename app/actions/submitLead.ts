@@ -543,15 +543,16 @@ export async function submitLead(formData: FormData) {
     // Send homeowner job-posted confirmation email
     if (user.email) {
       try {
+        const jobCity = data.city || resolvedCity;
         await sendJobPostedEmail({
           homeowner: { id: user.id, email: user.email, name: user.name },
           job: {
             id: lead.id,
             title: data.title,
             category: data.projectType,
-            city: data.city || resolvedCity || undefined,
-            province: data.province || undefined,
-            zipCode: data.postalCode || undefined,
+            ...(jobCity ? { city: jobCity } : {}),
+            ...(data.province ? { province: data.province } : {}),
+            ...(data.postalCode ? { zipCode: data.postalCode } : {}),
           },
         });
         console.log(`[submitLead:${requestId}] Job-posted confirmation email sent to ${user.email}`);

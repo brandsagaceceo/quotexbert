@@ -270,6 +270,16 @@ Unverified static testimonials/stock-profile endorsements are not rendered on th
 
 With the isolated app running at port 3102 without production credentials, run `.\node_modules\.bin\playwright.cmd test homepage-carousel.spec.ts --workers=1 --reporter=line --output=.next\playwright-results`. Fixtures are isolated inside browser tests and never represent production activity. Real authenticated/provider-backed journeys remain a separate acceptance gate.
 
+### Integration release checks
+
+The staging integration resolves the existing 26 TypeScript diagnostics without relaxing strict types. Optional email/analytics properties are omitted when absent, Lead-derived fields accept the database's nulls, and test fixtures match existing Prisma records. Build-time type checking is enabled again. Run `npm.cmd run typecheck` and `npm.cmd run build`; stop the local Next server before building against the same `.next` directory. Existing lint disabling is unchanged, so build success is not a lint pass.
+
+The existing homeowner bid page now accepts Next 14's plain route params and handles Prisma's nullable string prices rather than inventing zero-priced bids. The old subscription-success screen shows verification failures explicitly and no longer tracks guessed purchase prices or claims an email was sent. **Release blocker:** its referenced `/api/contractor/verify-subscription` endpoint does not exist. Reconcile this legacy checkout flow with the existing subscription/webhook/activation implementation using an authorized Stripe-test account; no parallel verifier, price change or live billing operation was added.
+
+The existing `/api/stats` is now dynamic and uncached. It counts only published non-seeded jobs, uses real review aggregates, returns `avgRating: null` when there are no reviews, and returns HTTP 503 rather than fabricated counts when storage is unavailable. Consumers must handle the null/unavailable states; no frontend consumer was found in the scoped page/component search.
+
+Focused state regressions: `.\node_modules\.bin\tsx.cmd --test scripts\client-release-states.test.ts scripts\public-stats.test.ts`. These execute actual handlers/client functions with isolated dependencies, not authenticated browser sessions. A credential-free production build passes; production-mode middleware still requires legitimate Clerk configuration and was not bypassed to manufacture a runtime pass. The local review uses development mode with all paid/database/SEO-write settings absent or disabled.
+
 ## 🔧 Configuration
 
 ### Environment Variables
