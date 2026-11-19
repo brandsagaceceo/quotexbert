@@ -5,6 +5,7 @@ import Link from "next/link";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useToast } from "@/components/ToastProvider";
 import {
   trackEstimateStarted,
   trackEstimateCompleted,
@@ -73,6 +74,7 @@ function EstimateGate({ onClose }: EstimateGateProps) {
 
 export default function LandingEstimatePage() {
   const { isSignedIn, authUser } = useAuth();
+  const toast = useToast();
   const [estimateResult, setEstimateResult] = useState<any>(null);
   const [showGate, setShowGate] = useState(false);
   const [hasUsedFree, setHasUsedFree] = useState(false);
@@ -127,9 +129,14 @@ export default function LandingEstimatePage() {
         max: estimateResult.totals?.total_high || 0,
         lineItems: estimateResult.line_items || [],
       };
-      localStorage.setItem("estimate_data", JSON.stringify(data));
+      try {
+        localStorage.setItem("estimate_data", JSON.stringify(data));
+      } catch {
+        toast.error("Your browser could not preserve this estimate for your project. Keep this page open and allow browser storage before continuing.");
+        return;
+      }
     }
-    window.location.href = isSignedIn ? "/create-lead" : "/sign-up";
+    window.location.href = isSignedIn ? "/create-lead" : "/sign-up?redirect_url=%2Fcreate-lead";
   };
 
   return (

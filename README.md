@@ -177,16 +177,36 @@ quotexbert/
 ## 📖 Core Features Documentation
 
 ### 1. User Management & Authentication
-- Demo authentication system
+- Existing Clerk sign-in and sign-up
 - Role-based access (homeowner/contractor)
 - Profile management with image uploads
-- Ready for Clerk integration
+- Existing database-backed account and role resolution
 
 ### 2. Job & Quote Management
 - Job posting with AI estimate generation
 - Quote submission and comparison
 - Status tracking and updates
 - File attachments support
+
+#### Estimate authentication handoff
+
+The existing homepage and estimate landing page retain `/create-lead` as the
+sign-up/sign-in return destination. Browser storage failures are reported before
+navigation rather than claiming that an estimate was preserved.
+
+The existing `pending_save_estimate` cache is cleared only after the existing
+save API confirms a saved record. Failed requests, malformed responses and newer
+queued estimates are retained. The client shares in-flight resume requests and
+adds a durable `clientRequestId` before posting, including for legacy caches.
+The existing save API uses that optional UUID as the existing `AIEstimate.id`:
+retries return the same owner-checked record without updating it; concurrent
+creation is handled. Callers without this optional field keep their previous
+create behavior. No new model, migration, API or authentication flow is added.
+
+Focused tests: `npx tsx --test scripts/estimate-handoff.test.ts scripts/homeowner-estimate-project-security.test.ts`.
+They exercise the client-to-existing-API retry workflow with in-memory records
+only, including a response lost after commit. Real Clerk/database/photo-upload
+acceptance still requires an authorized isolated environment.
 
 ### 3. Messaging System
 - Real-time conversations
