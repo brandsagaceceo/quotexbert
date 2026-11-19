@@ -280,7 +280,9 @@ function ContractorJobsContent() {
       setLoadError(
         error instanceof SyntaxError
           ? "The job service returned an unreadable response. Please try again."
-          : error instanceof Error ? error.message : "Error loading jobs. Please try again."
+          : error instanceof Error && error.message.trim()
+          ? error.message
+          : "Error loading jobs. Please try again."
       );
     } finally {
       if (requestId === jobsRequestId.current) setLoading(false);

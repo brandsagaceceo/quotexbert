@@ -77,6 +77,7 @@ test("HTTP, malformed and transport failures are explicit, clear stale jobs, and
     [async () => Response.json(null), /invalid response/],
     [async () => new Response("<html>Unavailable</html>"), /unreadable response/],
     [async () => { throw new Error("Network unavailable"); }, /Network unavailable/],
+    [async () => { throw new Error(""); }, /Error loading jobs/],
   ] satisfies Array<[() => Promise<Response>, RegExp]>) {
     const fixture = makeLoader(fetcher);
     await fixture.load();
