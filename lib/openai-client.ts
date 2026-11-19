@@ -22,6 +22,11 @@ export function getOpenAIClient(): OpenAI | null {
   return client;
 }
 
-export function isAiFeatureEnabled(name: "QUOTEXBERT_AI_ENABLED" | "SEO_DRAFT_AUTOMATION_ENABLED") {
+export function isAiFeatureEnabled(
+  name:
+    | "QUOTEXBERT_AI_ENABLED"
+    | "SEO_DRAFT_AUTOMATION_ENABLED"
+    | "SEO_MANUAL_DRAFT_ENABLED",
+) {
   return process.env[name] === "true";
 }
