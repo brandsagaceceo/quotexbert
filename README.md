@@ -260,6 +260,16 @@ The existing `/contractor/jobs` page reports service failures separately from em
 Focused validation: `.\node_modules\.bin\tsx.cmd --test scripts\contractor-job-board-loading.test.ts scripts\jobs-api-security.test.ts`.
 Real signed-in browsing and acceptance still require an authorized isolated account/database. This package changes no access rules, subscriptions, billing, API routes or models.
 
+### Integrated homepage journeys
+
+The existing homepage hero now uses one six-journey carousel, not a second homepage: photo estimate, photo-to-project preparation, existing job form, existing QuoteXbert assistant, existing visualizer and the existing design example library. Guided planning/visualization are labelled previews; the social inspiration feed is not advertised as released. The library explicitly identifies stock examples rather than claiming real transformations.
+
+Automatic rotation is six seconds with a 500ms fade. Hover, keyboard focus and hidden tabs pause it; users have previous/next, direct selection, pause/start, arrow/Home/End and horizontal touch controls. Reduced motion disables autoplay and decorative transitions. The estimator, estimate handoff, role-aware assistant and manual job submission remain authoritative.
+
+Unverified static testimonials/stock-profile endorsements are not rendered on the homepage. The existing public activity component uses only validated API records, converts ISO timestamps, and reports empty/error/retry states rather than inventing activity.
+
+With the isolated app running at port 3102 without production credentials, run `.\node_modules\.bin\playwright.cmd test homepage-carousel.spec.ts --workers=1 --reporter=line --output=.next\playwright-results`. Fixtures are isolated inside browser tests and never represent production activity. Real authenticated/provider-backed journeys remain a separate acceptance gate.
+
 ## 🔧 Configuration
 
 ### Environment Variables

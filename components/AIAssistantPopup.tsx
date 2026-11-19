@@ -147,7 +147,7 @@ export default function AIAssistantPopup() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry || window.innerWidth >= 768) return; // desktop: no-op
+        if (!entry || window.innerWidth >= 768 || isOpen) return; // keep explicitly opened conversations visible
         if (entry.isIntersecting) {
           setIsHidden(true);
           if (isOpen) setIsOpen(false);
@@ -696,6 +696,7 @@ export default function AIAssistantPopup() {
       {/* Floating Button - Hidden near bottom on mobile to avoid CTA overlaps */}
       {!isOpen && !mobileMenuOpen && (
         <button
+          id="quotexbert-ai-launcher"
           ref={buttonRef}
           onClick={() => {
             setIsOpen(true);
@@ -717,6 +718,8 @@ export default function AIAssistantPopup() {
       {/* Chat Window */}
       {isOpen && (
         <div
+          id="quotexbert-ai-panel"
+          tabIndex={-1}
           ref={chatWindowRef}
           className="fixed z-50 w-full max-w-sm sm:max-w-md md:max-w-lg lg:w-96 right-0 left-0 sm:left-auto sm:right-4 mx-auto sm:mx-0 bg-white rounded-2xl shadow-2xl border-2 border-rose-200 flex flex-col overflow-hidden"
           style={{
@@ -748,6 +751,12 @@ export default function AIAssistantPopup() {
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {!guidedAiEnabled && (
+            <p className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              Guided AI planning is not enabled. The site-help options remain available; they do not generate an AI plan.
+            </p>
+          )}
 
           {/* Messages */}
           <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white" style={{ minHeight: '120px', maxHeight: 'calc(80vh - 160px)' }}>

@@ -11,13 +11,13 @@ The active development view is now `integration/spring-2027-staging`, based on l
 | State | Evidence |
 | --- | --- |
 | Code integrated | All five full PR heads retained; existing Prisma schema unchanged; no duplicate implementation added. |
-| Tests passed | Nine relevant regression files run together: 16 runner tests pass. Deliberate isolated error fixtures log expected failures; no live provider/database calls. |
+| Tests passed | Nine relevant regression files run together: 16 runner tests pass. Four actual-app browser tests cover the carousel, responsive journeys and public-activity error/retry/empty/ISO-time behavior. Deliberate isolated fixtures make no live provider/database calls. |
 | Local preview verified | Existing app returns HTTP 200 on port 3102 without loading database/paid-service credentials. At 320, 375, 390, 768, 1024, 1280 and 1440px: no banner clipping/overflow; both header logos load with equal centre coordinates. Normal gradients are 12 seconds; reduced motion disables decoration. Anonymous SEO API request returns 403. |
-| Remote preview verified | Not yet; one canonical staging Preview is being prepared using the existing Vercel integration. |
+| Remote preview verified | Initial five-package integration built successfully in the existing Vercel Preview environment. Carousel changes are locally verified and await an updated deployment; build success alone does not establish authenticated runtime acceptance. |
 | Production enabled | No. No main merge, production deployment, paid AI activation or live data writes. |
 | Release readiness | Initial integrated typecheck exactly matches the existing 26 diagnostics. These now require scoped release-readiness assessment rather than being assumed resolved. |
 
-The requested six-journey rotating homepage carousel does not currently exist in the relevant homepage/components. Existing banners are not a carousel. Existing estimator, create-lead, assistant and visualizer must be reused. No inspiration route was found in the scoped page/component search; the existing visualizer library contains explicitly coded demo data and must not be presented as a released social feed or real transformations.
+**Homepage inventory and completion:** scoped discovery found existing banners, estimator, create-lead, one assistant, visualizer and design example library, but no rotating carousel. One necessary `HomepageJourneyCarousel` component now extends the existing hero with six journeys, six-second rotation, manual controls, keyboard navigation, horizontal swipe, pause-on-hover/focus/hidden-tab and reduced-motion behavior. One focused browser test file is the only other new file. Existing destinations and estimate/job handlers are reused. The existing assistant launcher is shared, with a truthful disabled-guided-planning notice and mobile opening fix. No inspiration route was found in the scoped page/component search: the library is labelled stock examples, not a released feed or real transformations. Unverified homepage endorsements/testimonials are not rendered. Existing public activity now validates records, parses ISO timestamps and shows explicit empty/error/retry states instead of fabricated fallback events.
 
 - **Existing work preserved:** the original working directory's 83 modified/untracked files remain unchanged. This tracked roadmap starts from the existing untracked roadmap, copied into the isolated Blog Studio worktree rather than overwriting the original.
 - **QX branding / PR #20:** existing header/footer and lossless display improvements are already implemented; do not repeat them. Commit `bdff6f0` additionally converts only the approved square PNG into existing favicon/ICO/SVG/Apple-touch/web-app outputs. Four focused asset tests pass, including pixel-for-pixel comparison against direct resizes. Both PNG masters and display derivatives remain unchanged. The updated Preview serves byte-identical converted icons; header centring is within 0.51px with no overflow at all seven previously tested widths (320-1440px). Signed-in header acceptance remains unverified without an authorized account. User visual approval remains required; no merge or production promotion is authorized.
@@ -32,12 +32,13 @@ The requested six-journey rotating homepage carousel does not currently exist in
 
 ### Review links
 
+- Integrated development: [draft PR #25](https://github.com/brandsagaceceo/quotexbert/pull/25), [initial integrated Preview build](https://quotexbert-production-46oiv25lq-brandsagaceceos-projects.vercel.app), and [current local review](http://127.0.0.1:3102). The remote initial build does not yet include the locally tested carousel.
 - Branding: [PR #20](https://github.com/brandsagaceceo/quotexbert/pull/20) and [verified Preview](https://quotexbert-production-2nl4cf3wu-brandsagaceceos-projects.vercel.app).
 - Blog Studio: [draft PR #21](https://github.com/brandsagaceceo/quotexbert/pull/21) and [protected Preview](https://quotexbert-production-bfqt44eik-brandsagaceceos-projects.vercel.app/admin/blog).
 - Homepage: [draft PR #22](https://github.com/brandsagaceceo/quotexbert/pull/22), [successful Preview build](https://quotexbert-bhc3whg9t-brandsagaceceos-projects.vercel.app), and [working local review](http://127.0.0.1:3101). The local instance serves the existing application without loading database or paid-service credentials; authenticated/provider-backed actions are not configured.
 - Handoff: [draft PR #23](https://github.com/brandsagaceceo/quotexbert/pull/23) and [Preview build](https://quotexbert-production-gzdi6xr7g-brandsagaceceos-projects.vercel.app).
 - Contractor job loading: [draft PR #24](https://github.com/brandsagaceceo/quotexbert/pull/24); Preview checks for the latest head are not yet verified. Real-account acceptance is not assumed complete.
-- These are independent main-based feature branches, not a combined release. Preview build success does not establish authenticated runtime or database acceptance.
+- Original package links remain historical independent previews. PR #25 is the single active combined development view, not a production release. Preview build success does not establish authenticated runtime or database acceptance.
 
 ## Status and evidence
 

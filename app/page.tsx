@@ -7,7 +7,6 @@ import Link from "next/link";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
-import { ReviewsSection, Review } from "@/components/ReviewsSection";
 import { LocalBusinessSchema } from "@/components/LocalBusinessSchema";
 import { TrustSignals } from "@/components/TrustSignals";
 import { StickyCTA } from "@/components/StickyCTA";
@@ -22,15 +21,12 @@ import {
 import RecentActivityFeed from "@/components/RecentActivityFeed";
 import { useToast } from "@/components/ToastProvider";
 import { queueEstimateForSignIn, resumePendingEstimate } from "@/lib/estimate-handoff";
+import HomepageJourneyCarousel from "@/components/HomepageJourneyCarousel";
 import FoundingContractorBanner from "@/components/FoundingContractorBanner";
 import FoundingContractorSection from "@/components/FoundingContractorSection";
 import {
   Sparkles,
   Gift,
-  MapPin,
-  Bookmark,
-  Users,
-  Star,
   CheckCircle2,
   Tag,
   Map,
@@ -49,7 +45,6 @@ import {
 
 // Lazy load below-the-fold components for better performance
 const ServiceAreaCities = lazy(() => import("@/components/ServiceAreaCities").then(mod => ({ default: mod.ServiceAreaCities })));
-const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection").then(mod => ({ default: mod.TestimonialsSection })));
 const ExitIntentModal = lazy(() => import("@/components/ExitIntentModal").then(mod => ({ default: mod.ExitIntentModal })));
 const ExampleEstimates = lazy(() => import("@/components/ExampleEstimates"));
 const TrustFAQ = lazy(() => import("@/components/TrustFAQ"));
@@ -61,6 +56,20 @@ export default function Home() {
   const [savingEstimate, setSavingEstimate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const toast = useToast();
+
+  const handleOpenPlanning = () => {
+    const panel = document.getElementById('quotexbert-ai-panel');
+    if (panel) {
+      panel.focus();
+      return;
+    }
+    const launcher = document.getElementById('quotexbert-ai-launcher');
+    if (!launcher) {
+      toast.error('The assistant is still loading. Please try again in a moment.');
+      return;
+    }
+    launcher.click();
+  };
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
@@ -106,9 +115,6 @@ export default function Home() {
     setShowSignUpGate(true);
     trackSignUpModalShown('estimator_gate');
   };
-
-  // In production, fetch real reviews from API
-  const realReviews: Review[] = []; // Empty for now - will show examples
 
   const handleGetContractorBids = () => {
     trackCTAClick('estimate_results', 'Get Contractor Bids');
@@ -312,107 +318,12 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
               {/* Left Column - Headline & Benefits - Mobile-Optimized */}
-              <div className="text-center lg:text-left space-y-2 md:space-y-6">
-                <div className="inline-flex items-center gap-2 mb-2 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-600" strokeWidth={2} />
-                  <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Estimates · Free to Start</span>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-3 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
-                  <span className="text-[#800020]">
-                    Get an AI Renovation
-                  </span>
-                  <br />
-                  <span className="text-[#800020]">
-                    Estimate Before You Hire
-                  </span>
-                </h1>
-
-                <p className="text-sm md:text-xl lg:text-2xl text-slate-600 mb-4 md:mb-10 leading-relaxed">
-                  <span className="text-rose-700 font-semibold">Describe your project or upload photos</span> to get a
-                  detailed renovation cost range based on <span className="text-rose-700 font-semibold">Ontario pricing</span>.
-                  Free for homeowners — quick free account required.
+              <div className="min-w-0">
+                <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
+                <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
+                <p className="mt-4 text-center text-sm text-slate-600 lg:text-left">
+                  Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
                 </p>
-
-                {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
-                <a
-                  href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-1.5 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-sm py-2.5 px-5 rounded-xl shadow-md active:scale-[0.98] transition-colors mb-3"
-                >
-                  <Camera className="w-4 h-4" strokeWidth={2} />
-                  Upload Photos — Free AI Estimate
-                </a>
-
-                {/* Mobile-only compact benefits (desktop shows full cards below) */}
-                <div className="lg:hidden flex flex-wrap gap-1.5 mb-2">
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
-                </div>
-
-                {/* Trust Points - Desktop only */}
-                <div className="hidden lg:block space-y-2.5 md:space-y-3 mb-6 md:mb-10">
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center ring-1 ring-emerald-100">
-                      <Gift className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Free for Homeowners</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No cost to get your estimate</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-rose-50 rounded-xl flex items-center justify-center ring-1 ring-rose-100">
-                      <MapPin className="w-5 h-5 md:w-6 md:h-6 text-rose-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Ontario-Focused Pricing</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Real Toronto, Durham &amp; GTA rates</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-orange-50 rounded-xl flex items-center justify-center ring-1 ring-orange-100">
-                      <Bookmark className="w-5 h-5 md:w-6 md:h-6 text-orange-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Save Estimates to Your Account</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Revisit anytime after signing up</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center ring-1 ring-blue-100">
-                      <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Connect With Contractors When Ready</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No pressure — you&apos;re always in control</div>
-                    </div>
-                  </Link>
-                </div>
-
-                {/* Social Proof - Real faces + badges */}
-                <div className="flex flex-wrap gap-2.5 md:gap-3 justify-center lg:justify-start items-center">
-                  {/* Stacked real homeowner faces */}
-                  <div className="flex items-center gap-2 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                    </div>
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA homeowners</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">Top Rated GTA</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA Verified</span>
-                  </div>
-                </div>
               </div>
 
               {/* Right Column - iPhone Estimator */}
@@ -828,11 +739,6 @@ export default function Home() {
         {/* Trust FAQ - How Pricing Works, Contractor Verification */}
         <Suspense fallback={<div className="py-12" />}>
           <TrustFAQ />
-        </Suspense>
-
-        {/* Testimonials with Social Proof */}
-        <Suspense fallback={<div className="py-12" />}>
-          <TestimonialsSection />
         </Suspense>
 
         {/* Service Area Cities */}

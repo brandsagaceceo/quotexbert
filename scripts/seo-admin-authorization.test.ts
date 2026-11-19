@@ -105,7 +105,7 @@ installModuleMock("@/lib/seo/article-generation", {
 });
 
 const listRoute = require("../app/api/admin/seo-articles/route") as {
-  GET: (request?: NextRequest) => Promise<Response>;
+  GET: (request: NextRequest) => Promise<Response>;
   POST: (request: NextRequest) => Promise<Response>;
 };
 const actionRoute =
@@ -137,18 +137,19 @@ async function main() {
   process.env.VERCEL_ENV = "preview";
   delete process.env.SEO_PREVIEW_WRITES_ENABLED;
   delete process.env.SEO_MANUAL_DRAFT_ENABLED;
-  const denied = await listRoute.GET();
+  const listRequest = new NextRequest("http://localhost/api/admin/seo-articles");
+  const denied = await listRoute.GET(listRequest);
   assert.equal(denied.status, 403);
   assert.equal(listCount, 0);
 
   sessionUserId = "clerk-visitor";
   sessionEmail = "visitor@example.test";
-  assert.equal((await listRoute.GET()).status, 403);
+  assert.equal((await listRoute.GET(listRequest)).status, 403);
   assert.equal(listCount, 0);
 
   sessionUserId = "clerk-admin";
   sessionEmail = "brandsagaceo@gmail.com";
-  const listed = await listRoute.GET();
+  const listed = await listRoute.GET(listRequest);
   assert.equal(listed.status, 200);
   assert.equal(listCount, 1);
   const listedData = await listed.json();
@@ -158,7 +159,7 @@ async function main() {
   assert.equal(listedData.capabilities.canGenerate, false);
   assert.equal(listedData.searchConsole.metricsConnected, false);
   listUnavailable = true;
-  const unavailable = await listRoute.GET();
+  const unavailable = await listRoute.GET(listRequest);
   assert.equal(unavailable.status, 503);
   assert.match(
     (await unavailable.json()).error,

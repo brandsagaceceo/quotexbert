@@ -10,14 +10,14 @@ import { SEO_ARTICLE_STATUSES } from "@/lib/seo/article-validation";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-export async function GET(request?: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const page = Number(request?.nextUrl.searchParams.get("page") || "1");
-    const status = request?.nextUrl.searchParams.get("status") || "all";
+    const page = Number(request.nextUrl.searchParams.get("page") || "1");
+    const status = request.nextUrl.searchParams.get("status") || "all";
     if (
       !Number.isSafeInteger(page) ||
       page < 1 ||
