@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 
 export default function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -10,9 +10,9 @@ export default function SiteFooter() {
         <div className="footer-grid grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
           {/* Brand — spans 2 cols on desktop, full width on mobile */}
           <div className="footer-brand-col col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center mb-4">
-              <span className="text-2xl font-bold text-[#800020]">QuoteXbert</span>
-            </Link>
+            <div className="mb-4">
+              <Logo size="sm" />
+            </div>
             <p className="text-ink-600 mb-4 text-sm leading-relaxed">
               AI-powered renovation estimates for Toronto, Durham Region &amp; GTA homeowners. Verified contractor marketplace. Free for homeowners.
             </p>
