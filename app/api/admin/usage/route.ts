@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = "force-dynamic";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'brandsagaceo@gmail.com,quotexbert@gmail.com')
   .split(',')
   .map((e) => e.trim().toLowerCase());
-
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
@@ -63,7 +61,10 @@ export async function GET(request: NextRequest) {
         acceptedApplications,
         paymentStats,
         messageCount,
-        portfolioCount
+        portfolioCount,
+        recentJobs,
+        recentUsers,
+        recentTransactions,
       ] = await Promise.all([
         prisma.user.count(),
         prisma.user.count({ where: { role: 'homeowner' } }),
@@ -84,11 +85,56 @@ export async function GET(request: NextRequest) {
           }
         }),
         prisma.message.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.portfolioItem.count()
+        prisma.portfolioItem.count(),
+        prisma.lead.findMany({
+          where: { isSeeded: false, createdAt: { gte: startDate } },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          select: { id: true, title: true, status: true, createdAt: true },
+        }),
+        prisma.user.findMany({
+          where: { createdAt: { gte: startDate } },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          select: { id: true, role: true, createdAt: true },
+        }),
+        prisma.transaction.findMany({
+          where: { createdAt: { gte: startDate } },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          select: { id: true, description: true, status: true, createdAt: true },
+        }),
       ]);
+
+      const recentActivity = [
+        ...recentJobs.map((job) => ({
+          id: `job:${job.id}`,
+          type: 'job',
+          description: `Job posted: ${job.title}`,
+          status: job.status,
+          timestamp: job.createdAt.toISOString(),
+        })),
+        ...recentUsers.map((recentUser) => ({
+          id: `user:${recentUser.id}`,
+          type: 'account',
+          description: `New ${recentUser.role || 'unassigned'} account`,
+          status: 'created',
+          timestamp: recentUser.createdAt.toISOString(),
+        })),
+        ...recentTransactions.map((transaction) => ({
+          id: `transaction:${transaction.id}`,
+          type: 'transaction',
+          description: transaction.description,
+          status: transaction.status,
+          timestamp: transaction.createdAt.toISOString(),
+        })),
+      ]
+        .sort((left, right) => right.timestamp.localeCompare(left.timestamp))
+        .slice(0, 10);
 
       return NextResponse.json({
         period,
+        generatedAt: now.toISOString(),
         overview: {
           users: {
             total: totalUsers,
@@ -116,7 +162,8 @@ export async function GET(request: NextRequest) {
             messages: messageCount,
             portfolios: portfolioCount
           }
-        }
+        },
+        recentActivity,
       });
     }
 

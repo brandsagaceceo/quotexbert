@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -16,15 +16,28 @@ import {
   Cog6ToothIcon
 } from "@heroicons/react/24/outline";
 
-interface DashboardStats {
-  totalLeads: number;
-  totalContractors: number;
-  totalUsers: number;
-  revenue: number;
+interface DashboardData {
+  generatedAt: string;
+  overview: {
+    users: {
+      total: number;
+      contractors: number;
+      new: number;
+    };
+    jobs: {
+      total: number;
+      new: number;
+    };
+    revenue: {
+      total: number;
+      transactions: number;
+    };
+  };
   recentActivity: Array<{
     id: string;
     type: string;
     description: string;
+    status: string;
     timestamp: string;
   }>;
 }
@@ -32,8 +45,9 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const { authUser: user, authLoading } = useAuth();
   const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [stats, setStats] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Guard: only admin emails may access this page
   useEffect(() => {
@@ -42,24 +56,34 @@ export default function AdminDashboard() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    if (!user || !ADMIN_EMAILS.includes(user.email || '')) return;
-    // Load mock stats for the admin overview
-    setTimeout(() => {
-      setStats({
-        totalLeads: 156,
-        totalContractors: 89,
-        totalUsers: 245,
-        revenue: 12450,
-        recentActivity: [
-          { id: "1", type: "lead", description: "New kitchen renovation lead posted", timestamp: "2 hours ago" },
-          { id: "2", type: "contractor", description: "Contractor verified: ABC Plumbing", timestamp: "4 hours ago" },
-          { id: "3", type: "payment", description: "$45 payment processed", timestamp: "6 hours ago" },
-        ]
-      });
+  const fetchDashboard = useCallback(async () => {
+    if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
       setLoading(false);
-    }, 1000);
-  }, []);
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/usage?metric=overview&period=30d", {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to load administrator metrics");
+      }
+      setStats(data);
+    } catch (cause) {
+      console.error("[ADMIN] Failed to load dashboard metrics:", cause);
+      setError(cause instanceof Error ? cause.message : "Unable to load administrator metrics");
+      setStats(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!authLoading) void fetchDashboard();
+  }, [authLoading, fetchDashboard]);
 
   const adminSections = [
     {
@@ -106,7 +130,7 @@ export default function AdminDashboard() {
     }
   ];
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <LoadingState
         fullScreen
@@ -115,6 +139,12 @@ export default function AdminDashboard() {
       />
     );
   }
+
+  const formatRevenue = (amountInCents: number) =>
+    new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency: "CAD",
+    }).format(amountInCents / 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
@@ -134,6 +164,16 @@ export default function AdminDashboard() {
           )}
         </div>
 
+        {error && (
+          <div role="alert" className="mb-8 rounded-xl border border-red-200 bg-red-50 p-5 text-red-800">
+            <p className="font-semibold">Administrator metrics are unavailable</p>
+            <p className="mt-1">{error}</p>
+            <button type="button" onClick={() => void fetchDashboard()} className="mt-3 font-semibold underline">
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Stats Overview */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -141,7 +181,8 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-rose-700 text-sm font-medium">Total Leads</p>
-                  <p className="text-3xl font-bold text-rose-950">{stats.totalLeads}</p>
+                  <p className="text-3xl font-bold text-rose-950">{stats.overview.jobs.total}</p>
+                  <p className="mt-1 text-xs text-rose-700">+{stats.overview.jobs.new} in the last 30 days</p>
                 </div>
                 <BriefcaseIcon className="h-8 w-8 text-rose-700" />
               </div>
@@ -151,7 +192,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-600 text-sm font-medium">Contractors</p>
-                  <p className="text-3xl font-bold text-green-900">{stats.totalContractors}</p>
+                  <p className="text-3xl font-bold text-green-900">{stats.overview.users.contractors}</p>
                 </div>
                 <UserGroupIcon className="h-8 w-8 text-green-600" />
               </div>
@@ -161,7 +202,8 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-rose-700 text-sm font-medium">Total Users</p>
-                  <p className="text-3xl font-bold text-rose-950">{stats.totalUsers}</p>
+                  <p className="text-3xl font-bold text-rose-950">{stats.overview.users.total}</p>
+                  <p className="mt-1 text-xs text-rose-700">+{stats.overview.users.new} in the last 30 days</p>
                 </div>
                 <UserGroupIcon className="h-8 w-8 text-rose-700" />
               </div>
@@ -170,8 +212,9 @@ export default function AdminDashboard() {
             <div className="bg-gradient-to-br from-orange-50/80 to-orange-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-orange-600 text-sm font-medium">Revenue</p>
-                  <p className="text-3xl font-bold text-orange-900">${stats.revenue.toLocaleString()}</p>
+                  <p className="text-orange-600 text-sm font-medium">Completed transaction value</p>
+                  <p className="text-3xl font-bold text-orange-900">{formatRevenue(stats.overview.revenue.total)}</p>
+                  <p className="mt-1 text-xs text-orange-700">{stats.overview.revenue.transactions} in the last 30 days</p>
                 </div>
                 <CurrencyDollarIcon className="h-8 w-8 text-orange-600" />
               </div>
@@ -213,16 +256,25 @@ export default function AdminDashboard() {
         {stats && (
           <div className="bg-gradient-to-br from-slate-50/80 to-orange-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
             <h3 className="text-2xl font-semibold text-slate-900 mb-6">Recent Activity</h3>
-            <div className="space-y-4">
-              {stats.recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between py-3 border-b border-slate-200 last:border-b-0">
-                  <div>
-                    <p className="text-slate-900 font-medium">{activity.description}</p>
-                    <p className="text-slate-500 text-sm capitalize">{activity.type} • {activity.timestamp}</p>
+            {stats.recentActivity.length === 0 ? (
+              <p className="text-slate-600">No jobs, accounts or transactions were recorded in the last 30 days.</p>
+            ) : (
+              <div className="space-y-4">
+                {stats.recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center justify-between py-3 border-b border-slate-200 last:border-b-0">
+                    <div>
+                      <p className="text-slate-900 font-medium">{activity.description}</p>
+                      <p className="text-slate-500 text-sm capitalize">
+                        {activity.type} • {activity.status} • {new Date(activity.timestamp).toLocaleString("en-CA")}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
+            <p className="mt-5 text-xs text-slate-500">
+              Database snapshot generated {new Date(stats.generatedAt).toLocaleString("en-CA")}. No sample activity is shown.
+            </p>
           </div>
         )}
       </div>
