@@ -1,226 +1,232 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 interface AnalyticsEvent {
+  id: string;
   event: string;
   timestamp: string;
-  properties: Record<string, any>;
-  person?: {
-    id: string;
-    properties: Record<string, any>;
-  };
+  properties: Record<string, unknown>;
+  identifiedUser: boolean;
 }
 
 interface AnalyticsData {
+  range: string;
+  source: "database";
+  generatedAt: string;
   totalEvents: number;
-  uniqueUsers: number;
-  events: AnalyticsEvent[];
+  identifiedUsers: number;
   eventCounts: Record<string, number>;
   recentActivity: AnalyticsEvent[];
+  truncated: boolean;
+  integrations: {
+    googleAnalytics: {
+      tagConfigured: boolean;
+      metricsConnected: false;
+    };
+    searchConsole: {
+      verificationTokenConfigured: boolean;
+      metricsConnected: false;
+      propertyUrl: string;
+      sitemapUrl: string;
+    };
+  };
 }
 
-const EVENT_DESCRIPTIONS = {
-  estimate_created: "Estimate Created",
-  estimate_viewed: "Estimate Viewed", 
-  thread_created: "Thread Started",
-  message_sent: "Message Sent",
-  lead_accepted: "Lead Accepted",
-  contract_created: "Contract Created",
-  contract_sent: "Contract Sent",
-  contract_accepted: "Contract Accepted",
-  contract_pdf_generated: "Contract PDF Generated",
-  payment_completed: "Payment Completed",
-};
+function eventLabel(event: string) {
+  return event.replace(/_/g, " ");
+}
 
 export default function InsightsPage() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("7d");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
+    setLoading(true);
+    setError("");
     try {
-      setLoading(true);
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch analytics");
-      }
-      
+      const response = await fetch(`/api/admin/analytics?range=${timeRange}`, {
+        cache: "no-store",
+      });
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch stored analytics");
+      }
       setAnalyticsData(data);
-    } catch (err) {
-      console.error("Error fetching analytics:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
+    } catch (cause) {
+      console.error("[ADMIN_INSIGHTS] Failed to load analytics:", cause);
+      setError(
+        cause instanceof Error ? cause.message : "Failed to fetch stored analytics",
+      );
+      setAnalyticsData(null);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchAnalytics();
   }, [timeRange]);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">📊 Product Analytics</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white p-6 rounded-lg shadow border">
-              <div className="h-20 bg-gray-200 animate-pulse rounded"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    void fetchAnalytics();
+  }, [fetchAnalytics]);
 
-  if (error) {
-    return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">📊 Product Analytics</h1>
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="text-center">
-            <p className="text-red-600 mb-4">Error loading analytics: {error}</p>
-            <button 
-              onClick={fetchAnalytics}
-              className="bg-rose-700 hover:bg-rose-700 text-white px-4 py-2 rounded"
+  return (
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <Link href="/admin" className="text-sm text-[#800020] hover:underline">
+              Back to administration
+            </Link>
+            <h1 className="mt-2 text-3xl font-bold text-slate-900">
+              Product Analytics
+            </h1>
+            <p className="mt-2 max-w-3xl text-slate-600">
+              Real events stored by QuoteXbert. Google Analytics and Search
+              Console metrics remain disconnected until separately authorized.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <select
+              aria-label="Analytics period"
+              value={timeRange}
+              onChange={(event) => setTimeRange(event.target.value)}
+              className="rounded border border-slate-300 bg-white px-3 py-2"
             >
-              Retry
+              <option value="1d">24 hours</option>
+              <option value="7d">7 days</option>
+              <option value="30d">30 days</option>
+              <option value="90d">90 days</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => void fetchAnalytics()}
+              disabled={loading}
+              className="rounded bg-[#800020] px-4 py-2 font-medium text-white disabled:opacity-50"
+            >
+              {loading ? "Refreshing..." : "Refresh"}
             </button>
           </div>
         </div>
-      </div>
-    );
-  }
 
-  const totalRevenue = analyticsData?.events
-    .filter(e => e.event === "payment_completed")
-    .reduce((sum, e) => sum + (e.properties.amountCents || 0), 0) || 0;
+        {error && (
+          <p role="alert" className="mb-6 rounded border border-red-200 bg-red-50 p-4 text-red-800">
+            {error}
+          </p>
+        )}
 
-  const conversionEvents = analyticsData?.events.filter(e => 
-    ["estimate_created", "lead_accepted", "contract_accepted", "payment_completed"].includes(e.event)
-  ) || [];
+        {loading && !analyticsData ? (
+          <p role="status" className="rounded border bg-white p-6 text-slate-600">
+            Loading stored analytics...
+          </p>
+        ) : analyticsData ? (
+          <>
+            <section aria-label="Analytics summary" className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <MetricCard label="Stored events" value={analyticsData.totalEvents.toLocaleString()} detail={analyticsData.range} />
+              <MetricCard label="Identified users" value={analyticsData.identifiedUsers.toLocaleString()} detail="Distinct stored user IDs" />
+              <MetricCard
+                label="Google Analytics tag"
+                value={analyticsData.integrations.googleAnalytics.tagConfigured ? "Configured" : "Not configured"}
+                detail="Metrics API not connected"
+              />
+              <MetricCard
+                label="Search Console"
+                value={analyticsData.integrations.searchConsole.verificationTokenConfigured ? "Verification prepared" : "Not configured"}
+                detail="Metrics API not connected"
+              />
+            </section>
 
-  return (
-    <div className="container mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">📊 Product Analytics</h1>
-        
-        <div className="flex items-center gap-4">
-          <select 
-            value={timeRange} 
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2"
-          >
-            <option value="1d">Today</option>
-            <option value="7d">7 Days</option>
-            <option value="30d">30 Days</option>
-            <option value="90d">90 Days</option>
-          </select>
-          
-          <button 
-            onClick={fetchAnalytics}
-            className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded border"
-          >
-            🔄 Refresh
-          </button>
-        </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Total Events</h3>
-            <span className="text-2xl">📈</span>
-          </div>
-          <div className="text-2xl font-bold">{analyticsData?.totalEvents.toLocaleString()}</div>
-          <p className="text-xs text-gray-500">All tracked events</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Active Users</h3>
-            <span className="text-2xl">👥</span>
-          </div>
-          <div className="text-2xl font-bold">{analyticsData?.uniqueUsers}</div>
-          <p className="text-xs text-gray-500">Unique users tracked</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Revenue</h3>
-            <span className="text-2xl">💵</span>
-          </div>
-          <div className="text-2xl font-bold">${(totalRevenue / 100).toFixed(2)}</div>
-          <p className="text-xs text-gray-500">Total payments</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-600">Conversions</h3>
-            <span className="text-2xl">🎯</span>
-          </div>
-          <div className="text-2xl font-bold">{conversionEvents.length}</div>
-          <p className="text-xs text-gray-500">Estimates → Payments</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Event Breakdown */}
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <h2 className="text-xl font-bold mb-2">Event Breakdown</h2>
-          <p className="text-gray-600 mb-4">Most frequent user actions</p>
-          
-          <div className="space-y-4">
-            {Object.entries(analyticsData?.eventCounts || {})
-              .sort(([,a], [,b]) => b - a)
-              .slice(0, 10)
-              .map(([event, count]) => {
-                const description = EVENT_DESCRIPTIONS[event as keyof typeof EVENT_DESCRIPTIONS] || event;
-                
-                return (
-                  <div key={event} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{description}</span>
-                    <span className="bg-gray-100 px-2 py-1 rounded text-sm">{count}</span>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white p-6 rounded-lg shadow border">
-          <h2 className="text-xl font-bold mb-2">Recent Activity</h2>
-          <p className="text-gray-600 mb-4">Latest user events</p>
-          
-          <div className="space-y-4">
-            {analyticsData?.recentActivity.slice(0, 10).map((event, index) => {
-              const description = EVENT_DESCRIPTIONS[event.event as keyof typeof EVENT_DESCRIPTIONS] || event.event;
-              const timestamp = new Date(event.timestamp).toLocaleString();
-              
-              return (
-                <div key={index} className="border-l-2 border-rose-700 pl-4 py-2">
-                  <p className="text-sm font-medium">{description}</p>
-                  <p className="text-xs text-gray-500">{timestamp}</p>
-                  {Object.keys(event.properties).length > 0 && (
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {Object.entries(event.properties).slice(0, 3).map(([key, value]) => (
-                        <span key={key} className="bg-rose-100 text-rose-900 px-2 py-1 rounded text-xs">
-                          {key}: {String(value).slice(0, 20)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+            <section className="mb-8 rounded-xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-bold text-slate-900">Google connection readiness</h2>
+              <dl className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+                <div>
+                  <dt className="font-semibold text-slate-700">Search property</dt>
+                  <dd className="text-slate-600">{analyticsData.integrations.searchConsole.propertyUrl}</dd>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+                <div>
+                  <dt className="font-semibold text-slate-700">Sitemap</dt>
+                  <dd className="text-slate-600">{analyticsData.integrations.searchConsole.sitemapUrl}</dd>
+                </div>
+              </dl>
+              <p className="mt-4 text-sm text-slate-600">
+                Configuration status is reported without exposing tokens or measurement IDs.
+                No Google API request is made by this page.
+              </p>
+            </section>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <section className="rounded-xl border border-slate-200 bg-white p-6">
+                <h2 className="text-xl font-bold text-slate-900">Stored event breakdown</h2>
+                {Object.keys(analyticsData.eventCounts).length === 0 ? (
+                  <p className="mt-4 text-slate-600">No stored events in this period.</p>
+                ) : (
+                  <div className="mt-4 space-y-3">
+                    {Object.entries(analyticsData.eventCounts)
+                      .sort((left, right) => right[1] - left[1])
+                      .map(([event, count]) => (
+                        <div key={event} className="flex justify-between gap-4 border-b border-slate-100 pb-2">
+                          <span className="capitalize text-slate-700">{eventLabel(event)}</span>
+                          <span className="font-semibold text-slate-900">{count}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="rounded-xl border border-slate-200 bg-white p-6">
+                <h2 className="text-xl font-bold text-slate-900">Recent stored activity</h2>
+                {analyticsData.recentActivity.length === 0 ? (
+                  <p className="mt-4 text-slate-600">No stored activity in this period.</p>
+                ) : (
+                  <div className="mt-4 space-y-4">
+                    {analyticsData.recentActivity.map((event) => (
+                      <article key={event.id} className="border-l-2 border-[#800020] pl-4">
+                        <p className="font-medium capitalize text-slate-900">{eventLabel(event.event)}</p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(event.timestamp).toLocaleString("en-CA")}
+                          {event.identifiedUser ? " • identified user" : ""}
+                        </p>
+                        {Object.keys(event.properties).length > 0 && (
+                          <p className="mt-1 text-xs text-slate-600">
+                            {Object.entries(event.properties)
+                              .slice(0, 3)
+                              .map(([key, value]) => `${key}: ${String(value).slice(0, 40)}`)
+                              .join(" • ")}
+                          </p>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+
+            <p className="mt-6 text-xs text-slate-500">
+              Database snapshot generated {new Date(analyticsData.generatedAt).toLocaleString("en-CA")}.
+              {analyticsData.truncated ? " Results are limited to the 500 newest events." : ""}
+            </p>
+          </>
+        ) : null}
       </div>
+    </main>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-5">
+      <p className="text-sm font-medium text-slate-600">{label}</p>
+      <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
+      <p className="mt-1 text-xs text-slate-500">{detail}</p>
     </div>
   );
 }
