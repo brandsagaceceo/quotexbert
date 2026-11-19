@@ -29,6 +29,14 @@ assert.match(
 );
 assert.match(page, /Search queries/, "Search Console queries are visible");
 assert.match(page, /GA4 key events/, "GA4 conversions are visible");
+assert.match(page, /Traffic sources/, "GA4 traffic sources are visible");
+assert.match(page, /Top landing pages/, "GA4 landing pages are visible");
+assert.match(page, /Blog performance/, "GA4 blog performance is visible");
+assert.match(
+  page,
+  /duplicate GTM loading is suppressed/,
+  "the dashboard reports the active non-duplicating tag mode",
+);
 assert.match(page, /AI usage and cost/, "real AI usage is visible");
 assert.match(
   page,

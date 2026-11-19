@@ -27,6 +27,9 @@ async function main() {
   assert.equal(disconnected.analytics.connected, false);
   assert.equal(disconnected.searchConsole.error, null);
   assert.equal(disconnected.analytics.error, null);
+  assert.deepEqual(disconnected.analytics.trafficSources, []);
+  assert.deepEqual(disconnected.analytics.landingPages, []);
+  assert.deepEqual(disconnected.analytics.blogPages, []);
 
   process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL = "metrics@example.test";
   process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY = "configured-for-test";

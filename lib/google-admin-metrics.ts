@@ -43,6 +43,24 @@ export interface GoogleAdminMetrics {
     sessions: number;
     pageViews: number;
     conversions: number;
+    trafficSources: Array<{
+      sourceMedium: string;
+      sessions: number;
+      activeUsers: number;
+      conversions: number;
+    }>;
+    landingPages: Array<{
+      path: string;
+      sessions: number;
+      activeUsers: number;
+      conversions: number;
+    }>;
+    blogPages: Array<{
+      path: string;
+      pageViews: number;
+      activeUsers: number;
+      conversions: number;
+    }>;
   };
 }
 
@@ -83,6 +101,9 @@ export async function fetchGoogleAdminMetrics(
       sessions: 0,
       pageViews: 0,
       conversions: 0,
+      trafficSources: [],
+      landingPages: [],
+      blogPages: [],
     },
   };
 
@@ -238,18 +259,63 @@ async function fetchAnalyticsMetrics(
   if (!rawProperty) throw new Error("Analytics property is not configured");
   const property = rawProperty.replace(/^properties\//, "");
   const endpoint = `https://analyticsdata.googleapis.com/v1beta/properties/${encodeURIComponent(property)}:runReport`;
-  const body = await googleJsonRequest<{
-    rows?: Array<{ metricValues?: Array<{ value?: string }> }>;
-  }>(endpoint, token, {
-    dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
-    metrics: [
-      { name: "activeUsers" },
-      { name: "sessions" },
-      { name: "screenPageViews" },
-      { name: "keyEvents" },
-    ],
-    limit: 1,
-  });
+  const [body, traffic, landingPages, blogPages] = await Promise.all([
+    googleJsonRequest<{
+      rows?: Array<{ metricValues?: Array<{ value?: string }> }>;
+    }>(endpoint, token, {
+      dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
+      metrics: [
+        { name: "activeUsers" },
+        { name: "sessions" },
+        { name: "screenPageViews" },
+        { name: "keyEvents" },
+      ],
+      limit: 1,
+    }),
+    googleJsonRequest<GaDimensionReport>(endpoint, token, {
+      dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
+      dimensions: [{ name: "sessionSourceMedium" }],
+      metrics: [
+        { name: "sessions" },
+        { name: "activeUsers" },
+        { name: "keyEvents" },
+      ],
+      orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+      limit: 20,
+    }),
+    googleJsonRequest<GaDimensionReport>(endpoint, token, {
+      dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
+      dimensions: [{ name: "landingPagePlusQueryString" }],
+      metrics: [
+        { name: "sessions" },
+        { name: "activeUsers" },
+        { name: "keyEvents" },
+      ],
+      orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+      limit: 20,
+    }),
+    googleJsonRequest<GaDimensionReport>(endpoint, token, {
+      dateRanges: [{ startDate: `${days}daysAgo`, endDate: "today" }],
+      dimensions: [{ name: "pagePath" }],
+      dimensionFilter: {
+        filter: {
+          fieldName: "pagePath",
+          stringFilter: {
+            matchType: "BEGINS_WITH",
+            value: "/blog/",
+            caseSensitive: false,
+          },
+        },
+      },
+      metrics: [
+        { name: "screenPageViews" },
+        { name: "activeUsers" },
+        { name: "keyEvents" },
+      ],
+      orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      limit: 20,
+    }),
+  ]);
   const values = body.rows?.[0]?.metricValues || [];
 
   return {
@@ -259,7 +325,41 @@ async function fetchAnalyticsMetrics(
     sessions: numericMetric(values[1]?.value),
     pageViews: numericMetric(values[2]?.value),
     conversions: numericMetric(values[3]?.value),
+    trafficSources: mapGaRows(traffic).map((row) => ({
+      sourceMedium: row.dimension,
+      sessions: row.metrics[0] || 0,
+      activeUsers: row.metrics[1] || 0,
+      conversions: row.metrics[2] || 0,
+    })),
+    landingPages: mapGaRows(landingPages).map((row) => ({
+      path: row.dimension,
+      sessions: row.metrics[0] || 0,
+      activeUsers: row.metrics[1] || 0,
+      conversions: row.metrics[2] || 0,
+    })),
+    blogPages: mapGaRows(blogPages).map((row) => ({
+      path: row.dimension,
+      pageViews: row.metrics[0] || 0,
+      activeUsers: row.metrics[1] || 0,
+      conversions: row.metrics[2] || 0,
+    })),
   };
+}
+
+interface GaDimensionReport {
+  rows?: Array<{
+    dimensionValues?: Array<{ value?: string }>;
+    metricValues?: Array<{ value?: string }>;
+  }>;
+}
+
+function mapGaRows(report: GaDimensionReport) {
+  return (report.rows || []).map((row) => ({
+    dimension: row.dimensionValues?.[0]?.value || "(not set)",
+    metrics: (row.metricValues || []).map((value) =>
+      numericMetric(value.value),
+    ),
+  }));
 }
 
 async function googleJsonRequest<T>(

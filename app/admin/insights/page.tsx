@@ -35,6 +35,8 @@ interface AnalyticsData {
   integrations: {
     googleAnalytics: {
       tagConfigured: boolean;
+      tagManagerConfigured: boolean;
+      tagMode: "direct" | "tag-manager" | "none";
       propertyConfigured: boolean;
       credentialsConfigured: boolean;
       metricsConnected: boolean;
@@ -44,6 +46,24 @@ interface AnalyticsData {
         sessions: number;
         pageViews: number;
         conversions: number;
+        trafficSources: Array<{
+          sourceMedium: string;
+          sessions: number;
+          activeUsers: number;
+          conversions: number;
+        }>;
+        landingPages: Array<{
+          path: string;
+          sessions: number;
+          activeUsers: number;
+          conversions: number;
+        }>;
+        blogPages: Array<{
+          path: string;
+          pageViews: number;
+          activeUsers: number;
+          conversions: number;
+        }>;
       };
     };
     searchConsole: {
@@ -324,6 +344,20 @@ export default function InsightsPage() {
                       : "missing"}
                   </dd>
                 </div>
+                <div>
+                  <dt className="font-semibold text-slate-700">
+                    Website tag mode
+                  </dt>
+                  <dd className="text-slate-600">
+                    {analyticsData.integrations.googleAnalytics.tagMode ===
+                    "direct"
+                      ? "Direct GA4 tag; duplicate GTM loading is suppressed"
+                      : analyticsData.integrations.googleAnalytics.tagMode ===
+                          "tag-manager"
+                        ? "Google Tag Manager"
+                        : "No GA4 website tag configured"}
+                  </dd>
+                </div>
               </dl>
               {analyticsData.integrations.searchConsole.error && (
                 <p
@@ -448,6 +482,57 @@ export default function InsightsPage() {
                             </tr>
                           ),
                         )}
+
+                        {analyticsData.integrations.googleAnalytics
+                          .metricsConnected && (
+                          <section
+                            aria-label="Google Analytics detail"
+                            className="mb-8 grid gap-6 xl:grid-cols-3"
+                          >
+                            <AnalyticsDimensionTable
+                              title="Traffic sources"
+                              dimensionLabel="Source / medium"
+                              rows={analyticsData.integrations.googleAnalytics.metrics.trafficSources.map(
+                                (row) => ({
+                                  label: row.sourceMedium,
+                                  primary: row.sessions,
+                                  secondary: row.activeUsers,
+                                  conversions: row.conversions,
+                                }),
+                              )}
+                              primaryLabel="Sessions"
+                              secondaryLabel="Users"
+                            />
+                            <AnalyticsDimensionTable
+                              title="Top landing pages"
+                              dimensionLabel="Landing page"
+                              rows={analyticsData.integrations.googleAnalytics.metrics.landingPages.map(
+                                (row) => ({
+                                  label: row.path,
+                                  primary: row.sessions,
+                                  secondary: row.activeUsers,
+                                  conversions: row.conversions,
+                                }),
+                              )}
+                              primaryLabel="Sessions"
+                              secondaryLabel="Users"
+                            />
+                            <AnalyticsDimensionTable
+                              title="Blog performance"
+                              dimensionLabel="Blog page"
+                              rows={analyticsData.integrations.googleAnalytics.metrics.blogPages.map(
+                                (row) => ({
+                                  label: row.path,
+                                  primary: row.pageViews,
+                                  secondary: row.activeUsers,
+                                  conversions: row.conversions,
+                                }),
+                              )}
+                              primaryLabel="Views"
+                              secondaryLabel="Users"
+                            />
+                          </section>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -552,6 +637,64 @@ function MetricCard({
       <p className="text-sm font-medium text-slate-600">{label}</p>
       <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
       <p className="mt-1 text-xs text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function AnalyticsDimensionTable({
+  title,
+  dimensionLabel,
+  rows,
+  primaryLabel,
+  secondaryLabel,
+}: {
+  title: string;
+  dimensionLabel: string;
+  rows: Array<{
+    label: string;
+    primary: number;
+    secondary: number;
+    conversions: number;
+  }>;
+  primaryLabel: string;
+  secondaryLabel: string;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-5">
+      <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+      {rows.length === 0 ? (
+        <p className="mt-3 text-sm text-slate-600">
+          No Google Analytics rows in this period.
+        </p>
+      ) : (
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b text-slate-600">
+                <th className="py-2 pr-3">{dimensionLabel}</th>
+                <th className="py-2 pr-3">{primaryLabel}</th>
+                <th className="py-2 pr-3">{secondaryLabel}</th>
+                <th className="py-2">Conversions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr
+                  key={row.label}
+                  className="border-b border-slate-100 align-top"
+                >
+                  <td className="max-w-48 break-words py-2 pr-3 text-slate-800">
+                    {row.label}
+                  </td>
+                  <td className="py-2 pr-3">{row.primary}</td>
+                  <td className="py-2 pr-3">{row.secondary}</td>
+                  <td className="py-2">{row.conversions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

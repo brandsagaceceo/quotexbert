@@ -122,6 +122,12 @@ export async function GET(request: NextRequest) {
           tagConfigured: Boolean(
             process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim(),
           ),
+          tagManagerConfigured: Boolean(process.env.NEXT_PUBLIC_GTM_ID?.trim()),
+          tagMode: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
+            ? "direct"
+            : process.env.NEXT_PUBLIC_GTM_ID?.trim()
+              ? "tag-manager"
+              : "none",
           propertyConfigured: google.status.analyticsPropertyConfigured,
           credentialsConfigured: google.status.serviceAccountConfigured,
           metricsConnected: google.analytics.connected,
@@ -131,6 +137,9 @@ export async function GET(request: NextRequest) {
             sessions: google.analytics.sessions,
             pageViews: google.analytics.pageViews,
             conversions: google.analytics.conversions,
+            trafficSources: google.analytics.trafficSources,
+            landingPages: google.analytics.landingPages,
+            blogPages: google.analytics.blogPages,
           },
         },
         searchConsole: {

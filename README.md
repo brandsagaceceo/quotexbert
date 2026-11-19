@@ -105,6 +105,30 @@ of the Search Console property and as a Viewer on the GA4 property. Keep
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` for the existing website tag. Credentials remain
 server-side and are never returned by the administrator APIs.
 
+Reuse the existing QuoteXbert GA4 property: set its existing `G-` Measurement ID
+and numeric Property ID; do not create another property. Direct GA4 mode owns one
+explicit pageview per route and suppresses GTM loading when both environment
+variables are present. If the existing property is intentionally installed only
+through GTM, leave `NEXT_PUBLIC_GA_MEASUREMENT_ID` unset and configure
+`NEXT_PUBLIC_GTM_ID` instead. Do not install the same GA4 Configuration tag in
+both places.
+
+Current conversion audit:
+
+- successful estimates emit events, but older flows use both
+  `estimate_complete` and `estimate_completed`; standardize on one confirmed
+  success event before marking it as a GA4 key event
+- job-post success has no authoritative GA4 success event
+- contractor registration currently tracks CTA intent, not confirmed account
+  creation
+- subscription helpers exist, but no confirmed checkout/webhook success event is
+  wired to GA4
+
+Future conversion work should emit browser events only after the corresponding
+authenticated success response, use a stable non-sensitive transaction ID for
+deduplication, and mark those confirmed events as GA4 key events. Never treat CTA
+clicks as completed registrations or purchases.
+
 For one low-cost, manually approved Blog Studio test in an isolated Preview
 environment, configure:
 
