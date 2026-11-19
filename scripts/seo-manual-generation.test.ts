@@ -19,6 +19,7 @@ let budgetAllowed = true;
 let providerAvailable = true;
 let createConflict = false;
 let lastWrite: Record<string, unknown> = {};
+let usageRecords = 0;
 
 mockModule("@clerk/nextjs/server", { auth: async () => ({ userId: null }) });
 mockModule("@/lib/prisma", {
@@ -49,6 +50,17 @@ mockModule("@/lib/ai-usage-budget", {
   reserveGlobalAiRequest: async (feature: string) => {
     assert.equal(feature, "seo_drafting");
     return budgetAllowed;
+  },
+  recordGlobalAiUsage: async (
+    feature: string,
+    model: string,
+    response: unknown,
+  ) => {
+    assert.equal(feature, "seo_drafting");
+    assert.equal(model, "test-model");
+    assert.ok(response);
+    usageRecords += 1;
+    return true;
   },
 });
 mockModule("@/lib/openai-client", {
@@ -129,6 +141,7 @@ async function main() {
     assert.equal(lastWrite.publishedAt, undefined);
     assert.equal(lastWrite.approvedAt, undefined);
     assert.equal(providerCalls, 1);
+    assert.equal(usageRecords, 1);
     assert.equal(writes, 2);
 
     assert.equal(
@@ -151,6 +164,7 @@ async function main() {
       "already-run",
     );
     assert.equal(providerCalls, 1);
+    assert.equal(usageRecords, 1);
     createConflict = false;
 
     existingSlot = null;

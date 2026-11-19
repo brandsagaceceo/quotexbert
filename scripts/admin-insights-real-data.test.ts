@@ -29,6 +29,17 @@ assert.match(
 );
 assert.match(page, /Search queries/, "Search Console queries are visible");
 assert.match(page, /GA4 key events/, "GA4 conversions are visible");
+assert.match(page, /AI usage and cost/, "real AI usage is visible");
+assert.match(
+  page,
+  /no cost is invented/,
+  "missing AI pricing never produces a fabricated cost",
+);
+assert.match(
+  route,
+  /AI_USAGE_COST_EVENT/,
+  "AI usage is read from the existing analytics event store",
+);
 assert.doesNotMatch(
   page,
   /amountCents|Estimates → Payments|Total payments/,

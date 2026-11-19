@@ -20,6 +20,18 @@ interface AnalyticsData {
   eventCounts: Record<string, number>;
   recentActivity: AnalyticsEvent[];
   truncated: boolean;
+  aiUsage: {
+    requests: number;
+    completions: number;
+    inputTokens: number;
+    cachedInputTokens: number;
+    outputTokens: number;
+    estimatedCostUsd: number;
+    pricedCompletions: number;
+    pricingComplete: boolean;
+    features: Record<string, number>;
+    truncated: boolean;
+  };
   integrations: {
     googleAnalytics: {
       tagConfigured: boolean;
@@ -203,6 +215,67 @@ export default function InsightsPage() {
                     : "Metrics API not connected"
                 }
               />
+            </section>
+
+            <section
+              aria-label="AI usage"
+              className="mb-8 rounded-xl border border-slate-200 bg-white p-6"
+            >
+              <h2 className="text-xl font-bold text-slate-900">
+                AI usage and cost
+              </h2>
+              <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <MetricCard
+                  label="Reserved requests"
+                  value={analyticsData.aiUsage.requests.toLocaleString()}
+                  detail={analyticsData.range}
+                />
+                <MetricCard
+                  label="Recorded completions"
+                  value={analyticsData.aiUsage.completions.toLocaleString()}
+                  detail={
+                    Object.entries(analyticsData.aiUsage.features)
+                      .map(([feature, count]) => `${feature}: ${count}`)
+                      .join(" · ") || "No completed AI usage"
+                  }
+                />
+                <MetricCard
+                  label="Input tokens"
+                  value={analyticsData.aiUsage.inputTokens.toLocaleString()}
+                  detail={`${analyticsData.aiUsage.cachedInputTokens.toLocaleString()} cached`}
+                />
+                <MetricCard
+                  label="Output tokens"
+                  value={analyticsData.aiUsage.outputTokens.toLocaleString()}
+                  detail={analyticsData.range}
+                />
+                <MetricCard
+                  label="AI usage cost"
+                  value={
+                    analyticsData.aiUsage.pricedCompletions > 0
+                      ? new Intl.NumberFormat("en-CA", {
+                          style: "currency",
+                          currency: "USD",
+                          minimumFractionDigits: 4,
+                        }).format(analyticsData.aiUsage.estimatedCostUsd)
+                      : "Pricing required"
+                  }
+                  detail="Estimated from real token usage and configured rates"
+                />
+              </div>
+              {!analyticsData.aiUsage.pricingComplete &&
+                analyticsData.aiUsage.completions > 0 && (
+                  <p className="mt-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                    Some AI completions have no configured token rates. Their
+                    real token counts are shown, but no cost is invented.
+                  </p>
+                )}
+              {analyticsData.aiUsage.truncated && (
+                <p className="mt-3 text-xs text-slate-500">
+                  AI usage is limited to the 1,000 newest completion records in
+                  this period.
+                </p>
+              )}
             </section>
 
             <section className="mb-8 rounded-xl border border-slate-200 bg-white p-6">

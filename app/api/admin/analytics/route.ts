@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { fetchGoogleAdminMetrics } from "@/lib/google-admin-metrics";
+import {
+  AI_USAGE_COST_EVENT,
+  AI_USAGE_RESERVATION_EVENT,
+} from "@/lib/ai-usage-budget";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +52,7 @@ export async function GET(request: NextRequest) {
       Date.now() -
         RANGE_DAYS[range as keyof typeof RANGE_DAYS] * 24 * 60 * 60 * 1000,
     );
-    const [rows, google] = await Promise.all([
+    const [rows, google, aiUsageRows, aiRequestCount] = await Promise.all([
       prisma.analytics.findMany({
         where: { timestamp: { gte: startDate } },
         orderBy: [{ timestamp: "desc" }, { id: "desc" }],
@@ -62,6 +66,21 @@ export async function GET(request: NextRequest) {
         },
       }),
       fetchGoogleAdminMetrics(RANGE_DAYS[range as keyof typeof RANGE_DAYS]),
+      prisma.analytics.findMany({
+        where: {
+          eventName: AI_USAGE_COST_EVENT,
+          timestamp: { gte: startDate },
+        },
+        orderBy: { timestamp: "desc" },
+        take: 1000,
+        select: { eventData: true },
+      }),
+      prisma.analytics.count({
+        where: {
+          eventName: AI_USAGE_RESERVATION_EVENT,
+          timestamp: { gte: startDate },
+        },
+      }),
     ]);
 
     const eventCounts: Record<string, number> = {};
@@ -80,6 +99,10 @@ export async function GET(request: NextRequest) {
     const site = new URL(
       process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com",
     );
+    const aiUsage = summarizeAiUsage(
+      aiUsageRows.map((row) => row.eventData),
+      aiRequestCount,
+    );
 
     return NextResponse.json({
       range,
@@ -90,6 +113,10 @@ export async function GET(request: NextRequest) {
       eventCounts,
       recentActivity: events.slice(0, 10),
       truncated: rows.length === 500,
+      aiUsage: {
+        ...aiUsage,
+        truncated: aiUsageRows.length === 1000,
+      },
       integrations: {
         googleAnalytics: {
           tagConfigured: Boolean(
@@ -140,4 +167,45 @@ export async function GET(request: NextRequest) {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function summarizeAiUsage(values: unknown[], requests: number) {
+  let inputTokens = 0;
+  let cachedInputTokens = 0;
+  let outputTokens = 0;
+  let estimatedCostUsd = 0;
+  let pricedCompletions = 0;
+  const features: Record<string, number> = {};
+
+  for (const value of values) {
+    if (!isRecord(value)) continue;
+    inputTokens += safeNumber(value.inputTokens);
+    cachedInputTokens += safeNumber(value.cachedInputTokens);
+    outputTokens += safeNumber(value.outputTokens);
+    if (typeof value.estimatedCostUsd === "number") {
+      estimatedCostUsd += value.estimatedCostUsd;
+      pricedCompletions += 1;
+    }
+    if (typeof value.feature === "string") {
+      features[value.feature] = (features[value.feature] || 0) + 1;
+    }
+  }
+
+  return {
+    requests,
+    completions: values.length,
+    inputTokens,
+    cachedInputTokens,
+    outputTokens,
+    estimatedCostUsd: Math.round(estimatedCostUsd * 100_000_000) / 100_000_000,
+    pricedCompletions,
+    pricingComplete: values.length > 0 && pricedCompletions === values.length,
+    features,
+  };
+}
+
+function safeNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : 0;
 }

@@ -105,6 +105,29 @@ of the Search Console property and as a Viewer on the GA4 property. Keep
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` for the existing website tag. Credentials remain
 server-side and are never returned by the administrator APIs.
 
+For one low-cost, manually approved Blog Studio test in an isolated Preview
+environment, configure:
+
+- `OPENAI_API_KEY` as a sensitive server-only value
+- `SEO_MANUAL_DRAFT_ENABLED=true`
+- `SEO_PREVIEW_WRITES_ENABLED=true` only after the Preview deployment uses an
+  isolated, migrated database
+- `AI_GLOBAL_DAILY_REQUEST_LIMIT=1`
+- `SEO_DRAFT_AUTOMATION_ENABLED=false`
+
+The existing generator uses `gpt-4o-mini`, creates a private draft, and never
+publishes automatically. To display an estimated USD cost from the provider's
+real token counts, copy the current rates for the configured model from the
+official OpenAI pricing page into:
+
+- `AI_SEO_INPUT_COST_PER_MILLION_USD`
+- `AI_SEO_CACHED_INPUT_COST_PER_MILLION_USD` (optional; input rate is used when
+  omitted)
+- `AI_SEO_OUTPUT_COST_PER_MILLION_USD`
+
+No default prices are embedded. If rates are absent, the dashboard displays real
+token usage and a pricing-required status instead of inventing a cost.
+
 Focused, isolated tests (no real database, email or AI calls):
 `npx tsx --test scripts/seo-admin-authorization.test.ts scripts/seo-content-validation.test.ts scripts/seo-cron-safety.test.ts scripts/seo-manual-generation.test.ts`.
 

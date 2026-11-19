@@ -4,7 +4,10 @@ import {
   isAiFeatureEnabled,
   OPENAI_MODELS,
 } from "@/lib/openai-client";
-import { reserveGlobalAiRequest } from "@/lib/ai-usage-budget";
+import {
+  recordGlobalAiUsage,
+  reserveGlobalAiRequest,
+} from "@/lib/ai-usage-budget";
 import { prisma } from "@/lib/prisma";
 import { parseGeneratedSeoArticle } from "@/lib/seo/article-validation";
 import {
@@ -152,6 +155,11 @@ export async function generateNextSeoDraft(
         },
       },
       { timeout: 45_000 },
+    );
+    await recordGlobalAiUsage(
+      "seo_drafting",
+      OPENAI_MODELS.seoDrafting,
+      response,
     );
 
     let generated: ReturnType<typeof parseGeneratedSeoArticle> = null;
