@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveSeoAdmin } from "@/lib/seo/admin-auth";
+import {
+  resolveSeoAdmin,
+  areSeoAdminWritesEnabled,
+} from "@/lib/seo/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +16,14 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!areSeoAdminWritesEnabled())
+      return NextResponse.json(
+        {
+          error:
+            "Preview writes are disabled until an isolated database is authorized",
+        },
+        { status: 403 },
+      );
 
     const rawBody = await request.text();
     if (rawBody.length > 2_000) {
@@ -40,11 +51,12 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
 
     const article = await prisma.seoArticle.findUnique({
       where: { id: params.id },
-      select: { id: true, status: true },
+      select: { id: true, status: true, updatedAt: true },
     });
     if (!article)
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
 
+    let data: { status: string; approvedAt?: Date | null; publishedAt?: Date };
     if (action === "approve") {
       if (article.status !== "draft") {
         return NextResponse.json(
@@ -52,21 +64,15 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
           { status: 409 },
         );
       }
-      await prisma.seoArticle.update({
-        where: { id: article.id },
-        data: { status: "approved", approvedAt: new Date() },
-      });
+      data = { status: "approved", approvedAt: new Date() };
     } else if (action === "reject") {
-      if (article.status === "published") {
+      if (!["draft", "approved", "failed"].includes(article.status)) {
         return NextResponse.json(
-          { error: "Published articles cannot be rejected" },
+          { error: "Only drafts, approved or failed articles can be rejected" },
           { status: 409 },
         );
       }
-      await prisma.seoArticle.update({
-        where: { id: article.id },
-        data: { status: "rejected" },
-      });
+      data = { status: "rejected", approvedAt: null };
     } else {
       if (article.status !== "approved") {
         return NextResponse.json(
@@ -83,11 +89,23 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
           { status: 403 },
         );
       }
-      await prisma.seoArticle.update({
-        where: { id: article.id },
-        data: { status: "published", publishedAt: new Date() },
-      });
+      data = { status: "published", publishedAt: new Date() };
     }
+    const updated = await prisma.seoArticle.updateMany({
+      where: {
+        id: article.id,
+        status: article.status,
+        updatedAt: article.updatedAt,
+      },
+      data,
+    });
+    if (updated.count !== 1)
+      return NextResponse.json(
+        {
+          error: "Article changed. Refresh and review it before trying again.",
+        },
+        { status: 409 },
+      );
 
     return NextResponse.json({ success: true });
   } catch (error) {

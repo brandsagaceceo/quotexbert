@@ -126,9 +126,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://www.quotexbert.com"
   },
-  verification: {
-    google: "your-google-verification-code-here",
-  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION?.trim()
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION.trim() }
+    : {},
 };
 
 // Single source of truth for the viewport tag — Next.js injects this once into <head>.

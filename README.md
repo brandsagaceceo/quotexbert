@@ -68,6 +68,34 @@ metadata/manifest references refresh older browser caches. Manifest icons use
 `purpose: any`: a maskable redesign is deliberately not claimed.
 Social exports and native App Store assets remain outside this update.
 
+### Existing AI Blog Studio
+
+`/admin/blog` now uses the existing database-backed SEO editor; `/admin/blog/seo`
+redirects there for compatibility. Counts and status filters use `SeoArticle`,
+not sample posts or invented analytics. The existing list API is paginated
+(25 records per page); response summaries cover all records.
+
+All generation stays private. Manual generation uses the same generator, approved
+topics, shared one-attempt-per-UTC-day reservation, and global AI request budget
+as scheduled drafting. It requires `SEO_MANUAL_DRAFT_ENABLED=true`; this package
+does not enable the flag or make paid AI requests. Non-production writes also
+require `SEO_PREVIEW_WRITES_ENABLED=true`, **only after** an authorized isolated
+database is configured with the existing migration. Preview publication remains
+blocked. No migration or environment change is performed by this package.
+
+Approval never publishes, and editing an approved article clears its approval.
+Cron can draft when explicitly enabled but cannot publish, even if the old
+`SEO_AUTO_PUBLISH_ENABLED` variable remains configured. Publication is only
+through the existing, explicitly confirmed administrator publish action.
+
+The Search Console panel links to the existing sitemap and reports setup status,
+not search metrics. `GOOGLE_SITE_VERIFICATION` optionally supplies the existing
+layout's HTML verification tag; the placeholder token was removed. Google
+ownership verification and separately authorized API access are still required.
+
+Focused, isolated tests (no real database, email or AI calls):
+`npx tsx --test scripts/seo-admin-authorization.test.ts scripts/seo-content-validation.test.ts scripts/seo-cron-safety.test.ts scripts/seo-manual-generation.test.ts`.
+
 ### Prerequisites
 
 - Node.js 20+

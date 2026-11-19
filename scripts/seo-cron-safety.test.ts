@@ -17,8 +17,6 @@ mockedModule.exports = {
   },
   isSeoDraftAutomationEnabled: () =>
     process.env.SEO_DRAFT_AUTOMATION_ENABLED === "true",
-  isSeoAutoPublishEnabled: () =>
-    process.env.SEO_AUTO_PUBLISH_ENABLED === "true",
   publishScheduledSeoArticles: async () => {
     publicationCount += 1;
     return 0;
@@ -70,7 +68,11 @@ async function main() {
   process.env.VERCEL_ENV = "production";
   const production = await callCron("Bearer test-cron-secret");
   assert.equal(production.status, 200);
-  assert.equal(publicationCount, 1);
+  assert.equal(
+    publicationCount,
+    0,
+    "Cron must not publish even if the old flag is enabled in production",
+  );
 
   delete process.env.CRON_SECRET;
   assert.equal((await callCron("Bearer test-cron-secret")).status, 503);

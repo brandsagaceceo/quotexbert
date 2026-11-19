@@ -13,6 +13,7 @@ import {
   getApprovedAffiliateProducts,
 } from "@/lib/seo/affiliate-products";
 import { APPROVED_SEO_TOPICS, type SeoTopic } from "@/lib/seo/topics";
+import { areSeoAdminWritesEnabled } from "@/lib/seo/admin-auth";
 
 const articleSchema = {
   type: "object",
@@ -45,8 +46,20 @@ Write 800-1,200 words with a clear introduction, at least five useful H2/H3 head
 Recommend only products whose IDs appear in the approved catalog. The catalog is empty unless supplied; never invent products, merchants, tracking IDs, product URLs, or prices. Return no more than three catalog IDs.
 Do not claim that keyword metrics or Search Console research were used.`;
 
-export async function generateNextSeoDraft() {
-  if (!isSeoDraftAutomationEnabled()) return { kind: "disabled" as const };
+export async function generateNextSeoDraft(
+  options: { trigger?: "manual" | "scheduled" } = {},
+) {
+  const enabled =
+    options.trigger === "manual"
+      ? isAiFeatureEnabled("SEO_MANUAL_DRAFT_ENABLED")
+      : isSeoDraftAutomationEnabled();
+  if (!enabled) return { kind: "disabled" as const };
+  if (!areSeoAdminWritesEnabled()) {
+    return {
+      kind: "blocked" as const,
+      error: "Preview database writes are disabled",
+    };
+  }
 
   const createdAtSlot = new Date();
   const slotKey = getSlotKey(createdAtSlot);
@@ -96,7 +109,11 @@ export async function generateNextSeoDraft() {
     if (!client)
       return recordFailure(reservation.id, slotKey, "OpenAIUnavailable");
     if (!(await reserveGlobalAiRequest("seo_drafting"))) {
-      return recordFailure(reservation.id, slotKey, "GlobalAiUsageBudgetReached");
+      return recordFailure(
+        reservation.id,
+        slotKey,
+        "GlobalAiUsageBudgetReached",
+      );
     }
 
     const response = await client.responses.create(
@@ -191,38 +208,6 @@ export async function generateNextSeoDraft() {
 
 export function isSeoDraftAutomationEnabled() {
   return isAiFeatureEnabled("SEO_DRAFT_AUTOMATION_ENABLED");
-}
-
-export function isSeoAutoPublishEnabled() {
-  return process.env.SEO_AUTO_PUBLISH_ENABLED === "true";
-}
-
-export async function publishScheduledSeoArticles(now = new Date()) {
-  const scheduled = await prisma.seoArticle.findMany({
-    where: {
-      status: "approved",
-      approvedAt: { not: null },
-      scheduledFor: { lte: now },
-    },
-    orderBy: { scheduledFor: "asc" },
-    take: 3,
-    select: { id: true },
-  });
-
-  let publishedCount = 0;
-  for (const article of scheduled) {
-    const updated = await prisma.seoArticle.updateMany({
-      where: {
-        id: article.id,
-        status: "approved",
-        approvedAt: { not: null },
-        scheduledFor: { lte: now },
-      },
-      data: { status: "published", publishedAt: now },
-    });
-    publishedCount += updated.count;
-  }
-  return publishedCount;
 }
 
 export function getNextPublicationSlot(now = new Date()) {

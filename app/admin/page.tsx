@@ -77,8 +77,8 @@ export default function AdminDashboard() {
       color: "from-green-500 to-green-600"
     },
     {
-      title: "Blog Management",
-      description: "Create and manage blog posts for SEO",
+      title: "AI Blog Studio",
+      description: "Review real SEO drafts and explicitly publish approved articles",
       href: "/admin/blog",
       icon: Cog6ToothIcon,
       color: "from-orange-600 to-orange-600"
