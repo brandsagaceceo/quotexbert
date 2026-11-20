@@ -1,4 +1,5 @@
 import { createSign } from "node:crypto";
+import { getVercelOidcToken } from "@vercel/oidc";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_SCOPES = [
@@ -68,7 +69,8 @@ export function getGoogleConnectionStatus(): GoogleConnectionStatus {
   return {
     serviceAccountConfigured: Boolean(
       process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim() &&
-        process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.trim(),
+        (process.env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER?.trim() ||
+          process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.trim()),
     ),
     searchConsolePropertyConfigured: Boolean(
       process.env.GOOGLE_SEARCH_CONSOLE_PROPERTY_URL?.trim(),
@@ -148,6 +150,17 @@ async function getGoogleAccessToken() {
   }
 
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  const provider = process.env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER?.trim();
+  if (provider) {
+    if (!email || process.env.VERCEL_ENV !== "preview") {
+      throw new Error(
+        "Google federation requires the reporting service account and a Vercel Preview deployment.",
+      );
+    }
+    cachedToken = await getFederatedGoogleAccessToken(email, provider);
+    return cachedToken.value;
+  }
+
   const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(
     /\\n/g,
     "\n",
@@ -201,6 +214,92 @@ async function getGoogleAccessToken() {
     expiresAt: Date.now() + expiresIn * 1000,
   };
   return cachedToken.value;
+}
+
+async function getFederatedGoogleAccessToken(
+  email: string,
+  provider: string,
+): Promise<GoogleAccessToken> {
+  if (
+    !/^projects\/\d+\/locations\/global\/workloadIdentityPools\/[\w-]+\/providers\/[\w-]+$/.test(
+      provider,
+    )
+  ) {
+    throw new Error("The Google workload identity provider resource is invalid.");
+  }
+
+  let subjectToken: string;
+  try {
+    subjectToken = await getVercelOidcToken({
+      audience: `https://iam.googleapis.com/${provider}`,
+    });
+  } catch {
+    throw new Error(
+      "Vercel OIDC authorization failed. Check the Preview project's OIDC configuration.",
+    );
+  }
+
+  const exchange = await fetchWithTimeout(
+    "https://sts.googleapis.com/v1/token",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        audience: `//iam.googleapis.com/${provider}`,
+        grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+        requested_token_type: "urn:ietf:params:oauth:token-type:access_token",
+        subject_token_type: "urn:ietf:params:oauth:token-type:jwt",
+        subject_token: subjectToken,
+        scope: "https://www.googleapis.com/auth/cloud-platform",
+      }),
+      cache: "no-store",
+    },
+    10_000,
+  );
+  if (!exchange.ok) {
+    throw new Error(
+      `Google federation exchange failed (${exchange.status}). Check the provider audience and Preview identity condition.`,
+    );
+  }
+  const exchanged: { access_token?: unknown } = await exchange.json();
+  if (
+    typeof exchanged.access_token !== "string" ||
+    !exchanged.access_token.trim()
+  ) {
+    throw new Error("Google federation returned no access token.");
+  }
+
+  const response = await fetchWithTimeout(
+    `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(email)}:generateAccessToken`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${exchanged.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ scope: GOOGLE_SCOPES, lifetime: "600s" }),
+      cache: "no-store",
+    },
+    10_000,
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Google service-account impersonation failed (${response.status}). Check Workload Identity User permission and the IAM Service Account Credentials API.`,
+    );
+  }
+  const body: { accessToken?: unknown; expireTime?: unknown } =
+    await response.json();
+  const expiresAt =
+    typeof body.expireTime === "string" ? Date.parse(body.expireTime) : NaN;
+  if (
+    typeof body.accessToken !== "string" ||
+    !body.accessToken.trim() ||
+    !Number.isFinite(expiresAt) ||
+    expiresAt <= Date.now() + 60_000
+  ) {
+    throw new Error("Google impersonation returned invalid token credentials.");
+  }
+  return { value: body.accessToken, expiresAt };
 }
 
 async function fetchSearchConsoleMetrics(
