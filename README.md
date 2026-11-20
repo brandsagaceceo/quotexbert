@@ -131,6 +131,15 @@ After an authorized Preview deployment, verify real GA4 and Search Console
 results through the existing authenticated `/admin/insights` page. A successful
 build alone does not verify federation or property permissions.
 
+Keyless Preview builds also run `npm run verify:google-preview` before compiling.
+This uses the same reporting module to make actual read-only GA4 and Search
+Console requests without requiring the application database. Both providers
+must connect or the build fails with sanitized errors. Successful checks print
+only seven-day aggregate reporting counts, never tokens or credentials.
+Other builds explicitly skip this check when Preview federation is not selected.
+This verifies Google access, not the dashboard: `/admin/insights` still requires
+the existing administrator session and an isolated application database.
+
 The `deploy` script pushes to `main` and relies on the existing Vercel Git
 integration; it no longer calls a deployment hook. Do not run it for staging or
 recovery work. The previously committed production `manual` hook was revoked

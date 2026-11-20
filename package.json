@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "prisma generate && next build",
+    "build": "npm run verify:google-preview && prisma generate && next build",
+    "verify:google-preview": "node --import tsx scripts/verify-google-preview.ts",
     "deploy": "git add -A && git diff --cached --quiet || git commit -m \"deploy: publish latest changes\" && git push origin main && echo \"Vercel Git integration handles deployment\"",
     "postinstall": "prisma generate",
     "start": "next start",
