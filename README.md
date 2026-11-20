@@ -133,8 +133,8 @@ build alone does not verify federation or property permissions.
 
 The `deploy` script pushes to `main` and relies on the existing Vercel Git
 integration; it no longer calls a deployment hook. Do not run it for staging or
-recovery work. The previously committed hook is exposed in Git history and must
-be revoked in Vercel; removing it from this script does not revoke it. Do not
+recovery work. The previously committed production `manual` hook was revoked
+in Vercel. Its historical URL remains exposed and must never be reused. Do not
 store replacement hook URLs in source code.
 
 Reuse the existing QuoteXbert GA4 property: set its existing `G-` Measurement ID

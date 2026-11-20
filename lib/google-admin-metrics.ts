@@ -13,6 +13,7 @@ type GoogleAccessToken = {
 };
 
 let cachedToken: GoogleAccessToken | null = null;
+let cachedTokenIdentity: string | null = null;
 
 export interface GoogleConnectionStatus {
   serviceAccountConfigured: boolean;
@@ -145,20 +146,38 @@ export async function fetchGoogleAdminMetrics(
 }
 
 async function getGoogleAccessToken() {
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
+  const provider = process.env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER?.trim();
+  if (!email) {
+    throw new GoogleAuthorizationError(
+      "Google reporting service account email is not configured.",
+    );
+  }
+  if (provider && process.env.VERCEL_ENV !== "preview") {
+    throw new GoogleAuthorizationError(
+      "Google federation requires the reporting service account and a Vercel Preview deployment.",
+    );
+  }
+  const identity = JSON.stringify([email, provider, process.env.VERCEL_ENV]);
+  if (
+    cachedTokenIdentity === identity &&
+    cachedToken &&
+    cachedToken.expiresAt > Date.now() + 60_000
+  ) {
     return cachedToken.value;
   }
 
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
-  const provider = process.env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER?.trim();
   if (provider) {
-    if (!email || process.env.VERCEL_ENV !== "preview") {
+    try {
+      cachedToken = await getFederatedGoogleAccessToken(email, provider);
+      cachedTokenIdentity = identity;
+      return cachedToken.value;
+    } catch (error) {
+      if (error instanceof GoogleAuthorizationError) throw error;
       throw new Error(
-        "Google federation requires the reporting service account and a Vercel Preview deployment.",
+        "Google federation authorization failed. Check connectivity and the identity provider configuration.",
       );
     }
-    cachedToken = await getFederatedGoogleAccessToken(email, provider);
-    return cachedToken.value;
   }
 
   const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(
@@ -213,6 +232,7 @@ async function getGoogleAccessToken() {
     value: body.access_token,
     expiresAt: Date.now() + expiresIn * 1000,
   };
+  cachedTokenIdentity = identity;
   return cachedToken.value;
 }
 
@@ -225,7 +245,9 @@ async function getFederatedGoogleAccessToken(
       provider,
     )
   ) {
-    throw new Error("The Google workload identity provider resource is invalid.");
+    throw new GoogleAuthorizationError(
+      "The Google workload identity provider resource is invalid.",
+    );
   }
 
   let subjectToken: string;
@@ -234,7 +256,7 @@ async function getFederatedGoogleAccessToken(
       audience: `https://iam.googleapis.com/${provider}`,
     });
   } catch {
-    throw new Error(
+    throw new GoogleAuthorizationError(
       "Vercel OIDC authorization failed. Check the Preview project's OIDC configuration.",
     );
   }
@@ -257,7 +279,7 @@ async function getFederatedGoogleAccessToken(
     10_000,
   );
   if (!exchange.ok) {
-    throw new Error(
+    throw new GoogleAuthorizationError(
       `Google federation exchange failed (${exchange.status}). Check the provider audience and Preview identity condition.`,
     );
   }
@@ -266,7 +288,9 @@ async function getFederatedGoogleAccessToken(
     typeof exchanged.access_token !== "string" ||
     !exchanged.access_token.trim()
   ) {
-    throw new Error("Google federation returned no access token.");
+    throw new GoogleAuthorizationError(
+      "Google federation returned no access token.",
+    );
   }
 
   const response = await fetchWithTimeout(
@@ -283,7 +307,7 @@ async function getFederatedGoogleAccessToken(
     10_000,
   );
   if (!response.ok) {
-    throw new Error(
+    throw new GoogleAuthorizationError(
       `Google service-account impersonation failed (${response.status}). Check Workload Identity User permission and the IAM Service Account Credentials API.`,
     );
   }
@@ -297,7 +321,9 @@ async function getFederatedGoogleAccessToken(
     !Number.isFinite(expiresAt) ||
     expiresAt <= Date.now() + 60_000
   ) {
-    throw new Error("Google impersonation returned invalid token credentials.");
+    throw new GoogleAuthorizationError(
+      "Google impersonation returned invalid token credentials.",
+    );
   }
   return { value: body.accessToken, expiresAt };
 }
@@ -528,6 +554,8 @@ class GoogleApiError extends Error {
     this.name = "GoogleApiError";
   }
 }
+
+class GoogleAuthorizationError extends Error {}
 
 function googleErrorMessage(error: unknown) {
   if (error instanceof GoogleApiError) {
