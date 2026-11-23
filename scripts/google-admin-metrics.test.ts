@@ -165,8 +165,8 @@ async function main() {
     assert.equal(connected.analytics.activeUsers, 11);
     assert.equal(connected.analytics.pageViews, 31);
     assert.equal(connected.searchConsole.clicks, 4);
-    assert.equal(connected.searchConsole.queries[0].query, "renovation quote");
-    assert.equal(connected.analytics.blogPages[0].path, "/blog/test");
+    assert.equal(connected.searchConsole.queries[0]?.query, "renovation quote");
+    assert.equal(connected.analytics.blogPages[0]?.path, "/blog/test");
 
     const exchanges = () =>
       calls.filter((url) => url === "https://sts.googleapis.com/v1/token")
