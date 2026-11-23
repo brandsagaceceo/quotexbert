@@ -94,7 +94,8 @@ verification tag. The administrator Insights page can retrieve read-only Search
 Console and GA4 metrics when all of these server-only values are configured:
 
 - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
+- `GOOGLE_WORKLOAD_IDENTITY_PROVIDER` (keyless Vercel Preview authentication;
+  full resource name `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID`)
 - `GOOGLE_SEARCH_CONSOLE_PROPERTY_URL` (the exact URL-prefix or `sc-domain:`
   property)
 - `GOOGLE_ANALYTICS_PROPERTY_ID` (the numeric GA4 property ID)
@@ -104,6 +105,46 @@ account's Google Cloud project. Add the service-account email as a read-only use
 of the Search Console property and as a Viewer on the GA4 property. Keep
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` for the existing website tag. Credentials remain
 server-side and are never returned by the administrator APIs.
+
+For the staging `quotexbert` Vercel project, reuse the existing `vercel` pool and
+provider in Google Cloud project `quotexbert` (project number `867365161323`).
+Use the team issuer `https://oidc.vercel.com/brandsagaceceos-projects`, default
+Google provider audience, `google.subject = assertion.sub`, and the condition
+`assertion.sub == 'owner:brandsagaceceos-projects:project:quotexbert:environment:preview'`.
+Grant only this exact subject `roles/iam.workloadIdentityUser` on the existing
+`quotexbert-google-reporting@quotexbert.iam.gserviceaccount.com` service account;
+do not grant project-wide roles. Keep Vercel Git Fork Protection enabled so
+unapproved fork deployments cannot obtain this identity.
+
+Configure these values only in the authorized staging Preview environment
+(branch `integration/spring-2027-staging`), never with a `NEXT_PUBLIC_` prefix.
+The provider variable selects federation and requires `VERCEL_ENV=preview`;
+failures do not fall back to a private key. The existing admin API exchanges the
+request's Vercel OIDC token for Google federation credentials, then impersonates
+the reporting account for ten-minute tokens limited to the two read-only
+reporting scopes. Enable the Security Token Service and IAM Service Account
+Credentials APIs as well as the two reporting APIs. No JSON key is needed;
+keep `iam.disableServiceAccountKeyCreation` enforced. Legacy environments without
+the provider variable retain their existing private-key authentication.
+
+After an authorized Preview deployment, verify real GA4 and Search Console
+results through the existing authenticated `/admin/insights` page. A successful
+build alone does not verify federation or property permissions.
+
+Keyless Preview builds also run `npm run verify:google-preview` before compiling.
+This uses the same reporting module to make actual read-only GA4 and Search
+Console requests without requiring the application database. Both providers
+must connect or the build fails with sanitized errors. Successful checks print
+only seven-day aggregate reporting counts, never tokens or credentials.
+Other builds explicitly skip this check when Preview federation is not selected.
+This verifies Google access, not the dashboard: `/admin/insights` still requires
+the existing administrator session and an isolated application database.
+
+The `deploy` script pushes to `main` and relies on the existing Vercel Git
+integration; it no longer calls a deployment hook. Do not run it for staging or
+recovery work. The previously committed production `manual` hook was revoked
+in Vercel. Its historical URL remains exposed and must never be reused. Do not
+store replacement hook URLs in source code.
 
 Reuse the existing QuoteXbert GA4 property: set its existing `G-` Measurement ID
 and numeric Property ID; do not create another property. Direct GA4 mode owns one
