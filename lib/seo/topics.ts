@@ -169,4 +169,48 @@ export const APPROVED_SEO_TOPICS: readonly SeoTopic[] = [
       "/blog",
     ],
   },
+  {
+    id: "newcastle-interior-painting-planning",
+    query: "interior painting planning in Newcastle",
+    titleBrief:
+      "Planning an interior painting project in Newcastle",
+    city: "Newcastle",
+    category: "Painting",
+    focus:
+      "Surface preparation, room sequencing, trim and ceiling decisions, ventilation, and contractor quote scope.",
+    internalLinks: ["/blog", "/contractors", "/create-lead"],
+  },
+  {
+    id: "oshawa-handyman-project-scope",
+    query: "how to scope a handyman project in Oshawa",
+    titleBrief:
+      "How Oshawa homeowners can scope and compare handyman projects",
+    city: "Oshawa",
+    category: "Handyman",
+    focus:
+      "Separate small repair tasks from renovation trades, clarify materials and labour, and compare itemized quotes.",
+    internalLinks: ["/blog", "/contractors", "/create-lead"],
+  },
+  {
+    id: "whitby-fence-repair-replacement",
+    query: "fence repair or replacement decisions in Whitby",
+    titleBrief:
+      "Fence repair versus replacement planning for Whitby homes",
+    city: "Whitby",
+    category: "Fencing",
+    focus:
+      "Post and panel condition, drainage, property-line questions, material choices, and quote comparisons.",
+    internalLinks: ["/blog", "/contractors", "/create-lead"],
+  },
+  {
+    id: "ajax-flooring-renovation-planning",
+    query: "flooring renovation planning in Ajax",
+    titleBrief:
+      "A practical flooring renovation planning guide for Ajax homeowners",
+    city: "Ajax",
+    category: "Flooring",
+    focus:
+      "Room preparation, subfloor checks, transitions, underlay, lead times, furniture moves, and itemized quote scope.",
+    internalLinks: ["/flooring-calculator", "/blog", "/contractors"],
+  },
 ];
