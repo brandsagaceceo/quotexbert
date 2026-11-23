@@ -50,6 +50,20 @@ interface StudioData {
     propertyConfigured: boolean;
     propertyUrl: string;
     sitemapUrl: string;
+    error: string | null;
+    metrics: {
+      clicks: number;
+      impressions: number;
+      ctr: number;
+      position: number;
+      queries: Array<{
+        query: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+      }>;
+    };
   };
 }
 
@@ -708,6 +722,39 @@ export default function BlogStudioPage() {
                 : "not configured"}
               .
             </p>
+            {studio.searchConsole.metricsConnected ? (
+              <div className="mt-4 rounded border border-slate-200 p-4">
+                <p className="font-semibold">
+                  Verified 30-day Search Console signals
+                </p>
+                <p className="mt-1">
+                  {studio.searchConsole.metrics.clicks.toLocaleString()} clicks ·{" "}
+                  {studio.searchConsole.metrics.impressions.toLocaleString()} impressions ·{" "}
+                  {Math.round(studio.searchConsole.metrics.ctr * 1000) / 10}% CTR
+                  · average position {studio.searchConsole.metrics.position.toFixed(1)}
+                </p>
+                {studio.searchConsole.metrics.queries.length > 0 ? (
+                  <ul className="mt-3 list-disc pl-5">
+                    {studio.searchConsole.metrics.queries.slice(0, 10).map((row) => (
+                      <li key={row.query}>
+                        {row.query}: {row.clicks} clicks, {row.impressions} impressions,
+                        {" "}{Math.round(row.ctr * 1000) / 10}% CTR,
+                        {" "}position {row.position.toFixed(1)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2">No query rows were returned for this period.</p>
+                )}
+              </div>
+            ) : (
+              <p className="mt-4 text-amber-800">
+                Live Search Console metrics are not connected
+                {studio.searchConsole.error
+                  ? `: ${studio.searchConsole.error}`
+                  : "."}
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap gap-4">
               <a
                 className="text-rose-800 underline"

@@ -145,6 +145,41 @@ export async function fetchGoogleAdminMetrics(
   return result;
 }
 
+export async function fetchGoogleSearchConsoleMetrics(
+  days: number,
+): Promise<GoogleAdminMetrics["searchConsole"]> {
+  const status = getGoogleConnectionStatus();
+  if (
+    !status.searchConsolePropertyConfigured ||
+    !status.serviceAccountConfigured
+  ) {
+    return {
+      connected: false,
+      error: null,
+      clicks: 0,
+      impressions: 0,
+      ctr: 0,
+      position: 0,
+      queries: [],
+    };
+  }
+
+  try {
+    const token = await getGoogleAccessToken();
+    return await fetchSearchConsoleMetrics(token, days);
+  } catch (error) {
+    return {
+      connected: false,
+      error: googleErrorMessage(error),
+      clicks: 0,
+      impressions: 0,
+      ctr: 0,
+      position: 0,
+      queries: [],
+    };
+  }
+}
+
 async function getGoogleAccessToken() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim();
   const provider = process.env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER?.trim();

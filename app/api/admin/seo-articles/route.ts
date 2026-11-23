@@ -6,7 +6,10 @@ import {
 } from "@/lib/seo/admin-auth";
 import { generateNextSeoDraft } from "@/lib/seo/article-generation";
 import { SEO_ARTICLE_STATUSES } from "@/lib/seo/article-validation";
-import { getGoogleConnectionStatus } from "@/lib/google-admin-metrics";
+import {
+  fetchGoogleSearchConsoleMetrics,
+  getGoogleConnectionStatus,
+} from "@/lib/google-admin-metrics";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -71,6 +74,7 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com",
     );
     const google = getGoogleConnectionStatus();
+    const searchConsoleMetrics = await fetchGoogleSearchConsoleMetrics(30);
 
     return NextResponse.json({
       articles: articles.map((article) => ({
@@ -90,7 +94,15 @@ export async function GET(request: NextRequest) {
         verificationTokenConfigured: Boolean(
           process.env.GOOGLE_SITE_VERIFICATION?.trim(),
         ),
-        metricsConnected: false,
+        metricsConnected: searchConsoleMetrics.connected,
+        error: searchConsoleMetrics.error,
+        metrics: {
+          clicks: searchConsoleMetrics.clicks,
+          impressions: searchConsoleMetrics.impressions,
+          ctr: searchConsoleMetrics.ctr,
+          position: searchConsoleMetrics.position,
+          queries: searchConsoleMetrics.queries,
+        },
         credentialsConfigured: google.serviceAccountConfigured,
         propertyConfigured: google.searchConsolePropertyConfigured,
         propertyUrl: site.origin,
