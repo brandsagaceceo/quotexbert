@@ -24,6 +24,11 @@ interface SeoArticle {
   scheduledFor: string | null;
   publishedAt: string | null;
   generationError: string | null;
+  pendingUpdate: {
+    id: string;
+    proposedData: EditableArticle;
+    createdAt: string;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +48,20 @@ interface StudioData {
     canGenerate: boolean;
     scheduledDraftingEnabled: boolean;
   };
+  seoOpportunities: Array<{
+    path: string;
+    title: string;
+    articleId: string | null;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+    previousClicks: number | null;
+    previousImpressions: number | null;
+    recommendation: string;
+    reasons: string[];
+    supportingQueries: string[];
+  }>;
   searchConsole: {
     verificationTokenConfigured: boolean;
     metricsConnected: boolean;
@@ -235,14 +254,23 @@ export default function BlogStudioPage() {
       setEdit(null);
       setEditing(false);
       setMessage(
-        "Draft saved privately. Any previous approval was cleared; review it again before publishing.",
+        data.pendingApproval
+          ? "Published-content update saved as a proposal. The live article is unchanged until you approve the update."
+          : "Draft saved privately. Any previous approval was cleared; review it again before publishing.",
       );
     });
   }
 
   async function setArticleStatus(
     id: string,
-    action: "approve" | "reject" | "publish" | "schedule" | "cancel",
+    action:
+      | "approve"
+      | "reject"
+      | "publish"
+      | "schedule"
+      | "cancel"
+      | "approve_update"
+      | "reject_update",
   ) {
     if (dirty && selectedId === id) {
       setError(
@@ -257,6 +285,10 @@ export default function BlogStudioPage() {
       schedule: "Schedule this approved article for publication?",
       cancel:
         "Cancel this scheduled publication? The approved article will remain private.",
+      approve_update:
+        "Approve this proposed update and replace the live published content?",
+      reject_update:
+        "Reject this proposed update? The live published content will remain unchanged.",
     }[action];
     const article = articles.find((item) => item.id === id);
     if (!article) {
@@ -274,6 +306,9 @@ export default function BlogStudioPage() {
         body: JSON.stringify({
           action,
           ifUpdatedAt: article.updatedAt,
+          ...(["approve_update", "reject_update"].includes(action)
+            ? { proposalId: article.pendingUpdate?.id }
+            : {}),
           ...(action === "schedule" && scheduleDate
             ? { scheduledFor: new Date(scheduleDate).toISOString() }
             : {}),
@@ -286,13 +321,17 @@ export default function BlogStudioPage() {
       setMessage(
         action === "publish"
           ? "Article is now public."
-          : action === "approve"
-            ? "Article approved and still private. Automatic publishing may schedule it if enabled."
-            : action === "schedule"
-              ? "Article scheduled; it remains private until publication."
-              : action === "cancel"
-                ? "Schedule cancelled; the approved article remains private."
-                : "Article rejected.",
+          : action === "approve_update"
+            ? "Published-content update approved and applied."
+            : action === "reject_update"
+              ? "Published-content update rejected. The live article was unchanged."
+              : action === "approve"
+                ? "Article approved and still private. Automatic publishing may schedule it if enabled."
+                : action === "schedule"
+                  ? "Article scheduled; it remains private until publication."
+                  : action === "cancel"
+                    ? "Schedule cancelled; the approved article remains private."
+                    : "Article rejected.",
       );
       if (selectedId === id) {
         setSelectedId(null);
@@ -768,6 +807,12 @@ export default function BlogStudioPage() {
                         View published article
                       </Link>
                     )}
+                    {article.status === "published" &&
+                      article.pendingUpdate && (
+                        <span className="inline-flex min-h-12 items-center rounded-lg bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">
+                          Update awaiting approval
+                        </span>
+                      )}
                   </div>
                 </article>
               ))
@@ -833,9 +878,13 @@ export default function BlogStudioPage() {
                     disabled={
                       busy ||
                       !studio?.capabilities.canEdit ||
-                      !["draft", "approved", "rejected", "failed"].includes(
-                        selectedArticle?.status || "",
-                      )
+                      ![
+                        "draft",
+                        "approved",
+                        "rejected",
+                        "failed",
+                        "published",
+                      ].includes(selectedArticle?.status || "")
                     }
                     className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 font-medium text-white disabled:opacity-50"
                   >
@@ -906,6 +955,37 @@ export default function BlogStudioPage() {
                       Cancel schedule
                     </button>
                   )}
+                  {selectedArticle?.status === "published" &&
+                    selectedArticle.pendingUpdate && (
+                      <>
+                        <button
+                          type="button"
+                          disabled={busy || !studio?.capabilities.canEdit}
+                          onClick={() =>
+                            setArticleStatus(
+                              selectedArticle.id,
+                              "approve_update",
+                            )
+                          }
+                          className="min-h-12 rounded-lg bg-emerald-700 px-5 py-3 font-medium text-white disabled:opacity-50"
+                        >
+                          Approve content update
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy || !studio?.capabilities.canEdit}
+                          onClick={() =>
+                            setArticleStatus(
+                              selectedArticle.id,
+                              "reject_update",
+                            )
+                          }
+                          className="min-h-12 rounded-lg border border-red-300 px-5 py-3 text-red-700 disabled:opacity-50"
+                        >
+                          Reject content update
+                        </button>
+                      </>
+                    )}
                   {selectedArticle &&
                     ["draft", "approved", "failed"].includes(
                       selectedArticle.status,
@@ -1044,15 +1124,13 @@ export default function BlogStudioPage() {
                 </fieldset>
                 <div className="flex gap-2">
                   <button
-                    disabled={
-                      busy ||
-                      !studio?.capabilities.canEdit ||
-                      selectedArticle?.status === "published"
-                    }
+                    disabled={busy || !studio?.capabilities.canEdit}
                     onClick={saveArticle}
                     className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 text-white disabled:opacity-50"
                   >
-                    Save changes
+                    {selectedArticle?.status === "published"
+                      ? "Submit update for approval"
+                      : "Save changes"}
                   </button>
                   <button
                     onClick={discardEditor}
@@ -1065,6 +1143,112 @@ export default function BlogStudioPage() {
             )}
           </section>
         </div>
+        {studio && (
+          <section
+            aria-label="SEO Opportunities"
+            className="mt-8 rounded-xl border border-rose-200 bg-white p-5 text-slate-700"
+          >
+            <h2 className="text-xl font-bold text-[#800020]">
+              SEO Opportunities
+            </h2>
+            <p className="mt-2">
+              Planning guidance: spend about 70% of content effort improving
+              pages that already show Google demand and about 30% exploring new
+              supporting content. This is a planning split, not a publishing
+              quota.
+            </p>
+            <p className="mt-2 text-sm">
+              Every metric below comes from the connected Search Console
+              property. Published-page updates remain separate from new-article
+              publishing and require explicit approval.
+            </p>
+            {!studio.searchConsole.metricsConnected ? (
+              <p className="mt-4 rounded-lg bg-amber-50 p-4 text-amber-900">
+                Live Search Console metrics are unavailable, so no SEO
+                opportunities are inferred.
+              </p>
+            ) : studio.seoOpportunities.length === 0 ? (
+              <p className="mt-4 rounded-lg bg-slate-50 p-4">
+                No published pages currently meet the real-data opportunity
+                criteria.
+              </p>
+            ) : (
+              <div className="mt-4 space-y-4">
+                {studio.seoOpportunities.map((opportunity) => (
+                  <article
+                    key={opportunity.path}
+                    className="rounded-lg border border-slate-200 p-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-900">
+                          {opportunity.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {opportunity.path}
+                        </p>
+                      </div>
+                      <a
+                        href={opportunity.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-12 items-center rounded-lg border px-4 py-3 text-sm text-[#800020]"
+                      >
+                        Open page
+                      </a>
+                    </div>
+                    <p className="mt-3 font-medium">
+                      {opportunity.clicks} clicks · {opportunity.impressions}{" "}
+                      impressions · {(opportunity.ctr * 100).toFixed(1)}% CTR ·
+                      position {opportunity.position.toFixed(1)}
+                    </p>
+                    {opportunity.previousClicks !== null &&
+                      opportunity.previousImpressions !== null && (
+                        <p className="mt-1 text-sm text-slate-600">
+                          Previous 30 days: {opportunity.previousClicks} clicks
+                          · {opportunity.previousImpressions} impressions
+                        </p>
+                      )}
+                    <ul className="mt-3 list-disc pl-5 text-sm">
+                      {opportunity.reasons.map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-3">{opportunity.recommendation}</p>
+                    {opportunity.supportingQueries.length > 0 && (
+                      <p className="mt-3 text-sm">
+                        Supporting-article queries with measured impressions,
+                        after competing-intent filtering:{" "}
+                        {opportunity.supportingQueries.join("; ")}.
+                      </p>
+                    )}
+                    {opportunity.articleId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const article = articles.find(
+                            (item) => item.id === opportunity.articleId,
+                          );
+                          if (article) startEditing(article);
+                          else {
+                            setFilter("published");
+                            setPage(1);
+                            setMessage(
+                              "Open the published article from its queue page to propose an update.",
+                            );
+                          }
+                        }}
+                        className="mt-3 min-h-12 rounded-lg bg-[#800020] px-4 py-3 font-medium text-white"
+                      >
+                        Propose approved update
+                      </button>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
         {studio && (
           <section
             aria-label="Google Search Console setup"

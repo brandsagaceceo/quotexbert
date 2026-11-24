@@ -43,11 +43,15 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     });
     if (!article)
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    if (!["draft", "approved", "rejected", "failed"].includes(article.status)) {
+    if (
+      !["draft", "approved", "rejected", "failed", "published"].includes(
+        article.status,
+      )
+    ) {
       return NextResponse.json(
         {
           error:
-            "Only drafts, approved, rejected or failed articles can be edited here",
+            "Only reviewable drafts or published update proposals can be edited here",
         },
         { status: 409 },
       );
@@ -113,6 +117,45 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
         { error: "Test-labelled articles must retain their TEST label" },
         { status: 409 },
       );
+    }
+
+    if (article.status === "published") {
+      const proposal = await prisma.$transaction(async (tx) => {
+        await tx.seoContentUpdateProposal.updateMany({
+          where: { articleId: article.id, status: "pending" },
+          data: {
+            status: "superseded",
+            reviewedBy: admin.id,
+            reviewedAt: new Date(),
+          },
+        });
+        const created = await tx.seoContentUpdateProposal.create({
+          data: {
+            articleId: article.id,
+            baseUpdatedAt: article.updatedAt,
+            proposedData: {
+              ...edits,
+              tags: edits.tags,
+              affiliateProductIds: edits.affiliateProductIds,
+            },
+            proposedBy: admin.id,
+          },
+        });
+        await tx.seoPublishingEvent.create({
+          data: {
+            actorId: admin.id,
+            articleId: article.id,
+            action: "content_update_proposed",
+            detail: created.id,
+          },
+        });
+        return created;
+      });
+      return NextResponse.json({
+        success: true,
+        pendingApproval: true,
+        proposal: { id: proposal.id, status: proposal.status },
+      });
     }
 
     const updated = await prisma.$transaction(async (tx) => {

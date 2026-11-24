@@ -42,6 +42,10 @@ const mockPrisma = {
     upsert: async () => ({ paused: false, autoPublish: false, weeklyLimit: 3 }),
     update: async () => ({}),
   },
+  seoContentUpdateProposal: {
+    findMany: async () => [],
+    findUnique: async () => null,
+  },
   user: {
     findFirst: async () =>
       sessionUserId ? { id: "admin-db", email: sessionEmail } : null,
@@ -51,6 +55,7 @@ const mockPrisma = {
       args: NonNullable<typeof lastListArgs> & { where: { id?: unknown } },
     ) => {
       if (args.where.id) return [];
+      if (!("take" in args)) return [];
       if (listUnavailable)
         throw Object.assign(new Error("test storage unavailable"), {
           code: "P2021",

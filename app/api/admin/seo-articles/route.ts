@@ -10,6 +10,8 @@ import {
   fetchGoogleSearchConsoleMetrics,
   getGoogleConnectionStatus,
 } from "@/lib/google-admin-metrics";
+import { blogPostMetadata } from "@/app/blog/blog-metadata";
+import { buildSeoOpportunities } from "@/lib/seo/opportunities";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
       );
     }
     const pageSize = 25;
-    const [articles, counts] = await Promise.all([
+    const [articles, counts, publishedArticles] = await Promise.all([
       prisma.seoArticle.findMany({
         where: status === "all" ? {} : { status },
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
@@ -64,7 +66,35 @@ export async function GET(request: NextRequest) {
         },
       }),
       prisma.seoArticle.groupBy({ by: ["status"], _count: { _all: true } }),
+      prisma.seoArticle.findMany({
+        where: { status: "published" },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          seoTitle: true,
+          tags: true,
+        },
+      }),
     ]);
+    const pendingUpdates = articles.length
+      ? await prisma.seoContentUpdateProposal.findMany({
+          where: {
+            articleId: { in: articles.map((article) => article.id) },
+            status: "pending",
+          },
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            articleId: true,
+            proposedData: true,
+            createdAt: true,
+          },
+        })
+      : [];
+    const pendingByArticle = new Map(
+      pendingUpdates.map((proposal) => [proposal.articleId, proposal]),
+    );
     const summary: Record<string, number> = Object.fromEntries(
       counts.map((group) => [group.status, group._count._all]),
     );
@@ -75,12 +105,36 @@ export async function GET(request: NextRequest) {
     );
     const google = getGoogleConnectionStatus();
     const searchConsoleMetrics = await fetchGoogleSearchConsoleMetrics(30);
+    const knownPages = [
+      ...Object.entries(blogPostMetadata).map(([slug, metadata]) => ({
+        path: `/blog/${slug}`,
+        title: metadata.title,
+        intents: [metadata.title, ...metadata.tags],
+      })),
+      ...publishedArticles.map((article) => ({
+        path: `/blog/${article.slug}`,
+        title: article.title,
+        intents: [
+          article.title,
+          article.seoTitle,
+          ...parseStringArray(article.tags),
+        ],
+        articleId: article.id,
+      })),
+    ];
+    const seoOpportunities = buildSeoOpportunities(
+      searchConsoleMetrics.pages,
+      searchConsoleMetrics.previousPages,
+      searchConsoleMetrics.pageQueries,
+      knownPages,
+    );
 
     return NextResponse.json({
       articles: articles.map((article) => ({
         ...article,
         tags: parseStringArray(article.tags),
         affiliateProductIds: parseStringArray(article.affiliateProductIds),
+        pendingUpdate: pendingByArticle.get(article.id) || null,
       })),
       summary: { ...summary, total },
       pagination: {
@@ -90,6 +144,7 @@ export async function GET(request: NextRequest) {
         pageCount: Math.max(1, Math.ceil(matchingTotal / pageSize)),
       },
       capabilities: getSeoStudioCapabilities(),
+      seoOpportunities,
       searchConsole: {
         verificationTokenConfigured: Boolean(
           process.env.GOOGLE_SITE_VERIFICATION?.trim(),

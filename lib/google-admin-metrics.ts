@@ -12,6 +12,18 @@ type GoogleAccessToken = {
   expiresAt: number;
 };
 
+export interface SearchConsolePageMetric {
+  page: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
+
+export interface SearchConsolePageQueryMetric extends SearchConsolePageMetric {
+  query: string;
+}
+
 let cachedToken: GoogleAccessToken | null = null;
 let cachedTokenIdentity: string | null = null;
 
@@ -37,6 +49,9 @@ export interface GoogleAdminMetrics {
       ctr: number;
       position: number;
     }>;
+    pages: SearchConsolePageMetric[];
+    previousPages: SearchConsolePageMetric[];
+    pageQueries: SearchConsolePageQueryMetric[];
   };
   analytics: {
     connected: boolean;
@@ -96,6 +111,9 @@ export async function fetchGoogleAdminMetrics(
       ctr: 0,
       position: 0,
       queries: [],
+      pages: [],
+      previousPages: [],
+      pageQueries: [],
     },
     analytics: {
       connected: false,
@@ -161,6 +179,9 @@ export async function fetchGoogleSearchConsoleMetrics(
       ctr: 0,
       position: 0,
       queries: [],
+      pages: [],
+      previousPages: [],
+      pageQueries: [],
     };
   }
 
@@ -176,6 +197,9 @@ export async function fetchGoogleSearchConsoleMetrics(
       ctr: 0,
       position: 0,
       queries: [],
+      pages: [],
+      previousPages: [],
+      pageQueries: [],
     };
   }
 }
@@ -371,28 +395,56 @@ async function fetchSearchConsoleMetrics(
   if (!property) throw new Error("Search Console property is not configured");
   const endpoint = `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(property)}/searchAnalytics/query`;
   const dates = googleDateRange(days);
-  const totals = await googleJsonRequest<{
-    rows?: Array<{
-      clicks?: number;
-      impressions?: number;
-      ctr?: number;
-      position?: number;
-    }>;
-  }>(endpoint, token, dates);
-  const queryRows = await googleJsonRequest<{
-    rows?: Array<{
-      keys?: string[];
-      clicks?: number;
-      impressions?: number;
-      ctr?: number;
-      position?: number;
-    }>;
-  }>(endpoint, token, {
-    ...dates,
-    dimensions: ["query"],
-    rowLimit: 25,
-  });
+  const previousDates = googleDateRange(days, days);
+  type SearchConsoleRow = {
+    keys?: string[];
+    clicks?: number;
+    impressions?: number;
+    ctr?: number;
+    position?: number;
+  };
+  const [totals, queryRows, pageRows, previousPageRows, pageQueryRows] =
+    await Promise.all([
+      googleJsonRequest<{
+        rows?: SearchConsoleRow[];
+      }>(endpoint, token, dates),
+      googleJsonRequest<{
+        rows?: SearchConsoleRow[];
+      }>(endpoint, token, {
+        ...dates,
+        dimensions: ["query"],
+        rowLimit: 25,
+      }),
+      googleJsonRequest<{
+        rows?: SearchConsoleRow[];
+      }>(endpoint, token, {
+        ...dates,
+        dimensions: ["page"],
+        rowLimit: 250,
+      }),
+      googleJsonRequest<{
+        rows?: SearchConsoleRow[];
+      }>(endpoint, token, {
+        ...previousDates,
+        dimensions: ["page"],
+        rowLimit: 250,
+      }),
+      googleJsonRequest<{
+        rows?: SearchConsoleRow[];
+      }>(endpoint, token, {
+        ...dates,
+        dimensions: ["page", "query"],
+        rowLimit: 500,
+      }),
+    ]);
   const total = totals.rows?.[0];
+  const mapPage = (row: SearchConsoleRow): SearchConsolePageMetric => ({
+    page: row.keys?.[0] || "",
+    clicks: row.clicks || 0,
+    impressions: row.impressions || 0,
+    ctr: row.ctr || 0,
+    position: row.position || 0,
+  });
 
   return {
     connected: true,
@@ -408,6 +460,16 @@ async function fetchSearchConsoleMetrics(
       ctr: row.ctr || 0,
       position: row.position || 0,
     })),
+    pages: (pageRows.rows || []).map(mapPage).filter((row) => row.page),
+    previousPages: (previousPageRows.rows || [])
+      .map(mapPage)
+      .filter((row) => row.page),
+    pageQueries: (pageQueryRows.rows || [])
+      .map((row) => ({
+        ...mapPage(row),
+        query: row.keys?.[1] || "",
+      }))
+      .filter((row) => row.page && row.query),
   };
 }
 
@@ -546,9 +608,9 @@ async function googleJsonRequest<T>(
   return (await response.json()) as T;
 }
 
-function googleDateRange(days: number) {
+function googleDateRange(days: number, offsetDays = 0) {
   const end = new Date();
-  end.setUTCDate(end.getUTCDate() - 2);
+  end.setUTCDate(end.getUTCDate() - 2 - offsetDays);
   const start = new Date(end);
   start.setUTCDate(start.getUTCDate() - Math.max(1, days - 1));
   return {

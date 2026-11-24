@@ -111,6 +111,22 @@ actions, control changes, rescheduling and failures are recorded in the
 publishing history. The `20261124010000_add_seo_publishing_controls` migration
 must be applied to an authorized database before using these controls.
 
+The Blog Studio's SEO Opportunities section uses only page and query rows
+returned by the existing read-only Search Console connection. It prioritizes
+published pages with clicks, high impressions and low CTR, or average positions
+from 4 through 20, and compares each page with the preceding reporting period.
+The displayed 70% improvement / 30% supporting-content split is planning
+guidance, not a publishing quota. Suggestions that exactly overlap another
+known page's search intent are suppressed.
+
+Editing a published database-backed article creates a pending content-update
+proposal; it does not alter the live article. A separate approval action applies
+the proposal only if the published article has not changed in the meantime.
+Rejections, superseded proposals, approvals, and applications retain their
+database records and publishing audit events. Apply
+`20261124030000_add_seo_content_update_proposals` to the authorized isolated
+database before using published-content proposals.
+
 Automatic generation is disabled even if the existing drafting feature flag
 is set: the existing request-count limit is not a monetary spending cap. A
 separate automatic generation control and an enforceable spending cap are still
