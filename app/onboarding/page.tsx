@@ -9,6 +9,7 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingRole, setCheckingRole] = useState(true);
+  const [confirmedRole, setConfirmedRole] = useState<string | null>(null);
   const router = useRouter();
   const { getToken } = useAuth();
 
@@ -21,8 +22,9 @@ export default function OnboardingPage() {
     try {
       stored = localStorage.getItem("post_auth_redirect");
       if (stored) localStorage.removeItem("post_auth_redirect");
-    } catch {
-      /* ignore storage errors */
+    } catch (error) {
+      console.error("[Onboarding] Could not restore the selected plan:", error);
+      throw new Error("Your account is ready, but your browser could not restore the selected plan. Continue below to choose it again.");
     }
     // Only honor the canonical subscription route, and only for contractors.
     if (role === "contractor" && stored && stored.startsWith("/contractor/subscriptions")) {
@@ -39,6 +41,7 @@ export default function OnboardingPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.role && (data.role === "contractor" || data.role === "homeowner")) {
+            setConfirmedRole(data.role);
             const dest = consumePostAuthRedirect(data.role);
             console.log("[Onboarding] User already has role:", data.role, "redirecting to", dest);
             router.push(dest);
@@ -47,6 +50,7 @@ export default function OnboardingPage() {
         }
       } catch (err) {
         console.error("[Onboarding] Error checking existing role:", err);
+        setError(err instanceof Error ? err.message : "Could not check your account. Please retry.");
       } finally {
         setCheckingRole(false);
       }
@@ -93,6 +97,7 @@ export default function OnboardingPage() {
       if (!response.ok) {
         throw new Error(data.error || "Failed to update role");
       }
+      setConfirmedRole(roleId);
 
       // Track successful user registration (Meta CompleteRegistration)
       try {
@@ -127,6 +132,22 @@ export default function OnboardingPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#800020] mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (confirmedRole && error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-lg rounded-xl border bg-white p-6">
+          <h1 className="text-xl font-bold">Your account is ready</h1>
+          <p role="alert" className="mt-3 text-red-700">{error}</p>
+          <p className="mt-3">You do not need to register again. Continue using the existing account.</p>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {confirmedRole === "contractor" && <a href="/contractor/subscriptions" className="rounded-lg bg-[#800020] px-4 py-2 text-white">Choose a subscription</a>}
+            <a href="/profile" className="px-4 py-2 underline">Go to my profile</a>
+          </div>
         </div>
       </div>
     );

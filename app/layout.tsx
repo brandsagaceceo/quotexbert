@@ -10,14 +10,26 @@ import { ToastProvider } from "@/components/ToastProvider";
 import dynamicImport from "next/dynamic";
 import "./globals.css";
 import "../styles/mobile.css";
+import "../styles/branding.css";
 import ReferralTracker from "@/components/ReferralTracker";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // Lazy load development and optional components
-const DevStatus = dynamicImport(() => import("./_components/DevStatus"), { ssr: false });
-const OverflowDebugger = dynamicImport(() => import("@/components/OverflowDebugger").then(mod => ({ default: mod.OverflowDebugger })), { ssr: false });
-const AIAssistantPopup = dynamicImport(() => import("@/components/AIAssistantPopup"), { ssr: false });
+const DevStatus = dynamicImport(() => import("./_components/DevStatus"), {
+  ssr: false,
+});
+const OverflowDebugger = dynamicImport(
+  () =>
+    import("@/components/OverflowDebugger").then((mod) => ({
+      default: mod.OverflowDebugger,
+    })),
+  { ssr: false },
+);
+const AIAssistantPopup = dynamicImport(
+  () => import("@/components/AIAssistantPopup"),
+  { ssr: false },
+);
 
 const interSans = Inter({
   variable: "--font-geist-sans",
@@ -35,10 +47,13 @@ const interMono = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_URL || "https://www.quotexbert.com",
+  ),
   title: {
-    default: "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
-    template: "%s | QuoteXbert"
+    default:
+      "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
+    template: "%s | QuoteXbert",
   },
   description:
     "Get AI-assisted renovation estimates and connect with verified contractors across Toronto, Durham Region, Clarington, and the GTA. Free for homeowners. Kitchen, bathroom, basement renovations & more.",
@@ -61,7 +76,7 @@ export const metadata: Metadata = {
     "Courtice renovation",
     "verified contractors GTA",
     "home improvement Toronto",
-    "renovation cost calculator"
+    "renovation cost calculator",
   ],
   authors: [{ name: "QuoteXbert" }],
   creator: "QuoteXbert",
@@ -72,16 +87,17 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   openGraph: {
     type: "website",
     locale: "en_CA",
     url: "https://www.quotexbert.com",
-    title: "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
+    title:
+      "QuoteXbert | AI Renovation Estimates for Toronto, Durham Region & the GTA",
     description:
       "Upload photos and get AI-assisted renovation estimates. Connect with verified contractors across Toronto, Durham Region, Clarington, and the GTA. Free, fast, and accurate.",
     siteName: "QuoteXbert",
@@ -90,30 +106,36 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "QuoteXbert - Instant Home Renovation Estimates in Toronto & GTA"
-      }
+        alt: "QuoteXbert - Instant Home Renovation Estimates in Toronto & GTA",
+      },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QuoteXbert - AI Renovation Estimates for Toronto, Durham Region & the GTA",
-    description: "Get AI renovation estimates for Toronto, Durham Region, Clarington & the GTA. Connect with verified local contractors. Upload photos, receive accurate quotes in minutes.",
+    title:
+      "QuoteXbert - AI Renovation Estimates for Toronto, Durham Region & the GTA",
+    description:
+      "Get AI renovation estimates for Toronto, Durham Region, Clarington & the GTA. Connect with verified local contractors. Upload photos, receive accurate quotes in minutes.",
     images: ["/twitter-image.svg"],
     creator: "@quotexbert",
   },
   icons: {
     icon: [
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png?v=qx", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png?v=qx", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-192x192.png?v=qx", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.svg?v=qx", type: "image/svg+xml" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/apple-touch-icon.png?v=qx",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
-    shortcut: ["/favicon-32x32.png"],
+    shortcut: ["/favicon-32x32.png?v=qx"],
   },
-  manifest: "/manifest.json",
+  manifest: "/manifest.json?v=qx",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -123,11 +145,11 @@ export const metadata: Metadata = {
     telephone: false,
   },
   alternates: {
-    canonical: "https://www.quotexbert.com"
+    canonical: "https://www.quotexbert.com",
   },
-  verification: {
-    google: "your-google-verification-code-here",
-  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION?.trim()
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION.trim() }
+    : {},
 };
 
 // Single source of truth for the viewport tag — Next.js injects this once into <head>.
@@ -172,24 +194,6 @@ export default function RootLayout({
           />
         )}
 
-        {/* Google Ads Conversion Tracking */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17979635426"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="google-ads"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'AW-17979635426');
-            `,
-          }}
-        />
-
         {/* Meta Pixel Code */}
         <Script
           id="fb-pixel"
@@ -218,7 +222,7 @@ export default function RootLayout({
             alt=""
           />
         </noscript>
-        
+
         {/* Comprehensive Schema.org Structured Data */}
         <Script
           id="schema-org"
@@ -231,23 +235,26 @@ export default function RootLayout({
                 {
                   "@type": "Organization",
                   "@id": "https://www.quotexbert.com/#organization",
-                  "name": "QuoteXbert",
-                  "url": "https://www.quotexbert.com",
-                  "logo": {
+                  name: "QuoteXbert",
+                  url: "https://www.quotexbert.com",
+                  logo: {
                     "@type": "ImageObject",
-                    "url": "https://www.quotexbert.com/icon.svg"
-                  }
+                    url: "https://www.quotexbert.com/icon.svg",
+                  },
                 },
                 {
                   "@type": "WebSite",
                   "@id": "https://www.quotexbert.com/#website",
-                  "url": "https://www.quotexbert.com",
-                  "name": "QuoteXbert",
-                  "description": "AI-assisted home renovation estimates and contractor matching for Toronto, Durham Region, and the GTA.",
-                  "publisher": { "@id": "https://www.quotexbert.com/#organization" }
-                }
-              ]
-            })
+                  url: "https://www.quotexbert.com",
+                  name: "QuoteXbert",
+                  description:
+                    "AI-assisted home renovation estimates and contractor matching for Toronto, Durham Region, and the GTA.",
+                  publisher: {
+                    "@id": "https://www.quotexbert.com/#organization",
+                  },
+                },
+              ],
+            }),
           }}
         />
       </head>
@@ -256,11 +263,12 @@ export default function RootLayout({
       >
         <ToastProvider>
           {/* Google Analytics & Tag Manager */}
-          <GoogleAnalytics 
+          <GoogleAnalytics
             GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
             GTM_ID={process.env.NEXT_PUBLIC_GTM_ID}
+            GOOGLE_ADS_ID="AW-17979635426"
           />
-          
+
           {/* Skip to content link for accessibility */}
           <a
             href="#main-content"
@@ -269,11 +277,12 @@ export default function RootLayout({
             Skip to content
           </a>
           <SiteHeader />
-          <main 
-            id="main-content" 
+          <main
+            id="main-content"
             className="min-h-screen"
             style={{
-              paddingBottom: 'calc(var(--bottom-nav-height, 56px) + env(safe-area-inset-bottom, 0px) + 8px)',
+              paddingBottom:
+                "calc(var(--bottom-nav-height, 56px) + env(safe-area-inset-bottom, 0px) + 8px)",
             }}
           >
             {children}
@@ -282,7 +291,7 @@ export default function RootLayout({
           <MobileBottomNav />
           <AIAssistantPopup />
           <ReferralTracker />
-          {process.env.NODE_ENV === 'development' && (
+          {process.env.NODE_ENV === "development" && (
             <>
               <DevStatus />
               <OverflowDebugger />
@@ -302,5 +311,7 @@ export default function RootLayout({
     >
       {content}
     </ClerkProvider>
-  ) : content;
+  ) : (
+    content
+  );
 }

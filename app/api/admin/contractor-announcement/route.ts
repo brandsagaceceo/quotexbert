@@ -33,7 +33,10 @@ const TEST_SEND_EMAILS = new Set([
   'quotexbert@gmail.com',
 ]);
 
-async function authorizeAdmin() {
+async function authorizeAdmin(): Promise<
+  | { error: string; status: 401 | 403 }
+  | { userId: string; adminEmail: string }
+> {
   const authResult = await auth();
   if (!authResult.userId) {
     return { error: 'Unauthorized', status: 401 as const };
@@ -355,7 +358,7 @@ async function runJobBoardOfferVariant(request: NextRequest, body: any) {
 
     const result = await sendContractorJobBoardOfferTestEmail({
       testEmail,
-      firstName: internalUser.name?.split(' ')[0] || testEmail.split('@')[0],
+      firstName: internalUser.name?.split(' ')[0] || testEmail.split('@')[0] || null,
       availableJobCount: summary.availableJobCount,
       unsubscribeUserId: internalUser.id,
     });
@@ -450,7 +453,7 @@ async function runContractorWelcomePhase1Variant(request: NextRequest, body: any
 
     const result = await sendContractorAccountWelcomeTestEmail({
       testEmail,
-      firstName: internalRecipient.name?.split(' ')[0] || testEmail.split('@')[0],
+      firstName: internalRecipient.name?.split(' ')[0] || testEmail.split('@')[0] || null,
       unsubscribeUserId: internalRecipient.id,
     });
 

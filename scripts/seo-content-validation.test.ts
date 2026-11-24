@@ -4,6 +4,7 @@ import {
   parseSeoArticleEdits,
 } from "../lib/seo/article-validation";
 import {
+  describeGenerationFailure,
   getNextPublicationSlot,
   isSeoDraftAutomationEnabled,
 } from "../lib/seo/article-generation";
@@ -76,11 +77,25 @@ const mondayAfterSlot = getNextPublicationSlot(
 );
 assert.equal(mondayAfterSlot.toISOString(), "2026-03-04T14:00:00.000Z");
 
+assert.equal(describeGenerationFailure({ status: 429 }), "OpenAIRateLimited");
+assert.equal(
+  describeGenerationFailure({ status: 401 }),
+  "OpenAIAuthenticationFailed",
+);
+assert.equal(
+  describeGenerationFailure(new Error("Request timed out")),
+  "OpenAITimeout",
+);
+
 const originalFlag = process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 delete process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 assert.equal(isSeoDraftAutomationEnabled(), false);
 process.env.SEO_DRAFT_AUTOMATION_ENABLED = "true";
-assert.equal(isSeoDraftAutomationEnabled(), true);
+assert.equal(
+  isSeoDraftAutomationEnabled(),
+  false,
+  "Request-count limits do not authorize paid automatic generation",
+);
 if (originalFlag === undefined) delete process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 else process.env.SEO_DRAFT_AUTOMATION_ENABLED = originalFlag;
 

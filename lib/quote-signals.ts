@@ -94,8 +94,9 @@ async function enrich(input: QuoteSignalInput): Promise<QuoteSignalInput> {
     if (input.leadId ?? q.job?.id) enriched.leadId = input.leadId ?? q.job?.id;
     if (input.category ?? q.job?.category) enriched.category = input.category ?? q.job?.category;
     // Prefer contractor profile city; fall back to job zipCode as a proxy
-    if (input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode) {
-      enriched.city = input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode;
+    const city = input.city ?? q.contractor?.contractorProfile?.city ?? q.job?.zipCode;
+    if (city) {
+      enriched.city = city;
     }
     const aiEstimateLow = input.aiEstimateLow ?? q.job?.aiEstimate?.minCost;
     if (aiEstimateLow != null) enriched.aiEstimateLow = aiEstimateLow;

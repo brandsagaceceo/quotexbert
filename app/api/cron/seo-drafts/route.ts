@@ -2,9 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   generateNextSeoDraft,
-  isSeoAutoPublishEnabled,
   isSeoDraftAutomationEnabled,
-  publishScheduledSeoArticles,
 } from "@/lib/seo/article-generation";
 
 export const dynamic = "force-dynamic";
@@ -22,20 +20,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const shouldDraft = isSeoDraftAutomationEnabled();
-  const shouldAutoPublish =
-    isSeoAutoPublishEnabled() && process.env.VERCEL_ENV === "production";
-  if (!shouldDraft && !shouldAutoPublish) {
+  if (!shouldDraft) {
     return NextResponse.json({ skipped: "SEO draft automation is disabled" });
   }
 
   try {
-    const publishedCount = shouldAutoPublish
-      ? await publishScheduledSeoArticles()
-      : 0;
-    const drafting = shouldDraft
-      ? await generateNextSeoDraft()
-      : { kind: "disabled" as const };
-    return NextResponse.json({ publishedCount, drafting });
+    const drafting = await generateNextSeoDraft();
+    if (drafting.kind === "blocked") {
+      return NextResponse.json({ error: drafting.error }, { status: 503 });
+    }
+    return NextResponse.json({ publishedCount: 0, drafting });
   } catch (error) {
     const errorType =
       error instanceof Error && /^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(error.name)

@@ -1,339 +1,1385 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { 
-  PlusIcon, 
-  PencilIcon, 
-  TrashIcon, 
-  EyeIcon,
-  CalendarDaysIcon,
-  TagIcon
-} from "@heroicons/react/24/outline";
+import { APPROVED_AFFILIATE_PRODUCTS } from "@/lib/seo/affiliate-products";
+import {
+  SEO_ARTICLE_STATUSES,
+  type SeoArticleStatus,
+} from "@/lib/seo/article-validation";
 
-interface BlogPost {
+interface SeoArticle {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
-  author: string;
-  publishedAt: string;
-  status: "draft" | "published" | "scheduled";
+  content: string;
   category: string;
+  author: string;
   tags: string[];
-  views: number;
+  seoTitle: string;
+  seoDescription: string;
+  affiliateProductIds: string[];
+  status: SeoArticleStatus;
+  scheduledFor: string | null;
+  publishedAt: string | null;
+  generationError: string | null;
+  pendingUpdate: {
+    id: string;
+    proposedData: EditableArticle;
+    createdAt: string;
+  } | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const ADMIN_EMAILS = ['brandsagaceo@gmail.com', 'quotexbert@gmail.com'];
+interface StudioData {
+  articles: SeoArticle[];
+  summary: Record<string, number>;
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    pageCount: number;
+  };
+  capabilities: {
+    canEdit: boolean;
+    canPublish: boolean;
+    canGenerate: boolean;
+    scheduledDraftingEnabled: boolean;
+  };
+  seoOpportunities: Array<{
+    path: string;
+    title: string;
+    articleId: string | null;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+    previousClicks: number | null;
+    previousImpressions: number | null;
+    recommendation: string;
+    reasons: string[];
+    supportingQueries: string[];
+  }>;
+  searchConsole: {
+    verificationTokenConfigured: boolean;
+    metricsConnected: boolean;
+    credentialsConfigured: boolean;
+    propertyConfigured: boolean;
+    propertyUrl: string;
+    sitemapUrl: string;
+    error: string | null;
+    metrics: {
+      clicks: number;
+      impressions: number;
+      ctr: number;
+      position: number;
+      queries: Array<{
+        query: string;
+        clicks: number;
+        impressions: number;
+        ctr: number;
+        position: number;
+      }>;
+    };
+  };
+}
 
-export default function AdminBlogPage() {
-  const { authUser, authLoading } = useAuth();
-  const router = useRouter();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+interface PublishingData {
+  autoPublish: boolean;
+  paused: boolean;
+  weeklyLimit: number;
+  scheduled: Array<{ id: string; title: string; scheduledFor: string | null }>;
+  events: Array<{
+    id: string;
+    action: string;
+    detail: string | null;
+    articleId: string | null;
+    actorId: string | null;
+    createdAt: string;
+  }>;
+  eventPage: number;
+  eventPageCount: number;
+}
+
+type EditableArticle = Pick<
+  SeoArticle,
+  | "title"
+  | "excerpt"
+  | "content"
+  | "seoTitle"
+  | "seoDescription"
+  | "tags"
+  | "affiliateProductIds"
+>;
+
+export default function BlogStudioPage() {
+  const [articles, setArticles] = useState<SeoArticle[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [edit, setEdit] = useState<EditableArticle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [studio, setStudio] = useState<StudioData | null>(null);
+  const [filter, setFilter] = useState<"all" | SeoArticleStatus>("all");
+  const [page, setPage] = useState(1);
+  const [generating, setGenerating] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [publishing, setPublishing] = useState<PublishingData | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const requestSequence = useRef(0);
+  const editorRef = useRef<HTMLElement>(null);
 
-  // Guard: redirect non-admins
-  useEffect(() => {
-    if (!authLoading && (!authUser || !ADMIN_EMAILS.includes(authUser.email || ''))) {
-      router.push('/');
-    }
-  }, [authUser, authLoading, router]);
-
-  // Sample blog posts for admin - Toronto focused
-  const samplePosts: BlogPost[] = [
-    {
-      id: "1",
-      title: "10 Home Renovation Projects That Add the Most Value in Toronto 2025",
-      slug: "home-renovation-projects-add-value-toronto-2025",
-      excerpt: "Discover which home improvement projects offer the best ROI for Toronto homeowners in the GTA market.",
-      author: "Sarah Johnson",
-      publishedAt: "2025-01-15",
-      status: "published",
-      category: "Home Value",
-      tags: ["toronto renovation", "GTA", "home value"],
-      views: 1247
-    },
-    {
-      id: "2",
-      title: "How to Choose the Right Contractor in Toronto: Complete GTA Guide",
-      slug: "choose-contractor-toronto-gta-guide",
-      excerpt: "Finding a reliable contractor in the Greater Toronto Area. Covers licensing, WSIB, and Tarion warranties.",
-      author: "Mike Rodriguez",
-      publishedAt: "2025-01-10",
-      status: "published",
-      category: "Contractor Tips",
-      tags: ["toronto contractors", "GTA", "WSIB"],
-      views: 892
-    },
-    {
-      id: "3",
-      title: "Kitchen Remodel Costs in Toronto: 2025 GTA Pricing Guide",
-      slug: "kitchen-remodel-costs-toronto-gta-2025",
-      excerpt: "Planning a kitchen renovation in Toronto? Get detailed GTA cost breakdowns including permits and labor rates.",
-      author: "Jennifer Smith",
-      publishedAt: "2025-01-05",
-      status: "published",
-      category: "Kitchen",
-      tags: ["toronto kitchen", "GTA renovation", "ontario permits"],
-      views: 634
-    },
-    {
-      id: "4",
-      title: "Toronto Winter Home Preparation Checklist 2025",
-      slug: "toronto-winter-home-preparation-2025",
-      excerpt: "Prepare your GTA home for harsh Ontario winters with this comprehensive Toronto-specific checklist.",
-      author: "David Chen",
-      publishedAt: "2025-02-01",
-      status: "draft",
-      category: "Maintenance",
-      tags: ["toronto winter", "GTA maintenance", "ontario"],
-      views: 0
-    }
-  ];
+  const refresh = useCallback(async () => {
+    const sequence = ++requestSequence.current;
+    const [response, publishingResponse] = await Promise.all([
+      fetch(`/api/admin/seo-articles?status=${filter}&page=${page}`, {
+        cache: "no-store",
+      }),
+      fetch("/api/admin/seo-publishing", { cache: "no-store" }),
+    ]);
+    const data = await response.json();
+    const publishingData = await publishingResponse.json();
+    if (sequence !== requestSequence.current) return;
+    if (!response.ok) throw new Error(data.error || "Unable to load articles");
+    if (!publishingResponse.ok)
+      throw new Error(
+        publishingData.error || "Unable to load publishing controls",
+      );
+    setArticles(data.articles);
+    setStudio(data);
+    setPublishing(publishingData);
+  }, [filter, page]);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setPosts(samplePosts);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    let active = true;
+    setLoading(true);
+    setError("");
+    setStudio(null);
+    setArticles([]);
+    refresh()
+      .catch(
+        (cause: unknown) =>
+          active &&
+          setError(
+            cause instanceof Error ? cause.message : "Unable to load articles",
+          ),
+      )
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+      requestSequence.current += 1;
+    };
+  }, [refresh]);
 
-  const filteredPosts = posts.filter(post => {
-    if (filter === "all") return true;
-    return post.status === filter;
-  });
+  useEffect(() => {
+    if (
+      !generating &&
+      !articles.some((article) => article.status === "generating")
+    )
+      return;
+    const timer = setInterval(() => {
+      refresh().catch((cause: unknown) =>
+        setError(
+          `Background refresh failed: ${cause instanceof Error ? cause.message : "Unable to refresh generation status"}. Use Refresh to retry.`,
+        ),
+      );
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [articles, generating, refresh]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  useEffect(() => {
+    if (selectedId) editorRef.current?.focus();
+  }, [selectedId]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "published":
-        return "bg-green-100 text-green-800";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800";
-      case "scheduled":
-        return "bg-rose-100 text-rose-900";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  useEffect(() => {
+    if (selectedId || busy) return;
+    const timer = setInterval(() => {
+      refresh().catch((cause: unknown) =>
+        setError(
+          cause instanceof Error ? cause.message : "Unable to refresh articles",
+        ),
+      );
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, [selectedId, busy, refresh]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
-          </div>
-        </div>
-      </div>
-    );
+  function discardEditor() {
+    if (dirty && !window.confirm("Discard your unsaved edits?")) return false;
+    setSelectedId(null);
+    setEdit(null);
+    setDirty(false);
+    setEditing(false);
+    setScheduleDate("");
+    return true;
   }
 
+  function startEditing(article: SeoArticle) {
+    if (!discardEditor()) return;
+    setSelectedId(article.id);
+    setEdit({
+      title: article.title,
+      excerpt: article.excerpt,
+      content: article.content,
+      seoTitle: article.seoTitle,
+      seoDescription: article.seoDescription,
+      tags: article.tags,
+      affiliateProductIds: article.affiliateProductIds,
+    });
+    setMessage("");
+    setEditing(false);
+  }
+
+  async function saveArticle() {
+    if (!selectedId || !edit) return;
+    await performAction(async () => {
+      const response = await fetch(`/api/admin/seo-articles/${selectedId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...edit,
+          ifUpdatedAt: selectedArticle?.updatedAt,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to save article");
+      await refresh();
+      setDirty(false);
+      setSelectedId(null);
+      setEdit(null);
+      setEditing(false);
+      setMessage(
+        data.pendingApproval
+          ? "Published-content update saved as a proposal. The live article is unchanged until you approve the update."
+          : "Draft saved privately. Any previous approval was cleared; review it again before publishing.",
+      );
+    });
+  }
+
+  async function setArticleStatus(
+    id: string,
+    action:
+      | "approve"
+      | "reject"
+      | "publish"
+      | "schedule"
+      | "cancel"
+      | "approve_update"
+      | "reject_update",
+  ) {
+    if (dirty && selectedId === id) {
+      setError(
+        "Save your edits before approving, rejecting or publishing this article.",
+      );
+      return;
+    }
+    const confirmation = {
+      approve: "Approve this draft for human-reviewed publication?",
+      reject: "Reject this draft? It will not be published.",
+      publish: "Publish this approved article publicly now?",
+      schedule: "Schedule this approved article for publication?",
+      cancel:
+        "Cancel this scheduled publication? The approved article will remain private.",
+      approve_update:
+        "Approve this proposed update and replace the live published content?",
+      reject_update:
+        "Reject this proposed update? The live published content will remain unchanged.",
+    }[action];
+    const article = articles.find((item) => item.id === id);
+    if (!article) {
+      setError(
+        "Article is no longer in this view. Refresh and review it again.",
+      );
+      return;
+    }
+    if (!window.confirm(confirmation)) return;
+
+    await performAction(async () => {
+      const response = await fetch(`/api/admin/seo-articles/${id}/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          ifUpdatedAt: article.updatedAt,
+          ...(["approve_update", "reject_update"].includes(action)
+            ? { proposalId: article.pendingUpdate?.id }
+            : {}),
+          ...(action === "schedule" && scheduleDate
+            ? { scheduledFor: new Date(scheduleDate).toISOString() }
+            : {}),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || `Unable to ${action} article`);
+      await refresh();
+      setMessage(
+        action === "publish"
+          ? "Article is now public."
+          : action === "approve_update"
+            ? "Published-content update approved and applied."
+            : action === "reject_update"
+              ? "Published-content update rejected. The live article was unchanged."
+              : action === "approve"
+                ? "Article approved and still private. Automatic publishing may schedule it if enabled."
+                : action === "schedule"
+                  ? "Article scheduled; it remains private until publication."
+                  : action === "cancel"
+                    ? "Schedule cancelled; the approved article remains private."
+                    : "Article rejected.",
+      );
+      if (selectedId === id) {
+        setSelectedId(null);
+        setEdit(null);
+        setDirty(false);
+      }
+    });
+  }
+
+  async function updatePublishing(
+    control: "autoPublish" | "paused",
+    enabled: boolean,
+  ) {
+    const prompt =
+      control === "paused"
+        ? enabled
+          ? "Pause all publishing, including Publish now?"
+          : "Resume publishing? Missed articles will be rescheduled gradually."
+        : enabled
+          ? "Enable automatic scheduling of approved articles? This does not enable AI generation."
+          : "Turn automatic publishing off?";
+    if (!(control === "paused" && enabled) && !window.confirm(prompt)) return;
+    await performAction(async () => {
+      const response = await fetch("/api/admin/seo-publishing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ control, enabled }),
+      });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Unable to update publishing");
+      await refresh();
+      setMessage(
+        control === "paused"
+          ? enabled
+            ? "All publishing paused."
+            : "Publishing resumed."
+          : enabled
+            ? "Automatic publishing enabled."
+            : "Automatic publishing disabled.",
+      );
+    });
+  }
+
+  async function loadMoreHistory() {
+    if (!publishing) return;
+    await performAction(async () => {
+      const response = await fetch(
+        `/api/admin/seo-publishing?page=${publishing.eventPage + 1}`,
+        { cache: "no-store" },
+      );
+      const data: PublishingData & { error?: string } = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Unable to load publishing history");
+      setPublishing((current) =>
+        current
+          ? {
+              ...current,
+              events: [...current.events, ...data.events],
+              eventPage: data.eventPage,
+              eventPageCount: data.eventPageCount,
+            }
+          : current,
+      );
+    });
+  }
+
+  async function generateArticle() {
+    if (
+      !window.confirm(
+        "Use the configured AI budget to generate one private draft? This shares the existing one-attempt-per-UTC-day limit with scheduled drafting. It will not publish.",
+      )
+    )
+      return;
+    setGenerating(true);
+    await performAction(async () => {
+      setMessage(
+        "Generating a private draft. This can take up to a minute; do not submit again.",
+      );
+      const response = await fetch("/api/admin/seo-articles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "generate" }),
+      });
+      const data = await response.json();
+      try {
+        await refresh();
+      } catch (cause) {
+        const outcome = response.ok
+          ? "Draft created privately."
+          : data.error || "Unable to generate an article.";
+        throw new Error(
+          `${outcome} Queue refresh failed: ${cause instanceof Error ? cause.message : "Unknown refresh error"}. Use Refresh to retry.`,
+        );
+      }
+      if (!response.ok)
+        throw new Error(data.error || "Unable to generate an article");
+      setMessage(
+        "Private draft created. Review and approve it, then explicitly publish when ready.",
+      );
+    });
+    setGenerating(false);
+  }
+
+  async function performAction(action: () => Promise<void>) {
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      await action();
+    } catch (cause) {
+      setMessage("");
+      setError(cause instanceof Error ? cause.message : "The action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const selectedArticle = articles.find((article) => article.id === selectedId);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-orange-100 to-red-50">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-12">
+    <main className="min-h-screen bg-slate-50 px-4 py-10 [overflow-wrap:anywhere]">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-[#800020] mb-2">
-              Blog Management
+            <h1 className="mt-2 text-3xl font-bold text-slate-900">
+              AI Blog Studio
             </h1>
-            <p className="text-xl text-slate-600">
-              Create and manage blog posts for SEO and customer engagement
+            <p className="mt-2 max-w-3xl text-slate-600">
+              Review and approve articles before publication. Automatic
+              publishing never enables AI generation.
             </p>
           </div>
-          <div className="flex gap-3">
-            <Link href="/admin/blog/seo" className="bg-white hover:bg-orange-50 text-[#800020] border border-[#800020] px-5 py-3 rounded-lg font-semibold transition-colors">
-              Review SEO drafts
-            </Link>
-            <button className="bg-[#800020] hover:bg-[#600018] text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center">
-              <PlusIcon className="h-5 w-5 mr-2" />
-              New Post
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={generateArticle}
+              disabled={busy || !studio?.capabilities.canGenerate}
+              className="min-h-12 rounded-lg bg-[#800020] px-4 py-3 font-medium text-white disabled:opacity-50"
+            >
+              {generating
+                ? "Generating private draft..."
+                : "Generate private draft"}
+            </button>
+            <button
+              onClick={() => performAction(refresh)}
+              disabled={busy}
+              className="min-h-12 rounded-lg border border-slate-300 bg-white px-4 py-3 font-medium disabled:opacity-50"
+            >
+              Refresh
             </button>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-50/80 to-blue-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-rose-700 text-sm font-medium">Total Posts</h3>
-            <p className="text-3xl font-bold text-rose-950">{posts.length}</p>
-          </div>
-          <div className="bg-gradient-to-br from-green-50/80 to-green-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-green-600 text-sm font-medium">Published</h3>
-            <p className="text-3xl font-bold text-green-900">
-              {posts.filter(p => p.status === "published").length}
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-yellow-50/80 to-yellow-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-yellow-600 text-sm font-medium">Drafts</h3>
-            <p className="text-3xl font-bold text-yellow-900">
-              {posts.filter(p => p.status === "draft").length}
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-rose-50/80 to-rose-100/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-            <h3 className="text-rose-700 text-sm font-medium">Total Views</h3>
-            <p className="text-3xl font-bold text-rose-950">
-              {posts.reduce((sum, p) => sum + p.views, 0).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex space-x-4 mb-8">
-          {["all", "published", "draft"].map((filterType) => (
-            <button
-              key={filterType}
-              onClick={() => setFilter(filterType as any)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === filterType
-                  ? "bg-orange-600 text-white"
-                  : "bg-white/80 text-slate-700 hover:bg-orange-100"
-              }`}
+        <nav
+          aria-label="Admin navigation"
+          className="mb-6 flex flex-wrap gap-2"
+        >
+          {(
+            [
+              ["/admin", "Dashboard"],
+              ["/admin/insights", "Analytics"],
+              ["/admin/leads", "Leads"],
+              ["/admin/contractors", "Contractors"],
+            ] as const
+          ).map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex min-h-12 items-center rounded-lg border border-rose-200 bg-white px-4 font-medium text-[#800020] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#800020]"
             >
-              {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-              {filterType !== "all" && (
-                <span className="ml-2 px-2 py-1 bg-white/20 rounded-full text-xs">
-                  {posts.filter(p => p.status === filterType).length}
-                </span>
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        {error && (
+          <p role="alert" className="mb-4 rounded bg-red-50 p-3 text-red-800">
+            {error}
+          </p>
+        )}
+        {message && (
+          <p
+            role="status"
+            className="mb-4 rounded bg-green-50 p-3 text-green-800"
+          >
+            {message}
+          </p>
+        )}
+
+        {studio && (
+          <>
+            <section
+              aria-label="Article totals"
+              className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4"
+            >
+              {(["total", ...SEO_ARTICLE_STATUSES] as const).map((status) => (
+                <div
+                  key={status}
+                  className="rounded-lg border border-slate-200 bg-white p-4"
+                >
+                  <p className="text-sm text-slate-600">
+                    {statusLabel(status)}
+                  </p>
+                  <p className="text-2xl font-bold text-[#800020]">
+                    {studio.summary[status] || 0}
+                  </p>
+                </div>
+              ))}
+            </section>
+            <section
+              className="mb-6 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700"
+              aria-label="Studio configuration"
+            >
+              <p>
+                Automatic AI drafting:{" "}
+                {studio.capabilities.scheduledDraftingEnabled
+                  ? "enabled"
+                  : "disabled"}
+                . Publishing never enables AI drafting.
+              </p>
+              <p>
+                Manual generation:{" "}
+                {studio.capabilities.canGenerate
+                  ? "enabled with the existing AI budget and daily slot limit"
+                  : "disabled pending explicit AI spending authorization and environment configuration"}
+                .
+              </p>
+              {!studio.capabilities.canEdit && (
+                <p className="mt-2 font-medium text-rose-900">
+                  Read-only preview. Enable SEO_PREVIEW_WRITES_ENABLED only
+                  after configuring an authorized isolated database. No
+                  production database writes are enabled here.
+                </p>
               )}
+              <p className="mt-2">
+                These totals cover database-backed SEO articles, not legacy
+                static blog posts. View analytics are not connected.
+              </p>
+            </section>
+            {publishing && (
+              <section
+                aria-label="Publishing controls"
+                className="mb-6 rounded-xl border border-rose-200 bg-white p-5"
+              >
+                <h2 className="text-xl font-bold text-[#800020]">
+                  Publishing controls
+                </h2>
+                <p className="mt-2">
+                  Automatic publishing:{" "}
+                  <strong>{publishing.autoPublish ? "ON" : "OFF"}</strong> · All
+                  publishing:{" "}
+                  <strong>{publishing.paused ? "PAUSED" : "active"}</strong> ·
+                  Limit: {publishing.weeklyLimit} articles per rolling 7 days,
+                  including manual posts.
+                </p>
+                <p className="mt-2 text-sm text-slate-700">
+                  Only human-approved articles can be scheduled automatically
+                  because factual claims cannot be verified automatically.
+                  Scheduled publishing runs daily at 14:00 UTC, so posts may
+                  appear after their selected time. Preview never publishes
+                  publicly.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    disabled={busy || !studio.capabilities.canEdit}
+                    onClick={() =>
+                      updatePublishing("paused", !publishing.paused)
+                    }
+                    className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 font-semibold text-white disabled:opacity-50"
+                  >
+                    {publishing.paused
+                      ? "Resume publishing"
+                      : "Pause all publishing"}
+                  </button>
+                  <button
+                    disabled={busy || !studio.capabilities.canEdit}
+                    onClick={() =>
+                      updatePublishing("autoPublish", !publishing.autoPublish)
+                    }
+                    className="min-h-12 rounded-lg border border-[#800020] px-5 py-3 font-semibold text-[#800020] disabled:opacity-50"
+                  >
+                    Turn automatic publishing{" "}
+                    {publishing.autoPublish ? "off" : "on"}
+                  </button>
+                </div>
+                <h3 className="mt-5 font-semibold">Next scheduled articles</h3>
+                {publishing.scheduled.length ? (
+                  <ul className="mt-2 space-y-2">
+                    {publishing.scheduled.map((item) => (
+                      <li key={item.id}>
+                        {item.title} — {formatDate(item.scheduledFor)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-slate-600">No scheduled articles.</p>
+                )}
+                <details className="mt-4">
+                  <summary className="min-h-12 cursor-pointer py-3 font-semibold text-[#800020]">
+                    Recent publishing activity
+                  </summary>
+                  {publishing.events.length ? (
+                    <ul className="space-y-2">
+                      {publishing.events.map((event) => (
+                        <li key={event.id}>
+                          {formatDate(event.createdAt)} ·{" "}
+                          {event.action.replace(/_/g, " ")} ·{" "}
+                          {event.actorId || "system"}
+                          {event.articleId
+                            ? ` · Article ${event.articleId}`
+                            : ""}
+                          {event.detail ? ` · ${event.detail}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No publishing activity yet.</p>
+                  )}
+                  {publishing.eventPage < publishing.eventPageCount && (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={loadMoreHistory}
+                      className="mt-3 min-h-12 rounded-lg border px-4 py-3"
+                    >
+                      Load older activity
+                    </button>
+                  )}
+                </details>
+              </section>
+            )}
+          </>
+        )}
+
+        <nav
+          className="mb-5 flex flex-wrap gap-2"
+          aria-label="Filter articles by status"
+        >
+          {(["all", ...SEO_ARTICLE_STATUSES] as const).map((status) => (
+            <button
+              key={status}
+              disabled={busy}
+              aria-pressed={filter === status}
+              onClick={() => {
+                if (discardEditor()) {
+                  setFilter(status);
+                  setPage(1);
+                }
+              }}
+              className={`min-h-12 rounded-lg border px-4 py-3 text-sm font-medium ${filter === status ? "border-[#800020] bg-[#800020] text-white" : "border-slate-300 bg-white text-slate-700"}`}
+            >
+              {statusLabel(status)}
             </button>
           ))}
-        </div>
+        </nav>
 
-        {/* Posts Table */}
-        <div className="bg-gradient-to-br from-white/90 to-orange-50/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-100/80">
-                <tr>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Title</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Author</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Status</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Category</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Views</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Date</th>
-                  <th className="px-6 py-4 text-left font-semibold text-slate-800">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {filteredPosts.map((post) => (
-                  <tr key={post.id} className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 mb-1">
-                          {post.title}
-                        </h3>
-                        <p className="text-sm text-slate-600 line-clamp-2">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center mt-2 space-x-2">
-                          {post.tags.slice(0, 2).map(tag => (
-                            <span 
-                              key={tag}
-                              className="inline-flex items-center px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full"
-                            >
-                              <TagIcon className="h-3 w-3 mr-1" />
-                              {tag}
-                            </span>
-                          ))}
-                          {post.tags.length > 2 && (
-                            <span className="text-xs text-slate-500">
-                              +{post.tags.length - 2} more
-                            </span>
+        <div className="grid gap-6">
+          <section
+            aria-label="SEO article drafts"
+            className={edit ? "hidden" : "space-y-3"}
+          >
+            {loading ? (
+              <p className="rounded-lg bg-white p-5 text-slate-600">
+                Loading review queue…
+              </p>
+            ) : !studio ? (
+              <p className="rounded-lg bg-white p-5 text-slate-600">
+                Articles could not be loaded. Use Refresh to retry; no sample
+                data is shown.
+              </p>
+            ) : articles.length === 0 ? (
+              <p className="rounded-lg bg-white p-5 text-slate-600">
+                No articles match this view. Generation stays disabled until
+                explicitly authorized.
+              </p>
+            ) : (
+              articles.map((article) => (
+                <article
+                  key={article.id}
+                  className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="font-semibold text-slate-900">
+                        <button
+                          onClick={() => startEditing(article)}
+                          disabled={busy}
+                          className="min-h-12 text-left text-lg text-[#800020] underline"
+                        >
+                          {article.title}
+                        </button>
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {article.category} · {article.slug}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium uppercase text-slate-700">
+                      {statusLabel(article.status)}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-600">
+                    {article.author} · Created: {formatDate(article.createdAt)}
+                    {article.status === "scheduled" && article.scheduledFor
+                      ? ` · Scheduled: ${formatDate(article.scheduledFor)}`
+                      : ""}
+                    {article.status === "published"
+                      ? ` · Published: ${formatDate(article.publishedAt)}`
+                      : ""}
+                  </p>
+                  {article.generationError && (
+                    <p className="mt-2 text-sm text-red-700">
+                      Requires attention: {article.generationError}
+                    </p>
+                  )}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {[
+                      "draft",
+                      "approved",
+                      "scheduled",
+                      "failed",
+                      "rejected",
+                      "published",
+                    ].includes(article.status) && (
+                      <button
+                        onClick={() => startEditing(article)}
+                        disabled={busy}
+                        className="min-h-12 rounded-lg border border-slate-300 px-4 py-3 text-sm font-medium disabled:opacity-50"
+                      >
+                        {article.status === "published"
+                          ? "Read article"
+                          : "Review / edit"}
+                      </button>
+                    )}
+                    {article.status === "draft" && (
+                      <button
+                        disabled={busy || !studio?.capabilities.canEdit}
+                        onClick={() => setArticleStatus(article.id, "approve")}
+                        className="min-h-12 rounded-lg bg-emerald-700 px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                    )}
+                    {article.status === "approved" && (
+                      <button
+                        disabled={
+                          busy ||
+                          !studio?.capabilities.canPublish ||
+                          publishing?.paused
+                        }
+                        onClick={() => setArticleStatus(article.id, "publish")}
+                        className="min-h-12 rounded-lg bg-rose-800 px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
+                      >
+                        Publish now
+                      </button>
+                    )}
+                    {["draft", "approved", "failed"].includes(
+                      article.status,
+                    ) && (
+                      <button
+                        disabled={busy || !studio?.capabilities.canEdit}
+                        onClick={() => setArticleStatus(article.id, "reject")}
+                        className="min-h-12 rounded-lg border border-red-300 px-4 py-3 text-sm font-medium text-red-700 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                    )}
+                    {article.status === "published" && (
+                      <Link
+                        href={`/blog/${article.slug}`}
+                        target="_blank"
+                        className="inline-flex min-h-12 items-center rounded-lg border border-slate-300 px-4 py-3 text-sm"
+                      >
+                        View published article
+                      </Link>
+                    )}
+                    {article.status === "published" &&
+                      article.pendingUpdate && (
+                        <span className="inline-flex min-h-12 items-center rounded-lg bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">
+                          Update awaiting approval
+                        </span>
+                      )}
+                  </div>
+                </article>
+              ))
+            )}
+            {studio && (
+              <nav
+                aria-label="Article pages"
+                className="flex items-center justify-between gap-2 py-3 text-sm"
+              >
+                <button
+                  disabled={busy || page <= 1}
+                  className="min-h-12 rounded-lg border px-4 py-3 disabled:opacity-50"
+                  onClick={() => {
+                    if (discardEditor()) setPage((current) => current - 1);
+                  }}
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {page} of {studio.pagination.pageCount} ·{" "}
+                  {studio.pagination.total} articles
+                </span>
+                <button
+                  disabled={busy || page >= studio.pagination.pageCount}
+                  className="min-h-12 rounded-lg border px-4 py-3 disabled:opacity-50"
+                  onClick={() => {
+                    if (discardEditor()) setPage((current) => current + 1);
+                  }}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
+          </section>
+
+          <section
+            aria-label="Edit SEO article"
+            ref={editorRef}
+            tabIndex={-1}
+            className={
+              edit
+                ? "min-h-screen rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                : "hidden"
+            }
+          >
+            {!edit ? (
+              <p className="text-slate-600">
+                Select an article to review or edit.
+              </p>
+            ) : !editing ? (
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  {edit.title}
+                </h2>
+                <p className="mt-3 text-lg text-slate-600">{edit.excerpt}</p>
+                <div className="mt-6 whitespace-pre-wrap text-base leading-7 text-slate-800">
+                  {edit.content}
+                </div>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(true)}
+                    disabled={
+                      busy ||
+                      !studio?.capabilities.canEdit ||
+                      ![
+                        "draft",
+                        "approved",
+                        "rejected",
+                        "failed",
+                        "published",
+                      ].includes(selectedArticle?.status || "")
+                    }
+                    className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 font-medium text-white disabled:opacity-50"
+                  >
+                    Edit article
+                  </button>
+                  {selectedArticle?.status === "draft" && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setArticleStatus(selectedArticle.id, "approve")
+                      }
+                      disabled={busy || !studio?.capabilities.canEdit}
+                      className="min-h-12 rounded-lg bg-emerald-700 px-5 py-3 font-medium text-white disabled:opacity-50"
+                    >
+                      Approve draft
+                    </button>
+                  )}
+                  {selectedArticle?.status === "approved" && (
+                    <>
+                      <label className="block text-sm font-medium">
+                        Schedule date and time
+                        <input
+                          type="datetime-local"
+                          value={scheduleDate}
+                          onChange={(event) =>
+                            setScheduleDate(event.target.value)
+                          }
+                          className="ml-2 min-h-12 rounded border p-3"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        disabled={
+                          busy || !scheduleDate || !studio?.capabilities.canEdit
+                        }
+                        onClick={() =>
+                          setArticleStatus(selectedArticle.id, "schedule")
+                        }
+                        className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 text-white disabled:opacity-50"
+                      >
+                        Schedule
+                      </button>
+                      <button
+                        type="button"
+                        disabled={
+                          busy ||
+                          !studio?.capabilities.canPublish ||
+                          publishing?.paused
+                        }
+                        onClick={() =>
+                          setArticleStatus(selectedArticle.id, "publish")
+                        }
+                        className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 text-white disabled:opacity-50"
+                      >
+                        Publish now
+                      </button>
+                    </>
+                  )}
+                  {selectedArticle?.status === "scheduled" && (
+                    <button
+                      type="button"
+                      disabled={busy || !studio?.capabilities.canEdit}
+                      onClick={() =>
+                        setArticleStatus(selectedArticle.id, "cancel")
+                      }
+                      className="min-h-12 rounded-lg border px-5 py-3"
+                    >
+                      Cancel schedule
+                    </button>
+                  )}
+                  {selectedArticle?.status === "published" &&
+                    selectedArticle.pendingUpdate && (
+                      <>
+                        <button
+                          type="button"
+                          disabled={busy || !studio?.capabilities.canEdit}
+                          onClick={() =>
+                            setArticleStatus(
+                              selectedArticle.id,
+                              "approve_update",
+                            )
+                          }
+                          className="min-h-12 rounded-lg bg-emerald-700 px-5 py-3 font-medium text-white disabled:opacity-50"
+                        >
+                          Approve content update
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy || !studio?.capabilities.canEdit}
+                          onClick={() =>
+                            setArticleStatus(
+                              selectedArticle.id,
+                              "reject_update",
+                            )
+                          }
+                          className="min-h-12 rounded-lg border border-red-300 px-5 py-3 text-red-700 disabled:opacity-50"
+                        >
+                          Reject content update
+                        </button>
+                      </>
+                    )}
+                  {selectedArticle &&
+                    ["draft", "approved", "failed"].includes(
+                      selectedArticle.status,
+                    ) && (
+                      <button
+                        type="button"
+                        disabled={busy || !studio?.capabilities.canEdit}
+                        onClick={() =>
+                          setArticleStatus(selectedArticle.id, "reject")
+                        }
+                        className="min-h-12 rounded-lg border border-red-300 px-5 py-3 text-red-700"
+                      >
+                        Reject
+                      </button>
+                    )}
+                  <button
+                    type="button"
+                    onClick={discardEditor}
+                    className="min-h-12 rounded-lg border px-5 py-3"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Edit{" "}
+                  {selectedArticle?.status === "published"
+                    ? "article"
+                    : "draft"}
+                </h2>
+                <label className="block text-sm font-medium text-slate-700">
+                  Title
+                  <input
+                    value={edit.title}
+                    onChange={(event) =>
+                      updateEdit("title", event.target.value)
+                    }
+                    className="mt-1 min-h-12 w-full rounded border p-3"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-slate-700">
+                  Excerpt
+                  <textarea
+                    value={edit.excerpt}
+                    onChange={(event) =>
+                      updateEdit("excerpt", event.target.value)
+                    }
+                    rows={3}
+                    className="mt-1 min-h-12 w-full rounded border p-3"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-slate-700">
+                  Article content (Markdown)
+                  <textarea
+                    value={edit.content}
+                    onChange={(event) =>
+                      updateEdit("content", event.target.value)
+                    }
+                    rows={18}
+                    className="mt-1 min-h-12 w-full rounded border p-3 font-mono text-base"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-slate-700">
+                  SEO title
+                  <input
+                    value={edit.seoTitle}
+                    onChange={(event) =>
+                      updateEdit("seoTitle", event.target.value)
+                    }
+                    className="mt-1 min-h-12 w-full rounded border p-3"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-slate-700">
+                  Meta description
+                  <textarea
+                    value={edit.seoDescription}
+                    onChange={(event) =>
+                      updateEdit("seoDescription", event.target.value)
+                    }
+                    rows={2}
+                    className="mt-1 min-h-12 w-full rounded border p-3"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-slate-700">
+                  Tags (comma-separated)
+                  <input
+                    value={edit.tags.join(", ")}
+                    onChange={(event) =>
+                      updateEdit(
+                        "tags",
+                        event.target.value
+                          .split(",")
+                          .map((tag) => tag.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                    className="mt-1 min-h-12 w-full rounded border p-3"
+                  />
+                </label>
+                <fieldset>
+                  <legend className="text-sm font-medium text-slate-700">
+                    Approved affiliate products
+                  </legend>
+                  {APPROVED_AFFILIATE_PRODUCTS.length === 0 ? (
+                    <p className="mt-1 text-sm text-slate-500">
+                      No approved products are configured.
+                    </p>
+                  ) : (
+                    APPROVED_AFFILIATE_PRODUCTS.map((product) => (
+                      <label
+                        key={product.id}
+                        className="mt-2 flex min-h-12 items-center gap-3 text-base"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={edit.affiliateProductIds.includes(
+                            product.id,
                           )}
-                        </div>
+                          onChange={(event) =>
+                            updateEdit(
+                              "affiliateProductIds",
+                              event.target.checked
+                                ? [...edit.affiliateProductIds, product.id]
+                                : edit.affiliateProductIds.filter(
+                                    (id) => id !== product.id,
+                                  ),
+                            )
+                          }
+                        />
+                        {product.name}
+                      </label>
+                    ))
+                  )}
+                </fieldset>
+                <div className="flex gap-2">
+                  <button
+                    disabled={busy || !studio?.capabilities.canEdit}
+                    onClick={saveArticle}
+                    className="min-h-12 rounded-lg bg-[#800020] px-5 py-3 text-white disabled:opacity-50"
+                  >
+                    {selectedArticle?.status === "published"
+                      ? "Submit update for approval"
+                      : "Save changes"}
+                  </button>
+                  <button
+                    onClick={discardEditor}
+                    className="min-h-12 rounded-lg border px-5 py-3"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+        {studio && (
+          <section
+            aria-label="SEO Opportunities"
+            className="mt-8 rounded-xl border border-rose-200 bg-white p-5 text-slate-700"
+          >
+            <h2 className="text-xl font-bold text-[#800020]">
+              SEO Opportunities
+            </h2>
+            <p className="mt-2">
+              Planning guidance: spend about 70% of content effort improving
+              pages that already show Google demand and about 30% exploring new
+              supporting content. This is a planning split, not a publishing
+              quota.
+            </p>
+            <p className="mt-2 text-sm">
+              Every metric below comes from the connected Search Console
+              property. Published-page updates remain separate from new-article
+              publishing and require explicit approval.
+            </p>
+            {!studio.searchConsole.metricsConnected ? (
+              <p className="mt-4 rounded-lg bg-amber-50 p-4 text-amber-900">
+                Live Search Console metrics are unavailable, so no SEO
+                opportunities are inferred.
+              </p>
+            ) : studio.seoOpportunities.length === 0 ? (
+              <p className="mt-4 rounded-lg bg-slate-50 p-4">
+                No published pages currently meet the real-data opportunity
+                criteria.
+              </p>
+            ) : (
+              <div className="mt-4 space-y-4">
+                {studio.seoOpportunities.map((opportunity) => (
+                  <article
+                    key={opportunity.path}
+                    className="rounded-lg border border-slate-200 p-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-900">
+                          {opportunity.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {opportunity.path}
+                        </p>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-slate-700">
-                      {post.author}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(post.status)}`}>
-                        {post.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-slate-700">
-                      {post.category}
-                    </td>
-                    <td className="px-6 py-4 text-slate-700">
-                      {post.views.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-slate-700">
-                      <div className="flex items-center">
-                        <CalendarDaysIcon className="h-4 w-4 mr-2" />
-                        {formatDate(post.publishedAt)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2">
-                        <Link 
-                          href={`/blog/${post.slug}`}
-                          target="_blank"
-                          className="p-2 text-rose-700 hover:text-rose-900 hover:bg-rose-100 rounded-lg transition-colors"
-                          title="View Post"
-                        >
-                          <EyeIcon className="h-4 w-4" />
-                        </Link>
-                        <button 
-                          className="p-2 text-orange-600 hover:text-orange-700 hover:bg-orange-100 rounded-lg transition-colors"
-                          title="Edit Post"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button 
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
-                          title="Delete Post"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                      <a
+                        href={opportunity.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-12 items-center rounded-lg border px-4 py-3 text-sm text-[#800020]"
+                      >
+                        Open page
+                      </a>
+                    </div>
+                    <p className="mt-3 font-medium">
+                      {opportunity.clicks} clicks · {opportunity.impressions}{" "}
+                      impressions · {(opportunity.ctr * 100).toFixed(1)}% CTR ·
+                      position {opportunity.position.toFixed(1)}
+                    </p>
+                    {opportunity.previousClicks !== null &&
+                      opportunity.previousImpressions !== null && (
+                        <p className="mt-1 text-sm text-slate-600">
+                          Previous 30 days: {opportunity.previousClicks} clicks
+                          · {opportunity.previousImpressions} impressions
+                        </p>
+                      )}
+                    <ul className="mt-3 list-disc pl-5 text-sm">
+                      {opportunity.reasons.map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-3">{opportunity.recommendation}</p>
+                    {opportunity.supportingQueries.length > 0 && (
+                      <p className="mt-3 text-sm">
+                        Supporting-article queries with measured impressions,
+                        after competing-intent filtering:{" "}
+                        {opportunity.supportingQueries.join("; ")}.
+                      </p>
+                    )}
+                    {opportunity.articleId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const article = articles.find(
+                            (item) => item.id === opportunity.articleId,
+                          );
+                          if (article) startEditing(article);
+                          else {
+                            setFilter("published");
+                            setPage(1);
+                            setMessage(
+                              "Open the published article from its queue page to propose an update.",
+                            );
+                          }
+                        }}
+                        className="mt-3 min-h-12 rounded-lg bg-[#800020] px-4 py-3 font-medium text-white"
+                      >
+                        Propose approved update
+                      </button>
+                    )}
+                  </article>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* SEO Tips */}
-        <div className="mt-12 bg-gradient-to-br from-blue-50/80 to-orange-50/80 backdrop-blur-sm rounded-xl p-8 shadow-lg">
-          <h3 className="text-2xl font-semibold text-slate-900 mb-6">SEO Best Practices for Your Blog</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold text-slate-800 mb-3">Content Optimization</h4>
-              <ul className="space-y-2 text-slate-600">
-                <li>• Target long-tail keywords (e.g., "kitchen renovation costs 2025")</li>
-                <li>• Write compelling meta descriptions (150-160 characters)</li>
-                <li>• Use H1, H2, H3 tags for structure</li>
-                <li>• Include internal links to service pages</li>
-                <li>• Add alt text to all images</li>
-              </ul>
+              </div>
+            )}
+          </section>
+        )}
+        {studio && (
+          <section
+            aria-label="Google Search Console setup"
+            className="mt-8 rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-700"
+          >
+            <h2 className="text-lg font-semibold text-slate-900">
+              Google Search Console
+            </h2>
+            <p className="mt-2">
+              Search metrics are shown in Analytics &amp; Insights after the
+              read-only Google connection is authorized. No impressions, clicks,
+              rankings or keyword data are fabricated.
+            </p>
+            <p>Site: {studio.searchConsole.propertyUrl}</p>
+            <p>
+              Verification token:{" "}
+              {studio.searchConsole.verificationTokenConfigured
+                ? "configured; verify ownership in Search Console"
+                : "not configured. Supply GOOGLE_SITE_VERIFICATION for an HTML-tag property, or use DNS verification"}
+              .
+            </p>
+            <p className="mt-2">
+              The existing sitemap includes eligible published content only.
+              Submit it after verifying the property.
+            </p>
+            <p className="mt-2">
+              Read-only API credentials:{" "}
+              {studio.searchConsole.credentialsConfigured
+                ? "configured"
+                : "not configured"}
+              . Search Console property:{" "}
+              {studio.searchConsole.propertyConfigured
+                ? "configured"
+                : "not configured"}
+              .
+            </p>
+            {studio.searchConsole.metricsConnected ? (
+              <div className="mt-4 rounded border border-slate-200 p-4">
+                <p className="font-semibold">
+                  Verified 30-day Search Console signals
+                </p>
+                <p className="mt-1">
+                  {studio.searchConsole.metrics.clicks.toLocaleString()} clicks
+                  · {studio.searchConsole.metrics.impressions.toLocaleString()}{" "}
+                  impressions ·{" "}
+                  {Math.round(studio.searchConsole.metrics.ctr * 1000) / 10}%
+                  CTR · average position{" "}
+                  {studio.searchConsole.metrics.position.toFixed(1)}
+                </p>
+                {studio.searchConsole.metrics.queries.length > 0 ? (
+                  <ul className="mt-3 list-disc pl-5">
+                    {studio.searchConsole.metrics.queries
+                      .slice(0, 10)
+                      .map((row) => (
+                        <li key={row.query}>
+                          {row.query}: {row.clicks} clicks, {row.impressions}{" "}
+                          impressions, {Math.round(row.ctr * 1000) / 10}% CTR,{" "}
+                          position {row.position.toFixed(1)}
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2">
+                    No query rows were returned for this period.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="mt-4 text-amber-800">
+                Live Search Console metrics are not connected
+                {studio.searchConsole.error
+                  ? `: ${studio.searchConsole.error}`
+                  : "."}
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap gap-4">
+              <a
+                className="inline-flex min-h-12 items-center text-rose-800 underline"
+                href={studio.searchConsole.sitemapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open existing sitemap
+              </a>
+              <a
+                className="inline-flex min-h-12 items-center text-rose-800 underline"
+                href="https://search.google.com/search-console"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open Search Console
+              </a>
             </div>
-            <div>
-              <h4 className="font-semibold text-slate-800 mb-3">Technical SEO</h4>
-              <ul className="space-y-2 text-slate-600">
-                <li>• Ensure fast loading times (&lt;3 seconds)</li>
-                <li>• Optimize for mobile responsiveness</li>
-                <li>• Add structured data (JSON-LD)</li>
-                <li>• Create XML sitemap</li>
-                <li>• Enable social media sharing</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+            <p className="mt-3">
+              Grant the configured service account read access to the Search
+              Console property; credentials are never returned to this page.
+            </p>
+          </section>
+        )}
       </div>
-    </div>
+    </main>
   );
+
+  function updateEdit<Key extends keyof EditableArticle>(
+    key: Key,
+    value: EditableArticle[Key],
+  ) {
+    setDirty(true);
+    setEdit((current) => (current ? { ...current, [key]: value } : current));
+  }
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "Not scheduled";
+  return new Date(value).toLocaleString("en-CA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function statusLabel(status: "total" | "all" | SeoArticleStatus) {
+  const labels: Record<typeof status, string> = {
+    total: "Total",
+    all: "All",
+    draft: "Needs Review",
+    approved: "Approved",
+    scheduled: "Scheduled",
+    published: "Published",
+    generating: "Generating",
+    failed: "Failed",
+    rejected: "Rejected",
+  };
+  return labels[status];
 }

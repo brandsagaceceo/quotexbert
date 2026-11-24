@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { resolveSeoAdmin } from "@/lib/seo/admin-auth";
-import { parseSeoArticleEdits } from "@/lib/seo/article-validation";
+import {
+  resolveSeoAdmin,
+  areSeoAdminWritesEnabled,
+} from "@/lib/seo/admin-auth";
+import {
+  hasTestArticleLabel,
+  parseSeoArticleEdits,
+} from "@/lib/seo/article-validation";
 import { APPROVED_SEO_TOPICS } from "@/lib/seo/topics";
 
 export const dynamic = "force-dynamic";
@@ -15,16 +21,38 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!areSeoAdminWritesEnabled())
+      return NextResponse.json(
+        {
+          error:
+            "Preview writes are disabled until an isolated database is authorized",
+        },
+        { status: 403 },
+      );
 
     const article = await prisma.seoArticle.findUnique({
       where: { id: params.id },
-      select: { id: true, topicId: true, status: true },
+      select: {
+        id: true,
+        topicId: true,
+        status: true,
+        updatedAt: true,
+        title: true,
+        slug: true,
+      },
     });
     if (!article)
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    if (article.status === "published") {
+    if (
+      !["draft", "approved", "rejected", "failed", "published"].includes(
+        article.status,
+      )
+    ) {
       return NextResponse.json(
-        { error: "Published articles cannot be edited here" },
+        {
+          error:
+            "Only reviewable drafts or published update proposals can be edited here",
+        },
         { status: 409 },
       );
     }
@@ -52,23 +80,115 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
+    if (body && typeof body === "object" && "ifUpdatedAt" in body) {
+      if (
+        typeof body.ifUpdatedAt !== "string" ||
+        !Number.isFinite(Date.parse(body.ifUpdatedAt))
+      ) {
+        return NextResponse.json(
+          { error: "Invalid article version" },
+          { status: 400 },
+        );
+      }
+      if (
+        new Date(body.ifUpdatedAt).getTime() !== article.updatedAt.getTime()
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Article changed since you opened it. Refresh and review it again.",
+          },
+          { status: 409 },
+        );
+      }
+    }
+
     const edits = parseSeoArticleEdits(body, topic);
     if (!edits)
       return NextResponse.json(
         { error: "Article fields are invalid" },
         { status: 400 },
       );
+    if (
+      hasTestArticleLabel(article.title, article.slug) &&
+      !hasTestArticleLabel(edits.title, article.slug)
+    ) {
+      return NextResponse.json(
+        { error: "Test-labelled articles must retain their TEST label" },
+        { status: 409 },
+      );
+    }
 
-    const updated = await prisma.seoArticle.update({
-      where: { id: article.id },
-      data: {
-        ...edits,
-        tags: JSON.stringify(edits.tags),
-        affiliateProductIds: JSON.stringify(edits.affiliateProductIds),
-      },
-      select: { id: true, updatedAt: true },
+    if (article.status === "published") {
+      const proposal = await prisma.$transaction(async (tx) => {
+        await tx.seoContentUpdateProposal.updateMany({
+          where: { articleId: article.id, status: "pending" },
+          data: {
+            status: "superseded",
+            reviewedBy: admin.id,
+            reviewedAt: new Date(),
+          },
+        });
+        const created = await tx.seoContentUpdateProposal.create({
+          data: {
+            articleId: article.id,
+            baseUpdatedAt: article.updatedAt,
+            proposedData: {
+              ...edits,
+              tags: edits.tags,
+              affiliateProductIds: edits.affiliateProductIds,
+            },
+            proposedBy: admin.id,
+          },
+        });
+        await tx.seoPublishingEvent.create({
+          data: {
+            actorId: admin.id,
+            articleId: article.id,
+            action: "content_update_proposed",
+            detail: created.id,
+          },
+        });
+        return created;
+      });
+      return NextResponse.json({
+        success: true,
+        pendingApproval: true,
+        proposal: { id: proposal.id, status: proposal.status },
+      });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const result = await tx.seoArticle.updateMany({
+        where: {
+          id: article.id,
+          status: article.status,
+          updatedAt: article.updatedAt,
+        },
+        data: {
+          ...edits,
+          tags: JSON.stringify(edits.tags),
+          affiliateProductIds: JSON.stringify(edits.affiliateProductIds),
+          status: "draft",
+          approvedAt: null,
+          scheduledFor: null,
+          scheduleSource: null,
+          generationError: null,
+        },
+      });
+      if (result.count === 1) {
+        await tx.seoPublishingEvent.create({
+          data: { actorId: admin.id, articleId: article.id, action: "edited" },
+        });
+      }
+      return result;
     });
-    return NextResponse.json({ success: true, article: updated });
+    if (updated.count !== 1)
+      return NextResponse.json(
+        { error: "Article changed while saving. Refresh and review it again." },
+        { status: 409 },
+      );
+    return NextResponse.json({ success: true, article: { id: article.id } });
   } catch (error) {
     console.error("[SEO_ADMIN] Failed to update article", safeErrorType(error));
     return NextResponse.json(

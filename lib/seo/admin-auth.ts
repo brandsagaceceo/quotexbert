@@ -24,3 +24,20 @@ export async function resolveSeoAdmin() {
 
   return { id: user.id };
 }
+
+export function areSeoAdminWritesEnabled() {
+  return (
+    process.env.VERCEL_ENV === "production" ||
+    process.env.SEO_PREVIEW_WRITES_ENABLED === "true"
+  );
+}
+
+export function getSeoStudioCapabilities() {
+  const canEdit = areSeoAdminWritesEnabled();
+  return {
+    canEdit,
+    canPublish: process.env.VERCEL_ENV === "production",
+    canGenerate: canEdit && process.env.SEO_MANUAL_DRAFT_ENABLED === "true",
+    scheduledDraftingEnabled: false,
+  };
+}

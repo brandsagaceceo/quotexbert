@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { parseSubscriptionMetadataCategories } from "@/lib/subscription-categories";
+import type Stripe from "stripe";
+import { activateCheckoutSubscription, getSubscriptionBillingPeriod } from "@/lib/subscription-activation";
+import { TIER_PRICING } from "@/lib/subscription-plans";
 import {
   sendSubscriptionCreatedEmail,
   sendSubscriptionCancelledEmail,
@@ -13,15 +15,14 @@ import {
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
+  let event: Stripe.Event | undefined;
   try {
     const body = await request.text();
     const headersList = await headers();
     const signature = headersList.get("stripe-signature")!;
 
-    let event: any; // Using any to access Stripe event properties
-
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret) as any;
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error("Webhook signature verification failed:", err);
       return NextResponse.json(
@@ -92,15 +93,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Webhook processing error:", error);
     
-    // Log error if we have an event ID
-    // Note: Using type assertion because Stripe Event type doesn't expose id property in some versions
-    const eventWithId = event as any;
-    if (eventWithId?.id) {
+    if (event?.id) {
       try {
         await prisma.$executeRaw`
           UPDATE stripe_webhook_logs
           SET error = ${(error as Error).message || 'Unknown error'}
-          WHERE "eventId" = ${eventWithId.id}
+          WHERE "eventId" = ${event.id}
         `;
       } catch (logError) {
         console.error('Failed to log webhook error:', logError);
@@ -115,133 +113,17 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle checkout session completed (new tier-based subscriptions)
-async function handleCheckoutSessionCompleted(session: any) {
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
   try {
+    if (session.mode !== "subscription") return;
     console.log("[STRIPE WEBHOOK] Checkout session completed:", session.id);
-    
-    const contractorId = session.metadata?.contractorId;
-    const tier = session.metadata?.tier;
-    const categoryCount = parseInt(session.metadata?.categoryCount || "0");
-    
-    if (!contractorId || !tier) {
-      console.error("[STRIPE WEBHOOK] Missing contractor ID or tier in checkout session metadata");
-      return;
-    }
+    const result = await activateCheckoutSubscription(session);
+    const { contractorId } = result;
+    const tierName = result.tier ? TIER_PRICING[result.tier].name : "Category";
+    const normalizedTier = result.tier?.toUpperCase() ?? "LEGACY";
 
-    // Map tier to pricing (lowercase from Stripe metadata)
-    const tierPricing: Record<string, { name: string; price: number; normalizedTier: string }> = {
-      handyman: { name: 'Handyman', price: 49, normalizedTier: 'HANDYMAN' },
-      renovation: { name: 'Renovation Xbert', price: 99, normalizedTier: 'RENOVATION' },
-      general: { name: 'General Contractor', price: 149, normalizedTier: 'GENERAL' }
-    };
-
-    const tierInfo = tierPricing[tier.toLowerCase()];
-    
-    if (!tierInfo) {
-      console.error(`[STRIPE WEBHOOK] Unknown tier: ${tier}`);
-      return;
-    }
-
-    // Get subscription details if available
-    let currentPeriodEnd = null;
-    if (session.subscription) {
-      try {
-        const { stripe } = await import('@/lib/stripe');
-        const subscriptionDetails = await stripe.subscriptions.retrieve(session.subscription as string);
-        if (subscriptionDetails && 'current_period_end' in subscriptionDetails) {
-          currentPeriodEnd = new Date((subscriptionDetails.current_period_end as number) * 1000);
-          console.log(`[STRIPE WEBHOOK] Retrieved subscription period end: ${currentPeriodEnd}`);
-        }
-      } catch (subError) {
-        console.error("[STRIPE WEBHOOK] Failed to retrieve subscription details:", subError);
-      }
-    }
-
-    // Update user record with subscription entitlements
-    await prisma.user.update({
-      where: { id: contractorId },
-      data: {
-        stripeCustomerId: session.customer as string,
-        stripeSubscriptionId: session.subscription as string,
-        subscriptionPlan: tierInfo.normalizedTier, // Store normalized uppercase tier
-        subscriptionStatus: 'active',
-        subscriptionInterval: 'month',
-        subscriptionCurrentPeriodEnd: currentPeriodEnd
-      }
-    });
-
-    console.log(`[STRIPE WEBHOOK] Updated user ${contractorId} with tier ${tierInfo.normalizedTier} (status: active)`);
-
-    // Activate selected categories from metadata
-    const selectedCategoriesRaw = session.metadata?.selectedCategories;
-    const selectedCategories = parseSubscriptionMetadataCategories(selectedCategoriesRaw);
-    if (selectedCategories.length > 0) {
-      try {
-        const now = new Date();
-        const periodEnd = currentPeriodEnd || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-        for (const category of selectedCategories) {
-          await prisma.contractorSubscription.upsert({
-            where: {
-              contractorId_category: { contractorId, category },
-            },
-            create: {
-              contractorId,
-              category,
-              status: "active",
-              monthlyPrice: 0,
-              stripeSubscriptionId: session.subscription as string | null,
-              stripeCustomerId: session.customer as string | null,
-              currentPeriodStart: now,
-              currentPeriodEnd: periodEnd,
-              canClaimLeads: true,
-              canViewLeads: true,
-            },
-            update: {
-              status: "active",
-              stripeSubscriptionId: session.subscription as string | null,
-              stripeCustomerId: session.customer as string | null,
-              currentPeriodStart: now,
-              currentPeriodEnd: periodEnd,
-              canClaimLeads: true,
-              canViewLeads: true,
-            },
-          });
-        }
-
-        // Update user's selectedCategories
-        const existingUser = await prisma.user.findUnique({ where: { id: contractorId }, select: { selectedCategories: true } });
-        const existing: string[] = (() => {
-          try { return JSON.parse(existingUser?.selectedCategories || "[]"); } catch { return []; }
-        })();
-        const merged = Array.from(new Set([...existing, ...selectedCategories]));
-        await prisma.user.update({
-          where: { id: contractorId },
-          data: { selectedCategories: JSON.stringify(merged) },
-        });
-
-        console.log(
-          `[STRIPE WEBHOOK] Activated categories for contractor ${contractorId}: ` +
-          `subscription=${session.subscription || 'none'}, count=${selectedCategories.length}, categories=${selectedCategories.join(',')}`
-        );
-      } catch (catError) {
-        console.error("[STRIPE WEBHOOK] Error activating categories:", catError);
-      }
-    } else if (selectedCategoriesRaw) {
-      console.warn(
-        `[STRIPE WEBHOOK] No valid categories parsed for contractor ${contractorId}: ` +
-        `subscription=${session.subscription || 'none'}`
-      );
-    }
-
-    // Create notification — discloses the founding-offer renewal price when applicable
-    // so there's a clear, permanent in-app record of what was promised (in addition to
-    // the audit fields already stored on the Stripe Checkout Session's metadata).
     const foundingOfferApplied = session.metadata?.foundingOfferApplied === "true";
-    const regularPriceDisplay = (tierInfo.price).toFixed(2);
-    const notificationMessage = foundingOfferApplied
-      ? `Your ${tierInfo.name} subscription is now active! First month billed at $0.99 (Founding Contractor Offer) — renews at $${regularPriceDisplay}/month starting next billing cycle. You can now select up to ${categoryCount} categories to receive leads from.`
-      : `Your ${tierInfo.name} subscription is now active! You can now select up to ${categoryCount} categories to receive leads from.`;
+    const notificationMessage = `Your ${tierName} subscription is confirmed with ${result.categories.length} categories activated. Review billing for charges and renewal terms.${foundingOfferApplied ? " Your founding offer terms are recorded in checkout and billing history." : ""}`;
 
     await prisma.notification.create({
       data: {
@@ -253,7 +135,7 @@ async function handleCheckoutSessionCompleted(session: any) {
       }
     });
 
-    console.log(`[STRIPE WEBHOOK] Successfully activated ${tierInfo.normalizedTier} subscription for contractor ${contractorId}${foundingOfferApplied ? ' (founding offer: first month $0.99)' : ''}`);
+    console.log(`[STRIPE WEBHOOK] Confirmed ${normalizedTier} subscription for contractor ${contractorId}`);
 
     // Send subscription confirmation email
     const contractorEmailUser = await prisma.user.findUnique({
@@ -265,7 +147,7 @@ async function handleCheckoutSessionCompleted(session: any) {
       try { activatedCategories = JSON.parse(contractorEmailUser.selectedCategories || '[]'); } catch {}
       await sendSubscriptionCreatedEmail({
         contractor: { id: contractorEmailUser.id, email: contractorEmailUser.email, name: contractorEmailUser.displayName ?? contractorEmailUser.name },
-        tier: tierInfo.normalizedTier,
+        tier: normalizedTier,
         categories: activatedCategories,
         nextBillingDate: contractorEmailUser.subscriptionCurrentPeriodEnd,
       }).catch(err => console.error('[EMAIL] sendSubscriptionCreatedEmail error:', err));
@@ -273,11 +155,12 @@ async function handleCheckoutSessionCompleted(session: any) {
 
   } catch (error) {
     console.error("[STRIPE WEBHOOK] Error handling checkout session completed:", error);
+    throw error;
   }
 }
 
 // Handle subscription created
-async function handleSubscriptionCreated(subscription: any) {
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   try {
     console.log("Subscription created:", subscription.id);
     
@@ -291,6 +174,7 @@ async function handleSubscriptionCreated(subscription: any) {
     }
 
     // Check if subscription record already exists
+    const { currentPeriodStart, currentPeriodEnd } = getSubscriptionBillingPeriod(subscription);
     const existingSubscription = await prisma.contractorSubscription.findFirst({
       where: { stripeSubscriptionId: subscription.id }
     });
@@ -301,9 +185,9 @@ async function handleSubscriptionCreated(subscription: any) {
         where: { id: existingSubscription.id },
         data: {
           status: subscription.status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          nextBillingDate: new Date(subscription.current_period_end * 1000)
+          currentPeriodStart,
+          currentPeriodEnd,
+          nextBillingDate: currentPeriodEnd
         }
       });
     } else {
@@ -335,10 +219,10 @@ async function handleSubscriptionCreated(subscription: any) {
           status: subscription.status,
           monthlyPrice: categoryInfo.price,
           stripeSubscriptionId: subscription.id,
-          stripeCustomerId: subscription.customer,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          nextBillingDate: new Date(subscription.current_period_end * 1000),
+          stripeCustomerId: typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id,
+          currentPeriodStart,
+          currentPeriodEnd,
+          nextBillingDate: currentPeriodEnd,
           trialStart: null,
           trialEnd: trialEnd,
           canClaimLeads: subscription.status === 'active',
@@ -361,41 +245,46 @@ async function handleSubscriptionCreated(subscription: any) {
 
   } catch (error) {
     console.error("Error handling subscription created:", error);
+    throw error;
   }
 }
 
 // Handle subscription updated
-async function handleSubscriptionUpdated(subscription: any) {
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   try {
     console.log("[STRIPE WEBHOOK] Subscription updated:", subscription.id);
     
-    // Update both ContractorSubscription and User tables
-    // First update the legacy ContractorSubscription table if exists
-    await prisma.contractorSubscription.updateMany({
-      where: { stripeSubscriptionId: subscription.id },
-      data: {
-        status: subscription.status,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        nextBillingDate: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null
-      }
-    });
+    const { currentPeriodStart, currentPeriodEnd } = getSubscriptionBillingPeriod(subscription);
+    const canAccessLeads = ["active", "trialing"].includes(subscription.status);
+    await prisma.$transaction(async transaction => {
+      await transaction.contractorSubscription.updateMany({
+        where: { stripeSubscriptionId: subscription.id },
+        data: {
+          status: subscription.status,
+          currentPeriodStart,
+          currentPeriodEnd,
+          nextBillingDate: currentPeriodEnd,
+          canClaimLeads: canAccessLeads,
+          canViewLeads: canAccessLeads,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null
+        }
+      });
 
-    // Update the User table with tier-based subscription info
-    await prisma.user.updateMany({
-      where: { stripeSubscriptionId: subscription.id },
-      data: {
-        subscriptionStatus: subscription.status,
-        subscriptionCurrentPeriodEnd: new Date(subscription.current_period_end * 1000)
-      }
+      await transaction.user.updateMany({
+        where: { stripeSubscriptionId: subscription.id },
+        data: {
+          subscriptionStatus: subscription.status,
+          subscriptionCurrentPeriodEnd: currentPeriodEnd
+        }
+      });
     });
 
     console.log(`[STRIPE WEBHOOK] Updated subscription status to ${subscription.status}`);
 
   } catch (error) {
     console.error("[STRIPE WEBHOOK] Error handling subscription updated:", error);
+    throw error;
   }
 }
 

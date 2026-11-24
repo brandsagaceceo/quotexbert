@@ -186,7 +186,7 @@ export const trackLead = (
     {
       content_category: projectCategory,
       content_name: "Renovation Lead",
-      value: value,
+      ...(value !== undefined ? { value } : {}),
       currency: "CAD"
     },
     deduplicationKey

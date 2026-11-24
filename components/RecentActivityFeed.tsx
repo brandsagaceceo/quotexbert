@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { z } from "zod";
 
-interface ActivityEvent {
-  id: string;
-  type: "quote_generated" | "job_posted" | "contractor_joined" | "job_claimed" | "job_completed";
-  category?: string;
-  city: string;
-  estimate?: number;
-  timestamp: Date;
-}
+const activityResponse = z.object({
+  activities: z.array(z.object({
+    id: z.string(),
+    type: z.enum(["quote_generated", "job_posted", "contractor_joined", "job_claimed", "job_completed"]),
+    category: z.string().nullish(),
+    city: z.string(),
+    estimate: z.number().finite().nonnegative().nullish(),
+    timestamp: z.string().datetime({ offset: true }).transform(value => new Date(value)),
+  })),
+});
+type ActivityEvent = z.infer<typeof activityResponse>["activities"][number];
 
 interface RecentActivityFeedProps {
   maxItems?: number;
@@ -26,120 +30,29 @@ export default function RecentActivityFeed({
   description,
 }: RecentActivityFeedProps) {
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchActivityData();
-  }, []);
+  }, [maxItems]);
 
   const fetchActivityData = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch('/api/activity-feed');
-      if (response.ok) {
-        const data = await response.json();
-        setActivities(data.activities || generateSampleActivities());
-      } else {
-        setActivities(generateSampleActivities());
-      }
+      const response = await fetch(`/api/activity-feed?limit=${maxItems}`);
+      if (!response.ok) throw new Error(`Activity service returned HTTP ${response.status}`);
+      const data = activityResponse.parse(await response.json());
+      setActivities(data.activities.slice(0, maxItems));
     } catch (error) {
       console.error('Failed to fetch activity feed:', error);
-      setActivities(generateSampleActivities());
+      setActivities([]);
+      setError("Recent activity is currently unavailable. No example activity is shown.");
+    } finally {
+      setLoading(false);
     }
   };
-
-  const generateSampleActivities = (): ActivityEvent[] => [
-      {
-        id: "1",
-        type: "quote_generated",
-        category: "Bathroom renovation",
-        city: "Toronto",
-        estimate: 5200,
-        timestamp: new Date(Date.now() - 3 * 60 * 1000), // 3 minutes ago
-      },
-      {
-        id: "2",
-        type: "job_posted",
-        category: "Kitchen remodel",
-        city: "Scarborough",
-        estimate: 22800,
-        timestamp: new Date(Date.now() - 11 * 60 * 1000), // 11 minutes ago
-      },
-      {
-        id: "3",
-        type: "job_claimed",
-        category: "Deck construction",
-        city: "Mississauga",
-        estimate: 12500,
-        timestamp: new Date(Date.now() - 18 * 60 * 1000), // 18 minutes ago
-      },
-      {
-        id: "4",
-        type: "contractor_joined",
-        city: "North York",
-        timestamp: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
-      },
-      {
-        id: "5",
-        type: "quote_generated",
-        category: "Basement finishing",
-        city: "Etobicoke",
-        estimate: 18500,
-        timestamp: new Date(Date.now() - 34 * 60 * 1000), // 34 minutes ago
-      },
-      {
-        id: "6",
-        type: "job_completed",
-        category: "Flooring installation",
-        city: "Brampton",
-        estimate: 8900,
-        timestamp: new Date(Date.now() - 47 * 60 * 1000), // 47 minutes ago
-      },
-      {
-        id: "7",
-        type: "job_posted",
-        category: "Roof replacement",
-        city: "Vaughan",
-        estimate: 15400,
-        timestamp: new Date(Date.now() - 58 * 60 * 1000), // 58 minutes ago
-      },
-      {
-        id: "8",
-        type: "quote_generated",
-        category: "Painting interior",
-        city: "Markham",
-        estimate: 6700,
-        timestamp: new Date(Date.now() - 72 * 60 * 1000), // 1 hour 12 min ago
-      },
-      {
-        id: "9",
-        type: "job_claimed",
-        category: "Kitchen renovation",
-        city: "Richmond Hill",
-        estimate: 24300,
-        timestamp: new Date(Date.now() - 89 * 60 * 1000), // 1 hour 29 min ago
-      },
-      {
-        id: "10",
-        type: "contractor_joined",
-        city: "Toronto",
-        timestamp: new Date(Date.now() - 105 * 60 * 1000), // 1 hour 45 min ago
-      },
-      {
-        id: "11",
-        type: "job_completed",
-        category: "Bathroom remodel",
-        city: "Scarborough",
-        estimate: 9800,
-        timestamp: new Date(Date.now() - 128 * 60 * 1000), // 2 hours 8 min ago
-      },
-      {
-        id: "12",
-        type: "quote_generated",
-        category: "Deck build",
-        city: "Mississauga",
-        estimate: 11200,
-        timestamp: new Date(Date.now() - 145 * 60 * 1000), // 2 hours 25 min ago
-      },
-    ];
 
   const formatTimestamp = (timestamp: Date): string => {
     const now = new Date();
@@ -178,22 +91,22 @@ export default function RecentActivityFeed({
   const getActivityText = (activity: ActivityEvent): string => {
     switch (activity.type) {
       case "quote_generated":
-        return `${activity.category} quote generated`;
+        return `${activity.category || "Project"} quote generated`;
       case "job_posted":
-        return `${activity.category} posted`;
+        return `${activity.category || "Project"} posted`;
       case "contractor_joined":
         return "Contractor joined the platform";
       case "job_claimed":
-        return `Contractor accepted ${activity.category}`;
+        return `Contractor accepted ${activity.category || "a project"}`;
       case "job_completed":
-        return `${activity.category} completed`;
+        return `${activity.category || "Project"} completed`;
       default:
         return "Activity";
     }
   };
 
   return (
-    <div className="w-full">
+    <div role="region" aria-label={title} className="w-full">
       {showTitle && (
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{title}</h2>
@@ -202,6 +115,13 @@ export default function RecentActivityFeed({
       )}
 
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        {loading ? <p role="status" className="p-4 text-slate-600">Loading recent activity...</p>
+          : error ? (
+            <div role="alert" className="p-4 text-red-800">
+              <p>{error}</p>
+              <button onClick={fetchActivityData} className="mt-2 font-semibold underline">Try again</button>
+            </div>
+          ) : activities.length === 0 ? <p className="p-4 text-slate-600">No public activity is available.</p> : null}
         <div className="divide-y divide-slate-100">
           {activities.map((activity) => (
             <div
