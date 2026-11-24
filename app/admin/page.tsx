@@ -84,40 +84,46 @@ export default function AdminDashboard() {
     }
   }, [user, authLoading, router]);
 
-  const fetchDashboard = useCallback(async () => {
-    if (!user || !ADMIN_EMAILS.includes(user.email || "")) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch(
-        "/api/admin/usage?metric=overview&period=30d",
-        {
-          cache: "no-store",
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to load administrator metrics");
+  const fetchDashboard = useCallback(
+    async (background = false) => {
+      if (!user || !ADMIN_EMAILS.includes(user.email || "")) {
+        setLoading(false);
+        return;
       }
-      setStats(data);
-    } catch (cause) {
-      console.error("[ADMIN] Failed to load dashboard metrics:", cause);
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Unable to load administrator metrics",
-      );
-      setStats(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+      if (!background) setLoading(true);
+      setError("");
+      try {
+        const response = await fetch(
+          "/api/admin/usage?metric=overview&period=30d",
+          {
+            cache: "no-store",
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to load administrator metrics");
+        }
+        setStats(data);
+      } catch (cause) {
+        console.error("[ADMIN] Failed to load dashboard metrics:", cause);
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "Unable to load administrator metrics",
+        );
+        setStats(null);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user],
+  );
 
   useEffect(() => {
-    if (!authLoading) void fetchDashboard();
+    if (authLoading) return;
+    void fetchDashboard();
+    const timer = setInterval(() => void fetchDashboard(true), 60_000);
+    return () => clearInterval(timer);
   }, [authLoading, fetchDashboard]);
 
   const adminSections = [
@@ -212,7 +218,7 @@ export default function AdminDashboard() {
             <button
               type="button"
               onClick={() => void fetchDashboard()}
-              className="mt-3 font-semibold underline"
+              className="mt-3 min-h-12 px-2 font-semibold underline"
             >
               Retry
             </button>
@@ -362,9 +368,9 @@ export default function AdminDashboard() {
             <Link
               key={section.href}
               href={section.href}
-              className="group block"
+              className="group block rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#800020]"
             >
-              <div className="bg-gradient-to-br from-orange-50/80 to-red-50/80 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+              <div className="min-h-12 rounded-xl border border-rose-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center mb-4">
                   <div
                     className={`p-3 rounded-lg bg-gradient-to-r ${section.color} mr-4`}
@@ -375,14 +381,17 @@ export default function AdminDashboard() {
                     <h3 className="text-xl font-semibold text-slate-900 group-hover:text-orange-700 transition-colors">
                       {section.title}
                     </h3>
+                    {section.href === "/admin/blog" && stats && (
+                      <p className="mt-1 font-medium text-[#800020]">
+                        {stats.overview.pending.seoReview} items need attention
+                      </p>
+                    )}
                   </div>
                 </div>
                 <p className="text-slate-600 group-hover:text-slate-700 transition-colors">
                   {section.description}
                 </p>
-                <div className="mt-4 text-orange-600 font-medium group-hover:text-orange-700 transition-colors">
-                  Access →
-                </div>
+                <div className="mt-4 text-[#800020] font-medium">Access →</div>
               </div>
             </Link>
           ))}

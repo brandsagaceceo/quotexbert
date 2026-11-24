@@ -4,7 +4,10 @@ import {
   resolveSeoAdmin,
   areSeoAdminWritesEnabled,
 } from "@/lib/seo/admin-auth";
-import { parseSeoArticleEdits } from "@/lib/seo/article-validation";
+import {
+  hasTestArticleLabel,
+  parseSeoArticleEdits,
+} from "@/lib/seo/article-validation";
 import { APPROVED_SEO_TOPICS } from "@/lib/seo/topics";
 
 export const dynamic = "force-dynamic";
@@ -29,15 +32,22 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
 
     const article = await prisma.seoArticle.findUnique({
       where: { id: params.id },
-      select: { id: true, topicId: true, status: true, updatedAt: true },
+      select: {
+        id: true,
+        topicId: true,
+        status: true,
+        updatedAt: true,
+        title: true,
+        slug: true,
+      },
     });
     if (!article)
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    if (!["draft", "approved", "rejected"].includes(article.status)) {
+    if (!["draft", "approved", "rejected", "failed"].includes(article.status)) {
       return NextResponse.json(
         {
           error:
-            "Only drafts, approved or rejected articles can be edited here",
+            "Only drafts, approved, rejected or failed articles can be edited here",
         },
         { status: 409 },
       );
@@ -66,26 +76,69 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
+    if (body && typeof body === "object" && "ifUpdatedAt" in body) {
+      if (
+        typeof body.ifUpdatedAt !== "string" ||
+        !Number.isFinite(Date.parse(body.ifUpdatedAt))
+      ) {
+        return NextResponse.json(
+          { error: "Invalid article version" },
+          { status: 400 },
+        );
+      }
+      if (
+        new Date(body.ifUpdatedAt).getTime() !== article.updatedAt.getTime()
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Article changed since you opened it. Refresh and review it again.",
+          },
+          { status: 409 },
+        );
+      }
+    }
+
     const edits = parseSeoArticleEdits(body, topic);
     if (!edits)
       return NextResponse.json(
         { error: "Article fields are invalid" },
         { status: 400 },
       );
+    if (
+      hasTestArticleLabel(article.title, article.slug) &&
+      !hasTestArticleLabel(edits.title, article.slug)
+    ) {
+      return NextResponse.json(
+        { error: "Test-labelled articles must retain their TEST label" },
+        { status: 409 },
+      );
+    }
 
-    const updated = await prisma.seoArticle.updateMany({
-      where: {
-        id: article.id,
-        status: article.status,
-        updatedAt: article.updatedAt,
-      },
-      data: {
-        ...edits,
-        tags: JSON.stringify(edits.tags),
-        affiliateProductIds: JSON.stringify(edits.affiliateProductIds),
-        status: "draft",
-        approvedAt: null,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const result = await tx.seoArticle.updateMany({
+        where: {
+          id: article.id,
+          status: article.status,
+          updatedAt: article.updatedAt,
+        },
+        data: {
+          ...edits,
+          tags: JSON.stringify(edits.tags),
+          affiliateProductIds: JSON.stringify(edits.affiliateProductIds),
+          status: "draft",
+          approvedAt: null,
+          scheduledFor: null,
+          scheduleSource: null,
+          generationError: null,
+        },
+      });
+      if (result.count === 1) {
+        await tx.seoPublishingEvent.create({
+          data: { actorId: admin.id, articleId: article.id, action: "edited" },
+        });
+      }
+      return result;
     });
     if (updated.count !== 1)
       return NextResponse.json(

@@ -38,8 +38,6 @@ export function getSeoStudioCapabilities() {
     canEdit,
     canPublish: process.env.VERCEL_ENV === "production",
     canGenerate: canEdit && process.env.SEO_MANUAL_DRAFT_ENABLED === "true",
-    scheduledDraftingEnabled:
-      process.env.SEO_DRAFT_AUTOMATION_ENABLED === "true",
-    automaticPublishingEnabled: false,
+    scheduledDraftingEnabled: false,
   };
 }

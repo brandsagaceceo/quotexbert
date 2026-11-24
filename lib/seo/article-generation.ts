@@ -215,7 +215,8 @@ export async function generateNextSeoDraft(
 }
 
 export function isSeoDraftAutomationEnabled() {
-  return isAiFeatureEnabled("SEO_DRAFT_AUTOMATION_ENABLED");
+  // A request-count limit is not a monetary spending cap.
+  return false;
 }
 
 export function getNextPublicationSlot(now = new Date()) {

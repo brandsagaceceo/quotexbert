@@ -91,7 +91,11 @@ const originalFlag = process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 delete process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 assert.equal(isSeoDraftAutomationEnabled(), false);
 process.env.SEO_DRAFT_AUTOMATION_ENABLED = "true";
-assert.equal(isSeoDraftAutomationEnabled(), true);
+assert.equal(
+  isSeoDraftAutomationEnabled(),
+  false,
+  "Request-count limits do not authorize paid automatic generation",
+);
 if (originalFlag === undefined) delete process.env.SEO_DRAFT_AUTOMATION_ENABLED;
 else process.env.SEO_DRAFT_AUTOMATION_ENABLED = originalFlag;
 

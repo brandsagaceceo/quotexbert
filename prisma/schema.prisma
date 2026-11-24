@@ -903,6 +903,7 @@ model SeoArticle {
   sourceNotes         String   @default("[]") @db.Text
   status              String   @default("draft")
   scheduledFor        DateTime?
+  scheduleSource      String?
   approvedAt          DateTime?
   publishedAt         DateTime?
   generationError     String?
@@ -913,6 +914,31 @@ model SeoArticle {
   @@index([topicId, status])
   @@index([createdAt])
   @@map("seo_articles")
+}
+
+model SeoPublishingSettings {
+  id                    String   @id @default("default")
+  autoPublish           Boolean  @default(false)
+  paused                Boolean  @default(false)
+  weeklyLimit           Int      @default(3)
+  lastPublishedAt       DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("seo_publishing_settings")
+}
+
+model SeoPublishingEvent {
+  id        String   @id @default(cuid())
+  articleId String?
+  actorId   String?
+  action    String
+  detail    String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([articleId, createdAt])
+  @@map("seo_publishing_events")
 }
 
 // AI Estimate Model - Stores all AI-generated estimates for homeowners

@@ -149,7 +149,7 @@ async function main() {
       "already-run",
     );
     process.env.SEO_DRAFT_AUTOMATION_ENABLED = "true";
-    assert.equal((await generateNextSeoDraft()).kind, "already-run");
+    assert.equal((await generateNextSeoDraft()).kind, "disabled");
     assert.equal(
       providerCalls,
       1,

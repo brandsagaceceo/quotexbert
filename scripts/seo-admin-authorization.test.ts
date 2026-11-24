@@ -4,6 +4,9 @@ import { NextRequest } from "next/server";
 let sessionUserId: string | null = null;
 let sessionEmail = "visitor@example.test";
 let articleStatus = "draft";
+let articleTitle = "A Practical Ontario Home Renovation Planning Guide";
+let articleSlug = "topic-slug";
+let articleApprovedAt: Date | null = null;
 let articleUpdateCount = 0;
 let listCount = 0;
 let generationCount = 0;
@@ -32,65 +35,86 @@ function installModuleMock(
 installModuleMock("@clerk/nextjs/server", {
   auth: async () => ({ userId: sessionUserId }),
 });
+const mockPrisma = {
+  $queryRaw: async () => [],
+  seoPublishingEvent: { create: async () => ({}) },
+  seoPublishingSettings: {
+    upsert: async () => ({ paused: false, autoPublish: false, weeklyLimit: 3 }),
+    update: async () => ({}),
+  },
+  user: {
+    findFirst: async () =>
+      sessionUserId ? { id: "admin-db", email: sessionEmail } : null,
+  },
+  seoArticle: {
+    findMany: async (
+      args: NonNullable<typeof lastListArgs> & { where: { id?: unknown } },
+    ) => {
+      if (args.where.id) return [];
+      if (listUnavailable)
+        throw Object.assign(new Error("test storage unavailable"), {
+          code: "P2021",
+        });
+      lastListArgs = args;
+      listCount += 1;
+      return [
+        {
+          id: "article-1",
+          topicId: "whitby-kitchen-cabinet-replacement",
+          title: "A Practical Ontario Home Renovation Planning Guide",
+          slug: "topic-slug",
+          excerpt: "An article excerpt for homeowner planning.",
+          content: "Article content",
+          category: "Kitchen",
+          author: "QuoteXbert Editorial Team",
+          tags: "[]",
+          seoTitle: "Ontario Renovation Planning: Homeowner Guide",
+          seoDescription:
+            "A sufficiently descriptive meta description for the article.",
+          affiliateProductIds: "[]",
+          status: articleStatus,
+          scheduledFor: null,
+          approvedAt: null,
+          publishedAt: null,
+          generationError: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+    },
+    groupBy: async () => [
+      { status: "draft", _count: { _all: 127 } },
+      { status: "published", _count: { _all: 2 } },
+    ],
+    findUnique: async () => ({
+      id: "article-1",
+      topicId: "whitby-kitchen-cabinet-replacement",
+      status: articleStatus,
+      updatedAt: new Date("2026-01-01"),
+      title: articleTitle,
+      slug: articleSlug,
+      content: "Article content",
+      approvedAt: articleApprovedAt,
+    }),
+    count: async () => 0,
+    updateMany: async (args: {
+      data: { status?: string; approvedAt?: Date | null };
+    }) => {
+      if (racedUpdate) return { count: 0 };
+      lastWrite = args.data;
+      articleUpdateCount += 1;
+      if (args.data.status) articleStatus = args.data.status;
+      if (args.data.approvedAt !== undefined)
+        articleApprovedAt = args.data.approvedAt;
+      return { count: 1 };
+    },
+  },
+};
 installModuleMock("@/lib/prisma", {
   prisma: {
-    user: {
-      findFirst: async () =>
-        sessionUserId ? { id: "admin-db", email: sessionEmail } : null,
-    },
-    seoArticle: {
-      findMany: async (args: NonNullable<typeof lastListArgs>) => {
-        if (listUnavailable)
-          throw Object.assign(new Error("test storage unavailable"), {
-            code: "P2021",
-          });
-        lastListArgs = args;
-        listCount += 1;
-        return [
-          {
-            id: "article-1",
-            topicId: "whitby-kitchen-cabinet-replacement",
-            title: "A Practical Ontario Home Renovation Planning Guide",
-            slug: "topic-slug",
-            excerpt: "An article excerpt for homeowner planning.",
-            content: "Article content",
-            category: "Kitchen",
-            author: "QuoteXbert Editorial Team",
-            tags: "[]",
-            seoTitle: "Ontario Renovation Planning: Homeowner Guide",
-            seoDescription:
-              "A sufficiently descriptive meta description for the article.",
-            affiliateProductIds: "[]",
-            status: articleStatus,
-            scheduledFor: null,
-            approvedAt: null,
-            publishedAt: null,
-            generationError: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ];
-      },
-      groupBy: async () => [
-        { status: "draft", _count: { _all: 127 } },
-        { status: "published", _count: { _all: 2 } },
-      ],
-      findUnique: async () => ({
-        id: "article-1",
-        topicId: "whitby-kitchen-cabinet-replacement",
-        status: articleStatus,
-        updatedAt: new Date("2026-01-01"),
-      }),
-      updateMany: async (args: {
-        data: { status?: string; approvedAt?: Date | null };
-      }) => {
-        if (racedUpdate) return { count: 0 };
-        lastWrite = args.data;
-        articleUpdateCount += 1;
-        if (args.data.status) articleStatus = args.data.status;
-        return { count: 1 };
-      },
-    },
+    ...mockPrisma,
+    $transaction: async (run: (tx: typeof mockPrisma) => Promise<unknown>) =>
+      run(mockPrisma),
   },
 });
 installModuleMock("@/lib/seo/article-generation", {
@@ -116,14 +140,17 @@ const actionRoute =
     ) => Promise<Response>;
   };
 
-async function postAction(action: string) {
+async function postAction(
+  action: string,
+  version = "2026-01-01T00:00:00.000Z",
+) {
   return actionRoute.POST(
     new NextRequest(
       "http://localhost/api/admin/seo-articles/article-1/action",
       {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, ifUpdatedAt: version }),
       },
     ),
     { params: { id: "article-1" } },
@@ -137,7 +164,9 @@ async function main() {
   process.env.VERCEL_ENV = "preview";
   delete process.env.SEO_PREVIEW_WRITES_ENABLED;
   delete process.env.SEO_MANUAL_DRAFT_ENABLED;
-  const listRequest = new NextRequest("http://localhost/api/admin/seo-articles");
+  const listRequest = new NextRequest(
+    "http://localhost/api/admin/seo-articles",
+  );
   const denied = await listRoute.GET(listRequest);
   assert.equal(denied.status, 403);
   assert.equal(listCount, 0);
@@ -219,6 +248,11 @@ async function main() {
 
   assert.equal((await postAction("publish")).status, 409);
   assert.equal(articleStatus, "draft");
+  assert.equal(
+    (await postAction("approve", "2025-01-01T00:00:00.000Z")).status,
+    409,
+  );
+  assert.equal(articleStatus, "draft");
   assert.equal((await postAction("approve")).status, 200);
   assert.equal(articleStatus, "approved");
   racedUpdate = true;
@@ -255,6 +289,29 @@ async function main() {
     tags: [],
     affiliateProductIds: [],
   };
+  const staleSave = await editRoute.PUT(
+    new NextRequest("http://localhost/api/admin/seo-articles/article-1", {
+      method: "PUT",
+      body: JSON.stringify({
+        ...edits,
+        ifUpdatedAt: "2025-01-01T00:00:00.000Z",
+      }),
+    }),
+    { params: { id: "article-1" } },
+  );
+  assert.equal(staleSave.status, 409);
+  assert.equal(articleStatus, "approved");
+  articleTitle = "TEST ONLY: Private Renovation Draft";
+  const removeTestLabel = await editRoute.PUT(
+    new NextRequest("http://localhost/api/admin/seo-articles/article-1", {
+      method: "PUT",
+      body: JSON.stringify(edits),
+    }),
+    { params: { id: "article-1" } },
+  );
+  assert.equal(removeTestLabel.status, 409);
+  assert.equal(articleStatus, "approved");
+  articleTitle = "A Practical Ontario Home Renovation Planning Guide";
   const saved = await editRoute.PUT(
     new NextRequest("http://localhost/api/admin/seo-articles/article-1", {
       method: "PUT",
@@ -277,6 +334,14 @@ async function main() {
   assert.equal(articleStatus, "approved");
 
   process.env.VERCEL_ENV = "production";
+  articleTitle = "TEST ONLY: Private Renovation Draft";
+  assert.equal((await postAction("publish")).status, 409);
+  assert.equal(articleStatus, "approved");
+  articleTitle = "A Practical Ontario Home Renovation Planning Guide";
+  articleSlug = "test-private-draft";
+  assert.equal((await postAction("publish")).status, 409);
+  assert.equal(articleStatus, "approved");
+  articleSlug = "topic-slug";
   assert.equal((await postAction("publish")).status, 200);
   assert.equal(articleStatus, "published");
   assert.equal(articleUpdateCount, 4);

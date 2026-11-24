@@ -74,19 +74,48 @@ Social exports and native App Store assets remain outside this update.
 redirects there for compatibility. Counts and status filters use `SeoArticle`,
 not sample posts or invented analytics. The existing list API is paginated
 (25 records per page); response summaries cover all records.
+The Studio provides large touch controls, links to the existing admin areas,
+and a full-text review before editing or approving an article. The dashboard
+shows the existing count of SEO items needing attention.
 
-All generation stays private. Manual generation uses the same generator, approved
-topics, shared one-attempt-per-UTC-day reservation, and global AI request budget
-as scheduled drafting. It requires `SEO_MANUAL_DRAFT_ENABLED=true`; this package
+All generation stays private. Manual generation uses the existing generator,
+approved topics, one-attempt-per-UTC-day reservation, and global AI request
+budget. It requires `SEO_MANUAL_DRAFT_ENABLED=true`; this package
 does not enable the flag or make paid AI requests. Non-production writes also
 require `SEO_PREVIEW_WRITES_ENABLED=true`, **only after** an authorized isolated
 database is configured with the existing migration. Preview publication remains
 blocked. No migration or environment change is performed by this package.
 
-Approval never publishes, and editing an approved article clears its approval.
-Cron can draft when explicitly enabled but cannot publish, even if the old
-`SEO_AUTO_PUBLISH_ENABLED` variable remains configured. Publication is only
-through the existing, explicitly confirmed administrator publish action.
+Approval never immediately publishes, and editing an approved article clears its approval.
+The publish action rejects articles with a standalone `TEST` label in the title
+or slug, and the editor cannot remove that label once present. Keep all test
+drafts clearly labelled; this check cannot identify an unlabelled test article.
+Publishing controls are stored in the database, defaulting to automatic publishing
+off and publishing unpaused. Pause blocks both immediate and scheduled publishing.
+Scheduled posts are retained during a pause; overdue posts are spread out after
+resuming. A daily authenticated Vercel cron processes due posts no earlier than
+their scheduled time. All publications, including manual ones, count towards
+the fixed limit of three in a rolling seven days. Scheduled publications are
+spaced at least 24 hours apart.
+
+Automatic scheduling only considers human-approved articles: the current
+generator has no verified sources and cannot establish the factual accuracy of
+unreviewed claims. The automatic path also checks article structure, approved
+links and disclosures, metadata, TEST labels, and exact or highly similar
+content in the available database and static blog content. Similarity checks
+cannot detect every paraphrase. Failures return the article to review.
+Automatic publishing in production additionally requires the server-only
+`SEO_AUTO_PUBLISH_PRODUCTION_AUTHORIZED=true` flag; this package does not set
+it. Preview can change the controls but cannot publish publicly. Publishing
+actions, control changes, rescheduling and failures are recorded in the
+publishing history. The `20261124010000_add_seo_publishing_controls` migration
+must be applied to an authorized database before using these controls.
+
+Automatic generation is disabled even if the existing drafting feature flag
+is set: the existing request-count limit is not a monetary spending cap. A
+separate automatic generation control and an enforceable spending cap are still
+required before it can be enabled. Turning on publishing never changes
+generation settings.
 
 The Search Console panel links to the existing sitemap and reports setup status.
 `GOOGLE_SITE_VERIFICATION` optionally supplies the existing layout's HTML
