@@ -58,13 +58,6 @@
       "destination": "/api/files/$1"
     }
   ],
-  "redirects": [
-    {
-      "source": "/admin",
-      "destination": "/admin/dashboard",
-      "permanent": false
-    }
-  ],
   "crons": [
     {
       "path": "/api/cron/contractor-followup",
