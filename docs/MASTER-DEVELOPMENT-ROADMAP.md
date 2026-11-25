@@ -4,7 +4,7 @@ Last updated: 2026-11-25
 
 ## Current milestone: Release 1 homepage preview
 
-Status: local implementation and focused verification complete; commit, branch push, and a fresh Vercel Preview are pending.
+Status: pushed to PR #28 at `7efb94f`; both Vercel project Preview deployments are ready. Owner review and image provenance remain release gates.
 
 - Restored the approved QX icon and wordmark across the existing site components and browser/app icons.
 - Kept the existing six-slide carousel, routes, animation, keyboard/touch controls, and responsive layout. Replaced the phone composition with the kitchen photo directly in private local review mode.
@@ -24,12 +24,12 @@ Status: local implementation and focused verification complete; commit, branch p
 - Fixed the mobile assistant observer so it hides the launcher near the estimator without closing a panel opened by the user.
 - TypeScript reports 26 existing diagnostics in unrelated application/test logic. No new homepage carousel diagnostics remain; do not suppress these errors.
 - Installed dependencies previously verified: Next.js 15.5.29, Sharp 0.35.5, and Clerk 6.39.3. Vercel Node 22 satisfies their runtime requirements.
-- Existing PR #28 Preview checks apply to its current remote commit only. A new Vercel Preview must be verified after pushing these changes.
+- PR #28 is open and both Vercel checks pass for commit `7efb94f`. The `quotexbert` Preview is https://quotexbert-git-integration-rele-de53ce-brandsagaceceos-projects.vercel.app; the `quotexbert-production` project's PR Preview is https://quotexbert-production-git-integ-96b56f-brandsagaceceos-projects.vercel.app. Both are Preview deployments, not Production, and require Vercel authentication.
 
 ## Release gates
 
 1. Owner provides original listing or photographer/licence evidence for each of the seven supplied photographs.
-2. Push this tested release branch and verify the resulting Vercel Preview; owner reviews desktop/mobile rendering.
+2. Owner reviews the desktop/mobile screenshots and authenticated Vercel Preview.
 3. Keep the supplied unverified photos private and retain licensed public fallbacks.
 4. Do not merge to Production or deploy until the owner explicitly approves.
 
@@ -46,4 +46,4 @@ After homepage review:
 ## Working boundaries
 
 - Continue on `integration/release-1-homepage-security-preview`; preserve the existing staging worktree and all unrelated platform features.
-- Branch commit/push and Vercel Preview are authorized. Production deployment, merge, production environment changes, database migrations, and billing changes remain unauthorized.
+- Branch commit/push and Vercel Preview are complete. Production deployment, merge, production environment changes, database migrations, and billing changes remain unauthorized.
