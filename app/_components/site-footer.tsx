@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 
 export default function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -10,11 +10,11 @@ export default function SiteFooter() {
         <div className="footer-grid grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
           {/* Brand — spans 2 cols on desktop, full width on mobile */}
           <div className="footer-brand-col col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center mb-4">
-              <span className="text-2xl font-bold text-[#800020]">QuoteXbert</span>
-            </Link>
+            <div className="mb-4">
+              <Logo size="sm" />
+            </div>
             <p className="text-ink-600 mb-4 text-sm leading-relaxed">
-              AI-powered renovation estimates for Toronto, Durham Region &amp; GTA homeowners. Verified contractor marketplace. Free for homeowners.
+              Get a renovation estimate and find local contractors in Toronto, Durham Region and the GTA. Free for homeowners.
             </p>
             <p className="text-xs text-slate-500">Toronto &amp; Durham Region, Ontario · Canada</p>
           </div>
@@ -23,12 +23,12 @@ export default function SiteFooter() {
           <div>
             <h3 className="text-sm font-bold text-ink-900 mb-3 uppercase tracking-wide">Homeowners</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/#get-estimate" className="text-ink-600 hover:text-brand transition-colors">Get AI Estimate</Link></li>
+              <li><Link href="/#get-estimate" className="text-ink-600 hover:text-brand transition-colors">Get an estimate</Link></li>
               <li><Link href="/renovation-costs" className="text-ink-600 hover:text-brand transition-colors">Renovation Cost Guides</Link></li>
               <li><Link href="/renovation-cost/toronto/kitchen" className="text-ink-600 hover:text-brand transition-colors">Kitchen Costs — Toronto</Link></li>
               <li><Link href="/renovation-cost/toronto/bathroom" className="text-ink-600 hover:text-brand transition-colors">Bathroom Costs — Toronto</Link></li>
               <li><Link href="/renovation-cost/toronto/basement" className="text-ink-600 hover:text-brand transition-colors">Basement Costs — Toronto</Link></li>
-              <li><Link href="/ai-renovation-check" className="text-ink-600 hover:text-brand transition-colors">AI Renovation Inspector</Link></li>
+              <li><Link href="/ai-renovation-check" className="text-ink-600 hover:text-brand transition-colors">Check renovation quality</Link></li>
             </ul>
           </div>
 

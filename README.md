@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![QuoteXbert Logo](public/logo.svg)
+![QuoteXbert Logo](public/branding/quotexbert-wordmark-display.webp)
 
 **AI-Powered Home Repair Estimates & Contractor Matching Platform**
 

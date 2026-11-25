@@ -3,7 +3,7 @@
 // import { useUser } from '@clerk/nextjs'
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 
 export default function RoleOnboardingPage() {
   // const { user } = useUser()
@@ -49,13 +49,7 @@ export default function RoleOnboardingPage() {
       <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <Image
-              src="/logo.svg"
-              alt="quotexbert logo"
-              width={48}
-              height={48}
-              className="w-12 h-12"
-            />
+            <Logo size="lg" showText={false} href="" />
           </div>
           <h1 className="text-4xl font-bold text-ink-900 mb-4">
             Welcome to quotexbert!

@@ -18,7 +18,7 @@ const CONTRACTOR_ONBOARDING_REMINDER_CAMPAIGN = 'contractor_onboarding_offer_rem
 export const CONTRACTOR_ACCOUNT_WELCOME_PHASE1_VARIANT = 'contractor-account-welcome-phase1-2026';
 export const CONTRACTOR_ACCOUNT_WELCOME_SUBJECT = 'Welcome to QuoteXbert — your contractor account is ready';
 export const CONTRACTOR_ACCOUNT_WELCOME_PREHEADER = 'Complete your profile and start browsing local homeowner projects.';
-const LOGO_URL = `${BASE_URL}/logo.svg`;
+const LOGO_URL = `${BASE_URL}/favicon-512x512.png?v=qx`;
 
 // Domains that Resend rejects as undeliverable (seed/test/placeholder accounts).
 // Including one of these in a batch send makes Resend reject the ENTIRE batch with

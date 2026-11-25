@@ -9,7 +9,7 @@ import {
 import { CityTradePageTemplate } from "@/components/seo/ContractorAcquisitionTemplates";
 
 interface Props {
-  params: { city: string; trade: string };
+  params: Promise<{ city: string; trade: string }>;
 }
 
 export async function generateStaticParams() {
@@ -17,9 +17,10 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const combo = getCityTradeCombo(params.city, params.trade);
+  const { city, trade } = await params;
+  const combo = getCityTradeCombo(city, trade);
   if (!combo) return {};
-  const url = `https://www.quotexbert.com/contractor-leads/${params.city}/${params.trade}`;
+  const url = `https://www.quotexbert.com/contractor-leads/${city}/${trade}`;
   return {
     title: combo.title,
     description: combo.metaDescription,
@@ -38,14 +39,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CityTradeContractorLeadsPage({ params }: Props) {
-  const combo = getCityTradeCombo(params.city, params.trade);
-  const cityData = getCityData(params.city);
-  const tradeData = getTradeData(params.trade);
+export default async function CityTradeContractorLeadsPage({ params }: Props) {
+  const { city, trade } = await params;
+  const combo = getCityTradeCombo(city, trade);
+  const cityData = getCityData(city);
+  const tradeData = getTradeData(trade);
 
   if (!combo || !cityData || !tradeData) notFound();
 
-  const url = `https://www.quotexbert.com/contractor-leads/${params.city}/${params.trade}`;
+  const url = `https://www.quotexbert.com/contractor-leads/${city}/${trade}`;
 
   const jsonLd = {
     "@context": "https://schema.org",

@@ -25,8 +25,8 @@ export default function ProBadge({
     <div className="flex items-center">
       <div className="relative">
         <Image
-          src="/logo.svg"
-          alt="Pro Badge"
+          src="/branding/quotexbert-qx-icon-display.webp"
+          alt=""
           width={size === "sm" ? 16 : size === "md" ? 24 : 32}
           height={size === "sm" ? 16 : size === "md" ? 24 : 32}
           className={sizeClasses[size]}

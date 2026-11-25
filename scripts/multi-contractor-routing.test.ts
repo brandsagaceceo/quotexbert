@@ -23,7 +23,7 @@ for (const [name, src] of [["NotificationBell", notificationBell], ["notificatio
 }
 
 // 2. New/revised quote notifications now identify WHICH contractor sent them.
-const sentBlock = putRoute.slice(putRoute.indexOf('if (status === "sent")'));
+const sentBlock = putRoute.slice(putRoute.indexOf("// Send notification to homeowner if quote was sent"));
 assert.match(sentBlock, /contractorId: updatedQuote\.contractorId/, "quote_received notification payload identifies the sending contractor");
 
 // 3. Job-accepted notification identifies WHICH contractor just accepted.
