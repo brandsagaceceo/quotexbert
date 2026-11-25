@@ -7,17 +7,18 @@ import { APPROVED_SEO_TOPICS } from "@/lib/seo/topics";
 export const dynamic = "force-dynamic";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function PUT(request: NextRequest, { params }: RouteContext) {
   try {
+    const { id } = await params;
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const article = await prisma.seoArticle.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, topicId: true, status: true },
     });
     if (!article)

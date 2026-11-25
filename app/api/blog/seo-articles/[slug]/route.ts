@@ -4,14 +4,15 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 interface RouteContext {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function GET(_request: Request, { params }: RouteContext) {
   try {
+    const { slug } = await params;
     const article = await prisma.seoArticle.findFirst({
       where: {
-        slug: params.slug,
+        slug,
         status: "published",
         publishedAt: { not: null },
       },

@@ -7,7 +7,7 @@ import {
 import { TradeLeadPageTemplate } from "@/components/seo/ContractorAcquisitionTemplates";
 
 interface Props {
-  params: { trade: string };
+  params: Promise<{ trade: string }>;
 }
 
 export async function generateStaticParams() {
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = getTradeData(params.trade);
+  const { trade } = await params;
+  const data = getTradeData(trade);
   if (!data) return {};
   const url = `https://www.quotexbert.com/contractor-leads/trades/${data.slug}`;
   return {
@@ -36,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function TradeContractorLeadsPage({ params }: Props) {
-  const data = getTradeData(params.trade);
+export default async function TradeContractorLeadsPage({ params }: Props) {
+  const { trade } = await params;
+  const data = getTradeData(trade);
   if (!data) notFound();
 
   const jsonLd = {

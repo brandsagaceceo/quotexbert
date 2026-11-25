@@ -7,17 +7,12 @@ import SiteFooter from "./_components/site-footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ToastProvider } from "@/components/ToastProvider";
-import dynamicImport from "next/dynamic";
+import ClientOnlyWidgets from "./_components/ClientOnlyWidgets";
 import "./globals.css";
 import "../styles/mobile.css";
 import ReferralTracker from "@/components/ReferralTracker";
 
 export const dynamic = 'force-dynamic';
-
-// Lazy load development and optional components
-const DevStatus = dynamicImport(() => import("./_components/DevStatus"), { ssr: false });
-const OverflowDebugger = dynamicImport(() => import("@/components/OverflowDebugger").then(mod => ({ default: mod.OverflowDebugger })), { ssr: false });
-const AIAssistantPopup = dynamicImport(() => import("@/components/AIAssistantPopup"), { ssr: false });
 
 const interSans = Inter({
   variable: "--font-geist-sans",
@@ -280,14 +275,8 @@ export default function RootLayout({
           </main>
           <SiteFooter />
           <MobileBottomNav />
-          <AIAssistantPopup />
+          <ClientOnlyWidgets />
           <ReferralTracker />
-          {process.env.NODE_ENV === 'development' && (
-            <>
-              <DevStatus />
-              <OverflowDebugger />
-            </>
-          )}
         </ToastProvider>
       </body>
     </html>

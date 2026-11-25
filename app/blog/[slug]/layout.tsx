@@ -9,17 +9,18 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   children: React.ReactNode;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const staticMeta = getBlogPostMeta(params.slug);
+  const { slug } = await params;
+  const staticMeta = getBlogPostMeta(slug);
   const generated = staticMeta
     ? null
     : await prisma.seoArticle.findFirst({
         where: {
-          slug: params.slug,
+          slug,
           status: "published",
           publishedAt: { not: null },
         },
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const canonicalUrl = generated?.canonicalUrl ?? `https://www.quotexbert.com/blog/${params.slug}`;
+  const canonicalUrl = generated?.canonicalUrl ?? `https://www.quotexbert.com/blog/${slug}`;
 
   return {
     title: meta.title,
