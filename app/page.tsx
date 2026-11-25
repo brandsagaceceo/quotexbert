@@ -4,6 +4,12 @@
 
 import { useState, lazy, Suspense, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import contractorTeam from "@/public/homepage/contractor-team.webp";
+import projectConsultation from "@/public/homepage/project-consultation.webp";
+import finishedKitchen from "@/public/homepage/finished-kitchen.webp";
+import finishedLivingRoom from "@/public/homepage/finished-living-room.webp";
+import HomepageJourneyCarousel from "@/components/HomepageJourneyCarousel";
 import { EstimatorMain } from "@/components/EstimatorMain";
 import { EstimateResults } from "@/components/EstimateResults";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
@@ -60,6 +66,20 @@ export default function Home() {
   const [savingEstimate, setSavingEstimate] = useState(false);
   const { authUser: user, isSignedIn } = useAuth();
   const toast = useToast();
+
+  const handleOpenPlanning = () => {
+    const panel = document.getElementById("quotexbert-ai-panel");
+    if (panel) {
+      panel.focus();
+      return;
+    }
+    const launcher = document.getElementById("quotexbert-ai-launcher");
+    if (!launcher) {
+      toast.error("The assistant is still loading. Please try again in a moment.");
+      return;
+    }
+    launcher.click();
+  };
 
   // Read localStorage on mount to know if this visitor already used their free estimate
   useEffect(() => {
@@ -303,165 +323,61 @@ export default function Home() {
       {!(isSignedIn && user?.role === 'contractor') && <FoundingContractorBanner />}
 
 
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pb-safe md:pb-0">
-        {/* Hero Section - 2 Column Layout - Mobile-Optimized */}
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-rose-50 pb-safe md:pb-0">
         {/* Dual anchor: both #get-estimate and #instant-quote scroll here */}
         <span id="instant-quote" aria-hidden="true" className="absolute" style={{ top: 0 }} />
-        <section id="get-estimate" className="relative py-3 md:py-16 lg:py-24 overflow-hidden">
-          {/* Enhanced Background Elements */}
-          <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10"></div>
-
-          <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
-              {/* Left Column - Headline & Benefits - Mobile-Optimized */}
-              <div className="text-center lg:text-left space-y-2 md:space-y-6">
-                <div className="inline-flex items-center gap-2 mb-2 md:mb-6 px-4 py-2 bg-white/80 backdrop-blur-sm border border-rose-200/80 text-rose-800 rounded-full shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-600" strokeWidth={2} />
-                  <span className="text-xs md:text-sm font-semibold tracking-wide">AI-Powered Estimates · Free to Start</span>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-3 md:mb-6 leading-[1.05] tracking-tight animate-fade-in-up">
-                  <span className="text-[#800020]">
-                    Get an AI Renovation
-                  </span>
-                  <br />
-                  <span className="text-[#800020]">
-                    Estimate Before You Hire
-                  </span>
-                </h1>
-
-                <p className="text-sm md:text-xl lg:text-2xl text-slate-600 mb-4 md:mb-10 leading-relaxed">
-                  <span className="text-rose-700 font-semibold">Describe your project or upload photos</span> to get a
-                  detailed renovation cost range based on <span className="text-rose-700 font-semibold">Ontario pricing</span>.
-                  Free for homeowners — quick free account required.
-                </p>
-
-                {/* Mobile-only CTA — estimator sits below left column in single-column layout */}
-                <a
-                  href="#estimator-tool"
-                  className="lg:hidden flex items-center justify-center gap-1.5 w-full bg-[#800020] hover:bg-[#600018] text-white font-bold text-sm py-2.5 px-5 rounded-xl shadow-md active:scale-[0.98] transition-colors mb-3"
-                >
-                  <Camera className="w-4 h-4" strokeWidth={2} />
-                  Upload Photos — Free AI Estimate
-                </a>
-
-                {/* Mobile-only compact benefits (desktop shows full cards below) */}
-                <div className="lg:hidden flex flex-wrap gap-1.5 mb-2">
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">⚡ 30-sec estimate</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📷 Just upload photos</span>
-                  <span className="bg-white/80 border border-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">📍 Toronto, Durham &amp; GTA prices</span>
-                </div>
-
-                {/* Trust Points - Desktop only */}
-                <div className="hidden lg:block space-y-2.5 md:space-y-3 mb-6 md:mb-10">
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center ring-1 ring-emerald-100">
-                      <Gift className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Free for Homeowners</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No cost to get your estimate</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-rose-50 rounded-xl flex items-center justify-center ring-1 ring-rose-100">
-                      <MapPin className="w-5 h-5 md:w-6 md:h-6 text-rose-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Ontario-Focused Pricing</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Real Toronto, Durham &amp; GTA rates</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-orange-50 rounded-xl flex items-center justify-center ring-1 ring-orange-100">
-                      <Bookmark className="w-5 h-5 md:w-6 md:h-6 text-orange-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Save Estimates to Your Account</div>
-                      <div className="text-slate-500 text-xs md:text-sm">Revisit anytime after signing up</div>
-                    </div>
-                  </Link>
-
-                  <Link href="#get-estimate" className="flex items-center gap-4 text-left bg-white/70 backdrop-blur-sm p-3.5 md:p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-rose-200 hover:bg-white transition-all duration-200 hover:translate-x-0.5 cursor-pointer">
-                    <div className="flex-shrink-0 w-11 h-11 md:w-12 md:h-12 bg-blue-50 rounded-xl flex items-center justify-center ring-1 ring-blue-100">
-                      <Users className="w-5 h-5 md:w-6 md:h-6 text-blue-600" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm md:text-base text-slate-900">Connect With Contractors When Ready</div>
-                      <div className="text-slate-500 text-xs md:text-sm">No pressure — you&apos;re always in control</div>
-                    </div>
-                  </Link>
-                </div>
-
-                {/* Social Proof - Real faces + badges */}
-                <div className="flex flex-wrap gap-2.5 md:gap-3 justify-center lg:justify-start items-center">
-                  {/* Stacked real homeowner faces */}
-                  <div className="flex items-center gap-2 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <div className="flex -space-x-2">
-                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=faces&q=80" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover object-center border-2 border-white shadow-sm" alt="homeowner" />
-                    </div>
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA homeowners</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">Top Rated GTA</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-full shadow-sm border border-slate-200">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-xs md:text-sm font-semibold text-slate-700">GTA Verified</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - iPhone Estimator */}
-              <div className="relative lg:pl-8">
-                <div className="hidden lg:block absolute -inset-6 bg-gradient-to-br from-rose-200/40 via-orange-200/30 to-transparent rounded-[2rem] blur-2xl -z-10" aria-hidden="true" />
-                <div id="estimator-tool" data-estimator>
-                  <EstimatorMain 
-                    onEstimateComplete={handleEstimateComplete}
-                    userId={user?.id || undefined}
-                    isBlocked={isEstimatorBlocked}
-                    onBlocked={handleShowSignUpGate}
-                  />
-                </div>
+        <section id="get-estimate" className="relative overflow-hidden py-3 md:py-6 lg:py-8">
+          <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10" />
+          <div className="relative z-10 mx-auto max-w-[1600px] sm:px-6 lg:px-8">
+            <div className="min-w-0">
+              <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
+              <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
+            </div>
+            <div className="relative mx-auto mt-8 w-full max-w-3xl px-4 sm:px-0">
+              <p className="mb-5 text-center text-sm text-slate-600">
+                Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
+              </p>
+              <div id="estimator-tool" data-estimator>
+                <EstimatorMain
+                  onEstimateComplete={handleEstimateComplete}
+                  userId={user?.id || undefined}
+                  isBlocked={isEstimatorBlocked}
+                  onBlocked={handleShowSignUpGate}
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Real Homes Photo Strip */}
+        {/* Illustrative renovation photo gallery */}
         <section className="overflow-hidden">
           {/* 4-col photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 h-72 md:h-80">
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=1000&fit=crop&crop=center&q=80" alt="Kitchen renovation Toronto" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <Image src={contractorTeam} alt="Two renovation professionals reviewing plans in a newly built home." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Kitchen · $28k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Planning example</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=1000&fit=crop&crop=center&q=80" alt="Bathroom renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <Image src={projectConsultation} alt="A couple discussing a renovation in a home under construction." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Bathroom · $9k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Renovation example</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=1000&fit=crop&crop=center&q=80" alt="Living room renovation" className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" />
+              <Image src={finishedKitchen} alt="A bright renovated kitchen with white cabinetry and a large island." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Basement · $15k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Kitchen example</span>
             </div>
             <div className="relative overflow-hidden group">
-              <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=1000&fit=crop&crop=top&q=80" alt="Toronto home exterior" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+              <Image src={finishedLivingRoom} alt="A completed contemporary living room with a staircase and warm wood details." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Exterior · $22k saved</span>
+              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Living room example</span>
             </div>
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
           <div className="bg-[#800020] px-4 py-2.5 md:py-5 text-center">
-            <p className="text-white font-bold text-xs md:text-lg tracking-tight">Real GTA &amp; Durham Region Homes. Real Savings.</p>
-            <p className="text-rose-200 text-[11px] md:text-sm mt-0.5 md:mt-1">Homeowners across Toronto, Durham Region &amp; the GTA avoid overpaying by knowing real prices <strong className="text-white font-semibold">before</strong> calling a contractor</p>
+            <p className="text-white font-bold text-xs md:text-lg tracking-tight">Renovation inspiration for Toronto, Durham Region &amp; the GTA.</p>
+            <p className="text-rose-200 text-[11px] md:text-sm mt-0.5 md:mt-1">Illustrative licensed stock photographs, not customer projects or guaranteed savings.</p>
           </div>
         </section>
 
@@ -618,13 +534,16 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Real Homeowner Hero Photo Section */}
+          {/* Illustrative stock-photo feature section */}
           <section className="relative overflow-hidden bg-slate-900">
             {/* Background image — slightly taller on mobile so content doesn't overflow */}
-            <img
-              src="https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1600&h=800&fit=crop&crop=top&q=80"
-              alt="Happy homeowners in their renovated Toronto starter home"
-              className="absolute inset-0 w-full h-full object-cover object-top opacity-40"
+            <Image
+              src={finishedLivingRoom}
+              alt="Illustrative licensed stock photograph of a completed contemporary living room."
+              fill
+              sizes="100vw"
+              loading="lazy"
+              className="object-cover object-top opacity-40"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/40" />
             {/* Content — normal flow on mobile so it never gets clipped */}
@@ -645,12 +564,12 @@ export default function Home() {
                     <div className="text-slate-400 text-xs">GTA Estimates</div>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">$16k</div>
-                    <div className="text-slate-400 text-xs">Avg. Savings</div>
+                    <div className="text-lg md:text-2xl font-black text-white">Free</div>
+                    <div className="text-slate-400 text-xs">For homeowners</div>
                   </div>
                   <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">30 sec</div>
-                    <div className="text-slate-400 text-xs">To get estimate</div>
+                    <div className="text-lg md:text-2xl font-black text-white">Review</div>
+                    <div className="text-slate-400 text-xs">Before sharing</div>
                   </div>
                 </div>
               </div>
