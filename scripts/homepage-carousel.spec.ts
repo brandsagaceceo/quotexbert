@@ -16,7 +16,7 @@ test("six existing journeys fit mobile/desktop without hidden focus targets or f
   await openHomepage(page);
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
   await expect(carousel.locator('[aria-roledescription="slide"]')).toHaveCount(6);
-  for (const width of [320, 375, 390, 768, 1024, 1280, 1440]) {
+  for (const width of [320, 375, 390, 760, 768, 1024, 1280, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     const layout = await carousel.evaluate(element => ({
       overflow: document.documentElement.scrollWidth > innerWidth,
@@ -28,6 +28,22 @@ test("six existing journeys fit mobile/desktop without hidden focus targets or f
         .filter(node => node.tabIndex !== -1).length,
     }));
     expect(layout, `viewport ${width}`).toEqual({ overflow: false, clipping: 0, hiddenTabStops: 0 });
+    const composition = await carousel.locator('[aria-roledescription="slide"][aria-hidden="false"]').evaluate(slide => {
+      const photo = slide.querySelector(".journey-photo")?.getBoundingClientRect();
+      const copy = slide.querySelector(".journey-copy")?.getBoundingClientRect();
+      return {
+        photoLeft: photo?.left ?? 0,
+        photoBottom: photo?.bottom ?? 0,
+        copyLeft: copy?.left ?? 0,
+        copyRight: copy?.right ?? 0,
+        copyTop: copy?.top ?? 0,
+      };
+    });
+    if (width <= 760) {
+      expect(composition.photoBottom, `mobile photo/copy overlap at ${width}px`).toBeLessThanOrEqual(composition.copyTop + 1);
+    } else {
+      expect(composition.photoLeft, `desktop photo/copy overlap at ${width}px`).toBeGreaterThanOrEqual(composition.copyRight - 1);
+    }
   }
   await carousel.getByRole("button", { name: /^Show journey 5:/ }).click();
   await expect(carousel.locator('[aria-hidden="false"]')).toContainText("social inspiration feed is coming soon");
@@ -177,6 +193,7 @@ test("six licensed carousel photographs load with a two-image initial budget and
       await carousel.getByRole("button", { name: new RegExp(`^Show journey ${index + 1}:`) }).click();
       const slide = carousel.locator('[aria-roledescription="slide"][aria-hidden="false"]');
       await expect(slide.getByRole("heading")).toHaveText(headings[index] ?? "");
+      await expect(slide.locator(".journey-chip")).toBeVisible();
       const image = slide.getByRole("img");
       await expect.poll(() => image.evaluate(node =>
         node instanceof HTMLImageElement && node.complete && node.naturalWidth > 0,
@@ -188,8 +205,14 @@ test("six licensed carousel photographs load with a two-image initial budget and
       if (height === undefined) height = box?.height;
       expect(box?.height).toBe(height);
       const photoBox = await image.boundingBox();
-      expect(photoBox?.width).toBe(box?.width);
-      expect(photoBox?.height ?? 0).toBeGreaterThan((box?.height ?? 0) * 0.75);
+      const photoRegion = await slide.locator(".journey-photo").boundingBox();
+      expect(photoBox?.width).toBe(photoRegion?.width);
+      expect(photoBox?.height).toBe(photoRegion?.height);
+      if (width > 760) {
+        expect(photoRegion?.height).toBe(box?.height);
+      } else {
+        expect(photoRegion?.height ?? 0).toBeLessThan((box?.height ?? 0) * 0.6);
+      }
       await carousel.screenshot({
         path: test.info().outputPath(`journey-${index + 1}-${width === 1440 ? "desktop" : "mobile"}.png`),
         animations: "disabled",

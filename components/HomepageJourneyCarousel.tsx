@@ -24,6 +24,8 @@ interface Journey {
   source: string;
   mobilePosition: string;
   desktopPosition: string;
+  photoChip: string;
+  photoNote: string;
 }
 
 interface PhotoStyle extends CSSProperties {
@@ -45,6 +47,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/woman-taking-photos-using-her-cellphone-7414962/",
     mobilePosition: "52% 25%",
     desktopPosition: "50% 25%",
+    photoChip: "Photo to estimate",
+    photoNote: "A starting range, not a contractor quote",
   },
   {
     title: "Post a Job From a Picture. Get Local Contractor Bids.",
@@ -59,6 +63,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/people-holding-a-piece-of-paper-while-standing-near-white-walls-8470045/",
     mobilePosition: "54% 30%",
     desktopPosition: "50% 35%",
+    photoChip: "Post your project",
+    photoNote: "Bids depend on local availability",
   },
   {
     title: "Plan Your Renovation Smarter With QuoteXbert AI.",
@@ -72,6 +78,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/women-looking-through-fabric-samples-8485587/",
     mobilePosition: "60% 48%",
     desktopPosition: "50% 38%",
+    photoChip: "Scope · Materials · Budget",
+    photoNote: "Guided AI planning is a preview",
   },
   {
     title: "See Your Renovation Before You Start.",
@@ -86,6 +94,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/kitchen-and-dining-area-1080721/",
     mobilePosition: "67% 35%",
     desktopPosition: "50% 45%",
+    photoChip: "Design preview",
+    photoNote: "Sign-in and available AI service required",
   },
   {
     title: "Get Inspired by Real Home Renovations.",
@@ -100,6 +110,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/interior-design-of-a-house-1571460/",
     mobilePosition: "57% 35%",
     desktopPosition: "50% 50%",
+    photoChip: "Discover your next idea",
+    photoNote: "Licensed stock-photo examples",
   },
   {
     title: "Find Local Renovation Opportunities.",
@@ -114,6 +126,8 @@ const journeys: Journey[] = [
     source: "https://www.pexels.com/photo/crop-man-installing-laminate-flooring-4263067/",
     mobilePosition: "78% 30%",
     desktopPosition: "50% 35%",
+    photoChip: "Local job opportunities",
+    photoNote: "Contractor account and sign-in required",
   },
 ];
 
@@ -244,7 +258,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
                     src={journey.photo}
                     alt={journey.alt}
                     fill
-                    sizes="(min-width: 1600px) 1536px, 100vw"
+                    sizes="(min-width: 761px) 55vw, 100vw"
                     priority={index === 0}
                     fetchPriority={index === 0 ? "high" : "auto"}
                     loading={index === 0 ? "eager" : "lazy"}
@@ -260,6 +274,10 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
                 )}
               </div>
               <div className="journey-photo-overlay" aria-hidden="true" />
+              <div className="journey-chip" aria-hidden="true">
+                <strong>{journey.photoChip}</strong>
+                <span>{journey.photoNote}</span>
+              </div>
               <a
                 href={journey.source}
                 target="_blank"
@@ -270,7 +288,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
                 Stock photo: {journey.photographer} / Pexels
               </a>
               <div className="journey-copy">
-                <span className="mb-4 inline-flex max-w-full items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white">
+                <span className="journey-label mb-4 inline-flex max-w-full items-center gap-2 text-xs font-semibold uppercase tracking-widest">
                   <Icon size={16} className="shrink-0" aria-hidden="true" />
                   {journey.label}
                 </span>
@@ -299,7 +317,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
           Loading photograph...
         </p>
       ) : null}
-      <div className="journey-navigation absolute inset-x-0 bottom-5 z-20 flex items-center justify-between gap-3 px-5 lg:px-12">
+      <div className="journey-navigation absolute z-20 flex items-center gap-3">
         <div className="flex gap-2">
           <button type="button" onClick={() => showJourney(target - 1)} aria-label="Previous journey" className={controlClass}>
             <ArrowLeft size={18} aria-hidden="true" />
