@@ -94,7 +94,6 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
   // Optimize production bundles
   experimental: {
     optimizePackageImports: ['lucide-react', '@clerk/nextjs', 'date-fns'],

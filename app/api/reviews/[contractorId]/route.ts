@@ -13,10 +13,10 @@ function reviewerDisplayName(name: string | null | undefined): string {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { contractorId: string } },
+  { params }: { params: Promise<{ contractorId: string }> },
 ) {
   try {
-    const { contractorId } = params;
+    const { contractorId } = await params;
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get("limit");
 

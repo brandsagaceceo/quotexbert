@@ -5,11 +5,12 @@ import { resolveSeoAdmin } from "@/lib/seo/admin-auth";
 export const dynamic = "force-dynamic";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
   try {
+    const { id } = await params;
     const admin = await resolveSeoAdmin();
     if (!admin)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
     }
 
     const article = await prisma.seoArticle.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, status: true },
     });
     if (!article)

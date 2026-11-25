@@ -11,15 +11,16 @@ import { analyzeQuote } from '@/lib/quote-analysis';
  */
 export async function POST(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const quoteId = params.id;
+    const quoteId = id;
 
     // Verify caller owns the homeowner role on this quote's job
     const quote = await prisma.quote.findUnique({

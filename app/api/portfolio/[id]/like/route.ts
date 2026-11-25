@@ -16,9 +16,10 @@ async function resolveDbUserId(userId: string): Promise<string | null> {
 // POST /api/portfolio/[id]/like — toggle like on a portfolio item
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId: clerkUserId } = await auth();
     if (!clerkUserId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -29,7 +30,7 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const portfolioItemId = params.id;
+    const portfolioItemId = id;
 
     // Verify portfolio item exists
     const item = await prisma.portfolioItem.findUnique({
@@ -63,11 +64,12 @@ export async function POST(
 // GET /api/portfolio/[id]/like — get like count + viewer's like status
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId: clerkUserId } = await auth();
-    const portfolioItemId = params.id;
+    const portfolioItemId = id;
 
     const likeCount = await prisma.portfolioLike.count({ where: { portfolioItemId } });
 
