@@ -246,6 +246,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
                     fill
                     sizes="(min-width: 1600px) 1536px, 100vw"
                     priority={index === 0}
+                    fetchPriority={index === 0 ? "high" : "auto"}
                     loading={index === 0 ? "eager" : "lazy"}
                     placeholder="blur"
                     className="journey-photo-image"
