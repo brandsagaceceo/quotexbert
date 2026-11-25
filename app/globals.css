@@ -391,6 +391,85 @@ textarea:focus-visible,
   animation: gradient 3s ease infinite;
 }
 
+.journey-slide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 660px;
+  padding: 240px 22px 100px;
+}
+
+.journey-photo {
+  position: absolute;
+  inset: 0 0 20%;
+  z-index: -2;
+}
+
+.journey-photo-image {
+  object-fit: cover;
+  object-position: var(--journey-mobile-position);
+}
+
+.journey-photo-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, #260611 0%, rgba(38, 6, 17, .95) 24%, rgba(38, 6, 17, .18) 57%, transparent 76%);
+}
+
+.journey-photo-credit {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  max-width: calc(100% - 100px);
+  border-radius: 6px;
+  padding: 5px 8px;
+  background: rgba(25, 9, 15, .75);
+  font-size: 10px;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.journey-copy {
+  width: 100%;
+  max-width: 38rem;
+}
+
+.journey-heading {
+  margin-bottom: 16px;
+  font-size: 31px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.journey-description {
+  max-width: 28rem;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #fff;
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .journey-slide { padding-right: 40px; padding-left: 40px; }
+  .journey-heading { max-width: 30rem; font-size: 40px; }
+}
+
+@media (min-width: 1024px) {
+  .journey-slide { min-height: 620px; padding: 100px 48px; }
+  .journey-photo { bottom: 0; }
+  .journey-photo-image { object-position: var(--journey-desktop-position); }
+  .journey-photo-overlay {
+    background: linear-gradient(90deg, rgba(38, 6, 17, .86), rgba(58, 4, 22, .72) 36%, rgba(80, 0, 32, .12) 65%, transparent 85%);
+  }
+  .journey-copy { max-width: 48%; }
+  .journey-heading { font-size: clamp(40px, 4.2vw, 64px); }
+  .journey-description { font-size: 16px; }
+  .journey-photo-credit { top: 24px; left: 48px; }
+}
+
 /* Gradient Shift Animation for Estimate Button */
 @keyframes gradient-shift {
   0%, 100% {
