@@ -253,4 +253,3 @@ test("photo project and visualization actions open their existing pages without 
   await expect(page.getByRole("heading", { name: "Access Restricted" })).toBeVisible();
   expect(writes).toEqual([]);
 });
-
