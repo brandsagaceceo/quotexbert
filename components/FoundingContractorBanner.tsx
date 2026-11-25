@@ -23,7 +23,7 @@ export default function FoundingContractorBanner() {
   return (
     <div
       className="
-        fixed bottom-4 left-1/2 -translate-x-1/2 z-[9998]
+        hidden md:block fixed bottom-4 left-1/2 -translate-x-1/2 z-[9998]
         w-[calc(100%-2rem)] max-w-2xl
         bg-gradient-to-r from-[#800020] to-[#600018]
         rounded-xl shadow-xl border border-white/20

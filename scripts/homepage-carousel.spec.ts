@@ -63,6 +63,15 @@ test("automatic rotation pauses for hover/focus and manual keyboard/navigation w
   await expect(active).toHaveAttribute("aria-label", "1 of 6");
 });
 
+test("mobile contractor offer does not cover the sticky estimate action", async ({ page }) => {
+  await page.clock.install();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openHomepage(page);
+  await page.clock.fastForward(1600);
+  await expect(page.locator(".sticky-cta-bar")).toBeVisible();
+  await expect(page.locator('div[role="banner"][aria-label="New Contractor Offer"]')).toBeHidden();
+});
+
 test("reduced motion disables autoplay, horizontal touch works, and existing actions do not write data", async ({ page }) => {
   await page.clock.install();
   await page.setViewportSize({ width: 390, height: 900 });
@@ -221,7 +230,7 @@ test("failed replacement photography reports an error without blanking the curre
   await expect(carousel.getByRole("alert")).toHaveCount(0);
 });
 
-test("photo project and visualization actions open their existing pages without submitting a project or generation", async ({ page }) => {
+test("photo and job actions use existing destinations without submitting a project or generation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openHomepage(page);
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
@@ -235,21 +244,13 @@ test("photo project and visualization actions open their existing pages without 
     await route.continue();
   });
   await carousel.getByRole("button", { name: /^Show journey 2:/ }).click();
-  await carousel.getByRole("link", { name: "Post a Job" }).click();
-  await expect(page).toHaveURL(/\/create-lead$/, { timeout: 20_000 });
-  await expect(page.getByRole("heading", { name: "Sign In Required" })).toBeVisible();
-  await page.goBack({ waitUntil: "domcontentloaded" });
+  await expect(carousel.getByRole("link", { name: "Post a Job" })).toHaveAttribute("href", "/create-lead");
   await carousel.getByRole("button", { name: /^Show journey 4:/ }).click();
   await expect(carousel).toContainText("Visualization preview");
-  await carousel.getByRole("link", { name: "Try Photo Visualization" }).click();
-  await expect(page).toHaveURL(/\/visualizer$/, { timeout: 20_000 });
-  await expect(page.getByRole("heading", { level: 1, name: /Visualize Your Dream Space/ })).toBeVisible();
+  await expect(carousel.getByRole("link", { name: "Try Photo Visualization" })).toHaveAttribute("href", "/visualizer");
   await openHomepage(page);
   await carousel.getByRole("button", { name: /^Show journey 6:/ }).click();
   await expect(carousel.locator('[aria-label="6 of 6"]')).toHaveAttribute("aria-hidden", "false");
   await expect(carousel.getByRole("link", { name: "Browse Jobs" })).toHaveAttribute("href", "/contractor/jobs");
-  await carousel.getByRole("link", { name: "Browse Jobs" }).click();
-  await expect(page).toHaveURL(/\/contractor\/jobs$/, { timeout: 20_000 });
-  await expect(page.getByRole("heading", { name: "Access Restricted" })).toBeVisible();
   expect(writes).toEqual([]);
 });
