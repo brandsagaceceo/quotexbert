@@ -12,9 +12,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { city: string };
+  params: Promise<{ city: string }>;
 }): Promise<Metadata> {
-  const city = CITY_MAP[params.city];
+  const { city: citySlug } = await params;
+  const city = CITY_MAP[citySlug];
   if (!city) return {};
 
   const title = `Find Renovation Contractors in ${city.name} | QuoteXbert`;
@@ -66,12 +67,13 @@ const COMPETITOR_COMPARISON = [
   },
 ];
 
-export default function ContractorsCityPage({
+export default async function ContractorsCityPage({
   params,
 }: {
-  params: { city: string };
+  params: Promise<{ city: string }>;
 }) {
-  const city = CITY_MAP[params.city];
+  const { city: citySlug } = await params;
+  const city = CITY_MAP[citySlug];
   if (!city) return null;
 
   const faqs = [

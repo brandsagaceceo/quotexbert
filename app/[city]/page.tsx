@@ -10,7 +10,7 @@ import InternalLinksSection from "@/components/seo/InternalLinksSection";
 import StructuredData from "@/components/seo/StructuredData";
 
 interface Props {
-  params: { city: string };
+  params: Promise<{ city: string }>;
 }
 
 export async function generateStaticParams() {
@@ -18,7 +18,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const page = renovationCostPages.find((p) => p.slug === params.city);
+  const { city } = await params;
+  const page = renovationCostPages.find((p) => p.slug === city);
   if (!page) return {};
   return {
     title: page.metaTitle,
@@ -64,8 +65,9 @@ const neighborhoodLinks = [
   { href: "/renovation-estimates-markham", label: "Markham" },
 ];
 
-export default function RenovationCostPage({ params }: Props) {
-  const page = renovationCostPages.find((p) => p.slug === params.city);
+export default async function RenovationCostPage({ params }: Props) {
+  const { city } = await params;
+  const page = renovationCostPages.find((p) => p.slug === city);
   if (!page) notFound();
 
   return (

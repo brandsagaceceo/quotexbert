@@ -7,7 +7,7 @@ import {
 import { CityLeadPageTemplate } from "@/components/seo/ContractorAcquisitionTemplates";
 
 interface Props {
-  params: { city: string };
+  params: Promise<{ city: string }>;
 }
 
 export async function generateStaticParams() {
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = getCityData(params.city);
+  const { city } = await params;
+  const data = getCityData(city);
   if (!data) return {};
   const url = `https://www.quotexbert.com/contractor-leads/${data.slug}`;
   return {
@@ -36,8 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CityContractorLeadsPage({ params }: Props) {
-  const data = getCityData(params.city);
+export default async function CityContractorLeadsPage({ params }: Props) {
+  const { city } = await params;
+  const data = getCityData(city);
   if (!data) notFound();
 
   const jsonLd = {
