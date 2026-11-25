@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Logo from "@/components/Logo";
 
 export default function SiteFooter() {
   const currentYear = new Date().getFullYear();
@@ -10,16 +10,9 @@ export default function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center space-x-3 mb-4">
-              <Image
-                src="/logo.svg"
-                alt="quotexbert logo"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span className="text-xl font-bold text-brand">QuoteXbert</span>
-            </Link>
+            <div className="mb-4">
+              <Logo size="sm" />
+            </div>
             <p className="text-ink-600 mb-4 max-w-md">
               Connect homeowners with trusted contractors. Get instant quotes
               for home improvement projects.

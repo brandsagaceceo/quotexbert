@@ -150,7 +150,6 @@ export default function AIAssistantPopup() {
         if (!entry || window.innerWidth >= 768) return; // desktop: no-op
         if (entry.isIntersecting) {
           setIsHidden(true);
-          if (isOpen) setIsOpen(false);
         } else {
           setIsHidden(false);
         }
@@ -159,7 +158,7 @@ export default function AIAssistantPopup() {
     );
     observer.observe(estimatorEl);
     return () => observer.disconnect();
-  }, [shouldHideForPath, pathname, isOpen]);
+  }, [shouldHideForPath, pathname]);
 
   // On mobile: hide widget when any input/textarea/select is focused (user is interacting with a form).
   // IMPORTANT: exclude focus events that happen inside the chat window itself — otherwise the

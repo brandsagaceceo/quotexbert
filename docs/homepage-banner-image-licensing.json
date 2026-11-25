@@ -1,0 +1,180 @@
+{
+  "verifiedOn": "2026-11-24",
+  "status": "Unverified source and license for every supplied photograph",
+  "packageSourceClaim": {
+    "reportedLibraries": ["Pexels", "Unsplash"],
+    "individualImageMappingProvided": false,
+    "verificationStatus": "unverified"
+  },
+  "inspection": {
+    "checked": [
+      "Package filenames and documentation",
+      "Image metadata",
+      "Prior homepage development records"
+    ],
+    "result": "No per-image source URLs, photographer names, or license evidence were found. Inspected WebP files contain no EXIF, IPTC, XMP, or comment metadata."
+  },
+  "usageRestriction": "These supplied images are available only through the development-only local review route. Do not copy them into public assets or use them in production until each original listing and commercial-use permission is verified.",
+  "licenseVerification": {
+    "license": null,
+    "commercialUseVerified": false,
+    "verificationStatus": "unverified"
+  },
+  "images": [
+    {
+      "banner": "estimate",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "/homepage/photo-estimate.webp",
+      "desktop": {
+        "file": "estimate.webp",
+        "width": 1919,
+        "height": 1280,
+        "bytes": 82354,
+        "sha256": "7d22d67ad2ec92952e3331acf573fb4313721c7608073289672e08aba4ebd69e"
+      },
+      "mobile": {
+        "file": "estimate-mobile.webp",
+        "width": 900,
+        "height": 600,
+        "bytes": 23836,
+        "sha256": "6ab6c80964dfbc6832ec2c785dd321624473ff841121619030a64955cc9b3578"
+      }
+    },
+    {
+      "banner": "local-bids",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "/homepage/contractor-team.webp",
+      "desktop": {
+        "file": "local-bids.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 97332,
+        "sha256": "4c972220d8f2d3dd548597b09d2093598c6ff398d88f22f5698950b7bd266c00"
+      },
+      "mobile": {
+        "file": "local-bids-mobile.webp",
+        "width": 900,
+        "height": 600,
+        "bytes": 35714,
+        "sha256": "bfa6fc1c2e995caa0f0d12fdc18bc4aed1650cb5176777aca49b65aa84e7f141"
+      }
+    },
+    {
+      "banner": "ai-planning",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "/homepage/renovation-planning.webp",
+      "desktop": {
+        "file": "ai-planning.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 67972,
+        "sha256": "e0af98c56a899862226695b1debd7ccd001204537aa865a6ee50888d4cf4c22b"
+      },
+      "mobile": {
+        "file": "ai-planning-mobile.webp",
+        "width": 900,
+        "height": 600,
+        "bytes": 31508,
+        "sha256": "fbd904e2567a3bfb5619fcc2884aa8d3919147464ec5428e8a557c83f5a05811"
+      }
+    },
+    {
+      "banner": "visualize-phone",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "Not used in the carousel; retained only in the package provenance manifest.",
+      "desktop": {
+        "file": "visualize-phone.webp",
+        "width": 1919,
+        "height": 1280,
+        "bytes": 59746,
+        "sha256": "334a934438a71b9c86e98b0cb628bb6e5363379afebd1d8e75e93a32a8c55ad4"
+      },
+      "mobile": {
+        "file": "visualize-phone-mobile.webp",
+        "width": 900,
+        "height": 600,
+        "bytes": 19364,
+        "sha256": "cd409c7b86492928612bccbda23daac5f22a6cf403a9b2424dfe6788a1e09296"
+      }
+    },
+    {
+      "banner": "visualize-kitchen",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "Used directly in the private visualization banner review only; the public fallback remains /homepage/finished-kitchen.webp.",
+      "desktop": {
+        "file": "visualize-kitchen.webp",
+        "width": 1536,
+        "height": 864,
+        "bytes": 69200,
+        "sha256": "e47487d25f3596a4ac0213c0da32c36a1a6caf3730a0c01692cad9b67b7a5b6b"
+      },
+      "mobile": {
+        "file": "visualize-kitchen-mobile.webp",
+        "width": 900,
+        "height": 506,
+        "bytes": 25652,
+        "sha256": "432139ff38dbb39209ee48a94e8b8cf97247ed39986c7baef835d448390aee53"
+      }
+    },
+    {
+      "banner": "inspiration",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "/homepage/finished-living-room.webp",
+      "desktop": {
+        "file": "inspiration.webp",
+        "width": 1920,
+        "height": 847,
+        "bytes": 100540,
+        "sha256": "1fc1fd39782930ea4db470bab69094274ae42c9aa2660e180fbd6e9607265fb0"
+      },
+      "mobile": {
+        "file": "inspiration-mobile.webp",
+        "width": 900,
+        "height": 397,
+        "bytes": 27204,
+        "sha256": "0003643389bf6bacc8532c4e22f81cfa090449d0f2fb6d1528f2d983d15da367"
+      }
+    },
+    {
+      "banner": "contractor",
+      "originalSourceUrl": null,
+      "photographer": null,
+      "license": null,
+      "verificationStatus": "unverified",
+      "publicFallback": "/homepage/contractor-flooring.webp",
+      "desktop": {
+        "file": "contractor.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 74860,
+        "sha256": "634c8304d36c055bf346defb2e39ef505da5f506e6a7729e18f1f367014d7a03"
+      },
+      "mobile": {
+        "file": "contractor-mobile.webp",
+        "width": 900,
+        "height": 600,
+        "bytes": 31954,
+        "sha256": "3fb67ccbdac4ec746daf3261eb4df3c0453784bb12f084e02660929701600446"
+      }
+    }
+  ],
+  "ownerActionNeeded": "Please provide the original source listing or photographer and license evidence for each of the seven banner photographs. A library name alone cannot establish provenance or commercial-use rights."
+}

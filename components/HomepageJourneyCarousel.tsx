@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Briefcase, Camera, Images, Palette, Pause, Play, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import photoEstimate from "@/public/homepage/photo-estimate.webp";
 import contractorFlooring from "@/public/homepage/contractor-flooring.webp";
 import contractorTeam from "@/public/homepage/contractor-team.webp";
@@ -14,18 +14,21 @@ import finishedLivingRoom from "@/public/homepage/finished-living-room.webp";
 interface Journey {
   title: string;
   description: string;
-  label: string;
   action: string;
-  icon: LucideIcon;
   href?: string;
   photo: StaticImageData;
+  reviewImage: ReviewImage;
   alt: string;
   photographer: string;
   source: string;
   mobilePosition: string;
   desktopPosition: string;
-  photoChip: string;
-  photoNote: string;
+}
+
+interface ReviewImage {
+  desktop: string;
+  mobile: string;
+  alt?: string;
 }
 
 interface PhotoStyle extends CSSProperties {
@@ -33,101 +36,113 @@ interface PhotoStyle extends CSSProperties {
   "--journey-desktop-position": string;
 }
 
+const privateReviewEnabled =
+  process.env.NODE_ENV === "development" &&
+  process.env.NEXT_PUBLIC_QX_BANNER_REVIEW === "1";
+
+const privateReviewAsset = (file: string) => `/api/local-banner-review/${file}`;
+
 const journeys: Journey[] = [
   {
-    title: "Take a Picture. Get an Instant Renovation Quote.",
-    description: "Explore an AI-assisted cost range before you hire. An estimate is not a binding contractor quote.",
-    label: "Start with your photos",
-    action: "Get My Estimate",
-    icon: Camera,
+    title: "Take a picture. Get an instant quote.",
+    description: "Upload a photo and let AI estimate the cost of your renovation.",
+    action: "Get an estimate",
     href: "#estimator-tool",
     photo: photoEstimate,
+    reviewImage: {
+      desktop: "estimate.webp",
+      mobile: "estimate-mobile.webp",
+      alt: "A homeowner photographing a bright renovated living space with a smartphone.",
+    },
     alt: "A woman taking smartphone photos inside a bright kitchen and living space.",
     photographer: "MART PRODUCTION",
     source: "https://www.pexels.com/photo/woman-taking-photos-using-her-cellphone-7414962/",
     mobilePosition: "52% 25%",
     desktopPosition: "50% 25%",
-    photoChip: "Photo to estimate",
-    photoNote: "A starting range, not a contractor quote",
   },
   {
-    title: "Post a Job From a Picture. Get Local Contractor Bids.",
-    description: "Share project photos and details. Local bids depend on your project area and contractor availability.",
-    label: "Review before posting",
-    action: "Post a Job",
-    icon: Images,
+    title: "Post a job. Get local quotes.",
+    description: "Upload a picture of what you need done and receive quotes from local contractors.",
+    action: "Post a job",
     href: "/create-lead",
     photo: contractorTeam,
+    reviewImage: {
+      desktop: "local-bids.webp",
+      mobile: "local-bids-mobile.webp",
+      alt: "Two renovators reviewing a project together at a worksite.",
+    },
     alt: "Two architects reviewing renovation plans inside a newly built home.",
     photographer: "Thirdman",
     source: "https://www.pexels.com/photo/people-holding-a-piece-of-paper-while-standing-near-white-walls-8470045/",
     mobilePosition: "54% 30%",
     desktopPosition: "50% 35%",
-    photoChip: "Post your project",
-    photoNote: "Bids depend on local availability",
   },
   {
-    title: "Plan Your Renovation Smarter With QuoteXbert AI.",
-    description: "Open the planning assistant. Guided AI planning is a preview and may not be enabled yet.",
-    label: "Planning preview",
-    action: "Plan My Project",
-    icon: Sparkles,
+    title: "Get help with your renovation.",
+    description: "Explore estimates, cost guides and design ideas for your next project.",
+    action: "Ask QuoteXbert AI",
     photo: renovationPlanning,
+    reviewImage: {
+      desktop: "ai-planning.webp",
+      mobile: "ai-planning-mobile.webp",
+      alt: "A renovation planner reviewing material samples beside a laptop.",
+    },
     alt: "Two people comparing fabric and colour samples together at a design table.",
     photographer: "Thirdman",
     source: "https://www.pexels.com/photo/women-looking-through-fabric-samples-8485587/",
     mobilePosition: "60% 48%",
     desktopPosition: "50% 38%",
-    photoChip: "Scope · Materials · Budget",
-    photoNote: "Guided AI planning is a preview",
   },
   {
-    title: "See Your Renovation Before You Start.",
-    description: "Explore the room-design preview. Sign-in, an enabled AI service and an available usage allowance are required.",
-    label: "Visualization preview",
-    action: "Try Photo Visualization",
-    icon: Palette,
+    title: "See it before you build it.",
+    description: "Upload a photo of your space and see how it could look after a renovation.",
+    action: "Visualize your space",
     href: "/visualizer",
     photo: finishedKitchen,
+    reviewImage: {
+      desktop: "visualize-kitchen.webp",
+      mobile: "visualize-kitchen-mobile.webp",
+      alt: "A luxury kitchen with a marble backsplash and a warm wood island.",
+    },
     alt: "A finished white kitchen with a large island, pendant lighting and a sunny dining area.",
     photographer: "Mark McCammon",
     source: "https://www.pexels.com/photo/kitchen-and-dining-area-1080721/",
     mobilePosition: "67% 35%",
     desktopPosition: "50% 45%",
-    photoChip: "Design preview",
-    photoNote: "Sign-in and available AI service required",
   },
   {
-    title: "Get Inspired by Real Home Renovations.",
-    description: "Browse licensed stock-photo design examples, not customer projects. The social inspiration feed is coming soon.",
-    label: "Example gallery",
-    action: "Explore Example Gallery",
-    icon: Images,
+    title: "Your dream home starts here.",
+    description: "Explore renovation ideas and find inspiration for your next home project.",
+    action: "Get inspired",
     href: "/visualizer-library",
     photo: finishedLivingRoom,
+    reviewImage: {
+      desktop: "inspiration.webp",
+      mobile: "inspiration-mobile.webp",
+      alt: "A bright luxury kitchen with a marble backsplash and a warm wood island.",
+    },
     alt: "A completed contemporary living room with a curved sofa, warm wood stairs and detailed lighting.",
     photographer: "Viaceslav Kat",
     source: "https://www.pexels.com/photo/interior-design-of-a-house-1571460/",
     mobilePosition: "57% 35%",
     desktopPosition: "50% 50%",
-    photoChip: "Discover your next idea",
-    photoNote: "Licensed stock-photo examples",
   },
   {
-    title: "Find Local Renovation Opportunities.",
-    description: "Browse renovation leads in your service area. Contractor account and sign-in are required.",
-    label: "For contractors",
-    action: "Browse Jobs",
-    icon: Briefcase,
+    title: "More jobs. More opportunities.",
+    description: "Find local renovation jobs, send quotes and grow your contracting business.",
+    action: "Find local jobs",
     href: "/contractor/jobs",
     photo: contractorFlooring,
+    reviewImage: {
+      desktop: "contractor.webp",
+      mobile: "contractor-mobile.webp",
+      alt: "A contractor using a tablet while reviewing a renovation project.",
+    },
     alt: "A flooring installer fitting wood flooring inside a home.",
     photographer: "K",
     source: "https://www.pexels.com/photo/crop-man-installing-laminate-flooring-4263067/",
     mobilePosition: "78% 30%",
     desktopPosition: "50% 35%",
-    photoChip: "Local job opportunities",
-    photoNote: "Contractor account and sign-in required",
   },
 ];
 
@@ -142,6 +157,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
   const [hovered, setHovered] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const imageRefs = useRef(new Map<number, HTMLImageElement>());
   const rotating = playing && !reducedMotion && !hovered && pageVisible;
 
   useEffect(() => {
@@ -179,6 +195,26 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
     setPlaying(false);
     setTarget((index + journeys.length) % journeys.length);
   };
+  const markPhotoLoaded = (index: number) => {
+    setLoadedPhotos(previous => previous.includes(index) ? previous : [...previous, index]);
+    setPreparedPhotos(previous => previous.includes(index) ? previous : [...previous, index]);
+    setFailedPhotos(previous => previous.includes(index) ? previous.filter(failed => failed !== index) : previous);
+  };
+  const markPhotoFailed = (index: number) => {
+    setFailedPhotos(previous => previous.includes(index) ? previous : [...previous, index]);
+  };
+  const setImageRef = (index: number, image: HTMLImageElement | null) => {
+    if (image) imageRefs.current.set(index, image);
+    else imageRefs.current.delete(index);
+  };
+
+  useEffect(() => {
+    for (const index of new Set([...preparedPhotos, target])) {
+      const image = imageRefs.current.get(index);
+      if (image?.complete && image.naturalWidth > 0) markPhotoLoaded(index);
+    }
+  }, [preparedPhotos, target]);
+
   const actionClass = "inline-flex max-w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3.5 text-center text-sm font-bold text-[#800020] shadow-lg transition-colors hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white";
   const controlClass = "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/50 bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
@@ -238,7 +274,7 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
       <div className="grid" aria-live={rotating ? "off" : "polite"} aria-atomic="true">
         {journeys.map((journey, index) => {
           const current = index === active;
-          const Icon = journey.icon;
+          const reviewImage = privateReviewEnabled ? journey.reviewImage : undefined;
           const photoStyle: PhotoStyle = {
             "--journey-mobile-position": journey.mobilePosition,
             "--journey-desktop-position": journey.desktopPosition,
@@ -254,44 +290,59 @@ export default function HomepageJourneyCarousel({ onOpenAssistant }: { onOpenAss
             >
               <div className="journey-photo" style={photoStyle}>
                 {(index === target || preparedPhotos.includes(index)) && (
-                  <Image
-                    src={journey.photo}
-                    alt={journey.alt}
-                    fill
-                    sizes="(min-width: 761px) 55vw, 100vw"
-                    priority={index === 0}
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    placeholder="blur"
-                    className="journey-photo-image"
-                    onLoad={() => {
-                      setLoadedPhotos(previous => previous.includes(index) ? previous : [...previous, index]);
-                      setPreparedPhotos(previous => previous.includes(index) ? previous : [...previous, index]);
-                      setFailedPhotos(previous => previous.includes(index) ? previous.filter(failed => failed !== index) : previous);
-                    }}
-                    onError={() => setFailedPhotos(previous => previous.includes(index) ? previous : [...previous, index])}
-                  />
+                  reviewImage ? (
+                    <picture className="journey-review-picture">
+                      <source media="(max-width: 760px)" srcSet={privateReviewAsset(reviewImage.mobile)} />
+                      <Image
+                        src={privateReviewAsset(reviewImage.desktop)}
+                        alt={reviewImage.alt ?? journey.alt}
+                        fill
+                        sizes="(min-width: 761px) 55vw, 100vw"
+                        priority={index === 0}
+                        fetchPriority={index === 0 ? "high" : "auto"}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        unoptimized
+                        className="journey-photo-image"
+                        ref={image => setImageRef(index, image)}
+                        onLoad={() => markPhotoLoaded(index)}
+                        onError={() => markPhotoFailed(index)}
+                      />
+                    </picture>
+                  ) : (
+                    <Image
+                      src={journey.photo}
+                      alt={journey.alt}
+                      fill
+                      sizes="(min-width: 761px) 55vw, 100vw"
+                      priority={index === 0}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      placeholder="blur"
+                      className="journey-photo-image"
+                      ref={image => setImageRef(index, image)}
+                      onLoad={() => markPhotoLoaded(index)}
+                      onError={() => markPhotoFailed(index)}
+                    />
+                  )
                 )}
               </div>
               <div className="journey-photo-overlay" aria-hidden="true" />
-              <div className="journey-chip" aria-hidden="true">
-                <strong>{journey.photoChip}</strong>
-                <span>{journey.photoNote}</span>
-              </div>
-              <a
-                href={journey.source}
-                target="_blank"
-                rel="noopener noreferrer"
-                tabIndex={current ? 0 : -1}
-                className="journey-photo-credit"
-              >
-                Stock photo: {journey.photographer} / Pexels
-              </a>
-              <div className="journey-copy">
-                <span className="journey-label mb-4 inline-flex max-w-full items-center gap-2 text-xs font-semibold uppercase tracking-widest">
-                  <Icon size={16} className="shrink-0" aria-hidden="true" />
-                  {journey.label}
+              {reviewImage ? (
+                <span className="journey-photo-credit journey-photo-credit--private">
+                  Private image review · attribution unverified
                 </span>
+              ) : (
+                <a
+                  href={journey.source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  tabIndex={current ? 0 : -1}
+                  className="journey-photo-credit"
+                >
+                  Stock photo: {journey.photographer} / Pexels
+                </a>
+              )}
+              <div className="journey-copy">
                 <h2 className="journey-heading">{journey.title}</h2>
                 <p className="journey-description">{journey.description}</p>
                 {journey.href ? (

@@ -14365,7 +14365,7 @@ export default function BlogPostPage() {
                 "name": "QuoteXbert",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "/logo.svg"
+                  "url": "https://www.quotexbert.com/branding/quotexbert-wordmark-display.webp"
                 }
               },
               "mainEntityOfPage": {

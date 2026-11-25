@@ -28,4 +28,4 @@ Place at: `public/og-image.jpg`
 - Or use AI: "Create a 1200x630 social media banner for QuoteXpert home services"
 
 ## Alternative: Use Logo
-If you don't have time, simply copy `public/logo.svg` and convert to JPG at 1200x630px with white/orange background.
+Use the approved QuoteXbert wordmark in `public/branding/quotexbert-wordmark-display.webp` on a burgundy-and-white background.

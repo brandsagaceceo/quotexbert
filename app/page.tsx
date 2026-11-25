@@ -330,12 +330,12 @@ export default function Home() {
           <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] -z-10" />
           <div className="relative z-10 mx-auto max-w-[1600px] sm:px-6 lg:px-8">
             <div className="min-w-0">
-              <h1 className="sr-only">Get an AI renovation estimate before you hire</h1>
+              <h1 className="sr-only">Get a renovation estimate from a photo or project details</h1>
               <HomepageJourneyCarousel onOpenAssistant={handleOpenPlanning} />
             </div>
             <div className="relative mx-auto mt-8 w-full max-w-3xl px-4 sm:px-0">
               <p className="mb-5 text-center text-sm text-slate-600">
-                Toronto, Durham Region and the GTA. Review your estimate and project before sharing it with contractors.
+                Get an estimate, review it, and choose whether to share your project with local contractors.
               </p>
               <div id="estimator-tool" data-estimator>
                 <EstimatorMain
@@ -356,28 +356,24 @@ export default function Home() {
             <div className="relative overflow-hidden group">
               <Image src={contractorTeam} alt="Two renovation professionals reviewing plans in a newly built home." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Planning example</span>
             </div>
             <div className="relative overflow-hidden group">
               <Image src={projectConsultation} alt="A couple discussing a renovation in a home under construction." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Renovation example</span>
             </div>
             <div className="relative overflow-hidden group">
               <Image src={finishedKitchen} alt="A bright renovated kitchen with white cabinetry and a large island." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Kitchen example</span>
             </div>
             <div className="relative overflow-hidden group">
               <Image src={finishedLivingRoom} alt="A completed contemporary living room with a staircase and warm wood details." fill sizes="(min-width: 768px) 25vw, 50vw" loading="lazy" className="object-cover object-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <span className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">Living room example</span>
             </div>
           </div>
           {/* Callout bar — sits below the photos, never overlaps */}
           <div className="bg-[#800020] px-4 py-2.5 md:py-5 text-center">
-            <p className="text-white font-bold text-xs md:text-lg tracking-tight">Renovation inspiration for Toronto, Durham Region &amp; the GTA.</p>
-            <p className="text-rose-200 text-[11px] md:text-sm mt-0.5 md:mt-1">Illustrative licensed stock photographs, not customer projects or guaranteed savings.</p>
+            <p className="text-white font-bold text-xs md:text-lg tracking-tight">Renovation ideas for homes across the GTA.</p>
+            <p className="text-rose-200 text-[11px] md:text-sm mt-0.5 md:mt-1">Example photos, not customer projects.</p>
           </div>
         </section>
 
@@ -386,12 +382,12 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-5 md:gap-6">
               {[
-                { Icon: Gift, tint: "text-emerald-600 bg-emerald-50 ring-emerald-100", label: "Free for Homeowners", sub: "$0, always" },
-                { Icon: Tag, tint: "text-rose-600 bg-rose-50 ring-rose-100", label: "Ontario Renovation Pricing", sub: "Real regional rates" },
-                { Icon: Sparkles, tint: "text-[#800020] bg-[#800020]/10 ring-[#800020]/20", label: "AI-Powered Estimates", sub: "Instant & detailed" },
-                { Icon: Map, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Durham Region & GTA", sub: "Toronto to Durham" },
-                { Icon: Lock, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Secure Accounts", sub: "Your data, protected" },
-                { Icon: HeartHandshake, tint: "text-amber-600 bg-amber-50 ring-amber-100", label: "No Obligation to Hire", sub: "Estimates are always free" },
+                { Icon: Gift, tint: "text-emerald-600 bg-emerald-50 ring-emerald-100", label: "Free homeowner estimates", sub: "No charge" },
+                { Icon: Tag, tint: "text-rose-600 bg-rose-50 ring-rose-100", label: "Ontario renovation costs", sub: "Local price ranges" },
+                { Icon: Sparkles, tint: "text-[#800020] bg-[#800020]/10 ring-[#800020]/20", label: "Quick cost estimates", sub: "Photos or project details" },
+                { Icon: Map, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Serving the GTA", sub: "Toronto to Durham" },
+                { Icon: Lock, tint: "text-slate-600 bg-slate-100 ring-slate-200", label: "Secure accounts", sub: "Your data, protected" },
+                { Icon: HeartHandshake, tint: "text-amber-600 bg-amber-50 ring-amber-100", label: "Your choice", sub: "No pressure to hire" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-3 justify-center group">
                   <div className={`w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center flex-shrink-0 ring-1 transition-transform duration-200 group-hover:scale-105 ${item.tint}`}>
@@ -411,9 +407,9 @@ export default function Home() {
         <section className="py-10 md:py-14 bg-gradient-to-br from-white to-slate-50 border-t border-slate-100">
           <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Areas We Serve</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Where we work</h2>
               <p className="text-slate-600 text-base max-w-2xl mx-auto">
-                QuoteXbert helps homeowners and contractors across Toronto, Durham Region, Clarington, and the GTA get fair renovation pricing.
+                Get renovation estimates and connect with contractors in Toronto, Durham Region, Clarington and the GTA.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -450,7 +446,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-center text-xs text-slate-500 mt-6">
-              Don&apos;t see your city? <Link href="/#get-estimate" className="text-rose-600 font-semibold hover:underline">Get an estimate anyway</Link> — our AI covers all Ontario postal codes.
+              Don&apos;t see your city? <Link href="/#get-estimate" className="text-rose-600 font-semibold hover:underline">Start with an estimate</Link>.
             </p>
           </div>
         </section>
@@ -462,14 +458,14 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-center sm:text-left">
-                  <p className="font-black text-base md:text-lg">🎯 Ready to Grow Your Business?</p>
-                  <p className="text-sm text-rose-100">Browse active leads in Toronto, Durham Region &amp; the GTA &bull; Get qualified projects today</p>
+                  <p className="font-black text-base md:text-lg">Find local renovation jobs</p>
+                  <p className="text-sm text-rose-100">Browse homeowner projects in Toronto, Durham Region and the GTA.</p>
                 </div>
                 <Link
                   href="/contractor/jobs"
                   className="flex-shrink-0 bg-white text-[#800020] font-bold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors shadow-sm text-sm whitespace-nowrap"
                 >
-                  Browse Available Leads &rarr;
+                  Find local jobs &rarr;
                 </Link>
               </div>
             </div>
@@ -484,10 +480,10 @@ export default function Home() {
             <div className="max-w-5xl mx-auto px-4">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-7">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black text-slate-900">Popular in the GTA</h2>
-                  <p className="text-slate-600 mt-1">Explore renovation costs and find contractors across every Toronto-area city.</p>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-900">Renovation costs across the GTA</h2>
+                  <p className="text-slate-600 mt-1">Compare common renovation costs by city and project type.</p>
                 </div>
-                <Link href="/renovation-costs" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">View all cost guides →</Link>
+                <Link href="/renovation-costs" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">See all cost guides →</Link>
               </div>
 
               {/* Cost guide chips */}
@@ -512,8 +508,8 @@ export default function Home() {
 
               {/* Contractor city chips */}
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
-                <p className="font-bold text-slate-800 text-sm">Find contractors near you:</p>
-                <Link href="/contractors/join" className="text-sky-700 font-bold text-sm hover:underline">Join as Contractor →</Link>
+                <p className="font-bold text-slate-800 text-sm">Looking for a contractor?</p>
+                <Link href="/contractors/join" className="text-sky-700 font-bold text-sm hover:underline">Join as a contractor →</Link>
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -549,29 +545,12 @@ export default function Home() {
             {/* Content — normal flow on mobile so it never gets clipped */}
             <div className="relative z-10 max-w-6xl mx-auto px-5 py-8 md:py-16">
               <div className="max-w-xl">
-                <p className="text-rose-400 font-bold text-xs md:text-sm uppercase tracking-widest mb-2 md:mb-3">Toronto GTA &mdash; First-Time Homeowners</p>
                 <h2 className="text-2xl md:text-5xl font-black text-white leading-tight mb-3 md:mb-4">
-                  Stop overpaying.<br />
-                  <span className="text-[#800020]">Know before you sign.</span>
+                  Know what your renovation could cost.
                 </h2>
                 <p className="text-slate-300 text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
-                  First-time homeowners in the GTA avoid costly surprises by getting an AI estimate <strong className="text-white">before</strong> hiring a contractor.
+                  Get a starting estimate before you speak with contractors. Review it before sharing your project.
                 </p>
-                {/* Stat cards — compact on mobile */}
-                <div className="flex flex-wrap gap-2 md:gap-4">
-                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">AI</div>
-                    <div className="text-slate-400 text-xs">GTA Estimates</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">Free</div>
-                    <div className="text-slate-400 text-xs">For homeowners</div>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg md:rounded-xl px-3 py-2 md:px-5 md:py-3 text-center">
-                    <div className="text-lg md:text-2xl font-black text-white">Review</div>
-                    <div className="text-slate-400 text-xs">Before sharing</div>
-                  </div>
-                </div>
               </div>
             </div>
           </section>
@@ -597,27 +576,24 @@ export default function Home() {
         <section className="py-16 md:py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-10 md:mb-12">
-              <div className="inline-flex items-center gap-1.5 mb-4 px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full">
-                <span className="text-xs font-semibold tracking-wide uppercase">Explore QuoteXbert</span>
-              </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-3 tracking-tight">
-                Everything You Need to Renovate Smarter
+                Plan your renovation with QuoteXbert
               </h2>
               <p className="text-base md:text-lg text-slate-500 max-w-2xl mx-auto">
-                One platform for AI estimates, cost guides, calculators, and contractor opportunities across Ontario.
+                Estimate costs, explore design ideas and connect with local contractors.
               </p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
               {[
-                { href: "#get-estimate", Icon: Camera, label: "AI Renovation Estimate", desc: "Upload photos or describe your project for an instant cost range." },
-                { href: "/renovation-calculator", Icon: Calculator, label: "Renovation Calculators", desc: "Quick calculators for kitchens, bathrooms, basements & more." },
-                { href: "/renovation-costs", Icon: BarChart3, label: "Renovation Cost Guides", desc: "Detailed cost guides by city and project type." },
-                { href: "/visualizer", Icon: Palette, label: "AI Photo Visualizer", desc: "See what your space could look like before you renovate." },
-                { href: "/ai-renovation-check", Icon: Search, label: "AI Renovation Inspector", desc: "Upload photos and let AI flag potential quality issues." },
-                { href: "/contractor/jobs", Icon: Briefcase, label: "Find Contractor Opportunities", desc: "Contractors: browse renovation opportunities near you." },
-                { href: "/contractor-leads", Icon: TrendingUp, label: "Contractor Leads", desc: "See how QuoteXbert connects contractors with homeowners." },
-                { href: "/guides", Icon: BookOpen, label: "Learning Center", desc: "Guides, permit info, and ROI data for every project type." },
+                { href: "#get-estimate", Icon: Camera, label: "Get an estimate", desc: "Upload a photo or describe your project." },
+                { href: "/renovation-calculator", Icon: Calculator, label: "Use a cost calculator", desc: "Plan costs for a kitchen, bathroom, basement or more." },
+                { href: "/renovation-costs", Icon: BarChart3, label: "Compare local costs", desc: "See renovation costs by city and project type." },
+                { href: "/visualizer", Icon: Palette, label: "Visualize your space", desc: "See how your room could look after a renovation." },
+                { href: "/ai-renovation-check", Icon: Search, label: "Check renovation quality", desc: "Upload photos to look for possible issues." },
+                { href: "/contractor/jobs", Icon: Briefcase, label: "Find local jobs", desc: "Contractors can browse homeowner projects in their area." },
+                { href: "/contractor-leads", Icon: TrendingUp, label: "Learn about contractor leads", desc: "See how contractors can find local projects." },
+                { href: "/guides", Icon: BookOpen, label: "Read renovation guides", desc: "Learn about permits, costs and planning." },
               ].map((card) => (
                 <Link
                   key={card.label}
@@ -645,10 +621,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Free Renovation Calculators</h2>
-                <p className="text-slate-500 mt-1">Get a rough budget in seconds — no photos required.</p>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Estimate your renovation costs</h2>
+                <p className="text-slate-500 mt-1">Build a rough budget with a few project details.</p>
               </div>
-              <Link href="/renovation-calculator" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">Explore All Renovation Calculators →</Link>
+              <Link href="/renovation-calculator" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">See all calculators →</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
               {[
@@ -675,16 +651,16 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Learning Center</h2>
-                <p className="text-slate-500 mt-1">In-depth guides on costs, permits, ROI, and hiring contractors.</p>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Renovation guides</h2>
+                <p className="text-slate-500 mt-1">Clear advice on costs, permits and choosing a contractor.</p>
               </div>
-              <Link href="/guides" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">Explore the Learning Center →</Link>
+              <Link href="/guides" className="text-rose-700 font-bold text-sm hover:underline whitespace-nowrap">See all guides →</Link>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
               {[
-                { href: "/ontario-renovation-cost-guide", label: "Ontario Renovation Cost Guide", desc: "Real pricing for every project type across Ontario cities." },
-                { href: "/durham-region-renovation-guide", label: "Durham Region Renovation Guide", desc: "Everything homeowners need to renovate in Durham Region." },
-                { href: "/contractor-growth-guide", label: "Contractor Growth Guide", desc: "How contractors get more leads and grow their business." },
+                { href: "/ontario-renovation-cost-guide", label: "Ontario renovation costs", desc: "Compare costs by project type and city." },
+                { href: "/durham-region-renovation-guide", label: "Durham Region renovation guide", desc: "What to know before renovating in Durham Region." },
+                { href: "/contractor-growth-guide", label: "Contractor growth guide", desc: "Ways contractors can find more local jobs." },
                 { href: "/renovation-permit-guide-durham-region", label: "Permit Guide", desc: "When you need a permit — and how to get one — in Durham Region." },
                 { href: "/best-roi-renovations-durham-region", label: "Best ROI Renovations", desc: "Which projects add the most value before you sell." },
                 { href: "/how-ai-works", label: "How AI Estimates Work", desc: "How QuoteXbert's AI calculates your renovation cost range." },
@@ -710,8 +686,8 @@ export default function Home() {
             <RecentActivityFeed
               maxItems={6}
               showTitle={true}
-              title="Recent Renovation Estimates"
-              description="Live activity from homeowners across Toronto & GTA"
+              title="Recent estimates"
+              description="Recent renovation activity from homeowners in Toronto and the GTA."
             />
           </div>
         </section>
@@ -720,16 +696,16 @@ export default function Home() {
         <section className="py-14 md:py-16 bg-slate-50 border-t border-slate-100">
           <div className="max-w-4xl mx-auto px-4">
             <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">Trust &amp; Transparency</h2>
-              <p className="text-slate-600 max-w-2xl mx-auto">How QuoteXbert estimates work — and what they don&apos;t promise.</p>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">What to know about your estimate</h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">A few things to keep in mind as you plan your project.</p>
             </div>
             <ul className="grid sm:grid-cols-2 gap-3 md:gap-4 mb-8">
               {[
-                "Estimates are starting ranges, not binding contractor quotes",
-                "Final pricing depends on site conditions, materials, labour, permits, and scope",
-                "Homeowners can save and revisit their estimates",
-                "Contractors provide the final, professional quote",
-                "QuoteXbert does not guarantee project prices",
+                "Your estimate is a starting range, not a contractor's final quote",
+                "The final price depends on your project, materials, labour, permits and site conditions",
+                "Save your estimate and come back to it",
+                "Your contractor provides the final quote",
+                "Project prices are not guaranteed",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-200 text-sm text-slate-600 leading-relaxed hover:border-slate-300 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={2} />
@@ -768,13 +744,9 @@ export default function Home() {
               <div className="flex items-center gap-4 text-center sm:text-left">
                 <span className="text-4xl">🎉</span>
                 <div>
-                  <h3 className="text-xl font-black text-green-800">100% FREE for Homeowners</h3>
-                  <p className="text-sm text-green-700">No hidden fees · No commissions · Forever free</p>
+                  <h3 className="text-xl font-black text-green-800">Free for homeowners</h3>
+                  <p className="text-sm text-green-700">Create renovation estimates at no charge.</p>
                 </div>
-              </div>
-              <div className="bg-green-100 rounded-xl px-6 py-3 border border-green-300 text-center">
-                <div className="text-3xl font-black text-green-800">$0</div>
-                <div className="text-xs font-semibold text-green-700">Always</div>
               </div>
             </div>
           </div>
@@ -793,39 +765,19 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               {/* Left: Value Prop */}
               <div className="text-center md:text-left">
-                <div className="inline-block bg-rose-600/20 border border-rose-500/30 rounded-full px-4 py-2 mb-4">
-                  <span className="text-rose-400 font-semibold text-sm">FOR CONTRACTORS</span>
-                </div>
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-                  Get Local Renovation<br />Opportunities Across Ontario
+                  Find renovation jobs in your area
                 </h2>
                 <p className="text-base md:text-lg text-slate-300 mb-4 md:mb-6">
-                  Create your contractor profile, choose your trades and service areas, and discover
-                  relevant homeowner opportunities across Durham Region, Toronto, Clarington, and the GTA.
+                  Create a profile, choose your trades and service area, then browse jobs from local homeowners.
                 </p>
                 
-                {/* Quick Stats */}
-                <div className="flex gap-3 mb-6 justify-center md:justify-start">
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-rose-500">GTA</div>
-                    <div className="text-slate-400 text-xs">Coverage</div>
-                  </div>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-orange-500">11</div>
-                    <div className="text-slate-400 text-xs">Categories</div>
-                  </div>
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border border-slate-700 text-center">
-                    <div className="text-2xl font-black text-amber-500">$0</div>
-                    <div className="text-slate-400 text-xs">Commission</div>
-                  </div>
-                </div>
-
                 <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                   <Link
                     href={isSignedIn && user?.role === 'contractor' ? "/contractor/jobs" : "/contractors/join"}
                     className="inline-flex items-center justify-center gap-2 bg-[#800020] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#600018] transition-all transform hover:scale-105 shadow-xl"
                   >
-                    {isSignedIn && user?.role === 'contractor' ? "Browse Leads Now" : "Join as Contractor"}
+                    {isSignedIn && user?.role === 'contractor' ? "Find local jobs" : "Join as a contractor"}
                   </Link>
                 </div>
               </div>
@@ -838,7 +790,7 @@ export default function Home() {
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-white mb-0.5">Real Project Leads</h3>
+                      <h3 className="text-base font-bold text-white mb-0.5">Jobs from homeowners</h3>
                       <p className="text-slate-300 text-sm">Homeowners post jobs with project details and budgets</p>
                     </div>
                   </div>
@@ -860,8 +812,8 @@ export default function Home() {
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-white mb-0.5">Toronto &amp; GTA Projects</h3>
-                      <p className="text-slate-300 text-sm">All projects are in your service area</p>
+                      <h3 className="text-base font-bold text-white mb-0.5">Local projects</h3>
+                      <p className="text-slate-300 text-sm">Find jobs in your service area</p>
                     </div>
                   </div>
                 </div>
@@ -882,10 +834,10 @@ export default function Home() {
               <Camera className="w-7 h-7 text-white" strokeWidth={2} />
             </div>
             <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">
-              Take a photo. Get your price.
+              Plan your next renovation.
             </h2>
             <p className="text-lg mb-8 text-rose-100">
-              Free AI estimate in 30 seconds. Free account required.
+              Start with a free estimate from a photo or project details.
             </p>
             <button
               onClick={() => {
@@ -897,7 +849,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 bg-white text-rose-600 font-bold px-10 py-4 rounded-xl transition-all hover:scale-[1.02] shadow-xl hover:shadow-2xl text-lg"
             >
               <Camera className="w-5 h-5" strokeWidth={2} />
-              Get Free AI Estimate
+              Get an estimate
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

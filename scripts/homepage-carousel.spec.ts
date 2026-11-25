@@ -1,5 +1,16 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect as playwrightExpect, test, type Page } from "@playwright/test";
 import credits from "../public/homepage/photography-credits.json";
+
+const privateReviewMode = process.env.NEXT_PUBLIC_QX_BANNER_REVIEW === "1";
+const privateReviewPhotoNames = [
+  "estimate",
+  "local-bids",
+  "ai-planning",
+  "visualize-kitchen",
+  "inspiration",
+  "contractor",
+];
+const expect = privateReviewMode ? playwrightExpect.configure({ timeout: 15_000 }) : playwrightExpect;
 
 test.use({ baseURL: "http://127.0.0.1:3102", hasTouch: true, viewport: { width: 1440, height: 1000 } });
 test.setTimeout(60_000);
@@ -8,10 +19,14 @@ async function openHomepage(page: Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
   await expect(carousel).toBeVisible();
-  await expect(carousel.locator("img")).toHaveCount(2);
+  const journeyPhotos = carousel.locator(".journey-photo img");
+  await expect(journeyPhotos).toHaveCount(2);
+  await expect.poll(() => journeyPhotos.evaluateAll(images =>
+    images.every(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0),
+  )).toBe(true);
 }
 
-test("six existing journeys fit mobile/desktop without hidden focus targets or false feed claims", async ({ page }) => {
+test("six journeys fit mobile/desktop and the inspiration banner opens the available gallery", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openHomepage(page);
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
@@ -46,10 +61,23 @@ test("six existing journeys fit mobile/desktop without hidden focus targets or f
     }
   }
   await carousel.getByRole("button", { name: /^Show journey 5:/ }).click();
-  await expect(carousel.locator('[aria-hidden="false"]')).toContainText("social inspiration feed is coming soon");
-  await expect(carousel.getByRole("link", { name: "Explore Example Gallery" })).toHaveAttribute("href", "/visualizer-library");
+  const inspirationSlide = carousel.locator('[aria-hidden="false"]');
+  await expect(inspirationSlide.getByRole("heading")).toHaveText("Your dream home starts here.");
+  await expect(inspirationSlide).toContainText("Explore renovation ideas and find inspiration for your next home project.");
+  await expect(carousel.getByRole("link", { name: "Get inspired" })).toHaveAttribute("href", "/visualizer-library");
   await page.goto("/visualizer-library", { waitUntil: "domcontentloaded" });
   await expect(page.getByText(/Illustrative stock-image examples/)).toBeVisible();
+});
+
+test("homepage sections use plain language and keep the estimate disclosure", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText("Get an estimate, review it, and choose whether to share your project with local contractors.")).toBeVisible();
+  await expect(page.getByText("Example photos, not customer projects.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "How QuoteXbert works", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Plan your renovation with QuoteXbert" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What to know about your estimate" })).toBeVisible();
+  await expect(page.getByText("Your estimate is a starting range, not a contractor's final quote", { exact: true })).toBeVisible();
 });
 
 test("automatic rotation pauses for hover/focus and manual keyboard/navigation works", async ({ page }) => {
@@ -88,8 +116,20 @@ test("mobile contractor offer does not cover the sticky estimate action", async 
   await expect(page.locator('div[role="banner"][aria-label="New Contractor Offer"]')).toBeHidden();
 });
 
-test("reduced motion disables autoplay, horizontal touch works, and existing actions do not write data", async ({ page }) => {
+test("reduced motion disables carousel autoplay", async ({ page }) => {
   await page.clock.install();
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openHomepage(page);
+  const carousel = page.getByRole("region", { name: "Renovation journeys" });
+  const active = carousel.locator('[aria-roledescription="slide"][aria-hidden="false"]');
+  await expect(carousel.getByRole("button", { name: /disabled for reduced motion/ })).toBeDisabled();
+  await expect(active).toHaveAttribute("aria-label", "1 of 6");
+  await page.clock.fastForward(15000);
+  await expect(active).toHaveAttribute("aria-label", "1 of 6");
+});
+
+test("existing homepage actions use available destinations without writing data", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openHomepage(page);
@@ -105,17 +145,32 @@ test("reduced motion disables autoplay, horizontal touch works, and existing act
     }
     await route.continue();
   });
-  await expect(carousel.getByRole("button", { name: /disabled for reduced motion/ })).toBeDisabled();
-  await page.clock.fastForward(15000);
-  await expect(active).toHaveAttribute("aria-label", "1 of 6");
+  await carousel.getByRole("link", { name: "Get an estimate" }).click();
+  await expect(page.locator("#estimator-tool")).toBeInViewport();
+  await carousel.scrollIntoViewIfNeeded();
+  await carousel.getByRole("button", { name: /^Show journey 2:/ }).click();
+  await expect(active).toHaveAttribute("aria-label", "2 of 6");
+  await expect(carousel.getByRole("link", { name: "Post a job" })).toHaveAttribute("href", "/create-lead");
+  await carousel.getByRole("button", { name: /^Show journey 3:/ }).click();
+  await expect(active).toHaveAttribute("aria-label", "3 of 6");
+  await expect(page.locator("#quotexbert-ai-launcher")).toBeAttached();
+  await carousel.getByRole("button", { name: "Ask QuoteXbert AI", exact: true }).click();
+  await expect(page.locator("#quotexbert-ai-panel")).toBeVisible();
+  await expect(page.getByText(/Guided AI planning is not enabled/)).toBeVisible();
+  expect(writes).toEqual([]);
+});
+
+test("horizontal touch changes journeys while a vertical gesture remains available", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openHomepage(page);
+  const carousel = page.getByRole("region", { name: "Renovation journeys" });
+  const active = carousel.locator('[aria-roledescription="slide"][aria-hidden="false"]');
   await carousel.evaluate(element => {
-    const gesture = (startX: number, startY: number, endX: number, endY: number) => {
-      const start = new Touch({ identifier: 1, target: element, clientX: startX, clientY: startY });
-      const end = new Touch({ identifier: 1, target: element, clientX: endX, clientY: endY });
-      element.dispatchEvent(new TouchEvent("touchstart", { touches: [start], bubbles: true }));
-      element.dispatchEvent(new TouchEvent("touchend", { changedTouches: [end], bubbles: true }));
-    };
-    gesture(220, 150, 80, 155);
+    const start = new Touch({ identifier: 1, target: element, clientX: 220, clientY: 150 });
+    const end = new Touch({ identifier: 1, target: element, clientX: 80, clientY: 155 });
+    element.dispatchEvent(new TouchEvent("touchstart", { touches: [start], bubbles: true }));
+    element.dispatchEvent(new TouchEvent("touchend", { changedTouches: [end], bubbles: true }));
   });
   await expect(active).toHaveAttribute("aria-label", "2 of 6");
   await carousel.evaluate(element => {
@@ -125,24 +180,14 @@ test("reduced motion disables autoplay, horizontal touch works, and existing act
     element.dispatchEvent(new TouchEvent("touchend", { changedTouches: [end], bubbles: true }));
   });
   await expect(active).toHaveAttribute("aria-label", "2 of 6");
-  await expect(carousel.getByRole("link", { name: "Post a Job" })).toHaveAttribute("href", "/create-lead");
-  await carousel.getByRole("button", { name: /^Show journey 1:/ }).click();
-  await carousel.getByRole("link", { name: "Get My Estimate" }).click();
-  await expect(page.locator("#estimator-tool")).toBeInViewport();
-  await carousel.scrollIntoViewIfNeeded();
-  await carousel.getByRole("button", { name: /^Show journey 2:/ }).click();
-  await expect(carousel.getByRole("link", { name: "Post a Job" })).toHaveAttribute("href", "/create-lead");
-  await carousel.getByRole("button", { name: /^Show journey 3:/ }).click();
-  await carousel.getByRole("button", { name: "Plan My Project", exact: true }).click();
-  await expect(page.locator("#quotexbert-ai-panel")).toBeVisible();
-  await expect(page.getByText(/Guided AI planning is not enabled/)).toBeVisible();
-  expect(writes).toEqual([]);
 });
 
-test("six licensed carousel photographs load with a two-image initial budget and stable desktop/mobile composition", async ({ page }) => {
+test("carousel photographs use the correct source with a two-image initial budget and stable desktop/mobile composition", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
-  const names = credits.photos.map(photo => photo.file.replace(/\.webp$/, ""));
+  const names = privateReviewMode
+    ? privateReviewPhotoNames.flatMap(name => [name, `${name}-mobile`])
+    : credits.photos.map(photo => photo.file.replace(/\.webp$/, ""));
   expect(new Set(credits.photos.map(photo => photo.source)).size).toBe(7);
   expect(credits.license.url).toBe("https://www.pexels.com/license/");
   const photoResponses = new Map<string, Promise<number>>();
@@ -152,8 +197,9 @@ test("six licensed carousel photographs load with a two-image initial budget and
     }
   });
   await openHomepage(page);
-  await expect(carousel.locator("img")).toHaveCount(2);
-  await expect.poll(() => carousel.locator("img").evaluateAll(images =>
+  const journeyPhotos = carousel.locator(".journey-photo img");
+  await expect(journeyPhotos).toHaveCount(2);
+  await expect.poll(() => journeyPhotos.evaluateAll(images =>
     images.every(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0),
   )).toBe(true);
   const initialCarouselRequests = new Set(await carousel.locator("img").evaluateAll(images =>
@@ -169,7 +215,7 @@ test("six licensed carousel photographs load with a two-image initial budget and
     urls: carouselResponses.map(([url]) => url),
   };
   expect(initialMedia.photos).toBe(2);
-  expect(initialMedia.fullSizeRequests).toBe(2);
+  expect(initialMedia.fullSizeRequests).toBe(privateReviewMode ? 0 : 2);
   expect(initialMedia.bytes).toBeGreaterThan(0);
   expect(initialMedia.bytes).toBeLessThan(350_000);
   await test.info().attach("initial-photo-network.json", {
@@ -177,29 +223,71 @@ test("six licensed carousel photographs load with a two-image initial budget and
     contentType: "application/json",
   });
   await expect(carousel.locator("img").first()).toHaveAttribute("fetchpriority", "high");
-  const headings = [
-    "Take a Picture. Get an Instant Renovation Quote.",
-    "Post a Job From a Picture. Get Local Contractor Bids.",
-    "Plan Your Renovation Smarter With QuoteXbert AI.",
-    "See Your Renovation Before You Start.",
-    "Get Inspired by Real Home Renovations.",
-    "Find Local Renovation Opportunities.",
+  const banners = [
+    {
+      title: "Take a picture. Get an instant quote.",
+      description: "Upload a photo and let AI estimate the cost of your renovation.",
+      action: "Get an estimate",
+    },
+    {
+      title: "Post a job. Get local quotes.",
+      description: "Upload a picture of what you need done and receive quotes from local contractors.",
+      action: "Post a job",
+    },
+    {
+      title: "Get help with your renovation.",
+      description: "Explore estimates, cost guides and design ideas for your next project.",
+      action: "Ask QuoteXbert AI",
+    },
+    {
+      title: "See it before you build it.",
+      description: "Upload a photo of your space and see how it could look after a renovation.",
+      action: "Visualize your space",
+    },
+    {
+      title: "Your dream home starts here.",
+      description: "Explore renovation ideas and find inspiration for your next home project.",
+      action: "Get inspired",
+    },
+    {
+      title: "More jobs. More opportunities.",
+      description: "Find local renovation jobs, send quotes and grow your contracting business.",
+      action: "Find local jobs",
+    },
   ];
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     const sources = new Set<string>();
     let height: number | undefined;
-    for (let index = 0; index < headings.length; index++) {
+    for (let index = 0; index < banners.length; index++) {
       await carousel.getByRole("button", { name: new RegExp(`^Show journey ${index + 1}:`) }).click();
       const slide = carousel.locator('[aria-roledescription="slide"][aria-hidden="false"]');
-      await expect(slide.getByRole("heading")).toHaveText(headings[index] ?? "");
-      await expect(slide.locator(".journey-chip")).toBeVisible();
+      const banner = banners[index];
+      if (!banner) throw new Error(`Missing banner copy for journey ${index + 1}`);
+      await expect(slide.getByRole("heading")).toHaveText(banner.title);
+      await expect(slide.getByText(banner.description, { exact: true })).toBeVisible();
+      await expect(slide.locator(".journey-chip, .journey-label, .journey-phone-composition")).toHaveCount(0);
+      if (index === 2) {
+        await expect(slide.getByRole("button", { name: banner.action })).toBeVisible();
+      } else {
+        await expect(slide.getByRole("link", { name: banner.action })).toBeVisible();
+      }
       const image = slide.getByRole("img");
       await expect.poll(() => image.evaluate(node =>
         node instanceof HTMLImageElement && node.complete && node.naturalWidth > 0,
       )).toBe(true);
-      sources.add(await image.getAttribute("src") ?? "");
-      await expect(slide.getByRole("link", { name: /Stock photo:/ })).toHaveAttribute("href", credits.photos[index]?.source ?? "");
+      const currentSource = await image.evaluate(node => node instanceof HTMLImageElement ? node.currentSrc : "");
+      sources.add(currentSource);
+      if (privateReviewMode) {
+        const photoName = privateReviewPhotoNames[index];
+        expect(currentSource).toContain(`/api/local-banner-review/${photoName}${width <= 760 ? "-mobile" : ""}.webp`);
+        await expect(slide.locator(".journey-photo-credit")).toHaveText("Private image review · attribution unverified");
+        if (index === 3) {
+          expect(currentSource).toContain(`/api/local-banner-review/visualize-kitchen${width <= 760 ? "-mobile" : ""}.webp`);
+        }
+      } else {
+        await expect(slide.getByRole("link", { name: /Stock photo:/ })).toHaveAttribute("href", credits.photos[index]?.source ?? "");
+      }
       const box = await carousel.boundingBox();
       expect(box).not.toBeNull();
       if (height === undefined) height = box?.height;
@@ -226,6 +314,7 @@ test("six licensed carousel photographs load with a two-image initial budget and
 });
 
 test("failed replacement photography reports an error without blanking the current scene", async ({ page }) => {
+  test.skip(privateReviewMode, "The licensed-fallback suite covers replacement-image error handling.");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await openHomepage(page);
   const carousel = page.getByRole("region", { name: "Renovation journeys" });
@@ -234,8 +323,9 @@ test("failed replacement photography reports an error without blanking the curre
     node instanceof HTMLImageElement && node.complete && node.naturalWidth > 0,
   )).toBe(true);
   let failLastPhoto = true;
-  await page.route("**/_next/image?**", async route => {
-    if (failLastPhoto && decodeURIComponent(route.request().url()).includes("/contractor-flooring.")) {
+  await page.route(privateReviewMode ? "**/api/local-banner-review/**" : "**/_next/image?**", async route => {
+    const url = decodeURIComponent(route.request().url());
+    if (failLastPhoto && (privateReviewMode ? url.includes("/contractor.webp") : url.includes("/contractor-flooring."))) {
       await route.fulfill({ status: 503, body: "Isolated photo failure" });
     } else {
       await route.continue();
@@ -267,13 +357,17 @@ test("photo and job actions use existing destinations without submitting a proje
     await route.continue();
   });
   await carousel.getByRole("button", { name: /^Show journey 2:/ }).click();
-  await expect(carousel.getByRole("link", { name: "Post a Job" })).toHaveAttribute("href", "/create-lead");
+  await expect(carousel.getByRole("link", { name: "Post a job" })).toHaveAttribute("href", "/create-lead");
   await carousel.getByRole("button", { name: /^Show journey 4:/ }).click();
-  await expect(carousel).toContainText("Visualization preview");
-  await expect(carousel.getByRole("link", { name: "Try Photo Visualization" })).toHaveAttribute("href", "/visualizer");
+  await expect(carousel).toContainText("Upload a photo of your space and see how it could look after a renovation.");
+  await expect(carousel.getByRole("link", { name: "Visualize your space" })).toHaveAttribute("href", "/visualizer");
   await openHomepage(page);
   await carousel.getByRole("button", { name: /^Show journey 6:/ }).click();
-  await expect(carousel.locator('[aria-label="6 of 6"]')).toHaveAttribute("aria-hidden", "false");
-  await expect(carousel.getByRole("link", { name: "Browse Jobs" })).toHaveAttribute("href", "/contractor/jobs");
+  const contractorSlide = carousel.locator('[aria-label="6 of 6"]');
+  await expect.poll(() => contractorSlide.locator("img").evaluate(image =>
+    image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0,
+  ), { timeout: 15_000 }).toBe(true);
+  await expect(contractorSlide).toHaveAttribute("aria-hidden", "false", { timeout: 15_000 });
+  await expect(carousel.getByRole("link", { name: "Find local jobs" })).toHaveAttribute("href", "/contractor/jobs");
   expect(writes).toEqual([]);
 });

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "responsive-header";
@@ -10,16 +11,15 @@ interface LogoProps {
   className?: string;
 }
 
-// Width:height ratio matches logo.svg viewBox (200:240 = 5:6)
-const sizeMap = {
-  sm: { width: 32, height: 38, textSize: "text-lg" },
-  md: { width: 40, height: 48, textSize: "text-2xl" },
-  lg: { width: 50, height: 60, textSize: "text-3xl" },
-  xl: { width: 67, height: 80, textSize: "text-4xl" },
-  "2xl": { width: 100, height: 120, textSize: "text-5xl" },
-  "3xl": { width: 125, height: 150, textSize: "text-6xl" },
-  "responsive-header": { width: 36, height: 43, textSize: "text-xl sm:text-2xl md:text-3xl" }
-};
+const iconSizes = {
+  sm: 28,
+  md: 36,
+  lg: 44,
+  xl: 56,
+  "2xl": 72,
+  "3xl": 96,
+  "responsive-header": 36,
+} satisfies Record<NonNullable<LogoProps["size"]>, number>;
 
 export default function Logo({ 
   size = "md", 
@@ -27,36 +27,41 @@ export default function Logo({
   href = "/", 
   className = "" 
 }: LogoProps) {
-  const { width, height, textSize } = sizeMap[size];
-  
-  const logoContent = (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Image
-        src="/logo.svg"
-        alt="QuoteXbert mascot"
-        width={width}
-        height={height}
-        priority
-        className="shrink-0"
-      />
+  const content = (
+    <span
+      className={`qx-logo ${size === "responsive-header" ? "qx-logo-header" : ""} ${className}`}
+      style={{ "--qx-logo-size": `${iconSizes[size]}px` } as CSSProperties}
+    >
+      <span className="qx-logo-icon">
+        <Image
+          src="/branding/quotexbert-qx-icon-display.webp"
+          alt={showText ? "" : "QuoteXbert"}
+          width={558}
+          height={540}
+          unoptimized
+          priority={size === "responsive-header"}
+        />
+      </span>
       {showText && (
-        <span className={`font-black text-[#800020] ${textSize} tracking-tight`}>
-          QuoteXbert
+        <span className="qx-logo-wordmark">
+          <Image
+            src="/branding/quotexbert-wordmark-display.webp"
+            alt="QuoteXbert"
+            width={2036}
+            height={353}
+            unoptimized
+            priority={size === "responsive-header"}
+          />
         </span>
       )}
-    </div>
+    </span>
   );
 
-  if (href) {
-    return (
-      <Link 
-        href={href}
-        className="hover:opacity-90 transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-md"
-      >
-        {logoContent}
-      </Link>
-    );
-  }
-
-  return logoContent;
+  return href ? (
+    <Link href={href} className="qx-logo-link">
+      {content}
+    </Link>
+  ) : (
+    content
+  );
 }
